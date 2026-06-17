@@ -36,8 +36,8 @@
       "image_prompt_ko": "디자인 스튜디오 책상 위에 사진 선별, 레이어 합성, 색보정 화면이 여러 패널로 떠 있고 그 사이를 부드러운 AI 흐름선이 연결하는 장면. 텍스트와 로고 없음, 16:9 에디토리얼 일러스트레이션.",
       "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQVnhjN0d6M0oyNGJnU0pXRkE2QmhTZUEwQ01BMUVsUzVTclVIX0tXRG1TS25ZX0xJazhxSHU4WnA4YVBVeXZaU3pfN1hwcmtoeUFiT0ZGVms4dlhVLVY1SnY3aUJlcjhRM0l6aXV2NjIyZHQtMUU0Y01ab0QxU0lKd0s4My1Nb2VaQWFrN2pfUzZad3k1V1FSZ25yek1ybTZ3WVdMRmh1b1VWTVQ0aGlqeEhGeW12RWxiaE5kS3d6dmo1WF9BOXZubG1ZbEk1X01NcHQ3ZDZR?oc=5",
       "links": {},
-      "image_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-adobe-creative-cloud.png",
-      "media_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-adobe-creative-cloud.png",
+      "image_url": "assets/brief-adobe-creative-cloud.png",
+      "media_url": "assets/brief-adobe-creative-cloud.png",
       "media_type": "image",
       "media_source": "gpt-image-2-generated",
       "image_source": "gpt-image-2-generated"
@@ -53,8 +53,8 @@
       "image_prompt_ko": "여러 개의 이미지 생성 노드, 색보정 노드, 합성 노드가 그래프 형태로 연결되어 하나의 최종 비주얼로 흐르는 추상적 창작 파이프라인. 텍스트와 로고 없음, 16:9 에디토리얼 일러스트레이션.",
       "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBidTZzRTRmZUQteWFIbTBuZDRLQWxxZEVJNUUzcDllMDl5aGJXaHRueVlFcHlxc3g2WXZqRGJaLS1LWjFqM01DTnMwVzBRbTBlcHZUQ0tENmpLWUJoZU1r?oc=5",
       "links": {},
-      "image_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-firefly-graph.png",
-      "media_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-firefly-graph.png",
+      "image_url": "assets/brief-firefly-graph.png",
+      "media_url": "assets/brief-firefly-graph.png",
       "media_type": "image",
       "media_source": "gpt-image-2-generated",
       "image_source": "gpt-image-2-generated"
@@ -70,8 +70,8 @@
       "image_prompt_ko": "영화 촬영장처럼 구성된 디지털 스튜디오에서 여러 AI 영상 스타일 프리셋과 카메라 움직임 궤적이 겹쳐 보이는 장면. 텍스트와 로고 없음, 16:9 에디토리얼 일러스트레이션.",
       "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5",
       "links": {},
-      "image_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-higgsfield-video.png",
-      "media_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-higgsfield-video.png",
+      "image_url": "assets/brief-higgsfield-video.png",
+      "media_url": "assets/brief-higgsfield-video.png",
       "media_type": "image",
       "media_source": "gpt-image-2-generated",
       "image_source": "gpt-image-2-generated"
@@ -87,8 +87,8 @@
       "image_prompt_ko": "어두운 스튜디오에서 로컬 AI 에이전트가 게임 화면 스크린샷을 분석하고, 레이트레이싱 장면 위에 피드백 루프가 빛나는 장면. 텍스트와 로고 없음, 16:9 에디토리얼 일러스트레이션.",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u89f2q/headless_screenshot_loops_let_a_local_30b_agent/",
       "links": {},
-      "image_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-agent-screenshot-loop.png",
-      "media_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-agent-screenshot-loop.png",
+      "image_url": "assets/brief-agent-screenshot-loop.png",
+      "media_url": "assets/brief-agent-screenshot-loop.png",
       "media_type": "image",
       "media_source": "gpt-image-2-generated",
       "image_source": "gpt-image-2-generated"
@@ -106,8 +106,8 @@
       "links": {
         "논문": "https://arxiv.org/abs/2606.18247v1"
       },
-      "image_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-veritas-visual-verifier.png",
-      "media_url": "/project/vertex_artlab/08_outputs/ai_digest/assets/brief-veritas-visual-verifier.png",
+      "image_url": "assets/brief-veritas-visual-verifier.png",
+      "media_url": "assets/brief-veritas-visual-verifier.png",
       "media_type": "image",
       "media_source": "gpt-image-2-generated",
       "image_source": "gpt-image-2-generated"
