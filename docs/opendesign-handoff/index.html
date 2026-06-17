@@ -13,13 +13,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system
 a{color:inherit}
 .page{max-width:1180px;margin:0 auto;padding:34px 22px 70px}
 .masthead{border-bottom:1px solid var(--ink);padding:8px 0 22px;margin-bottom:26px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
-.kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 h1{font-size:clamp(42px,7vw,82px);line-height:.95;letter-spacing:-.055em;margin:8px 0 0;font-weight:850;text-wrap:balance}
 .pubdate{font-size:15px;color:var(--muted);font-weight:700;white-space:nowrap}
-.intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:28px;margin:22px 0 38px;align-items:start}
-.intro p{font-size:21px;line-height:1.55;margin:0;letter-spacing:-.015em}
-.policy{border-left:3px solid var(--accent);padding-left:16px;color:var(--muted);font-size:15px;line-height:1.65}
-.lead{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(320px,.84fr);gap:28px;border-top:3px solid var(--ink);border-bottom:1px solid var(--line);padding:24px 0 30px;margin-bottom:22px}
+.lead{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(320px,.84fr);gap:28px;border-top:3px solid var(--ink);border-bottom:1px solid var(--line);padding:24px 0 30px;margin:26px 0 22px}
 .lead .media{margin:0}
 .media{background:var(--soft);border:1px solid var(--line);overflow:hidden}
 .media img,.media video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111}
@@ -41,21 +37,16 @@ h2{font-size:clamp(32px,4.5vw,56px);line-height:1.02;letter-spacing:-.04em;margi
 .story .media{align-self:start}
 .story h3{font-size:24px;line-height:1.22;letter-spacing:-.03em;margin:8px 0 10px;text-wrap:pretty}
 .story p{font-size:15px}
-.footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:18px;color:var(--muted);font-size:14px;line-height:1.65}
-@media(max-width:900px){.masthead,.intro,.lead{grid-template-columns:1fr}.pubdate{white-space:normal}.grid{grid-template-columns:1fr}.story{grid-template-columns:150px 1fr}}
-@media(max-width:620px){.page{padding:24px 16px 54px}.story{grid-template-columns:1fr}.story .media{width:100%}.intro p{font-size:18px}}
+@media(max-width:900px){.masthead,.lead{grid-template-columns:1fr}.pubdate{white-space:normal}.grid{grid-template-columns:1fr}.story{grid-template-columns:150px 1fr}}
+@media(max-width:620px){.page{padding:24px 16px 54px}.story{grid-template-columns:1fr}.story .media{width:100%}}
 </style>
 </head>
 <body>
 <main class="page">
   <header class="masthead">
-    <div><div class="kicker">Daily field notes for creative AI</div><h1>창작자를 위한 AI 다이제스트</h1></div>
+    <div><h1>창작자를 위한 AI 다이제스트</h1></div>
     <div class="pubdate">발행일 2026.06.17</div>
   </header>
-  <section class="intro">
-    <p>최근 10일 안의 AI 도구·사례·연구 중에서 창작 현장에서 바로 참고할 만한 것만 골랐습니다. 어렵게 들리는 기술도 “어디에 써볼 수 있을까?”가 보이도록 쉽게 풀어 전합니다.</p>
-    <div class="policy">이미지·영상·음악·3D·로봇·에이전트처럼 실제 제작 흐름을 바꿀 수 있는 소식을 우선합니다. 링크는 공개 원문 기준으로 연결합니다.</div>
-  </section>
   <section class="lead">
     <div class="media media-video"><video src="https://research.nvidia.com/labs/gear/motionbricks/videos/motionbricks_demo_1080p30f.mp4" controls muted playsinline preload="metadata"></video></div>
     <div class="lead-copy">
@@ -68,7 +59,7 @@ h2{font-size:clamp(32px,4.5vw,56px);line-height:1.02;letter-spacing:-.04em;margi
       <div class="links"><a href="https://nvlabs.github.io/motionbricks/" target="_blank" rel="noopener">원문</a><a href="https://nvlabs.github.io/motionbricks/" target="_blank" rel="noopener">프로젝트</a><a href="https://github.com/NVlabs/GR00T-WholeBodyControl/tree/main/motionbricks" target="_blank" rel="noopener">GitHub</a></div>
     </div>
   </section>
-  <div class="section-title"><h2>오늘 볼 만한 토픽</h2><span>최근 10일 기준</span></div>
+  <div class="section-title"><h2>오늘 볼 만한 토픽</h2></div>
   <section class="grid">
     <article class="story">
       <div class="media"><img src="assets/brief-adobe-creative-cloud.png" alt="Adobe Creative Cloud, 선별부터 합성까지 창작 워크플로우 전반에 AI 기능 확장" loading="lazy"></div>
@@ -117,7 +108,6 @@ h2{font-size:clamp(32px,4.5vw,56px);line-height:1.02;letter-spacing:-.04em;margi
       </div>
     </article>
   </section>
-  <footer class="footer">최근 10일 안의 공개 자료를 바탕으로, 창작자·교육자·디자이너가 현장에서 빠르게 참고할 수 있도록 정리한 다이제스트입니다.</footer>
 </main>
 </body>
 </html>
