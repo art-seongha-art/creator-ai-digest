@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">
+  <entry>
+    <id>yt:video:abc123</id>
+    <yt:videoId>abc123</yt:videoId>
+    <title>New AI video model demo</title>
+    <link rel="alternate" href="https://www.youtube.com/watch?v=abc123"/>
+    <published>2026-06-16T12:00:00+00:00</published>
+    <updated>2026-06-16T12:00:00+00:00</updated>
+  </entry>
+</feed>

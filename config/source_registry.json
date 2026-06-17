@@ -1,0 +1,602 @@
+{
+  "period_days": 7,
+  "categories": [
+    "주요 뉴스",
+    "LLM / 모델",
+    "에이전트 / 코딩",
+    "이미지",
+    "영상",
+    "음악 / 오디오",
+    "3D / 공간",
+    "정책 / 저작권",
+    "하드웨어 / 인프라",
+    "논문"
+  ],
+  "sources": [
+    {
+      "id": "official-openai",
+      "display_name": "OpenAI News",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://openai.com/news/rss.xml",
+      "fallback_urls": [
+        "https://openai.com/news/"
+      ],
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-anthropic",
+      "display_name": "Anthropic News",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://www.anthropic.com/news/rss.xml",
+      "fallback_urls": [
+        "https://www.anthropic.com/news"
+      ],
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-deepmind",
+      "display_name": "Google DeepMind Blog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://deepmind.google/discover/blog/rss.xml",
+      "fallback_urls": [
+        "https://deepmind.google/blog/"
+      ],
+      "category_hints": [
+        "LLM / 모델",
+        "논문"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-adobe",
+      "display_name": "Adobe Blog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://blog.adobe.com/en/feed.xml",
+      "fallback_urls": [
+        "https://blog.adobe.com/en",
+        "https://news.adobe.com/news"
+      ],
+      "category_hints": [
+        "이미지",
+        "영상"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-runway",
+      "display_name": "Runway News",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://runwayml.com/news/rss.xml",
+      "fallback_urls": [
+        "https://runwayml.com/news",
+        "https://runwayml.com/research"
+      ],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-suno",
+      "display_name": "Suno Blog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://suno.com/blog/rss.xml",
+      "fallback_urls": [
+        "https://suno.com/blog",
+        "https://suno.com/release-notes"
+      ],
+      "category_hints": [
+        "음악 / 오디오"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-elevenlabs",
+      "display_name": "ElevenLabs Blog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://elevenlabs.io/blog/rss.xml",
+      "fallback_urls": [
+        "https://elevenlabs.io/blog",
+        "https://elevenlabs.io/docs/changelog"
+      ],
+      "category_hints": [
+        "음악 / 오디오"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "official-runway-changelog",
+      "display_name": "Runway Changelog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://runwayml.com/changelog",
+      "fallback_urls": [
+        "https://runwayml.com/changelog"
+      ],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Official Runway product changelog page."
+    },
+    {
+      "id": "official-luma-changelog",
+      "display_name": "Luma Changelog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://lumalabs.ai/changelog",
+      "fallback_urls": [
+        "https://lumalabs.ai/changelog"
+      ],
+      "category_hints": [
+        "영상",
+        "3D / 공간"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Official Luma changelog page."
+    },
+    {
+      "id": "official-higgsfield-home",
+      "display_name": "Higgsfield Official",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://higgsfield.ai/",
+      "fallback_urls": [
+        "https://higgsfield.ai/"
+      ],
+      "category_hints": [
+        "영상",
+        "이미지"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Official Higgsfield landing page for feature monitoring."
+    },
+    {
+      "id": "official-kling-blog",
+      "display_name": "Kling AI Blog",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://klingaio.com/blogs",
+      "fallback_urls": [
+        "https://klingaio.com/blogs"
+      ],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Kling AI blog page for release monitoring."
+    },
+    {
+      "id": "official-nvlabs-motionbricks",
+      "display_name": "NVLabs MotionBricks",
+      "source_group": "official",
+      "adapter": "rss",
+      "primary_url": "https://nvlabs.github.io/motionbricks/",
+      "fallback_urls": [
+        "https://nvlabs.github.io/motionbricks/"
+      ],
+      "category_hints": [
+        "3D / 공간"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Official MotionBricks project page with videos."
+    },
+    {
+      "id": "nvidia-robotics-motion-search",
+      "display_name": "NVIDIA Robotics / Motion search",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=MotionBricks+NVIDIA+NVLabs+robot+motion+generation+humanoid+when%3A21d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "3D / 공간"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Search feed for NVIDIA/NVLabs robot motion generation updates."
+    },
+    {
+      "id": "robot-motion-generation-search",
+      "display_name": "Robot motion generation search",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=robot+motion+generation+AI+animation+humanoid+real-time+motion+model+when%3A21d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "3D / 공간"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Search feed for robot/animation motion generation updates relevant to media art and spatial interaction."
+    },
+    {
+      "id": "creative-kling-updates",
+      "display_name": "Kling AI updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Kling+AI+new+model+update+video+generation+OR+Kling+3.0+OR+Kling+O3+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-google-flow-veo",
+      "display_name": "Google Flow / Veo updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Google+Flow+Veo+new+model+update+OR+Veo+3+Flow+video+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-higgsfield-updates",
+      "display_name": "Higgsfield updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Higgsfield+AI+update+new+model+video+creator+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-runway-updates",
+      "display_name": "Runway updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Runway+AI+new+model+update+video+generation+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-luma-updates",
+      "display_name": "Luma Dream Machine updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Luma+AI+Dream+Machine+new+model+update+video+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-pika-updates",
+      "display_name": "Pika updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Pika+AI+new+model+update+video+generation+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "영상"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-midjourney-updates",
+      "display_name": "Midjourney updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Midjourney+new+model+update+image+video+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "이미지"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-adobe-firefly-updates",
+      "display_name": "Adobe Firefly updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Adobe+Firefly+new+model+update+creative+cloud+AI+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "이미지"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-suno-updates",
+      "display_name": "Suno updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=Suno+AI+music+new+model+update+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "음악 / 오디오"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-elevenlabs-updates",
+      "display_name": "ElevenLabs updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=ElevenLabs+new+model+update+voice+music+audio+AI+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "음악 / 오디오"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-3d-updates",
+      "display_name": "AI 3D tool updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=AI+3D+model+generation+update+Tripo+Meshy+Rodin+Trellis+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "3D / 공간"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "creative-comfyui-updates",
+      "display_name": "ComfyUI workflow updates",
+      "source_group": "creative_tool",
+      "adapter": "rss",
+      "primary_url": "https://news.google.com/rss/search?q=ComfyUI+new+workflow+model+update+image+video+AI+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen",
+      "fallback_urls": [],
+      "category_hints": [
+        "이미지"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "note": "Creative tool update search feed; prioritize practical image/video/music/3D updates for art/design/education brief."
+    },
+    {
+      "id": "news-techcrunch-ai",
+      "display_name": "TechCrunch AI",
+      "source_group": "news",
+      "adapter": "rss",
+      "primary_url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "fallback_urls": [],
+      "category_hints": [
+        "주요 뉴스"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "news-theverge-ai",
+      "display_name": "The Verge AI",
+      "source_group": "news",
+      "adapter": "rss",
+      "primary_url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "fallback_urls": [],
+      "category_hints": [
+        "주요 뉴스"
+      ],
+      "max_items": 6,
+      "enabled": true
+    },
+    {
+      "id": "youtube-openai",
+      "display_name": "OpenAI YouTube",
+      "source_group": "youtube",
+      "adapter": "youtube",
+      "channel_id": "UCXZCJLdBC09xxGZ6gcdrc6A",
+      "category_hints": [
+        "LLM / 모델",
+        "영상"
+      ],
+      "auth_env": "YOUTUBE_API_KEY",
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "youtube-google-deepmind",
+      "display_name": "Google DeepMind YouTube",
+      "source_group": "youtube",
+      "adapter": "youtube",
+      "channel_id": "UCP7jMXSY2xbc3KCAE0MHQ-A",
+      "category_hints": [
+        "논문",
+        "LLM / 모델"
+      ],
+      "auth_env": "YOUTUBE_API_KEY",
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "reddit-localllama",
+      "display_name": "r/LocalLLaMA",
+      "source_group": "reddit",
+      "adapter": "reddit",
+      "subreddit": "LocalLLaMA",
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "reddit-singularity",
+      "display_name": "r/singularity",
+      "source_group": "reddit",
+      "adapter": "reddit",
+      "subreddit": "singularity",
+      "category_hints": [
+        "주요 뉴스"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "reddit-machinelearning",
+      "display_name": "r/MachineLearning",
+      "source_group": "reddit",
+      "adapter": "reddit",
+      "subreddit": "MachineLearning",
+      "category_hints": [
+        "논문"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "reddit-openai",
+      "display_name": "r/OpenAI",
+      "source_group": "reddit",
+      "adapter": "reddit",
+      "subreddit": "OpenAI",
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "reddit-claudeai",
+      "display_name": "r/ClaudeAI",
+      "source_group": "reddit",
+      "adapter": "reddit",
+      "subreddit": "ClaudeAI",
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "x-ai-search",
+      "display_name": "X AI search",
+      "source_group": "x",
+      "adapter": "auth_gated_social",
+      "primary_url": "https://api.x.com/2/tweets/search/recent",
+      "required_env": [
+        "X_BEARER_TOKEN"
+      ],
+      "category_hints": [
+        "주요 뉴스"
+      ],
+      "max_items": 5,
+      "enabled": false,
+      "note": "X recent search is kept optional because it may require a paid API plan."
+    },
+    {
+      "id": "threads-ai-search",
+      "display_name": "Threads existing account",
+      "source_group": "threads",
+      "adapter": "threads",
+      "primary_url": "https://graph.threads.net/v1.0/{THREADS_USER_ID}/threads",
+      "required_env": [
+        "THREADS_USER_ID",
+        "THREADS_ACCESS_TOKEN"
+      ],
+      "category_hints": [
+        "주요 뉴스",
+        "LLM / 모델"
+      ],
+      "max_items": 5,
+      "enabled": true,
+      "user_id_env": "THREADS_USER_ID",
+      "token_env": "THREADS_ACCESS_TOKEN"
+    },
+    {
+      "id": "hn-openai",
+      "display_name": "Hacker News: OpenAI",
+      "source_group": "hn",
+      "adapter": "hn",
+      "query": "OpenAI",
+      "category_hints": [
+        "LLM / 모델"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "hn-ai-agent",
+      "display_name": "Hacker News: AI 에이전트",
+      "source_group": "hn",
+      "adapter": "hn",
+      "query": "AI agent",
+      "category_hints": [
+        "에이전트 / 코딩"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "arxiv-cs-ai",
+      "display_name": "arXiv cs.AI",
+      "source_group": "arxiv",
+      "adapter": "arxiv",
+      "query": "cat:cs.AI",
+      "category_hints": [
+        "논문"
+      ],
+      "max_items": 5,
+      "enabled": true
+    },
+    {
+      "id": "hf-daily",
+      "display_name": "Hugging Face Daily Papers",
+      "source_group": "hf",
+      "adapter": "hf_daily",
+      "category_hints": [
+        "논문"
+      ],
+      "max_items": 6,
+      "enabled": true
+    }
+  ]
+}

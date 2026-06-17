@@ -1,0 +1,34 @@
+name: Daily Creator AI Digest
+
+on:
+  schedule:
+    - cron: "0 22 * * *" # 07:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        run: python -m unittest discover -s tests
+      - name: Build digest
+        run: |
+          python scripts/weekly_ai_digest_v2.py \
+            --period-days 1 \
+            --output-json docs/latest_candidates.json \
+            --output-html docs/index.html \
+            --archive-dir docs/archive \
+            --limit-per-source 4 \
+            --skip-llm-curation
+      - name: Commit updated digest
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update daily creator AI digest"
+          file_pattern: docs/**

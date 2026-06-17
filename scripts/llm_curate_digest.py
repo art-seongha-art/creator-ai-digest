@@ -1,0 +1,254 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+import html
+
+BASE = Path('.')
+OUTROOT = Path('docs')
+
+CATEGORIES = [
+    '바로 써볼 AI 도구', '수업·워크숍 아이디어', '창작·디자인 사례', '연구·논문', '정책·저작권',
+    'LLM / 모델', '이미지', '영상', '음악 / 오디오', '3D / 공간', '에이전트 / 코딩', '하드웨어 / 인프라', '주요 뉴스'
+]
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description='Use an LLM agent to write Korean public AI digest copy from candidate JSON.')
+    p.add_argument('--input-json', default=str(BASE / 'output/latest_candidates.json'))
+    p.add_argument('--output-json', default=str(BASE / 'output/latest_public_ko_llm.json'))
+    p.add_argument('--output-html', default=str(OUTROOT / 'latest.html'))
+    p.add_argument('--archive-dir', default=str(OUTROOT))
+    p.add_argument('--model', default='sonnet')
+    p.add_argument('--timeout', type=int, default=420)
+    p.add_argument('--max-llm-items', type=int, default=8, help='Maximum selected items to send to the LLM curator.')
+    p.add_argument('--render-existing-json', default='', help='Render this public JSON directly without calling the LLM.')
+    return p.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    if args.render_existing_json:
+        public = json.loads(Path(args.render_existing_json).read_text(encoding='utf-8'))
+        html_text = render_html(public)
+        output_html = Path(args.output_html)
+        output_html.parent.mkdir(parents=True, exist_ok=True)
+        output_html.write_text(html_text, encoding='utf-8')
+        print(json.dumps({'output_json': args.render_existing_json, 'output_html': str(output_html), 'items': len(public.get('items', [])), 'mode': 'render_existing_json'}, ensure_ascii=False, indent=2))
+        return 0
+    data = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
+    selected = data.get('selected') or []
+    if not selected:
+        raise SystemExit('No selected items in input JSON')
+    selected = prioritize_for_llm(selected, args.max_llm_items)
+    prompt = build_prompt(data, selected)
+    raw = run_claude(prompt, args.model, args.timeout)
+    public = extract_json(raw)
+    validate_public(public)
+    public['period'] = data.get('period', {})
+    public['curation'] = {
+        'writer': 'claude-cli',
+        'mode': 'llm_korean_digest_copy',
+        'source_json': str(Path(args.input_json)),
+    }
+    output_json = Path(args.output_json)
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(public, ensure_ascii=False, indent=2), encoding='utf-8')
+    html_text = render_html(public)
+    output_html = Path(args.output_html)
+    output_html.parent.mkdir(parents=True, exist_ok=True)
+    output_html.write_text(html_text, encoding='utf-8')
+    period_end = parse_dt(public.get('period', {}).get('end')) or datetime.now()
+    archive_dir = Path(args.archive_dir)
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    archive = archive_dir / f'weekly-ai-digest-v2-{period_end.strftime("%Y-%m-%d")}-llm-ko.html'
+    archive.write_text(html_text, encoding='utf-8')
+    print(json.dumps({'output_json': str(output_json), 'output_html': str(output_html), 'archive': str(archive), 'items': len(public['items'])}, ensure_ascii=False, indent=2))
+    return 0
+
+
+def prioritize_for_llm(items: list[dict], limit: int) -> list[dict]:
+    """Keep LLM input small and favor practical creative-tool / media / motion items."""
+    def weight(item: dict) -> tuple[int, float]:
+        text = f"{item.get('title','')} {item.get('summary','')} {item.get('source_name','')} {item.get('category','')}".lower()
+        score = float(item.get('score') or 0)
+        boost = 0
+        for term in ['motionbricks','nvidia','nvlabs','kling','flow','veo','higgsfield','runway','luma','pika','midjourney','firefly','adobe','suno','elevenlabs','comfyui','3d','video','music','audio','robot','motion']:
+            if term in text:
+                boost += 10
+        for term in ['earnings transcript','stock','lawyer','pricing','review 2026']:
+            if term in text:
+                boost -= 8
+        return (boost, score)
+    return sorted(items, key=weight, reverse=True)[:limit]
+
+
+def build_prompt(data: dict, selected: list[dict]) -> str:
+    slim = []
+    for item in selected:
+        summary = (item.get('summary') or '')
+        if len(summary) > 700:
+            summary = summary[:700] + '…'
+        slim.append({
+            'category': item.get('category'),
+            'source_name': item.get('source_name'),
+            'published_at': item.get('published_at'),
+            'title_original': item.get('title'),
+            'summary_original': summary,
+            'url': item.get('url'),
+            'links': item.get('links') or {},
+            'source_group': item.get('source_group'),
+        })
+    period = data.get('period', {})
+    return f"""
+너는 AI×예술·디자인·교육 주간 브리프 큐레이터다.
+입력 후보에서 6~8개를 골라 공개용 한국어 JSON만 출력한다.
+우선순위: MotionBricks/NVIDIA 로봇·모션, 영상/이미지/음악/3D 창작 도구 업데이트, Adobe/Runway/Luma/Kling/Higgsfield/Suno/ElevenLabs, 실습 가능한 에이전트/로컬AI.
+제외: 스마트스피커, 데이터센터, 주식/실적, 단순 가격비교, 창작 연결이 약한 일반뉴스.
+각 항목은 자연스러운 한국어로 쓰고, URL은 입력 그대로 유지한다. 없는 사실은 만들지 않는다.
+quality: A=실제 기능/모델 업데이트, B=창작 도구·산업 사례, C=보조 인사이트.
+출력 JSON 형식만:
+{{"title":"창작자를 위한 AI 다이제스트","items":[{{"category":"바로 써볼 AI 도구|영상|이미지|음악 / 오디오|3D / 공간|창작·디자인 사례|연구·논문|LLM / 모델|에이전트 / 코딩","source_name":"","published_at":"","title_ko":"","summary_ko":"2~3문장","insight_ko":"1~2문장","image_prompt_ko":"16:9 관련 이미지 프롬프트","image_url":"","media_url":"","media_type":"","quality":"A|B|C","url":"","links":{{}}}}]}}
+기간: {json.dumps(period, ensure_ascii=False)}
+후보: {json.dumps(slim, ensure_ascii=False)}
+""".strip()
+
+
+def run_claude(prompt: str, model: str, timeout: int) -> str:
+    cmd = [
+        'claude', '-p', prompt,
+        '--model', model,
+        '--output-format', 'text',
+        '--max-budget-usd', '1.00',
+        '--no-session-persistence',
+    ]
+    proc = subprocess.run(cmd, cwd=str(BASE), text=True, capture_output=True, timeout=timeout)
+    if proc.returncode != 0:
+        raise RuntimeError(f'claude failed rc={proc.returncode} stdout={proc.stdout[-2000:]} stderr={proc.stderr[-2000:]}')
+    return proc.stdout
+
+
+def extract_json(raw: str) -> dict:
+    text = raw.strip()
+    if text.startswith('```'):
+        text = re.sub(r'^```(?:json)?\s*', '', text)
+        text = re.sub(r'\s*```$', '', text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r'\{.*\}', text, re.S)
+        if not m:
+            raise
+        return json.loads(m.group(0))
+
+
+def validate_public(public: dict) -> None:
+    if not isinstance(public, dict) or not isinstance(public.get('items'), list):
+        raise ValueError('LLM output missing items list')
+    for i, item in enumerate(public['items']):
+        for key in ['category', 'source_name', 'published_at', 'title_ko', 'summary_ko', 'insight_ko', 'image_prompt_ko', 'url']:
+            if not item.get(key):
+                raise ValueError(f'item {i} missing {key}')
+        bad = ['candidate_count', 'score_breakdown', 'USER_ACTION_REQUIRED', 'source_reports', 'adapter', 'selected_reason']
+        joined = (item.get('title_ko','') + ' ' + item.get('summary_ko',''))
+        hits = [x for x in bad if x in joined]
+        if hits:
+            raise ValueError(f'item {i} contains internal terms: {hits}')
+
+
+def parse_dt(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace('Z', '+00:00'))
+    except Exception:
+        return None
+
+
+def render_html(public: dict) -> str:
+    period = public.get('period', {})
+    start = parse_dt(period.get('start')) or datetime.now()
+    end = parse_dt(period.get('end')) or datetime.now()
+    by_category = defaultdict(list)
+    for item in public.get('items', []):
+        by_category[item.get('category', '주요 뉴스')].append(item)
+    sections = []
+    for category in CATEGORIES:
+        items = by_category.get(category) or []
+        if not items:
+            continue
+        body = ''.join(item_html(item) for item in items)
+        sections.append(f'<section><h2>{esc(category)}</h2>{body}</section>')
+    return page(start, end, ''.join(sections))
+
+
+def item_html(item: dict) -> str:
+    published = parse_dt(item.get('published_at'))
+    date = published.strftime('%Y.%m.%d') if published else ''
+    links = [f'<a href="{esc(item.get("url"))}">원문</a>']
+    for label, url in (item.get('links') or {}).items():
+        links.append(f'<a href="{esc(url)}">{esc(label)}</a>')
+    return (
+        '<article class="item">'
+        + f'<div class="meta"><b>{esc(item.get("source_name"))}</b><span>{esc(date)}</span></div>'
+        + f'<h3>{esc(item.get("title_ko"))}</h3>'
+        + image_html(item)
+        + f'<p>{esc(item.get("summary_ko"))}</p>'
+        + f'<p class="application"><b>인사이트:</b> {esc(item.get("insight_ko"))}</p>'
+        + f'<div class="links">{" ".join(links)}</div>'
+        + '</article>'
+    )
+
+
+def image_html(item: dict) -> str:
+    media_url = item.get('media_url') or item.get('image_url') or ''
+    media_type = item.get('media_type') or ('image' if item.get('image_url') else '')
+    prompt = item.get('image_prompt_ko') or ''
+    title = item.get('title_ko') or ''
+    if media_url and media_type == 'video':
+        if media_url.lower().split('?',1)[0].endswith('.mp4'):
+            return f'<figure class="thumb"><video src="{esc(media_url)}" controls muted playsinline preload="metadata"></video><figcaption>관련 영상</figcaption></figure>'
+        return f'<figure class="thumb placeholder"><div>관련 영상: <a href="{esc(media_url)}">영상 열기</a></div><figcaption>관련 영상 링크</figcaption></figure>'
+    if media_url:
+        return f'<figure class="thumb"><img src="{esc(media_url)}" alt="{esc(title)}" loading="lazy"><figcaption>관련 이미지</figcaption></figure>'
+    if prompt:
+        return f'<figure class="thumb placeholder"><div>{esc(prompt)}</div><figcaption>이미지 생성 프롬프트</figcaption></figure>'
+    return ''
+
+
+def page(start: datetime, end: datetime, body: str) -> str:
+    return f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>창작자를 위한 AI 다이제스트 - {end.strftime('%Y.%m.%d')}</title><style>
+body{{margin:0;background:#f7f7f4;color:#151515;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}}
+.wrap{{max-width:1040px;margin:0 auto;padding:30px 18px 64px}}
+header{{border-bottom:3px solid #151515;padding-bottom:14px;margin-bottom:16px;display:flex;justify-content:space-between;gap:16px;align-items:end}}
+h1{{font-size:44px;line-height:1;margin:0;letter-spacing:0}}
+.period{{font-weight:800;color:#555}}
+section{{border-top:1px solid #d9d9d2;margin:20px 0 0;padding-top:12px}}
+h2{{font-size:24px;margin:0 0 8px}}
+.item{{padding:16px 0;border-bottom:1px solid #e6e6df}}
+.meta{{display:flex;gap:9px;flex-wrap:wrap;font-size:12px;color:#666;margin-bottom:7px}}
+.meta b{{color:#21528d}}
+h3{{font-size:20px;line-height:1.34;margin:0 0 8px;letter-spacing:0}}
+p{{margin:0 0 10px;color:#333;line-height:1.62}}
+.application{{background:#fff;border-left:4px solid #21528d;padding:10px 12px;color:#222}}
+.thumb{{margin:10px 0 12px;border:1px solid #deded6;background:#fff;border-radius:12px;overflow:hidden}}
+.thumb img,.thumb video{{display:block;width:100%;max-height:420px;object-fit:cover;background:#000}}
+.thumb figcaption{{font-size:12px;color:#777;padding:7px 10px;border-top:1px solid #ecece6}}
+.thumb.placeholder div{{min-height:120px;padding:18px;color:#555;background:linear-gradient(135deg,#f0f3f7,#ffffff);font-size:14px;line-height:1.55}}
+.links a{{display:inline-block;border:1px solid #d4d4cc;border-radius:8px;padding:6px 9px;margin-right:6px;font-size:13px;color:#222;text-decoration:none;background:#fff}}
+@media(max-width:760px){{header{{display:block}}h1{{font-size:36px}}.period{{margin-top:10px}}}}
+</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">{start.strftime('%Y.%m.%d')} - {end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>'''
+
+
+def esc(value: object) -> str:
+    return html.escape(str(value or ''), quote=True)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
