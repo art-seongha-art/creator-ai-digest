@@ -73,7 +73,7 @@ def _item_html(item: PublicItem) -> str:
 
 
 def _page(period_start: datetime, period_end: datetime, body: str) -> str:
-    return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>이번 주 AI 소식 - {period_end.strftime('%Y.%m.%d')}</title><style>
+    return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>창작자를 위한 AI 다이제스트 - {period_end.strftime('%Y.%m.%d')}</title><style>
 body{{margin:0;background:#f7f7f4;color:#151515;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}}
 .wrap{{max-width:1040px;margin:0 auto;padding:30px 18px 64px}}
 header{{border-bottom:3px solid #151515;padding-bottom:14px;margin-bottom:16px;display:flex;justify-content:space-between;gap:16px;align-items:end}}
@@ -88,7 +88,7 @@ h3{{font-size:20px;line-height:1.34;margin:0 0 8px;letter-spacing:0}}
 p{{margin:0 0 10px;color:#333;line-height:1.58}}
 .links a{{display:inline-block;border:1px solid #d4d4cc;border-radius:8px;padding:6px 9px;margin-right:6px;font-size:13px;color:#222;text-decoration:none;background:#fff}}
 @media(max-width:760px){{header{{display:block}}h1{{font-size:36px}}.period{{margin-top:10px}}}}
-</style></head><body><main class="wrap"><header><h1>이번 주 AI 소식</h1><div class="period">{period_start.strftime('%Y.%m.%d')} - {period_end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>"""
+</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">발행일 {period_end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>"""
 
 
 def _esc(value: str) -> str:

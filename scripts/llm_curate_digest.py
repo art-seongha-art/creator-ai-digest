@@ -108,14 +108,15 @@ def build_prompt(data: dict, selected: list[dict]) -> str:
     period = data.get('period', {})
     return f"""
 너는 AI×예술·디자인·교육 주간 브리프 큐레이터다.
-입력 후보에서 6~8개를 골라 공개용 한국어 JSON만 출력한다.
+입력 후보에서 6~8개를 골라 공개용 한국어 JSON만 출력한다. 독자는 AI 전문가가 아닐 수 있으므로 쉽고 친근하게, 현장에서 바로 써먹을 수 있는 말로 설명한다.
 우선순위: MotionBricks/NVIDIA 로봇·모션, 영상/이미지/음악/3D 창작 도구 업데이트, Adobe/Runway/Luma/Kling/Higgsfield/Suno/ElevenLabs, 실습 가능한 에이전트/로컬AI.
 제외: 스마트스피커, 데이터센터, 주식/실적, 단순 가격비교, 창작 연결이 약한 일반뉴스.
-각 항목은 자연스러운 한국어로 쓰고, URL은 입력 그대로 유지한다. 없는 사실은 만들지 않는다.
+각 항목은 자연스러운 한국어로 쓰고, URL은 입력 그대로 유지한다. 없는 사실은 만들지 않는다. 요약은 어려운 용어를 풀어서 쓰고, 인사이트는 ‘그래서 오늘 창작자가 뭘 해볼 수 있나’가 보이게 쓴다.
 quality: A=실제 기능/모델 업데이트, B=창작 도구·산업 사례, C=보조 인사이트.
 출력 JSON 형식만:
 {{"title":"창작자를 위한 AI 다이제스트","items":[{{"category":"바로 써볼 AI 도구|영상|이미지|음악 / 오디오|3D / 공간|창작·디자인 사례|연구·논문|LLM / 모델|에이전트 / 코딩","source_name":"","published_at":"","title_ko":"","summary_ko":"2~3문장","insight_ko":"1~2문장","image_prompt_ko":"16:9 관련 이미지 프롬프트","image_url":"","media_url":"","media_type":"","quality":"A|B|C","url":"","links":{{}}}}]}}
-기간: {json.dumps(period, ensure_ascii=False)}
+수집 기준: 발행일 기준 최근 10일 안의 주요 토픽
+기간 데이터: {json.dumps(period, ensure_ascii=False)}
 후보: {json.dumps(slim, ensure_ascii=False)}
 """.strip()
 
@@ -243,7 +244,7 @@ p{{margin:0 0 10px;color:#333;line-height:1.62}}
 .thumb.placeholder div{{min-height:120px;padding:18px;color:#555;background:linear-gradient(135deg,#f0f3f7,#ffffff);font-size:14px;line-height:1.55}}
 .links a{{display:inline-block;border:1px solid #d4d4cc;border-radius:8px;padding:6px 9px;margin-right:6px;font-size:13px;color:#222;text-decoration:none;background:#fff}}
 @media(max-width:760px){{header{{display:block}}h1{{font-size:36px}}.period{{margin-top:10px}}}}
-</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">{start.strftime('%Y.%m.%d')} - {end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>'''
+</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">발행일 {end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>'''
 
 
 def esc(value: object) -> str:

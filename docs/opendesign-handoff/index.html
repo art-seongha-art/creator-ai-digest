@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>창작자를 위한 AI 다이제스트 - 2026.06.17</title>
+<style>
+:root{
+  --paper:#ffffff; --ink:#171717; --muted:#6c6c64; --line:#e8e4dc; --soft:#f8f6f1; --accent:#245b47; --accent2:#b46b36;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",Inter,sans-serif;}
+a{color:inherit}
+.page{max-width:1180px;margin:0 auto;padding:34px 22px 70px}
+.masthead{border-bottom:1px solid var(--ink);padding:8px 0 22px;margin-bottom:26px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(42px,7vw,82px);line-height:.95;letter-spacing:-.055em;margin:8px 0 0;font-weight:850;text-wrap:balance}
+.pubdate{font-size:15px;color:var(--muted);font-weight:700;white-space:nowrap}
+.intro{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:28px;margin:22px 0 38px;align-items:start}
+.intro p{font-size:21px;line-height:1.55;margin:0;letter-spacing:-.015em}
+.policy{border-left:3px solid var(--accent);padding-left:16px;color:var(--muted);font-size:15px;line-height:1.65}
+.lead{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(320px,.84fr);gap:28px;border-top:3px solid var(--ink);border-bottom:1px solid var(--line);padding:24px 0 30px;margin-bottom:22px}
+.lead .media{margin:0}
+.media{background:var(--soft);border:1px solid var(--line);overflow:hidden}
+.media img,.media video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#111}
+.media-empty{aspect-ratio:16/9;display:grid;place-items:center;color:var(--muted)}
+.lead-copy{display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.eyebrow{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px;font-weight:750;letter-spacing:.02em}
+.eyebrow span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:#fff}
+h2{font-size:clamp(32px,4.5vw,56px);line-height:1.02;letter-spacing:-.04em;margin:12px 0 14px;text-wrap:balance}
+.lead p,.story p{font-size:16px;line-height:1.72;color:#333;margin:0 0 12px}
+.take{background:var(--soft);border-left:3px solid var(--accent2);padding:12px 14px;color:#2d2d28!important}
+.take b{display:block;margin-bottom:3px;color:var(--ink)}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.links a{text-decoration:none;border-bottom:1px solid var(--ink);font-size:14px;font-weight:700;padding-bottom:2px}
+.section-title{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--ink);margin:34px 0 0;padding-bottom:10px}
+.section-title h2{font-size:25px;letter-spacing:-.025em;margin:0}
+.section-title span{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 30px}
+.story{display:grid;grid-template-columns:180px minmax(0,1fr);gap:18px;padding:24px 0;border-bottom:1px solid var(--line)}
+.story .media{align-self:start}
+.story h3{font-size:24px;line-height:1.22;letter-spacing:-.03em;margin:8px 0 10px;text-wrap:pretty}
+.story p{font-size:15px}
+.footer{margin-top:46px;border-top:1px solid var(--ink);padding-top:18px;color:var(--muted);font-size:14px;line-height:1.65}
+@media(max-width:900px){.masthead,.intro,.lead{grid-template-columns:1fr}.pubdate{white-space:normal}.grid{grid-template-columns:1fr}.story{grid-template-columns:150px 1fr}}
+@media(max-width:620px){.page{padding:24px 16px 54px}.story{grid-template-columns:1fr}.story .media{width:100%}.intro p{font-size:18px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <div><div class="kicker">Daily field notes for creative AI</div><h1>창작자를 위한 AI 다이제스트</h1></div>
+    <div class="pubdate">발행일 2026.06.17</div>
+  </header>
+  <section class="intro">
+    <p>최근 10일 안의 AI 도구·사례·연구 중에서 창작 현장에서 바로 참고할 만한 것만 골랐습니다. 어렵게 들리는 기술도 “어디에 써볼 수 있을까?”가 보이도록 쉽게 풀어 전합니다.</p>
+    <div class="policy">이미지·영상·음악·3D·로봇·에이전트처럼 실제 제작 흐름을 바꿀 수 있는 소식을 우선합니다. 링크는 공개 원문 기준으로 연결합니다.</div>
+  </section>
+  <section class="lead">
+    <div class="media media-video"><video src="https://research.nvidia.com/labs/gear/motionbricks/videos/motionbricks_demo_1080p30f.mp4" controls muted playsinline preload="metadata"></video></div>
+    <div class="lead-copy">
+      <div>
+        <div class="eyebrow"><span>3D / 공간</span><span>NVLabs / NVIDIA</span><span>2026-06-15</span></div>
+        <h2>NVIDIA MotionBricks, 목적지만 주면 로봇·캐릭터의 중간 동작을 실시간 생성</h2>
+        <p>NVIDIA/NVLabs의 MotionBricks는 35만 개 이상의 모션 클립을 하나의 생성 모델로 다루며, 걷기·피하기·앉기·물체 상호작용 같은 중간 동작을 실시간으로 합창작자는 프레임워크입니다. 사용자는 동작을 하나하나 설계하기보다 목표와 제약을 지정하고, 시스템이 초당 15,000프레임 수준의 모션 후보를 만들어 애니메이션과 로봇 제어에 연결합니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> 이 항목은 로봇을 명령 실행 장치가 아니라 공간 안에서 몸의 문법을 생성하는 매체로 보게 만듭니다. 공공미술·퍼포먼스·인터랙티브 설치에서는 작가가 모든 움직임을 키프레임으로 짜는 방식에서, 목표와 제약을 설계하고 움직임은 AI가 실시간 생성하는 방식으로 이동할 수 있습니다.</p>
+      </div>
+      <div class="links"><a href="https://nvlabs.github.io/motionbricks/" target="_blank" rel="noopener">원문</a><a href="https://nvlabs.github.io/motionbricks/" target="_blank" rel="noopener">프로젝트</a><a href="https://github.com/NVlabs/GR00T-WholeBodyControl/tree/main/motionbricks" target="_blank" rel="noopener">GitHub</a></div>
+    </div>
+  </section>
+  <div class="section-title"><h2>오늘 볼 만한 토픽</h2><span>최근 10일 기준</span></div>
+  <section class="grid">
+    <article class="story">
+      <div class="media"><img src="assets/brief-adobe-creative-cloud.png" alt="Adobe Creative Cloud, 선별부터 합성까지 창작 워크플로우 전반에 AI 기능 확장" loading="lazy"></div>
+      <div class="story-body">
+        <div class="eyebrow"><span>이미지</span><span>Adobe</span><span>2026-06-15</span></div>
+        <h3>Adobe Creative Cloud, 선별부터 합성까지 창작 워크플로우 전반에 AI 기능 확장</h3>
+        <p>Adobe는 사진 선별, 편집, 합성 등 Creative Cloud 작업 전반에 걸친 신규 AI 기능을 공개했습니다. 개별 생성 기능보다 작업 흐름 전체에서 반복 판단과 편집 단계를 줄이는 방향이 강조됩니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> AI가 별도 메뉴가 아니라 기존 창작 도구의 기본 인프라로 들어가고 있다는 신호입니다. 학생들에게 “AI 툴 하나를 배운다”보다 “기존 제작 프로세스 중 어디가 자동화되는가”를 보게 하는 것이 중요합니다.</p>
+        <div class="links"><a href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxQVnhjN0d6M0oyNGJnU0pXRkE2QmhTZUEwQ01BMUVsUzVTclVIX0tXRG1TS25ZX0xJazhxSHU4WnA4YVBVeXZaU3pfN1hwcmtoeUFiT0ZGVms4dlhVLVY1SnY3aUJlcjhRM0l6aXV2NjIyZHQtMUU0Y01ab0QxU0lKd0s4My1Nb2VaQWFrN2pfUzZad3k1V1FSZ25yek1ybTZ3WVdMRmh1b1VWTVQ0aGlqeEhGeW12RWxiaE5kS3d6dmo1WF9BOXZubG1ZbEk1X01NcHQ3ZDZR?oc=5" target="_blank" rel="noopener">원문</a></div>
+      </div>
+    </article><article class="story">
+      <div class="media"><img src="assets/brief-firefly-graph.png" alt="Adobe Firefly Graph, 생성 AI를 창작 파이프라인 오케스트레이션으로 확장" loading="lazy"></div>
+      <div class="story-body">
+        <div class="eyebrow"><span>이미지</span><span>Adobe for Business</span><span>2026-06-17</span></div>
+        <h3>Adobe Firefly Graph, 생성 AI를 창작 파이프라인 오케스트레이션으로 확장</h3>
+        <p>Firefly Graph는 생성 AI를 단발성 이미지 생성이 아니라 기업형 창작 워크플로우의 연결 구조로 다루는 방향을 보여줍니다. 여러 생성·편집 단계를 그래프처럼 묶어 반복 제작과 협업을 자동화하는 흐름입니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> 공공미술·전시·영상 콘텐츠 제작에서도 앞으로 중요한 것은 “멋진 한 장”보다 반복 가능한 제작 파이프라인을 설계하는 능력입니다. 이는 창작 현장의 편집·연결 관점과도 잘 맞습니다.</p>
+        <div class="links"><a href="https://news.google.com/rss/articles/CBMiX0FVX3lxTFBidTZzRTRmZUQteWFIbTBuZDRLQWxxZEVJNUUzcDllMDl5aGJXaHRueVlFcHlxc3g2WXZqRGJaLS1LWjFqM01DTnMwVzBRbTBlcHZUQ0tENmpLWUJoZU1r?oc=5" target="_blank" rel="noopener">원문</a></div>
+      </div>
+    </article><article class="story">
+      <div class="media"><img src="assets/brief-higgsfield-video.png" alt="Higgsfield, 1년 만에 사용자 2,400만 명 규모로 성장한 AI 영상 도구 사례" loading="lazy"></div>
+      <div class="story-body">
+        <div class="eyebrow"><span>영상</span><span>Higgsfield / Inc.</span><span>2026-06-16</span></div>
+        <h3>Higgsfield, 1년 만에 사용자 2,400만 명 규모로 성장한 AI 영상 도구 사례</h3>
+        <p>Higgsfield는 짧은 기간에 대규모 사용자를 모은 AI 영상·이미지 생성 도구로 소개됐습니다. 단순히 영상 생성 모델이 하나 더 나온 것이 아니라, 특정 미감과 카메라/캐릭터 스타일을 전면에 내세운 창작 도구가 시장에서 빠르게 반응을 얻고 있다는 점이 중요합니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> AI 영상 도구 경쟁은 성능표보다 “어떤 스타일을 쉽게 만들게 해주는가”의 경쟁으로 이동하고 있습니다. 수업이나 프로젝트에서도 도구를 모델명으로만 비교하기보다 미감·카메라·워크플로우 단위로 비교해야 합니다.</p>
+        <div class="links"><a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5" target="_blank" rel="noopener">원문</a></div>
+      </div>
+    </article><article class="story">
+      <div class="media"><img src="assets/brief-agent-screenshot-loop.png" alt="로컬 30B급 에이전트, 스크린샷 피드백 루프로 C 레이트레이싱 데모를 완성" loading="lazy"></div>
+      <div class="story-body">
+        <div class="eyebrow"><span>에이전트 / 코딩</span><span>r/LocalLLaMA</span><span>2026-06-17</span></div>
+        <h3>로컬 30B급 에이전트, 스크린샷 피드백 루프로 C 레이트레이싱 데모를 완성</h3>
+        <p>커뮤니티 실험에서 로컬 30B급 코딩 에이전트가 헤드리스 실행 중 스크린샷을 찍고, 그 결과를 보며 디버깅하는 루프를 사용해 C 기반 레이트레이싱 FPS 데모를 완성했습니다. 핵심은 모델 크기보다 결과를 볼 수 있는 피드백 구조였습니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> AI 에이전트에게 “눈”을 주면 창작 코딩과 인터랙티브 미디어 제작에서 스스로 반복 개선하는 구조를 만들 수 있습니다. 이는 수업용 AI 워크플로우 실험으로도 적합합니다.</p>
+        <div class="links"><a href="https://www.reddit.com/r/LocalLLaMA/comments/1u89f2q/headless_screenshot_loops_let_a_local_30b_agent/" target="_blank" rel="noopener">원문</a></div>
+      </div>
+    </article><article class="story">
+      <div class="media"><img src="assets/brief-veritas-visual-verifier.png" alt="VERITAS, 시각 검증기로 로봇 정책을 실행 중 조정하고 스스로 개선" loading="lazy"></div>
+      <div class="story-body">
+        <div class="eyebrow"><span>연구·논문</span><span>arXiv cs.AI</span><span>2026-06-16</span></div>
+        <h3>VERITAS, 시각 검증기로 로봇 정책을 실행 중 조정하고 스스로 개선</h3>
+        <p>VERITAS는 로봇 정책이 행동을 생성한 뒤, 별도의 시각 검증기가 그 행동을 평가해 실행 시점에 더 나은 선택으로 유도하는 생성기-검증기 구조입니다. 추가 인간 시연 없이도 검증된 자기 생성 궤적을 학습 데이터로 삼아 성능을 개선할 수 있음을 보입니다.</p>
+        <p class="take"><b>어떻게 써볼까?</b> 이미지·영상 생성 AI에서도 결과물을 다시 보는 검증 루프가 중요해지고 있습니다. 로봇 연구의 생성기-검증기 구조는 창작 AI 파이프라인에도 그대로 참고할 수 있습니다.</p>
+        <div class="links"><a href="https://arxiv.org/abs/2606.18247v1" target="_blank" rel="noopener">원문</a><a href="https://arxiv.org/abs/2606.18247v1" target="_blank" rel="noopener">논문</a></div>
+      </div>
+    </article>
+  </section>
+  <footer class="footer">최근 10일 안의 공개 자료를 바탕으로, 창작자·교육자·디자이너가 현장에서 빠르게 참고할 수 있도록 정리한 다이제스트입니다.</footer>
+</main>
+</body>
+</html>

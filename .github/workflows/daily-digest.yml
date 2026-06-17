@@ -21,7 +21,7 @@ jobs:
       - name: Build digest
         run: |
           python scripts/weekly_ai_digest_v2.py \
-            --period-days 1 \
+            --period-days 10 \
             --output-json docs/latest_candidates.json \
             --output-html docs/index.html \
             --archive-dir docs/archive \
