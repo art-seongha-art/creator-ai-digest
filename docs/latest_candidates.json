@@ -1,9 +1,9 @@
 {
   "period": {
-    "start": "2026-06-08T23:26:20.009974+00:00",
-    "end": "2026-06-18T23:26:20.009974+00:00"
+    "start": "2026-06-09T11:15:44.616582+00:00",
+    "end": "2026-06-19T11:15:44.616582+00:00"
   },
-  "candidate_count": 116,
+  "candidate_count": 117,
   "selected_count": 18,
   "source_reports": [
     {
@@ -187,7 +187,7 @@
       "display_name": "NVIDIA Robotics / Motion search",
       "adapter": "rss",
       "status": "ok",
-      "candidate_count": 0,
+      "candidate_count": 1,
       "fetched_urls": [
         "https://news.google.com/rss/search?q=MotionBricks+NVIDIA+NVLabs+robot+motion+generation+humanoid+when%3A21d&hl=en-US&gl=US&ceid=US%3Aen"
       ],
@@ -506,7 +506,7 @@
       "status": "ok",
       "candidate_count": 4,
       "fetched_urls": [
-        "https://hn.algolia.com/api/v1/search?query=OpenAI&tags=story&numericFilters=created_at_i%3E1780961180&hitsPerPage=4"
+        "https://hn.algolia.com/api/v1/search?query=OpenAI&tags=story&numericFilters=created_at_i%3E1781003744&hitsPerPage=4"
       ],
       "errors": [],
       "action_required": null
@@ -518,7 +518,7 @@
       "status": "ok",
       "candidate_count": 4,
       "fetched_urls": [
-        "https://hn.algolia.com/api/v1/search?query=AI+agent&tags=story&numericFilters=created_at_i%3E1780961180&hitsPerPage=4"
+        "https://hn.algolia.com/api/v1/search?query=AI+agent&tags=story&numericFilters=created_at_i%3E1781003744&hitsPerPage=4"
       ],
       "errors": [],
       "action_required": null
@@ -542,7 +542,7 @@
       "status": "ok",
       "candidate_count": 4,
       "fetched_urls": [
-        "https://huggingface.co/api/daily_papers?date=2026-06-08"
+        "https://huggingface.co/api/daily_papers?date=2026-06-09"
       ],
       "errors": [],
       "action_required": null
@@ -550,47 +550,10 @@
   ],
   "empty_sections": [
     "에이전트 / 코딩",
-    "3D / 공간"
+    "3D / 공간",
+    "정책 / 저작권"
   ],
   "candidates": [
-    {
-      "title": "Adobe’s redesigned AI studio remembers what your creations look like",
-      "url": "https://www.theverge.com/tech/952104/adobe-firefly-ai-agent-elements-projects-update",
-      "source_id": "news-theverge-ai",
-      "source_name": "The Verge AI",
-      "source_group": "news",
-      "published_at": "2026-06-18T13:00:00+00:00",
-      "summary": "Adobe is introducing some new capabilities for its Firefly AI assistant, alongside a \"reimagined\" AI studio that lets you edit and generate new designs from a single interface. The new Firefly experience launching today in private beta is designed to give you \"persistent context, reusable assets, and organized workflows\" across your projects, according to Adobe, […]",
-      "category": "이미지",
-      "score": 40.471,
-      "score_breakdown": {
-        "recency": 16.26,
-        "authority": 8.0,
-        "social": 0.0,
-        "relevance": 9.200000000000001,
-        "content": 3.111,
-        "novelty": 3.9000000000000004,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "adobe redesigned studio remembers what your creations look",
-      "selection_decision": "selected",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "news-theverge-ai",
-          "source_name": "The Verge AI",
-          "source_group": "news",
-          "url": "https://www.theverge.com/tech/952104/adobe-firefly-ai-agent-elements-projects-update",
-          "title": "Adobe’s redesigned AI studio remembers what your creations look like",
-          "published_at": "2026-06-18T13:00:00+00:00",
-          "summary": "Adobe is introducing some new capabilities for its Firefly AI assistant, alongside a \"reimagined\" AI studio that lets you edit and generate new designs from a single interface. The new Firefly experience launching today in private beta is designed to give you \"persistent context, reusable assets, and organized workflows\" across your projects, according to Adobe, […]",
-          "metrics": {}
-        }
-      ]
-    },
     {
       "title": "Photoshop and Premiere now have AI assistants",
       "url": "https://www.theverge.com/tech/952099/adobe-ai-assistants-photoshop-premiere-illustrator-beta-launch",
@@ -600,9 +563,9 @@
       "published_at": "2026-06-18T13:00:00+00:00",
       "summary": "Adobe's plan to stick AI assistants into all of its Creative Cloud suite is now fully underway, with new chatbots now rolling out to its biggest editing and design apps. As part of a public beta launching today, Photoshop, Premiere, Illustrator, InDesign, and Frame.io now each have a bespoke AI Assistant that can be used […]",
       "category": "주요 뉴스",
-      "score": 38.271,
+      "score": 36.301,
       "score_breakdown": {
-        "recency": 16.26,
+        "recency": 14.29,
         "authority": 8.0,
         "social": 0.0,
         "relevance": 9.600000000000001,
@@ -630,6 +593,44 @@
       ]
     },
     {
+      "title": "Researchers trained a Deep Research agent with 32 H100s and open-sourced everything",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9w6my/researchers_trained_a_deep_research_agent_with_32/",
+      "source_id": "reddit-localllama",
+      "source_name": "r/LocalLLaMA",
+      "source_group": "reddit",
+      "published_at": "2026-06-19T08:20:43+00:00",
+      "summary": "Ohio State University's NLP team released QUEST-35B, an open-source Deep Research agent trained using ~32 H100s and ~8K synthetic samples. The team open-sourced the training recipe, code, weights and datasets. Benchmark results show competitive performance against several frontier Deep Research systems. What do you think is the biggest remaining gap between open-source Deep Research agents and frontier closed systems? Source: Professor Yusu submitted by /u/BuildwithVignesh [link] [comments]",
+      "category": "LLM / 모델",
+      "score": 34.036,
+      "score_breakdown": {
+        "recency": 17.514,
+        "authority": 5.0,
+        "social": 0.0,
+        "relevance": 5.2,
+        "content": 3.722,
+        "novelty": 2.6,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "researchers trained deep research agent h100s open sourced",
+      "selection_decision": "selected",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "reddit-localllama",
+          "source_name": "r/LocalLLaMA",
+          "source_group": "reddit",
+          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9w6my/researchers_trained_a_deep_research_agent_with_32/",
+          "title": "Researchers trained a Deep Research agent with 32 H100s and open-sourced everything",
+          "published_at": "2026-06-19T08:20:43+00:00",
+          "summary": "Ohio State University's NLP team released QUEST-35B, an open-source Deep Research agent trained using ~32 H100s and ~8K synthetic samples. The team open-sourced the training recipe, code, weights and datasets. Benchmark results show competitive performance against several frontier Deep Research systems. What do you think is the biggest remaining gap between open-source Deep Research agents and frontier closed systems? Source: Professor Yusu submitted by /u/BuildwithVignesh [link] [comments]",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "My suitcase robot gets high now off a real gas sensor wired straight into the LLM sampler. Smoke raises temperature/top_p/top_k live, so his speech genuinely gets loopier and never repeats.",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/",
       "source_id": "reddit-localllama",
@@ -638,9 +639,9 @@
       "published_at": "2026-06-18T15:52:34+00:00",
       "summary": "Follow-up on Sparky, my offline suitcase robot I keep overdeveloping. He gets high now, and there's no scripted \"stoned mode\" anywhere in it. A real MQ-2 gas sensor sits in the case. Every 0.5s I read it against an adaptive clean-air baseline and turn a smoke hit into a 0 to 10 phase that climbs as you blow at him and decays on its own over minutes. The fun part is that phase rewires his sampler per token. Temperature 1.0 to ~1.6, top_p 0.95 to 0.99, top_k 64 to 120 as he climbs. His word choice flattens and wanders to lower-probability, more associative tokens, so his cognition genuinely gets noisier. It's the live sampler doing the work, so every high reply is freshly generated and never the same. A per-phase persona nudge makes him show it without ever announcing \"I am high.\" The body does the rest: a slight drawl, eyes that droop and go bloodshot, and the sensor display that escalates to a full smoke-and-plasma freakout at phase 10, keeping him blitzed there for the next 7 minutes. Honest caveat so nobody has to call it out: it's a smoke and VOC sensor, so a cigarette or incense probably trips it too. But blowing smoke and watching him unravel is watching a real measurement scramble a real model, live - and it's funny! Just an added Easter Egg to an already goofy suitcase robot. A real question for the hardware folks: is there a sensor, or a combination, that could actually distinguish cannabis smoke from generic smoke and VOCs? The MQ-2 can't really tell a joint from a candle, and I'd love to make the detection more specific if possible. submitted by /u/CreativelyBankrupt [link] [comments]",
       "category": "LLM / 모델",
-      "score": 35.74,
+      "score": 33.769,
       "score_breakdown": {
-        "recency": 16.74,
+        "recency": 14.769,
         "authority": 5.0,
         "social": 0.0,
         "relevance": 9.0,
@@ -676,9 +677,9 @@
       "published_at": "2026-06-18T19:10:18+00:00",
       "summary": "Learn how GPT-5.5 Instant improves ChatGPT’s health and wellness responses with stronger reasoning, better context, clearer communication, and physician-informed evaluations.",
       "category": "LLM / 모델",
-      "score": 35.4,
+      "score": 33.429,
       "score_breakdown": {
-        "recency": 17.289,
+        "recency": 15.318,
         "authority": 13.0,
         "social": 0.0,
         "relevance": 0.0,
@@ -724,9 +725,9 @@
       "published_at": "2026-06-18T13:00:00+00:00",
       "summary": "Adobe expands Firefly capabilities, extends agentic tools to Creative Cloud apps 9to5Mac",
       "category": "이미지",
-      "score": 35.127,
+      "score": 33.157,
       "score_breakdown": {
-        "recency": 16.26,
+        "recency": 14.29,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 9.200000000000001,
@@ -754,44 +755,6 @@
       ]
     },
     {
-      "title": "Rethinking Reward Supervision: Rubric-Conditioned Self-Distillation",
-      "url": "https://arxiv.org/abs/2606.19327v1",
-      "source_id": "arxiv-cs-ai",
-      "source_name": "arXiv cs.AI",
-      "source_group": "arxiv",
-      "published_at": "2026-06-17T17:54:04+00:00",
-      "summary": "Post-training of reasoning language models is commonly driven by supervised distillation and reinforcement learning with verifiable rewards. Distillation often relies on chain-of-thought annotations that are expensive to obtain and may themselves be noisy, incomplete, or partially incorrect; even when the final solution is correct, an imperfect rationale can interfere with learning. Reinforcement learning with verified rewards, on the other hand, typically compresses evaluative feedback into a scalar signal, obscuring which aspects of a response should be improved. We propose \\textbf{Rubric-Conditioned Self-Distillation}, a framework that incorporates rubrics as structured, fine-grained feedback for on-policy self-distillation. Our method conditions the teacher model on criterion-level rubrics and uses it to provide token-level guidance on the student's own sampled trajectories. This design avoids treating a single reference rationale as the sole supervision target. Instead, rubrics specify what a strong response should satisfy, enabling more fine-grained credit assignment over the reasoning process than scalar reward optimization. We instantiate this framework with a two-stage pipeline that first learns to generate task-specific rubrics and then trains a rubric-guided reasoner. We evaluate on a diverse suite of science reasoning benchmarks and results show that rubric-conditioned self-distillation effectively converts rubric-level criteria into token-level guidance over the reasoning process, surpassing GRPO by 1.0 points and OPSD by 0.9 points on average.",
-      "category": "논문",
-      "score": 34.677,
-      "score_breakdown": {
-        "recency": 13.077,
-        "authority": 7.0,
-        "social": 0.0,
-        "relevance": 9.6,
-        "content": 5.0,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "rethinking reward supervision rubric conditioned self distillation",
-      "selection_decision": "selected",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "arxiv-cs-ai",
-          "source_name": "arXiv cs.AI",
-          "source_group": "arxiv",
-          "url": "https://arxiv.org/abs/2606.19327v1",
-          "title": "Rethinking Reward Supervision: Rubric-Conditioned Self-Distillation",
-          "published_at": "2026-06-17T17:54:04+00:00",
-          "summary": "Post-training of reasoning language models is commonly driven by supervised distillation and reinforcement learning with verifiable rewards. Distillation often relies on chain-of-thought annotations that are expensive to obtain and may themselves be noisy, incomplete, or partially incorrect; even when the final solution is correct, an imperfect rationale can interfere with learning. Reinforcement learning with verified rewards, on the other hand, typically compresses evaluative feedback into a scalar signal, obscuring which aspects of a response should be improved. We propose \\textbf{Rubric-Conditioned Self-Distillation}, a framework that incorporates rubrics as structured, fine-grained feedback for on-policy self-distillation. Our method conditions the teacher model on criterion-level rubrics and uses it to provide token-level guidance on the student's own sampled trajectories. This design avoids treating a single reference rationale as the sole supervision target. Instead, rubrics specify what a strong response should satisfy, enabling more fine-grained credit assignment over the reasoning process than scalar reward optimization. We instantiate this framework with a two-stage pipeline that first learns to generate task-specific rubrics and then trains a rubric-guided reasoner. We evaluate on a diverse suite of science reasoning benchmarks and results show that rubric-conditioned self-distillation effectively converts rubric-level criteria into token-level guidance over the reasoning process, surpassing GRPO by 1.0 points and OPSD by 0.9 points on average.",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "Adobe Unveils Major Expansion of Creative Agent Across Firefly and Creative Cloud Apps Including Photoshop and Premiere - Adobe Newsroom",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1iM1dHcDBrc01VNWxESDBlN08tZ2UwQ2lJdENLU0ljeDhnaVdkaGltdW4tT0p5ZEFVSkRjYXRLUFdORGk3UWx4Z2xrVUFPMTl1NFlIVFhCemRjTXdzRXFkYjdmQ2pTbDh0UHNpQ2l0Y3JTXzA?oc=5",
       "source_id": "creative-adobe-firefly-updates",
@@ -800,9 +763,9 @@
       "published_at": "2026-06-18T09:55:15+00:00",
       "summary": "Adobe Unveils Major Expansion of Creative Agent Across Firefly and Creative Cloud Apps Including Photoshop and Premiere Adobe Newsroom",
       "category": "이미지",
-      "score": 34.503,
+      "score": 32.532,
       "score_breakdown": {
-        "recency": 15.747,
+        "recency": 13.776,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 7.4,
@@ -838,9 +801,9 @@
       "published_at": "2026-06-18T17:00:00+00:00",
       "summary": "OpenAI introduces new spend controls and usage analytics for ChatGPT Enterprise, helping organizations manage costs and scale AI with confidence.",
       "category": "LLM / 모델",
-      "score": 33.938,
+      "score": 31.967,
       "score_breakdown": {
-        "recency": 16.927,
+        "recency": 14.956,
         "authority": 13.0,
         "social": 0.0,
         "relevance": 1.6,
@@ -851,8 +814,8 @@
         "stale_penalty": 0.0
       },
       "story_key": "new usage analytics updated spend controls enterprises",
-      "selection_decision": "selected",
-      "rejection_reason": "",
+      "selection_decision": "rejected",
+      "rejection_reason": "section_limit",
       "selectable": true,
       "evidence": [
         {
@@ -868,6 +831,82 @@
       ]
     },
     {
+      "title": "Barret Zoph is out at OpenAI again after just five months",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/952837/barret-zoph-openai-thinking-machines-lab",
+      "source_id": "news-theverge-ai",
+      "source_name": "The Verge AI",
+      "source_group": "news",
+      "published_at": "2026-06-19T04:49:33+00:00",
+      "summary": "Five months after returning to OpenAI, Barret Zoph - the company's head of enterprise AI sales - has departed, The Verge has learned. Zoph returned to OpenAI in mid-January after a stint as co-founder and CTO of Thinking Machines Lab, the competing AI company founded by former OpenAI CTO Mira Murati. Shortly after Zoph returned […]",
+      "category": "주요 뉴스",
+      "score": 31.838,
+      "score_breakdown": {
+        "recency": 16.927,
+        "authority": 8.0,
+        "social": 0.0,
+        "relevance": 3.8000000000000003,
+        "content": 3.111,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "barret zoph out openai again after just five",
+      "selection_decision": "selected",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "news-theverge-ai",
+          "source_name": "The Verge AI",
+          "source_group": "news",
+          "url": "https://www.theverge.com/ai-artificial-intelligence/952837/barret-zoph-openai-thinking-machines-lab",
+          "title": "Barret Zoph is out at OpenAI again after just five months",
+          "published_at": "2026-06-19T04:49:33+00:00",
+          "summary": "Five months after returning to OpenAI, Barret Zoph - the company's head of enterprise AI sales - has departed, The Verge has learned. Zoph returned to OpenAI in mid-January after a stint as co-founder and CTO of Thinking Machines Lab, the competing AI company founded by former OpenAI CTO Mira Murati. Shortly after Zoph returned […]",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "How Transparent is DiffusionGemma?",
+      "url": "https://arxiv.org/abs/2606.20560v1",
+      "source_id": "arxiv-cs-ai",
+      "source_name": "arXiv cs.AI",
+      "source_group": "arxiv",
+      "published_at": "2026-06-18T17:59:46+00:00",
+      "summary": "LLM reasoning transparency is a critical affordance for understanding model decisions, mitigating misuse and misalignment, and debugging surprising model behaviors. However, DiffusionGemma performs a larger fraction of its computation in a continuous latent space; does this make its reasoning less transparent? We study this question by decomposing transparency into two components: variable transparency, whether we understand intermediate snapshots of a model's computational state; and algorithmic transparency, whether we can use these snapshots to reconstruct the process by which the model arrived at its outputs. Naively, DiffusionGemma has poor variable transparency: its opaque serial depth, the amount of serial computation that occurs in between interpretable model states, seems at first 28.6X higher than the corresponding autoregressive Gemma 4 model. However, we show that we can map the information flowing between denoising steps through an interpretable token bottleneck with no decrease in downstream performance. Treating these intermediate states as interpretable reduces the opaque serial depth to just 1.1X that of Gemma 4. Algorithmic transparency is harder for diffusion models than for autoregressive models because all token predictions in the canvas can change at every denoising step, giving the model the power to implement complicated distributed algorithms during the denoising process. To begin bridging this gap, we conduct a suite of interpretability case studies, uncovering initial evidence of novel diffusion-specific phenomena such as non-chronological reasoning, token and sequence smearing, and intermediate-context reasoning. Finally, we test monitorability, a key application of transparency that measures whether model outputs are useful for downstream tasks. We find that DiffusionGemma is similarly monitorable to Gemma 4.",
+      "category": "논문",
+      "score": 31.722,
+      "score_breakdown": {
+        "recency": 15.122,
+        "authority": 7.0,
+        "social": 0.0,
+        "relevance": 4.6000000000000005,
+        "content": 5.0,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "how transparent diffusiongemma",
+      "selection_decision": "selected",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "arxiv-cs-ai",
+          "source_name": "arXiv cs.AI",
+          "source_group": "arxiv",
+          "url": "https://arxiv.org/abs/2606.20560v1",
+          "title": "How Transparent is DiffusionGemma?",
+          "published_at": "2026-06-18T17:59:46+00:00",
+          "summary": "LLM reasoning transparency is a critical affordance for understanding model decisions, mitigating misuse and misalignment, and debugging surprising model behaviors. However, DiffusionGemma performs a larger fraction of its computation in a continuous latent space; does this make its reasoning less transparent? We study this question by decomposing transparency into two components: variable transparency, whether we understand intermediate snapshots of a model's computational state; and algorithmic transparency, whether we can use these snapshots to reconstruct the process by which the model arrived at its outputs. Naively, DiffusionGemma has poor variable transparency: its opaque serial depth, the amount of serial computation that occurs in between interpretable model states, seems at first 28.6X higher than the corresponding autoregressive Gemma 4 model. However, we show that we can map the information flowing between denoising steps through an interpretable token bottleneck with no decrease in downstream performance. Treating these intermediate states as interpretable reduces the opaque serial depth to just 1.1X that of Gemma 4. Algorithmic transparency is harder for diffusion models than for autoregressive models because all token predictions in the canvas can change at every denoising step, giving the model the power to implement complicated distributed algorithms during the denoising process. To begin bridging this gap, we conduct a suite of interpretability case studies, uncovering initial evidence of novel diffusion-specific phenomena such as non-chronological reasoning, token and sequence smearing, and intermediate-context reasoning. Finally, we test monitorability, a key application of transparency that measures whether model outputs are useful for downstream tasks. We find that DiffusionGemma is similarly monitorable to Gemma 4.",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "Using AI to help physicians diagnose rare genetic diseases affecting children",
       "url": "https://openai.com/index/diagnose-rare-childhood-diseases",
       "source_id": "official-openai",
@@ -876,9 +915,9 @@
       "published_at": "2026-06-18T08:00:00+00:00",
       "summary": "Researchers used an OpenAI reasoning model to help diagnose rare diseases, identifying 18 new diagnoses in previously unsolved cases.",
       "category": "LLM / 모델",
-      "score": 33.683,
+      "score": 31.712,
       "score_breakdown": {
-        "recency": 15.427,
+        "recency": 13.456,
         "authority": 13.0,
         "social": 0.0,
         "relevance": 4.2,
@@ -906,6 +945,44 @@
       ]
     },
     {
+      "title": "Toward Calibrated Mixture-of-Experts Under Distribution Shift",
+      "url": "https://arxiv.org/abs/2606.20544v1",
+      "source_id": "arxiv-cs-ai",
+      "source_name": "arXiv cs.AI",
+      "source_group": "arxiv",
+      "published_at": "2026-06-18T17:55:00+00:00",
+      "summary": "Calibration aligns a model's predictive uncertainty with the frequencies of its empirical outcomes and is important for understanding and trusting reported probabilities. Recent work shows that enforcing calibration at the level of individual predictors can improve ensemble accuracy and calibration, with mixture-of-experts (MoE) models showing strong empirical improvements in particular; however, the conditions under which calibration helps MoE are not well understood. In this work, we study how MoE models behave under distribution shift, focusing on how routing mechanisms interact with expert-level calibration. We show that expert calibration is sufficient to ensure calibration of the overall model under a broad class of distribution shifts in hard-routed models, but is insufficient for calibrating soft-routed models. To address this, we propose an adversarial reweighting that penalizes calibration errors of the routed aggregate under distribution shift, and we demonstrate that it improves the accuracy-calibration tradeoff both on average and on difficult subsets of the data, across model classes, prediction tasks, and distribution shifts.",
+      "category": "논문",
+      "score": 30.909,
+      "score_breakdown": {
+        "recency": 15.109,
+        "authority": 7.0,
+        "social": 0.0,
+        "relevance": 3.8000000000000003,
+        "content": 5.0,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "toward calibrated mixture experts under distribution shift",
+      "selection_decision": "selected",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "arxiv-cs-ai",
+          "source_name": "arXiv cs.AI",
+          "source_group": "arxiv",
+          "url": "https://arxiv.org/abs/2606.20544v1",
+          "title": "Toward Calibrated Mixture-of-Experts Under Distribution Shift",
+          "published_at": "2026-06-18T17:55:00+00:00",
+          "summary": "Calibration aligns a model's predictive uncertainty with the frequencies of its empirical outcomes and is important for understanding and trusting reported probabilities. Recent work shows that enforcing calibration at the level of individual predictors can improve ensemble accuracy and calibration, with mixture-of-experts (MoE) models showing strong empirical improvements in particular; however, the conditions under which calibration helps MoE are not well understood. In this work, we study how MoE models behave under distribution shift, focusing on how routing mechanisms interact with expert-level calibration. We show that expert calibration is sufficient to ensure calibration of the overall model under a broad class of distribution shifts in hard-routed models, but is insufficient for calibrating soft-routed models. To address this, we propose an adversarial reweighting that penalizes calibration errors of the routed aggregate under distribution shift, and we demonstrate that it improves the accuracy-calibration tradeoff both on average and on difficult subsets of the data, across model classes, prediction tasks, and distribution shifts.",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "xAI has made its video generation AI 'Grok Imagine Video 1.5' generally available, and a high-speed model, 'Grok Imagine Video 1.5 Fast,' has also been released. - GIGAZINE",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5obUpVUUJIdXRpd24yYTBpcW9MYUphUVpzejFLR05pMUFZWXlob2RJS1VuS1lIQTJaa0lNX1AteVpDaHZHV0l4b3NKOENlTUE0RnB4U05vMnFwT2Z3RU9KQ2RVUDY5V1JIVXZTNzhRVDNWdGs?oc=5",
       "source_id": "creative-midjourney-updates",
@@ -914,9 +991,9 @@
       "published_at": "2026-06-18T02:15:00+00:00",
       "summary": "xAI has made its video generation AI 'Grok Imagine Video 1.5' generally available, and a high-speed model, 'Grok Imagine Video 1.5 Fast,' has also been released. GIGAZINE",
       "category": "이미지",
-      "score": 32.669,
+      "score": 30.698,
       "score_breakdown": {
-        "recency": 14.469,
+        "recency": 12.498,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 3.8000000000000003,
@@ -927,8 +1004,8 @@
         "stale_penalty": 0.0
       },
       "story_key": "xai has made its video generation grok imagine",
-      "selection_decision": "rejected",
-      "rejection_reason": "section_limit",
+      "selection_decision": "selected",
+      "rejection_reason": "",
       "selectable": true,
       "evidence": [
         {
@@ -952,9 +1029,9 @@
       "published_at": "2026-06-17T18:33:16+00:00",
       "summary": "Adobe: New Firefly Graph can turn creative workflows into reusable assets Computerworld",
       "category": "이미지",
-      "score": 32.553,
+      "score": 30.582,
       "score_breakdown": {
-        "recency": 13.186,
+        "recency": 11.215,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 8.4,
@@ -982,6 +1059,44 @@
       ]
     },
     {
+      "title": "Structuring and Tokenizing Distributed User Interest Context for Generative Recommendation",
+      "url": "https://arxiv.org/abs/2606.20554v1",
+      "source_id": "arxiv-cs-ai",
+      "source_name": "arXiv cs.AI",
+      "source_group": "arxiv",
+      "published_at": "2026-06-18T17:58:32+00:00",
+      "summary": "Generative recommendation is an emerging paradigm that has shown promise in industrial recommendation systems, aiming to predict users' next interactions from their historical behaviors. At the core of generative recommendation lies item tokenization, which bridges item semantics and recommendation models. However, existing methods often struggle to effectively organize and inject complex user-behavioral and item-semantic contexts into recommendation models simultaneously. On the one hand, existing graph-based integration methods, such as graph serialization and graph neural networks, either suffer from scalability issues or exploit only local graph information. On the other hand, existing semantic tokenization methods typically rely on heuristics and lack explicit supervision signals, which may lead to inaccurate or suboptimal semantic representations. To address these limitations in user interest context modeling, we propose G2Rec, a scalable framework that unifies holistic graph-based user co-engagement modeling with semantic tokenization for industrial-scale generative recommendation. Overall, G2Rec enables recommendation models to capture holistic and semantically grounded user interest prototypes without requiring ground-truth user interests, thereby providing more comprehensive and accurate modeling of user behavior contexts in industrial sequential recommendation. Online deployment across product surfaces and extensive experiments on public datasets demonstrate the superiority of G2Rec over existing methods.",
+      "category": "논문",
+      "score": 30.519,
+      "score_breakdown": {
+        "recency": 15.119,
+        "authority": 7.0,
+        "social": 0.0,
+        "relevance": 3.4000000000000004,
+        "content": 5.0,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "structuring tokenizing distributed user interest context generative recommendation",
+      "selection_decision": "selected",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "arxiv-cs-ai",
+          "source_name": "arXiv cs.AI",
+          "source_group": "arxiv",
+          "url": "https://arxiv.org/abs/2606.20554v1",
+          "title": "Structuring and Tokenizing Distributed User Interest Context for Generative Recommendation",
+          "published_at": "2026-06-18T17:58:32+00:00",
+          "summary": "Generative recommendation is an emerging paradigm that has shown promise in industrial recommendation systems, aiming to predict users' next interactions from their historical behaviors. At the core of generative recommendation lies item tokenization, which bridges item semantics and recommendation models. However, existing methods often struggle to effectively organize and inject complex user-behavioral and item-semantic contexts into recommendation models simultaneously. On the one hand, existing graph-based integration methods, such as graph serialization and graph neural networks, either suffer from scalability issues or exploit only local graph information. On the other hand, existing semantic tokenization methods typically rely on heuristics and lack explicit supervision signals, which may lead to inaccurate or suboptimal semantic representations. To address these limitations in user interest context modeling, we propose G2Rec, a scalable framework that unifies holistic graph-based user co-engagement modeling with semantic tokenization for industrial-scale generative recommendation. Overall, G2Rec enables recommendation models to capture holistic and semantically grounded user interest prototypes without requiring ground-truth user interests, thereby providing more comprehensive and accurate modeling of user behavior contexts in industrial sequential recommendation. Online deployment across product surfaces and extensive experiments on public datasets demonstrate the superiority of G2Rec over existing methods.",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "Snap spins off AI video team into new company, Dotmo, due to costs",
       "url": "https://techcrunch.com/2026/06/18/snap-spins-off-ai-video-team-into-new-company-dotmo-due-to-costs/",
       "source_id": "news-techcrunch-ai",
@@ -990,9 +1105,9 @@
       "published_at": "2026-06-18T20:30:00+00:00",
       "summary": "The Snapchat maker is spinning off yet another internal unit. Dotmo will be composed of current Snap staff who are leaving the social media company to focus on AI video development.",
       "category": "영상",
-      "score": 32.432,
+      "score": 30.462,
       "score_breakdown": {
-        "recency": 17.51,
+        "recency": 15.54,
         "authority": 8.0,
         "social": 0.0,
         "relevance": 5.2,
@@ -1028,9 +1143,9 @@
       "published_at": "2026-06-18T18:37:01+00:00",
       "summary": "What Is Google Flow? AI Video Tool Guide Simplilearn.com",
       "category": "영상",
-      "score": 31.496,
+      "score": 29.526,
       "score_breakdown": {
-        "recency": 17.196,
+        "recency": 15.226,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 4.8,
@@ -1058,55 +1173,17 @@
       ]
     },
     {
-      "title": "Data Intelligence Agents: Interpreting, Modeling, and Querying Enterprise Data via Autonomous Coding Agents",
-      "url": "https://arxiv.org/abs/2606.19319v1",
-      "source_id": "arxiv-cs-ai",
-      "source_name": "arXiv cs.AI",
-      "source_group": "arxiv",
-      "published_at": "2026-06-17T17:45:32+00:00",
-      "summary": "Production data integration is bottlenecked by repeated, lossy handoffs between data owners, engineers, and analysts who must collaboratively discover, structure, and query enterprise data. We present Data Intelligence Agents (DIA), a system of three agents (Data Interpreter, Schema Creator, and Query Generator) that compresses this workflow by treating autonomous coding agents (ACAs) as a first-class abstraction: rather than emitting text, the agents generate, execute, validate, and repair concrete artifacts, draw on a shared memory for experience reuse, and surface each for review by domain experts. DIA is deployed in production for enterprise customers. We study the Query Generator in depth and evaluate it in fully autonomous mode across seven SQL benchmarks spanning four task categories and four dialects. It matches or surpasses the best published results on all seven, demonstrating that an architecture grounded in execution, built on ACAs and a shared memory, generalizes across the data intelligence workload with adaptation confined to natural-language instructions.",
-      "category": "논문",
-      "score": 31.453,
-      "score_breakdown": {
-        "recency": 13.053,
-        "authority": 7.0,
-        "social": 0.0,
-        "relevance": 6.4,
-        "content": 5.0,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "data intelligence agents interpreting modeling querying enterprise data",
-      "selection_decision": "selected",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "arxiv-cs-ai",
-          "source_name": "arXiv cs.AI",
-          "source_group": "arxiv",
-          "url": "https://arxiv.org/abs/2606.19319v1",
-          "title": "Data Intelligence Agents: Interpreting, Modeling, and Querying Enterprise Data via Autonomous Coding Agents",
-          "published_at": "2026-06-17T17:45:32+00:00",
-          "summary": "Production data integration is bottlenecked by repeated, lossy handoffs between data owners, engineers, and analysts who must collaboratively discover, structure, and query enterprise data. We present Data Intelligence Agents (DIA), a system of three agents (Data Interpreter, Schema Creator, and Query Generator) that compresses this workflow by treating autonomous coding agents (ACAs) as a first-class abstraction: rather than emitting text, the agents generate, execute, validate, and repair concrete artifacts, draw on a shared memory for experience reuse, and surface each for review by domain experts. DIA is deployed in production for enterprise customers. We study the Query Generator in depth and evaluate it in fully autonomous mode across seven SQL benchmarks spanning four task categories and four dialects. It matches or surpasses the best published results on all seven, demonstrating that an architecture grounded in execution, built on ACAs and a shared memory, generalizes across the data intelligence workload with adaptation confined to natural-language instructions.",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI - Business Insider",
       "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNY2l4MVVNeXdIeGVtN3o2OHM2cnZoT0prZE9UOGoxdmFYcWlFRnJ3cG1jdnJpcjQ3cWxYVmxFT0xPYVhjRkVEU281NFBtN1R2OUhSZTZkcnFYY1k0V3ZCNjRxbGc5TmUtRF9LdGZYRWxWcUhrVzVmQmFibTNSMG1fNkNKbGc3aDkxVzJhUnk1UF9tdFBOYXFJdg?oc=5",
       "source_id": "creative-higgsfield-updates",
       "source_name": "Higgsfield updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-18T11:00:18+00:00",
+      "published_at": "2026-06-18T11:00:00+00:00",
       "summary": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI Business Insider",
       "category": "영상",
-      "score": 31.35,
+      "score": 29.378,
       "score_breakdown": {
-        "recency": 15.928,
+        "recency": 13.956,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 5.2,
@@ -1127,7 +1204,7 @@
           "source_group": "creative_tool",
           "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNY2l4MVVNeXdIeGVtN3o2OHM2cnZoT0prZE9UOGoxdmFYcWlFRnJ3cG1jdnJpcjQ3cWxYVmxFT0xPYVhjRkVEU281NFBtN1R2OUhSZTZkcnFYY1k0V3ZCNjRxbGc5TmUtRF9LdGZYRWxWcUhrVzVmQmFibTNSMG1fNkNKbGc3aDkxVzJhUnk1UF9tdFBOYXFJdg?oc=5",
           "title": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI - Business Insider",
-          "published_at": "2026-06-18T11:00:18+00:00",
+          "published_at": "2026-06-18T11:00:00+00:00",
           "summary": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI Business Insider",
           "metrics": {}
         }
@@ -1142,9 +1219,9 @@
       "published_at": "2026-06-18T16:00:00+00:00",
       "summary": "When three Amazon software engineers testified earlier this month at Seattle City Council hearings about data centers, they started their testimony by citing a city law barring employment discrimination over political speech. Now, they're accusing their employer of breaking that law by retaliating against them. On June 10th - one week after the hearing, and […]",
       "category": "하드웨어 / 인프라",
-      "score": 30.871,
+      "score": 28.901,
       "score_breakdown": {
-        "recency": 16.76,
+        "recency": 14.79,
         "authority": 8.0,
         "social": 0.0,
         "relevance": 3.0,
@@ -1172,6 +1249,82 @@
       ]
     },
     {
+      "title": "How Do Instructions Shape Speech? Cross-Attention Attribution for Style-Captioned Text-to-Speech",
+      "url": "https://arxiv.org/abs/2606.20532v1",
+      "source_id": "arxiv-cs-ai",
+      "source_name": "arXiv cs.AI",
+      "source_group": "arxiv",
+      "published_at": "2026-06-18T17:47:32+00:00",
+      "summary": "Style-captioned text-to-speech systems use natural language to control voice characteristics, but how individual words influence acoustic output remains unclear. Understanding this is critical for diagnosing failure modes and improving controllability in expressive TTS. We propose cross-attention attribution for speech diffusion models, adapting the DAAM framework to the speech domain for the first time, and apply it to CapSpeech-TTS. Our method extracts per-token heatmaps across 25 layers and 24 ODE steps. We analyze 3,600 (style caption, text transcript) combinations comprising 120 style captions conditioning the generation of 30 text transcripts each, revealing how caption tokens shape waveforms. Results show: (1) style tokens have lower temporal variance than content/function tokens, confirming global conditioning; (2) style attention correlates with F0 and energy; (3) style conditioning peaks in early steps and deep layers; (4) attention entropy reaches its minimum at layer 17, co-occurring with the style importance peak, indicating maximal network selectivity at the most style-critical stage. This is the first study of how natural language influences cross-attention in speech diffusion models",
+      "category": "논문",
+      "score": 28.688,
+      "score_breakdown": {
+        "recency": 15.088,
+        "authority": 7.0,
+        "social": 0.0,
+        "relevance": 1.6,
+        "content": 5.0,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "how instructions shape speech cross attention attribution style",
+      "selection_decision": "rejected",
+      "rejection_reason": "section_limit",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "arxiv-cs-ai",
+          "source_name": "arXiv cs.AI",
+          "source_group": "arxiv",
+          "url": "https://arxiv.org/abs/2606.20532v1",
+          "title": "How Do Instructions Shape Speech? Cross-Attention Attribution for Style-Captioned Text-to-Speech",
+          "published_at": "2026-06-18T17:47:32+00:00",
+          "summary": "Style-captioned text-to-speech systems use natural language to control voice characteristics, but how individual words influence acoustic output remains unclear. Understanding this is critical for diagnosing failure modes and improving controllability in expressive TTS. We propose cross-attention attribution for speech diffusion models, adapting the DAAM framework to the speech domain for the first time, and apply it to CapSpeech-TTS. Our method extracts per-token heatmaps across 25 layers and 24 ODE steps. We analyze 3,600 (style caption, text transcript) combinations comprising 120 style captions conditioning the generation of 30 text transcripts each, revealing how caption tokens shape waveforms. Results show: (1) style tokens have lower temporal variance than content/function tokens, confirming global conditioning; (2) style attention correlates with F0 and energy; (3) style conditioning peaks in early steps and deep layers; (4) attention entropy reaches its minimum at layer 17, co-occurring with the style importance peak, indicating maximal network selectivity at the most style-critical stage. This is the first study of how natural language influences cross-attention in speech diffusion models",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "Midjourney Reveals Full-Body Medical Scanner, Expanding Beyond AI Image Generation - Tekedia",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQT3JZSFZxVEc1SXU0VGZISW9xNmdCcngwWHRtaXAwUXg2Vzd4QUJlYXM3NlZ6X0I1TXhLZlVkUnpKbVBORXBXbnJ4cWNpbVN1VHR6WkNmNmpWeFMtRXN3MHpfRkd0UDZmcjBZanNWXzlXcUh3aUx4VmlYQ1YwRl9tbGpmeEM1QW0zZDliWExkX0JxZTFSc2VwZEhKYmVfbjdVTlJTX3p2cWlkdw?oc=5",
+      "source_id": "creative-midjourney-updates",
+      "source_name": "Midjourney updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-18T23:15:29+00:00",
+      "summary": "Midjourney Reveals Full-Body Medical Scanner, Expanding Beyond AI Image Generation Tekedia",
+      "category": "이미지",
+      "score": 28.61,
+      "score_breakdown": {
+        "recency": 15.999,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 3.0,
+        "content": 0.611,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "midjourney reveals full body medical scanner expanding beyond",
+      "selection_decision": "rejected",
+      "rejection_reason": "section_limit",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-midjourney-updates",
+          "source_name": "Midjourney updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQT3JZSFZxVEc1SXU0VGZISW9xNmdCcngwWHRtaXAwUXg2Vzd4QUJlYXM3NlZ6X0I1TXhLZlVkUnpKbVBORXBXbnJ4cWNpbVN1VHR6WkNmNmpWeFMtRXN3MHpfRkd0UDZmcjBZanNWXzlXcUh3aUx4VmlYQ1YwRl9tbGpmeEM1QW0zZDliWExkX0JxZTFSc2VwZEhKYmVfbjdVTlJTX3p2cWlkdw?oc=5",
+          "title": "Midjourney Reveals Full-Body Medical Scanner, Expanding Beyond AI Image Generation - Tekedia",
+          "published_at": "2026-06-18T23:15:29+00:00",
+          "summary": "Midjourney Reveals Full-Body Medical Scanner, Expanding Beyond AI Image Generation Tekedia",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "Months after its AI virtual singer Wu AI-Hua went viral, Warner Music China doubles down on digital artists via strategic deal with Dream Maker - Music Business Worldwide",
       "url": "https://news.google.com/rss/articles/CBMijwJBVV95cUxNRkRZY01vZEx0dXZ4eDZUZ2NCaTgwWjNFbXhoWDR0bzZua3lUUWF1TnFzNUYwdHRCd3lFQVFjNTZPSkJMUnU1WnZqN0YzUlQ0bGt3czZKSWZTRGk3ZTI2ZVdhT2szdjd3cXhLTEMzWkdnNUtteDZZVElUYVQ0bG5pRDNVcHk1bS1XQWZLQzlqenYxU043Vl96U3ZkU2JEZExoTGxmRWJWYVBRa3hfY2E1UENOdk43eHU4S0E4OHF6UEc4TTZSeWt5WDJobVJuMnkzdGNoemdHaF9Cd2MtOWRiUnFCdXFsdG0tTlA3cm1Nd0xWSzFUQU1xemFXMXdxd3Nrc2lYSlVhRGdNckh3cUdJ?oc=5",
       "source_id": "creative-kling-updates",
@@ -1180,9 +1333,9 @@
       "published_at": "2026-06-17T14:09:42+00:00",
       "summary": "Months after its AI virtual singer Wu AI-Hua went viral, Warner Music China doubles down on digital artists via strategic deal with Dream Maker Music Business Worldwide",
       "category": "영상",
-      "score": 30.354,
+      "score": 28.383,
       "score_breakdown": {
-        "recency": 12.454,
+        "recency": 10.483,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 7.4,
@@ -1210,27 +1363,27 @@
       ]
     },
     {
-      "title": "OpenAI is bringing on some big guns in the lead-up to its IPO",
-      "url": "https://techcrunch.com/2026/06/18/openai-is-bringing-on-some-big-guns-in-the-lead-up-to-its-ipo/",
+      "title": "Source: Elastic agrees to buy CRV-backed DeductiveAI for up to $85M",
+      "url": "https://techcrunch.com/2026/06/18/source-elastic-agrees-to-buy-crv-backed-deductiveai-for-up-to-85m/",
       "source_id": "news-techcrunch-ai",
       "source_name": "TechCrunch AI",
       "source_group": "news",
-      "published_at": "2026-06-18T19:59:22+00:00",
-      "summary": "OpenAI is bulking up before its IPO, landing Transformer co-inventor Noam Shazeer from Google DeepMind and former Trump AI policy official Dean Ball in the same week.",
-      "category": "정책 / 저작권",
-      "score": 30.325,
+      "published_at": "2026-06-19T00:51:11+00:00",
+      "summary": "DeductiveAI, a startup that uses AI to catch and resolve bugs in software, was founded just three years ago.",
+      "category": "주요 뉴스",
+      "score": 28.321,
       "score_breakdown": {
-        "recency": 17.425,
+        "recency": 16.265,
         "authority": 8.0,
         "social": 0.0,
-        "relevance": 3.4000000000000004,
-        "content": 1.5,
+        "relevance": 3.0,
+        "content": 1.056,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "openai bringing some big guns lead its ipo",
+      "story_key": "source elastic agrees buy crv backed deductiveai 85m",
       "selection_decision": "selected",
       "rejection_reason": "",
       "selectable": true,
@@ -1239,10 +1392,10 @@
           "source_id": "news-techcrunch-ai",
           "source_name": "TechCrunch AI",
           "source_group": "news",
-          "url": "https://techcrunch.com/2026/06/18/openai-is-bringing-on-some-big-guns-in-the-lead-up-to-its-ipo/",
-          "title": "OpenAI is bringing on some big guns in the lead-up to its IPO",
-          "published_at": "2026-06-18T19:59:22+00:00",
-          "summary": "OpenAI is bulking up before its IPO, landing Transformer co-inventor Noam Shazeer from Google DeepMind and former Trump AI policy official Dean Ball in the same week.",
+          "url": "https://techcrunch.com/2026/06/18/source-elastic-agrees-to-buy-crv-backed-deductiveai-for-up-to-85m/",
+          "title": "Source: Elastic agrees to buy CRV-backed DeductiveAI for up to $85M",
+          "published_at": "2026-06-19T00:51:11+00:00",
+          "summary": "DeductiveAI, a startup that uses AI to catch and resolve bugs in software, was founded just three years ago.",
           "metrics": {}
         }
       ]
@@ -1256,9 +1409,9 @@
       "published_at": "2026-06-18T14:00:00+00:00",
       "summary": "On today’s episode of Decoder, my guest is Hayden Field, senior AI reporter for The Verge. Often when Hayden comes on the show, it’s because something has gone wrong in the world of AI. Last weekend, that something was a pretty intense mix of Anthropic, the Trump administration, and Anthropic’s new AI model, Fable 5. […]",
       "category": "LLM / 모델",
-      "score": 29.938,
+      "score": 27.967,
       "score_breakdown": {
-        "recency": 16.427,
+        "recency": 14.456,
         "authority": 8.0,
         "social": 0.0,
         "relevance": 2.4000000000000004,
@@ -1286,44 +1439,6 @@
       ]
     },
     {
-      "title": "Almost half of U.S. singles feel negatively about AI in dating, Match says",
-      "url": "https://techcrunch.com/2026/06/18/almost-half-of-u-s-singles-feel-negatively-about-ai-in-dating-match-says/",
-      "source_id": "news-techcrunch-ai",
-      "source_name": "TechCrunch AI",
-      "source_group": "news",
-      "published_at": "2026-06-18T18:51:46+00:00",
-      "summary": "About 47% of singles look negatively at the use of AI in dating -- but, many dating app users are open to AI helping with profile punch-ups and conversation starters.",
-      "category": "주요 뉴스",
-      "score": 29.904,
-      "score_breakdown": {
-        "recency": 17.237,
-        "authority": 8.0,
-        "social": 0.0,
-        "relevance": 3.0,
-        "content": 1.667,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "almost half singles feel negatively about dating match",
-      "selection_decision": "selected",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "news-techcrunch-ai",
-          "source_name": "TechCrunch AI",
-          "source_group": "news",
-          "url": "https://techcrunch.com/2026/06/18/almost-half-of-u-s-singles-feel-negatively-about-ai-in-dating-match-says/",
-          "title": "Almost half of U.S. singles feel negatively about AI in dating, Match says",
-          "published_at": "2026-06-18T18:51:46+00:00",
-          "summary": "About 47% of singles look negatively at the use of AI in dating -- but, many dating app users are open to AI helping with profile punch-ups and conversation starters.",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "AI inference startup Baseten reportedly raising $1.5B months after its last mega-round",
       "url": "https://techcrunch.com/2026/06/18/ai-inference-startup-baseten-reportedly-raising-1-5b-months-after-its-last-mega-round/",
       "source_id": "news-techcrunch-ai",
@@ -1332,9 +1447,9 @@
       "published_at": "2026-06-18T21:20:13+00:00",
       "summary": "Startup Baseten is reportedly close to finalizing a $1.5 billion round at a $13 billion as the “inference gold rush\" marches on.",
       "category": "하드웨어 / 인프라",
-      "score": 29.872,
+      "score": 27.901,
       "score_breakdown": {
-        "recency": 17.65,
+        "recency": 15.679,
         "authority": 8.0,
         "social": 0.0,
         "relevance": 3.0,
@@ -1370,9 +1485,9 @@
       "published_at": "2026-06-18T17:20:46+00:00",
       "summary": "The AI Creative Studio Comes of Age at VivaTech Visionary Marketing",
       "category": "영상",
-      "score": 29.596,
+      "score": 27.625,
       "score_breakdown": {
-        "recency": 16.985,
+        "recency": 15.014,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 3.0,
@@ -1408,9 +1523,9 @@
       "published_at": "2026-06-17T10:00:00+00:00",
       "summary": "OpenAI and Molecule.one show how a near-autonomous AI chemist using GPT-5.4 improved a key drug-making reaction, advancing medicinal chemistry research.",
       "category": "LLM / 모델",
-      "score": 29.271,
+      "score": 27.301,
       "score_breakdown": {
-        "recency": 11.76,
+        "recency": 9.79,
         "authority": 13.0,
         "social": 0.0,
         "relevance": 3.4000000000000004,
@@ -1438,6 +1553,44 @@
       ]
     },
     {
+      "title": "The US says ASML’s top chip tool may be in China. ASML says it isn’t",
+      "url": "https://techcrunch.com/2026/06/19/the-us-says-asmls-top-chip-tool-may-be-in-china-asml-says-it-isnt/",
+      "source_id": "news-techcrunch-ai",
+      "source_name": "TechCrunch AI",
+      "source_group": "news",
+      "published_at": "2026-06-19T07:59:12+00:00",
+      "summary": "There's a commercial logic that cuts against the idea that ASML would risk its export license to arm a Chinese customer.",
+      "category": "주요 뉴스",
+      "score": 27.221,
+      "score_breakdown": {
+        "recency": 17.454,
+        "authority": 8.0,
+        "social": 0.0,
+        "relevance": 0.6000000000000001,
+        "content": 1.167,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "says asml top chip tool may china asml",
+      "selection_decision": "rejected",
+      "rejection_reason": "section_limit",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "news-techcrunch-ai",
+          "source_name": "TechCrunch AI",
+          "source_group": "news",
+          "url": "https://techcrunch.com/2026/06/19/the-us-says-asmls-top-chip-tool-may-be-in-china-asml-says-it-isnt/",
+          "title": "The US says ASML’s top chip tool may be in China. ASML says it isn’t",
+          "published_at": "2026-06-19T07:59:12+00:00",
+          "summary": "There's a commercial logic that cuts against the idea that ASML would risk its export license to arm a Chinese customer.",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "AI Agents Add New Color to Adobe’s Firefly Growth - The National CIO Review",
       "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxORVR3Z1BGZ0E0NWxLU2N0b2FXaXpoU3Y0bnlpWkl5djZZVXRrLThnVlFNdUpSTVRjNDBQYTBkWWdqQmFQQmZMSF9nSEJsVk93dlhQQlVKUkJzSUxJQVdYUFAwNHFJRE1Rc1lRQUYxazVibmhiN2R2Q0tnQWRzbVNjZ2s1TERKd2JmMlpVZVNuWE9RT3Q4OGdqc29kcDNGUTNkYjhIQ0ttcDF2eFdHTmtwYUpOaw?oc=5",
       "source_id": "creative-adobe-firefly-updates",
@@ -1446,9 +1599,9 @@
       "published_at": "2026-06-17T20:13:32+00:00",
       "summary": "AI Agents Add New Color to Adobe’s Firefly Growth The National CIO Review",
       "category": "이미지",
-      "score": 29.186,
+      "score": 27.216,
       "score_breakdown": {
-        "recency": 13.464,
+        "recency": 11.494,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 6.0,
@@ -1476,77 +1629,39 @@
       ]
     },
     {
-      "title": "UBP2: Uncertainty-Balanced Preference Planning for Efficient Preference-based Reinforcement Learning",
-      "url": "https://arxiv.org/abs/2606.19328v1",
-      "source_id": "arxiv-cs-ai",
-      "source_name": "arXiv cs.AI",
-      "source_group": "arxiv",
-      "published_at": "2026-06-17T17:54:32+00:00",
-      "summary": "Preference-based RL provides an approach to learning reward models from pairwise comparisons of behaviors, bypassing the need for explicit reward design. However, existing methods typically rely on passive data collection and suffer from poor sample efficiency, especially during the early stages of learning. We introduce a model-based approach that actively directs exploration by jointly reasoning over uncertainties in the reward, dynamics, and value functions. Our method, Uncertainty-Balanced Preference Planning (UBP2), uses ensembles of reward, dynamics, and value function models to evaluate candidate trajectories according to a unified score that combines expected reward, terminal value, and epistemic uncertainty. Planning under this objective yields an explicit tradeoff between exploitation and information acquisition without requiring ad hoc exploration heuristics. Under standard regularity assumptions, we establish sublinear regret guarantees for both finite-horizon and infinite-horizon settings. Empirically, experiments on the Meta-World benchmark show UBP2 achieves substantially higher sample efficiency than model-free preference-based methods and non-optimistic model-based baselines.",
-      "category": "논문",
-      "score": 28.878,
+      "title": "GLM-5.2 can now run locally in llama.cpp and Unsloth Studio.",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9vfhf/glm52_can_now_run_locally_in_llamacpp_and_unsloth/",
+      "source_id": "reddit-localllama",
+      "source_name": "r/LocalLLaMA",
+      "source_group": "reddit",
+      "published_at": "2026-06-19T07:34:56+00:00",
+      "summary": "The 2-bit model retains ~82% accuracy after we shrunk it from 1.51TB to 238GB (-84% size). Run on a 256GB Mac or RAM/VRAM setups. GLM-5.2 is the strongest open model to date. Check the graph for the accuracy of each GLM-5.2-GGUF quantization. Full guide: https://unsloth.ai/docs/models/glm-5.2 GGUF: https://huggingface.co/unsloth/GLM-5.2-GGUF submitted by /u/beasthunterr69 [link] [comments]",
+      "category": "LLM / 모델",
+      "score": 26.876,
       "score_breakdown": {
-        "recency": 13.078,
-        "authority": 7.0,
+        "recency": 17.387,
+        "authority": 5.0,
         "social": 0.0,
-        "relevance": 3.8000000000000003,
-        "content": 5.0,
+        "relevance": 1.6,
+        "content": 2.889,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "ubp2 uncertainty balanced preference planning efficient preference based",
-      "selection_decision": "selected",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "arxiv-cs-ai",
-          "source_name": "arXiv cs.AI",
-          "source_group": "arxiv",
-          "url": "https://arxiv.org/abs/2606.19328v1",
-          "title": "UBP2: Uncertainty-Balanced Preference Planning for Efficient Preference-based Reinforcement Learning",
-          "published_at": "2026-06-17T17:54:32+00:00",
-          "summary": "Preference-based RL provides an approach to learning reward models from pairwise comparisons of behaviors, bypassing the need for explicit reward design. However, existing methods typically rely on passive data collection and suffer from poor sample efficiency, especially during the early stages of learning. We introduce a model-based approach that actively directs exploration by jointly reasoning over uncertainties in the reward, dynamics, and value functions. Our method, Uncertainty-Balanced Preference Planning (UBP2), uses ensembles of reward, dynamics, and value function models to evaluate candidate trajectories according to a unified score that combines expected reward, terminal value, and epistemic uncertainty. Planning under this objective yields an explicit tradeoff between exploitation and information acquisition without requiring ad hoc exploration heuristics. Under standard regularity assumptions, we establish sublinear regret guarantees for both finite-horizon and infinite-horizon settings. Empirically, experiments on the Meta-World benchmark show UBP2 achieves substantially higher sample efficiency than model-free preference-based methods and non-optimistic model-based baselines.",
-          "metrics": {}
-        }
-      ]
-    },
-    {
-      "title": "Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors",
-      "url": "https://arxiv.org/abs/2606.19325v1",
-      "source_id": "arxiv-cs-ai",
-      "source_name": "arXiv cs.AI",
-      "source_group": "arxiv",
-      "published_at": "2026-06-17T17:51:50+00:00",
-      "summary": "Existing multi-speaker dialogue systems bind speakers to utterances through structured supervision: per-turn tags, multi-stream transcriptions, or learnable speaker embeddings. These systems operate within speech-only pipelines that produce clean vocal sequences without the ambient texture of real conversations. We take a different approach. Our method, ScenA, conditions a text-to-audio flow-matching foundation model, pretrained on large-scale in-the-wild data, directly on multiple reference voices and a free-form natural language prompt that describes an entire multi-speaker audio scene. Leveraging such a foundational model allows us to inherit its capacity for natural, non-studio audio: background noise, room acoustics, overlapping dialogue, and spontaneous paralinguistic events, while adding multi-speaker control without any per-turn structure. Concretely, reference latents are concatenated into the model's token sequence and distinguished by lightweight identity-aware positional encodings. However, we identify a critical obstacle to this approach: the \\textit{Reference Shortcut}. During training under standard noise schedules, the model can identify the matching reference by acoustic similarity to the noisy target, bypassing the text prompt entirely. We address this with a high-noise-biased timestep distribution that forces the model to rely on the text prompt for speaker assignment. We evaluate ScenA on the CoVoMix2-Dialogue benchmark, showing that it outperforms existing multi-speaker systems on speaker-binding metrics while generating rich conversational audio with overlapping speech, emotional vocalizations, and ambient sound. Our results demonstrate the advantage of using a general-purpose audio model conditioned on a free-form scene description, rather than passing structured dialog scripts through a speech-only pipeline.",
-      "category": "논문",
-      "score": 28.871,
-      "score_breakdown": {
-        "recency": 13.071,
-        "authority": 7.0,
-        "social": 0.0,
-        "relevance": 3.8000000000000003,
-        "content": 5.0,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "reference driven multi speaker audio scene generation wild",
+      "story_key": "glm can now run locally llama cpp unsloth",
       "selection_decision": "rejected",
       "rejection_reason": "section_limit",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "arxiv-cs-ai",
-          "source_name": "arXiv cs.AI",
-          "source_group": "arxiv",
-          "url": "https://arxiv.org/abs/2606.19325v1",
-          "title": "Reference-Driven Multi-Speaker Audio Scene Generation from In-the-Wild Priors",
-          "published_at": "2026-06-17T17:51:50+00:00",
-          "summary": "Existing multi-speaker dialogue systems bind speakers to utterances through structured supervision: per-turn tags, multi-stream transcriptions, or learnable speaker embeddings. These systems operate within speech-only pipelines that produce clean vocal sequences without the ambient texture of real conversations. We take a different approach. Our method, ScenA, conditions a text-to-audio flow-matching foundation model, pretrained on large-scale in-the-wild data, directly on multiple reference voices and a free-form natural language prompt that describes an entire multi-speaker audio scene. Leveraging such a foundational model allows us to inherit its capacity for natural, non-studio audio: background noise, room acoustics, overlapping dialogue, and spontaneous paralinguistic events, while adding multi-speaker control without any per-turn structure. Concretely, reference latents are concatenated into the model's token sequence and distinguished by lightweight identity-aware positional encodings. However, we identify a critical obstacle to this approach: the \\textit{Reference Shortcut}. During training under standard noise schedules, the model can identify the matching reference by acoustic similarity to the noisy target, bypassing the text prompt entirely. We address this with a high-noise-biased timestep distribution that forces the model to rely on the text prompt for speaker assignment. We evaluate ScenA on the CoVoMix2-Dialogue benchmark, showing that it outperforms existing multi-speaker systems on speaker-binding metrics while generating rich conversational audio with overlapping speech, emotional vocalizations, and ambient sound. Our results demonstrate the advantage of using a general-purpose audio model conditioned on a free-form scene description, rather than passing structured dialog scripts through a speech-only pipeline.",
+          "source_id": "reddit-localllama",
+          "source_name": "r/LocalLLaMA",
+          "source_group": "reddit",
+          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9vfhf/glm52_can_now_run_locally_in_llamacpp_and_unsloth/",
+          "title": "GLM-5.2 can now run locally in llama.cpp and Unsloth Studio.",
+          "published_at": "2026-06-19T07:34:56+00:00",
+          "summary": "The 2-bit model retains ~82% accuracy after we shrunk it from 1.51TB to 238GB (-84% size). Run on a 256GB Mac or RAM/VRAM setups. GLM-5.2 is the strongest open model to date. Check the graph for the accuracy of each GLM-5.2-GGUF quantization. Full guide: https://unsloth.ai/docs/models/glm-5.2 GGUF: https://huggingface.co/unsloth/GLM-5.2-GGUF submitted by /u/beasthunterr69 [link] [comments]",
           "metrics": {}
         }
       ]
@@ -1560,9 +1675,9 @@
       "published_at": "2026-06-17T11:54:09+00:00",
       "summary": "Poland invests $11M in ElevenLabs and launches AI Lab Poland to grow its next generation of AI startups Tech Funding News",
       "category": "음악 / 오디오",
-      "score": 28.744,
+      "score": 26.774,
       "score_breakdown": {
-        "recency": 12.077,
+        "recency": 10.107,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 5.2,
@@ -1598,9 +1713,9 @@
       "published_at": "2026-06-18T17:33:49+00:00",
       "summary": "Midjourney Medical Shows The Claims Behind Its 60-Second Body Scanner Tech My Money",
       "category": "이미지",
-      "score": 27.543,
+      "score": 25.572,
       "score_breakdown": {
-        "recency": 17.021,
+        "recency": 15.05,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 0.8,
@@ -1636,9 +1751,9 @@
       "published_at": "2026-06-18T12:03:34+00:00",
       "summary": "In the Age of AI, Is Chinese Opera Being Revived or Reduced? Sixth Tone",
       "category": "영상",
-      "score": 26.681,
+      "score": 24.711,
       "score_breakdown": {
-        "recency": 16.103,
+        "recency": 14.133,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 0.8,
@@ -1666,39 +1781,153 @@
       ]
     },
     {
-      "title": "DeepAI Review 2026: Features, Pricing & Is It Safe? - Memeburn",
-      "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTFBmR1Q0ZkJtSER1MTg0U2hsTVhmY0pwaEFLYWM5Q0VQR0pZZXAyQjB5cmExM3hXZHpWTW5Gci1VeGQ2c3d3d0RCSDlpS0o?oc=5",
-      "source_id": "creative-midjourney-updates",
-      "source_name": "Midjourney updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-18T02:15:30+00:00",
-      "summary": "DeepAI Review 2026: Features, Pricing & Is It Safe? Memeburn",
-      "category": "이미지",
-      "score": 24.826,
+      "title": "GLM-5.2 is above GPT-5.5 in AA-Briefcase, Artificial Analysis' new agentic knowledge work eval",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9myi6/glm52_is_above_gpt55_in_aabriefcase_artificial/",
+      "source_id": "reddit-localllama",
+      "source_name": "r/LocalLLaMA",
+      "source_group": "reddit",
+      "published_at": "2026-06-19T00:17:31+00:00",
+      "summary": "submitted by /u/analysis_scaled [link] [comments]",
+      "category": "LLM / 모델",
+      "score": 24.45,
       "score_breakdown": {
-        "recency": 14.47,
-        "authority": 9.0,
+        "recency": 16.172,
+        "authority": 5.0,
         "social": 0.0,
-        "relevance": 0.8,
-        "content": 0.556,
+        "relevance": 3.0,
+        "content": 0.278,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "deepai review 2026 features pricing safe memeburn",
-      "selection_decision": "rejected",
-      "rejection_reason": "noise_filter",
+      "story_key": "glm above gpt briefcase artificial analysis new agentic",
+      "selection_decision": "eligible",
+      "rejection_reason": "",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-midjourney-updates",
-          "source_name": "Midjourney updates",
+          "source_id": "reddit-localllama",
+          "source_name": "r/LocalLLaMA",
+          "source_group": "reddit",
+          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9myi6/glm52_is_above_gpt55_in_aabriefcase_artificial/",
+          "title": "GLM-5.2 is above GPT-5.5 in AA-Briefcase, Artificial Analysis' new agentic knowledge work eval",
+          "published_at": "2026-06-19T00:17:31+00:00",
+          "summary": "submitted by /u/analysis_scaled [link] [comments]",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "What to Look for in an AI API Platform: A 2026 Developer Checklist - The AI Journal",
+      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPdy02d01VN01LTDBtRTdkaVBZX2dKQmNCekNfT0I1Ym80OGZuSnNwR0pobTlFVk9zWXVQNDlPOE0wQjdsMUp1T1o2Y1RNSGtsaGJxSFNzQzFlNGxYbkR2ZTZ1R19XV2dxOVotaTFqVHlseC13Wkx0bi1vXzU4dHpsOTdoV1JaeGp3S0JMSDVsdw?oc=5",
+      "source_id": "creative-luma-updates",
+      "source_name": "Luma Dream Machine updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-18T08:59:38+00:00",
+      "summary": "What to Look for in an AI API Platform: A 2026 Developer Checklist The AI Journal",
+      "category": "영상",
+      "score": 24.311,
+      "score_breakdown": {
+        "recency": 13.622,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 0.8,
+        "content": 0.889,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "what look api platform 2026 developer checklist journal",
+      "selection_decision": "eligible",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-luma-updates",
+          "source_name": "Luma Dream Machine updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTFBmR1Q0ZkJtSER1MTg0U2hsTVhmY0pwaEFLYWM5Q0VQR0pZZXAyQjB5cmExM3hXZHpWTW5Gci1VeGQ2c3d3d0RCSDlpS0o?oc=5",
-          "title": "DeepAI Review 2026: Features, Pricing & Is It Safe? - Memeburn",
-          "published_at": "2026-06-18T02:15:30+00:00",
-          "summary": "DeepAI Review 2026: Features, Pricing & Is It Safe? Memeburn",
+          "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPdy02d01VN01LTDBtRTdkaVBZX2dKQmNCekNfT0I1Ym80OGZuSnNwR0pobTlFVk9zWXVQNDlPOE0wQjdsMUp1T1o2Y1RNSGtsaGJxSFNzQzFlNGxYbkR2ZTZ1R19XV2dxOVotaTFqVHlseC13Wkx0bi1vXzU4dHpsOTdoV1JaeGp3S0JMSDVsdw?oc=5",
+          "title": "What to Look for in an AI API Platform: A 2026 Developer Checklist - The AI Journal",
+          "published_at": "2026-06-18T08:59:38+00:00",
+          "summary": "What to Look for in an AI API Platform: A 2026 Developer Checklist The AI Journal",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "Best AI Creativity Tools: Free & Paid Options - HP",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQemI4al9CVnpaWFU4MDFKWnd1cW5xR3VxRUJVMnhrdFEwUWg5LUdwTnRkVktKQ2JCQmo4VkV2cmNEbjdETlZsRGdjeUdRR0dPN0FoOGkyYzd2YXlnZ3ZGNXUyYU1UVU1oTDA3R0tuMmpzM0tlZ2YxQlJ4ck1aSl9yYVJ3MVlIU0E?oc=5",
+      "source_id": "creative-runway-updates",
+      "source_name": "Runway updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-17T20:58:26+00:00",
+      "summary": "Best AI Creativity Tools: Free & Paid Options HP",
+      "category": "영상",
+      "score": 23.719,
+      "score_breakdown": {
+        "recency": 11.619,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 2.6,
+        "content": 0.5,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "best creativity tools free paid options",
+      "selection_decision": "eligible",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-runway-updates",
+          "source_name": "Runway updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQemI4al9CVnpaWFU4MDFKWnd1cW5xR3VxRUJVMnhrdFEwUWg5LUdwTnRkVktKQ2JCQmo4VkV2cmNEbjdETlZsRGdjeUdRR0dPN0FoOGkyYzd2YXlnZ3ZGNXUyYU1UVU1oTDA3R0tuMmpzM0tlZ2YxQlJ4ck1aSl9yYVJ3MVlIU0E?oc=5",
+          "title": "Best AI Creativity Tools: Free & Paid Options - HP",
+          "published_at": "2026-06-17T20:58:26+00:00",
+          "summary": "Best AI Creativity Tools: Free & Paid Options HP",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "AI Creative Hubs - Trend Hunter",
+      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1NLXUxNWRBbVNUenlScGNYVnJZQVVueXNMSXhETlFtUERaQ2g5SXJfMWdpVmxQYl9WS3RJb3hjNVpVNmYzNEZsVUhQejM2ZTNnVDRjVlA2S29rX3FkcTVCOGxhONIBY0FVX3lxTE1NLXUxNWRBbVNUenlScGNYVnJZQVVueXNMSXhETlFtUERaQ2g5SXJfMWdpVmxQYl9WS3RJb3hjNVpVNmYzNEZsVUhQejM2ZTNnVDRjVlA2S29rX3FkcTVCOGxhOA?oc=5",
+      "source_id": "creative-pika-updates",
+      "source_name": "Pika updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-17T15:12:57+00:00",
+      "summary": "AI Creative Hubs Trend Hunter",
+      "category": "영상",
+      "score": 22.937,
+      "score_breakdown": {
+        "recency": 10.659,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 3.0,
+        "content": 0.278,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "creative hubs trend hunter",
+      "selection_decision": "eligible",
+      "rejection_reason": "",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-pika-updates",
+          "source_name": "Pika updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1NLXUxNWRBbVNUenlScGNYVnJZQVVueXNMSXhETlFtUERaQ2g5SXJfMWdpVmxQYl9WS3RJb3hjNVpVNmYzNEZsVUhQejM2ZTNnVDRjVlA2S29rX3FkcTVCOGxhONIBY0FVX3lxTE1NLXUxNWRBbVNUenlScGNYVnJZQVVueXNMSXhETlFtUERaQ2g5SXJfMWdpVmxQYl9WS3RJb3hjNVpVNmYzNEZsVUhQejM2ZTNnVDRjVlA2S29rX3FkcTVCOGxhOA?oc=5",
+          "title": "AI Creative Hubs - Trend Hunter",
+          "published_at": "2026-06-17T15:12:57+00:00",
+          "summary": "AI Creative Hubs Trend Hunter",
           "metrics": {}
         }
       ]
@@ -1712,9 +1941,9 @@
       "published_at": "2026-06-16T23:00:47+00:00",
       "summary": "I ditched cloud AI image tools and built my own — now I generate for free MakeUseOf",
       "category": "이미지",
-      "score": 24.673,
+      "score": 22.702,
       "score_breakdown": {
-        "recency": 9.929,
+        "recency": 7.958,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 4.8,
@@ -1742,44 +1971,6 @@
       ]
     },
     {
-      "title": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI - Hypebeast",
-      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQMWxMSlllR0t1RjQxUmVPd2xJNEJueHVYSnc5Y09YUlpOODdYNE5YRHdyWFFuRFVERlRIM0JfUWxWRmRYMEVIempuM2d6Tktnd1hGaEszNUlfeUZ2azRtakRxU0dIRFpNaE50ZUhVdWZoS0ozcGpsellVcmoxYWVuNkxJa3k?oc=5",
-      "source_id": "creative-suno-updates",
-      "source_name": "Suno updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-16T06:37:20+00:00",
-      "summary": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI Hypebeast",
-      "category": "음악 / 오디오",
-      "score": 24.541,
-      "score_breakdown": {
-        "recency": 7.197,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 7.4,
-        "content": 0.944,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "bad bunny taylor swift among million artists whose",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-suno-updates",
-          "source_name": "Suno updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQMWxMSlllR0t1RjQxUmVPd2xJNEJueHVYSnc5Y09YUlpOODdYNE5YRHdyWFFuRFVERlRIM0JfUWxWRmRYMEVIempuM2d6Tktnd1hGaEszNUlfeUZ2azRtakRxU0dIRFpNaE50ZUhVdWZoS0ozcGpsellVcmoxYWVuNkxJa3k?oc=5",
-          "title": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI - Hypebeast",
-          "published_at": "2026-06-16T06:37:20+00:00",
-          "summary": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI Hypebeast",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "Did a 54-Year-Old Nonprofit Worker Just Use AI to Become the Next Charlie Kaufman? - The Hollywood Reporter",
       "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOX3BuRy0tRTR4YzFuQTZTY2RGTHpaUV9fYVdrY043WjN2cDZ3THMwLXBKM0d0cllYaHBzblBvZzVXWEVzc0hfNEgxVzZ6dDR3X1pGd2NNNU5POGRENURta1Zma0dicDdvSG02R0R5dFRsNFN1NENrM1hYLXNkNUVsVEJ4NjJnMktkRjUycnpsc2xjekZwY0FGNGRvOTBfU0pwU2Y2dTBoOUtZd2dXRnVvcXJ2by01Y2s?oc=5",
       "source_id": "creative-runway-updates",
@@ -1788,9 +1979,9 @@
       "published_at": "2026-06-17T16:39:45+00:00",
       "summary": "Did a 54-Year-Old Nonprofit Worker Just Use AI to Become the Next Charlie Kaufman? The Hollywood Reporter",
       "category": "영상",
-      "score": 23.615,
+      "score": 21.644,
       "score_breakdown": {
-        "recency": 12.871,
+        "recency": 10.9,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 0.8,
@@ -1818,44 +2009,6 @@
       ]
     },
     {
-      "title": "GLM-5.2 inference is free on Hugging Face for the next 6 hours",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u99hel/glm52_inference_is_free_on_hugging_face_for_the/",
-      "source_id": "reddit-localllama",
-      "source_name": "r/LocalLLaMA",
-      "source_group": "reddit",
-      "published_at": "2026-06-18T15:31:38+00:00",
-      "summary": "doc: https://huggingface.co/docs/inference-providers/index a cool prompt to try first: https://huggingface.co/chat/r/aFATtCW?leafId=ed28d5b0-d99b-40be-ba8b-315b1f450e5a submitted by /u/paf1138 [link] [comments]",
-      "category": "LLM / 모델",
-      "score": 22.459,
-      "score_breakdown": {
-        "recency": 16.681,
-        "authority": 5.0,
-        "social": 0.0,
-        "relevance": 0.0,
-        "content": 0.778,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "glm inference free hugging face next hours",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "reddit-localllama",
-          "source_name": "r/LocalLLaMA",
-          "source_group": "reddit",
-          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u99hel/glm52_inference_is_free_on_hugging_face_for_the/",
-          "title": "GLM-5.2 inference is free on Hugging Face for the next 6 hours",
-          "published_at": "2026-06-18T15:31:38+00:00",
-          "summary": "doc: https://huggingface.co/docs/inference-providers/index a cool prompt to try first: https://huggingface.co/chat/r/aFATtCW?leafId=ed28d5b0-d99b-40be-ba8b-315b1f450e5a submitted by /u/paf1138 [link] [comments]",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "Record & Replay in Codex",
       "url": "https://www.youtube.com/watch?v=ZK3JhU73W18",
       "source_id": "youtube-openai",
@@ -1864,9 +2017,9 @@
       "published_at": "2026-06-18T18:57:34+00:00",
       "summary": "",
       "category": "LLM / 모델",
-      "score": 22.253,
+      "score": 20.283,
       "score_breakdown": {
-        "recency": 17.253,
+        "recency": 15.283,
         "authority": 5.0,
         "social": 0.0,
         "relevance": 0.0,
@@ -1894,44 +2047,6 @@
       ]
     },
     {
-      "title": "unsloth GLM-5.2-GGUF , including 2bit at 238GB",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u98iig/unsloth_glm52gguf_including_2bit_at_238gb/",
-      "source_id": "reddit-localllama",
-      "source_name": "r/LocalLLaMA",
-      "source_group": "reddit",
-      "published_at": "2026-06-18T14:55:44+00:00",
-      "summary": "submitted by /u/okaycan [link] [comments]",
-      "category": "LLM / 모델",
-      "score": 21.86,
-      "score_breakdown": {
-        "recency": 16.582,
-        "authority": 5.0,
-        "social": 0.0,
-        "relevance": 0.0,
-        "content": 0.278,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "unsloth glm gguf including 2bit 238gb",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "reddit-localllama",
-          "source_name": "r/LocalLLaMA",
-          "source_group": "reddit",
-          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u98iig/unsloth_glm52gguf_including_2bit_at_238gb/",
-          "title": "unsloth GLM-5.2-GGUF , including 2bit at 238GB",
-          "published_at": "2026-06-18T14:55:44+00:00",
-          "summary": "submitted by /u/okaycan [link] [comments]",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "Kuaishou’s Kling AI seeks over $2b at $18b valuation - Tech in Asia",
       "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5hWG5YUVJTTWdZWFNxbV9PeWdBaVI5dnVTdGo2cXhWVUtybnpGdm1hS04yTFBybGxNMXIxWS1acmNndGo3amlIMC04YXM4aWR2TVp6SjBUUC1EVVpDaXZaZm9fY09ka1AzVzZNS0tJeDhELWVqN1JBS1pmck9Sdw?oc=5",
       "source_id": "creative-kling-updates",
@@ -1940,9 +2055,9 @@
       "published_at": "2026-06-17T06:42:00+00:00",
       "summary": "Kuaishou’s Kling AI seeks over $2b at $18b valuation Tech in Asia",
       "category": "영상",
-      "score": 21.677,
+      "score": 19.707,
       "score_breakdown": {
-        "recency": 11.21,
+        "recency": 9.24,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 0.8,
@@ -1970,77 +2085,39 @@
       ]
     },
     {
-      "title": "GLM's founder says GLM-fable before the end of the year?!",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u96jof/glms_founder_says_glmfable_before_the_end_of_the/",
-      "source_id": "reddit-localllama",
-      "source_name": "r/LocalLLaMA",
-      "source_group": "reddit",
-      "published_at": "2026-06-18T13:38:29+00:00",
-      "summary": "submitted by /u/Charuru [link] [comments]",
-      "category": "LLM / 모델",
-      "score": 21.645,
-      "score_breakdown": {
-        "recency": 16.367,
-        "authority": 5.0,
-        "social": 0.0,
-        "relevance": 0.0,
-        "content": 0.278,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "glm founder says glm fable before end year",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "reddit-localllama",
-          "source_name": "r/LocalLLaMA",
-          "source_group": "reddit",
-          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u96jof/glms_founder_says_glmfable_before_the_end_of_the/",
-          "title": "GLM's founder says GLM-fable before the end of the year?!",
-          "published_at": "2026-06-18T13:38:29+00:00",
-          "summary": "submitted by /u/Charuru [link] [comments]",
-          "metrics": {}
-        }
-      ]
-    },
-    {
-      "title": "Best AI Video Generators for Creators in 2026 - The AI Journal",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBCel93RElxQVU0b0thN3dKUUdKc1VsMGFVcW4wblNMTDVpalNlM0w4ZFRqeDNvWGxCNjFEQWpCdERQMHZFZC0xMGJpSU5DYWlFSFd1d19HaEx1U0pzYUw1N2RoWDd5QndrUkRtWEtjSE02N0Fm?oc=5",
-      "source_id": "creative-pika-updates",
-      "source_name": "Pika updates",
+      "title": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI - Hypebeast",
+      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQMWxMSlllR0t1RjQxUmVPd2xJNEJueHVYSnc5Y09YUlpOODdYNE5YRHdyWFFuRFVERlRIM0JfUWxWRmRYMEVIempuM2d6Tktnd1hGaEszNUlfeUZ2azRtakRxU0dIRFpNaE50ZUhVdWZoS0ozcGpsellVcmoxYWVuNkxJa3k?oc=5",
+      "source_id": "creative-suno-updates",
+      "source_name": "Suno updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-16T05:43:09+00:00",
-      "summary": "Best AI Video Generators for Creators in 2026 The AI Journal",
-      "category": "영상",
-      "score": 19.658,
+      "published_at": "2026-06-16T06:37:20+00:00",
+      "summary": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI Hypebeast",
+      "category": "음악 / 오디오",
+      "score": 19.173,
       "score_breakdown": {
-        "recency": 7.047,
+        "recency": 1.829,
         "authority": 9.0,
         "social": 0.0,
-        "relevance": 3.0,
-        "content": 0.611,
+        "relevance": 7.4,
+        "content": 0.944,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "best video generators creators 2026 journal",
+      "story_key": "bad bunny taylor swift among million artists whose",
       "selection_decision": "eligible",
       "rejection_reason": "",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-pika-updates",
-          "source_name": "Pika updates",
+          "source_id": "creative-suno-updates",
+          "source_name": "Suno updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBCel93RElxQVU0b0thN3dKUUdKc1VsMGFVcW4wblNMTDVpalNlM0w4ZFRqeDNvWGxCNjFEQWpCdERQMHZFZC0xMGJpSU5DYWlFSFd1d19HaEx1U0pzYUw1N2RoWDd5QndrUkRtWEtjSE02N0Fm?oc=5",
-          "title": "Best AI Video Generators for Creators in 2026 - The AI Journal",
-          "published_at": "2026-06-16T05:43:09+00:00",
-          "summary": "Best AI Video Generators for Creators in 2026 The AI Journal",
+          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQMWxMSlllR0t1RjQxUmVPd2xJNEJueHVYSnc5Y09YUlpOODdYNE5YRHdyWFFuRFVERlRIM0JfUWxWRmRYMEVIempuM2d6Tktnd1hGaEszNUlfeUZ2azRtakRxU0dIRFpNaE50ZUhVdWZoS0ozcGpsellVcmoxYWVuNkxJa3k?oc=5",
+          "title": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI - Hypebeast",
+          "published_at": "2026-06-16T06:37:20+00:00",
+          "summary": "Bad Bunny, Taylor Swift Among 21 Million Artists Whose Music Was Secretly Used to Train AI Hypebeast",
           "metrics": {}
         }
       ]
@@ -2054,9 +2131,9 @@
       "published_at": "2026-06-15T09:01:31+00:00",
       "summary": "From culling to compositing: New Creative Cloud innovations across every stage of your workflow Adobe",
       "category": "이미지",
-      "score": 18.592,
+      "score": 17.903,
       "score_breakdown": {
-        "recency": 1.259,
+        "recency": 0.57,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 6.2,
@@ -2067,8 +2144,8 @@
         "stale_penalty": 0.0
       },
       "story_key": "culling compositing new creative cloud innovations across every",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
+      "selection_decision": "rejected",
+      "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
@@ -2084,6 +2161,44 @@
       ]
     },
     {
+      "title": "7 Best AI Art Generators for 2026: Top Tools for Stunning Digital Art - TechRepublic",
+      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE53UnNDXy1ZNW1wTjFMbnZTSkxmOXFzN0tadk1IRUhlUGhNUWpYazlELVVUeVktSGxGbmkxWVU0RENFR1NHTHJJR3B6LWxpYm9Uc0FXTHRYdzJhdGZjOGVpd2JaSG81VUVRUUsyaA?oc=5",
+      "source_id": "creative-midjourney-updates",
+      "source_name": "Midjourney updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-16T07:00:00+00:00",
+      "summary": "7 Best AI Art Generators for 2026: Top Tools for Stunning Digital Art TechRepublic",
+      "category": "이미지",
+      "score": 16.429,
+      "score_breakdown": {
+        "recency": 1.851,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 4.8,
+        "content": 0.778,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "best art generators 2026 top tools stunning digital",
+      "selection_decision": "rejected",
+      "rejection_reason": "below_threshold",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-midjourney-updates",
+          "source_name": "Midjourney updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE53UnNDXy1ZNW1wTjFMbnZTSkxmOXFzN0tadk1IRUhlUGhNUWpYazlELVVUeVktSGxGbmkxWVU0RENFR1NHTHJJR3B6LWxpYm9Uc0FXTHRYdzJhdGZjOGVpd2JaSG81VUVRUUsyaA?oc=5",
+          "title": "7 Best AI Art Generators for 2026: Top Tools for Stunning Digital Art - TechRepublic",
+          "published_at": "2026-06-16T07:00:00+00:00",
+          "summary": "7 Best AI Art Generators for 2026: Top Tools for Stunning Digital Art TechRepublic",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "Build and test iOS apps without leaving Codex!",
       "url": "https://www.youtube.com/shorts/rOLKQJMLBHI",
       "source_id": "youtube-openai",
@@ -2092,9 +2207,9 @@
       "published_at": "2026-06-17T18:01:46+00:00",
       "summary": "",
       "category": "LLM / 모델",
-      "score": 18.098,
+      "score": 16.128,
       "score_breakdown": {
-        "recency": 13.098,
+        "recency": 11.128,
         "authority": 5.0,
         "social": 0.0,
         "relevance": 0.0,
@@ -2105,8 +2220,8 @@
         "stale_penalty": 0.0
       },
       "story_key": "build test ios apps without leaving codex",
-      "selection_decision": "eligible",
-      "rejection_reason": "",
+      "selection_decision": "rejected",
+      "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
@@ -2122,27 +2237,27 @@
       ]
     },
     {
-      "title": "What Is GPTProto? A Practical AI API Platform for Developers in 2026 - Technology Org",
-      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOZlIwaWl4S3FDNzU3WmoyQS1UQ09LTHhaWHd1SlBkZE52bUkzTjBtV2lTR0F3UTJjSlNqTG5LZXNWMzlQUmw4dHdUOV91S2sxZ0FYZjZ1U2NQbHBDZUNUaFV3NG5CemVLb2NUZ3NaU3lLcXlqeV9nZTQ5X1FjN19qOW1qSWoyamh3S1lJTnowWWFlUHdoUVV3NjkzdXE4SDQ3RmlTTWZHaC1GUQ?oc=5",
+      "title": "21 Best AI Tools For Animation (With Examples) [2026] - OfficeChai",
+      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE5MZHNkRjl6QWg3UkVwMVhOVHp3OWlqVk5idUVsb2R1a3Rab0JDRnJaX0U0MVY0TVdoU1hYWGY3aDJ0d2pPeUM2N2hSUFExSTJjWVIxeGJuYVcxdmI3bHhPNElB?oc=5",
       "source_id": "creative-luma-updates",
       "source_name": "Luma Dream Machine updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-16T07:17:19+00:00",
-      "summary": "What Is GPTProto? A Practical AI API Platform for Developers in 2026 Technology Org",
+      "published_at": "2026-06-16T05:30:00+00:00",
+      "summary": "21 Best AI Tools For Animation (With Examples) [2026] OfficeChai",
       "category": "영상",
-      "score": 17.886,
+      "score": 16.12,
       "score_breakdown": {
-        "recency": 7.308,
+        "recency": 1.764,
         "authority": 9.0,
         "social": 0.0,
-        "relevance": 0.8,
-        "content": 0.778,
+        "relevance": 4.8,
+        "content": 0.556,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "what gptproto practical api platform developers 2026 technology",
+      "story_key": "best tools animation examples 2026 officechai",
       "selection_decision": "rejected",
       "rejection_reason": "below_threshold",
       "selectable": true,
@@ -2151,86 +2266,10 @@
           "source_id": "creative-luma-updates",
           "source_name": "Luma Dream Machine updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOZlIwaWl4S3FDNzU3WmoyQS1UQ09LTHhaWHd1SlBkZE52bUkzTjBtV2lTR0F3UTJjSlNqTG5LZXNWMzlQUmw4dHdUOV91S2sxZ0FYZjZ1U2NQbHBDZUNUaFV3NG5CemVLb2NUZ3NaU3lLcXlqeV9nZTQ5X1FjN19qOW1qSWoyamh3S1lJTnowWWFlUHdoUVV3NjkzdXE4SDQ3RmlTTWZHaC1GUQ?oc=5",
-          "title": "What Is GPTProto? A Practical AI API Platform for Developers in 2026 - Technology Org",
-          "published_at": "2026-06-16T07:17:19+00:00",
-          "summary": "What Is GPTProto? A Practical AI API Platform for Developers in 2026 Technology Org",
-          "metrics": {}
-        }
-      ]
-    },
-    {
-      "title": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? - The AI Journal",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPRm5OZnRlSTNFbDEyZVpJTHdhMDloa1JvNnpJeEt3ZmlOUlBISUlRNHZjb1JidDREZjFoRkpUUXplajJhcnZ2cUlESVJzR3RxZ243QmlLeDB6a2hzcHlhX0IxT2p0VW0tRlo1eGwxbHg3Tk9GWmFfeHdjYXY0emZleVVobmRyb1dCZ013M2dSZW9lNllVNU9LYWRJazdlckFSUHc?oc=5",
-      "source_id": "creative-elevenlabs-updates",
-      "source_name": "ElevenLabs updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-16T05:42:52+00:00",
-      "summary": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? The AI Journal",
-      "category": "음악 / 오디오",
-      "score": 17.679,
-      "score_breakdown": {
-        "recency": 7.046,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 0.8,
-        "content": 0.833,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "which voice generator safest commercial projects clear licensing",
-      "selection_decision": "rejected",
-      "rejection_reason": "below_threshold",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-elevenlabs-updates",
-          "source_name": "ElevenLabs updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPRm5OZnRlSTNFbDEyZVpJTHdhMDloa1JvNnpJeEt3ZmlOUlBISUlRNHZjb1JidDREZjFoRkpUUXplajJhcnZ2cUlESVJzR3RxZ243QmlLeDB6a2hzcHlhX0IxT2p0VW0tRlo1eGwxbHg3Tk9GWmFfeHdjYXY0emZleVVobmRyb1dCZ013M2dSZW9lNllVNU9LYWRJazdlckFSUHc?oc=5",
-          "title": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? - The AI Journal",
-          "published_at": "2026-06-16T05:42:52+00:00",
-          "summary": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? The AI Journal",
-          "metrics": {}
-        }
-      ]
-    },
-    {
-      "title": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How - inc.com",
-      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5",
-      "source_id": "creative-higgsfield-updates",
-      "source_name": "Higgsfield updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-15T12:08:49+00:00",
-      "summary": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How inc.com",
-      "category": "영상",
-      "score": 16.53,
-      "score_breakdown": {
-        "recency": 1.441,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 5.2,
-        "content": 0.889,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": 0.0
-      },
-      "story_key": "video startup grew million users just year here",
-      "selection_decision": "rejected",
-      "rejection_reason": "below_threshold",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-higgsfield-updates",
-          "source_name": "Higgsfield updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5",
-          "title": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How - inc.com",
-          "published_at": "2026-06-15T12:08:49+00:00",
-          "summary": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How inc.com",
+          "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE5MZHNkRjl6QWg3UkVwMVhOVHp3OWlqVk5idUVsb2R1a3Rab0JDRnJaX0U0MVY0TVdoU1hYWGY3aDJ0d2pPeUM2N2hSUFExSTJjWVIxeGJuYVcxdmI3bHhPNElB?oc=5",
+          "title": "21 Best AI Tools For Animation (With Examples) [2026] - OfficeChai",
+          "published_at": "2026-06-16T05:30:00+00:00",
+          "summary": "21 Best AI Tools For Animation (With Examples) [2026] OfficeChai",
           "metrics": {}
         }
       ]
@@ -2242,11 +2281,11 @@
       "source_name": "Hacker News: OpenAI",
       "source_group": "hn",
       "published_at": "2026-06-17T21:31:35+00:00",
-      "summary": "HN points 357, comments 4",
+      "summary": "HN points 358, comments 4",
       "category": "LLM / 모델",
       "score": 16.0,
       "score_breakdown": {
-        "recency": 13.681,
+        "recency": 11.711,
         "authority": 4.0,
         "social": 8.0,
         "relevance": 1.6,
@@ -2269,9 +2308,9 @@
           "url": "https://arstechnica.com/ai/2026/06/leaked-financial-docs-show-openai-is-losing-billions-of-dollars-a-year/",
           "title": "Leaked financial docs show OpenAI is losing billions of dollars a year",
           "published_at": "2026-06-17T21:31:35+00:00",
-          "summary": "HN points 357, comments 4",
+          "summary": "HN points 358, comments 4",
           "metrics": {
-            "hn_points": 357,
+            "hn_points": 358,
             "hn_comments": 4
           }
         }
@@ -2284,11 +2323,11 @@
       "source_name": "Hacker News: OpenAI",
       "source_group": "hn",
       "published_at": "2026-06-18T00:26:06+00:00",
-      "summary": "HN points 252, comments 221",
+      "summary": "HN points 332, comments 327",
       "category": "LLM / 모델",
       "score": 16.0,
       "score_breakdown": {
-        "recency": 14.166,
+        "recency": 12.195,
         "authority": 4.0,
         "social": 8.0,
         "relevance": 1.6,
@@ -2311,10 +2350,10 @@
           "url": "https://twitter.com/NoamShazeer/status/2067400851438932297",
           "title": "Noam Shazeer Joins OpenAI",
           "published_at": "2026-06-18T00:26:06+00:00",
-          "summary": "HN points 252, comments 221",
+          "summary": "HN points 332, comments 327",
           "metrics": {
-            "hn_points": 252,
-            "hn_comments": 221
+            "hn_points": 332,
+            "hn_comments": 327
           }
         }
       ]
@@ -2326,11 +2365,11 @@
       "source_name": "Hacker News: OpenAI",
       "source_group": "hn",
       "published_at": "2026-06-17T02:47:29+00:00",
-      "summary": "HN points 220, comments 260",
+      "summary": "HN points 220, comments 261",
       "category": "LLM / 모델",
       "score": 16.0,
       "score_breakdown": {
-        "recency": 10.559,
+        "recency": 8.588,
         "authority": 4.0,
         "social": 8.0,
         "relevance": 1.6,
@@ -2353,10 +2392,10 @@
           "url": "https://runtimewire.com/article/openai-leaked-financials-altman-compute-burn",
           "title": "Leaked OpenAI financials show $38.5B loss and compute burn",
           "published_at": "2026-06-17T02:47:29+00:00",
-          "summary": "HN points 220, comments 260",
+          "summary": "HN points 220, comments 261",
           "metrics": {
             "hn_points": 220,
-            "hn_comments": 260
+            "hn_comments": 261
           }
         }
       ]
@@ -2368,11 +2407,11 @@
       "source_name": "Hacker News: OpenAI",
       "source_group": "hn",
       "published_at": "2026-06-16T04:05:48+00:00",
-      "summary": "HN points 213, comments 387",
+      "summary": "HN points 216, comments 393",
       "category": "LLM / 모델",
       "score": 16.0,
       "score_breakdown": {
-        "recency": 6.776,
+        "recency": 1.682,
         "authority": 4.0,
         "social": 8.0,
         "relevance": 1.6,
@@ -2395,10 +2434,10 @@
           "url": "https://www.wheresyoured.at/exclusive-openai-financials/",
           "title": "OpenAI Losses Increased Nearly 8X in 2025, with Spending Hitting $34B",
           "published_at": "2026-06-16T04:05:48+00:00",
-          "summary": "HN points 213, comments 387",
+          "summary": "HN points 216, comments 393",
           "metrics": {
-            "hn_points": 213,
-            "hn_comments": 387
+            "hn_points": 216,
+            "hn_comments": 393
           }
         }
       ]
@@ -2572,6 +2611,44 @@
       ]
     },
     {
+      "title": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How - inc.com",
+      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5",
+      "source_id": "creative-higgsfield-updates",
+      "source_name": "Higgsfield updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-15T12:08:49+00:00",
+      "summary": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How inc.com",
+      "category": "영상",
+      "score": 15.841,
+      "score_breakdown": {
+        "recency": 0.752,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 5.2,
+        "content": 0.889,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "video startup grew million users just year here",
+      "selection_decision": "rejected",
+      "rejection_reason": "below_threshold",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-higgsfield-updates",
+          "source_name": "Higgsfield updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSTRtSUlFcGFzenNDeTl1U0xlYU96U1poNUFTMjIyUkx3cWZDajZ1X1V5X1NNWURKMkIwVndyM1NmSEVEbXM0RWVSVkswYnpHbmlualQ5SThFU2tVdDdnS0lYX3BHOWtGVWNYZzhwUGRzaUYyM2pwUGFQRzhGUW9WZTZOSGhQM0xKVFRwTmIwR1hQSGZsa3BVb3VDRnZsdDBhSG9fX3FpTG5DdkR4TlN2UHEyZWlpbUE?oc=5",
+          "title": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How - inc.com",
+          "published_at": "2026-06-15T12:08:49+00:00",
+          "summary": "This AI Video Startup Grew to 24 Million Users in Just 1 Year. Here’s How inc.com",
+          "metrics": {}
+        }
+      ]
+    },
+    {
       "title": "AI Video Creation: Pika Labs AI Generates Videos from Text Prompts and Creative Ideas - Trend Hunter",
       "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE96cWlFVUZ0Z0ZVZWVlbXhTX0wzbGJ2YXdqRTlXSUlmMzFQQ3hJWDhWNGV3Z0FReWxNX0d6QXhQQzMwM2NzZVNscUMtUUFrQ095ZTdsWGx2cjZuUUE?oc=5",
       "source_id": "creative-pika-updates",
@@ -2618,9 +2695,9 @@
       "published_at": "2026-06-14T14:56:00+00:00",
       "summary": "Kinetix: 3D-Conditioned AI Video with Real Motion Intelligence. quasa.io",
       "category": "3D / 공간",
-      "score": 14.904,
+      "score": 14.7,
       "score_breakdown": {
-        "recency": 0.204,
+        "recency": 0.0,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 5.2,
@@ -2648,87 +2725,87 @@
       ]
     },
     {
-      "title": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try - PC Tech Magazine",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPSl9EbWpyaFJna1FPRUgwWDdudW9ZVU5zcHZDejN0UTcxQS1xSnJTcWRSenUzVU9LU0IwcG5HcERYNHp3NHdCd3VOMktTekFwSmo4bmlBUnVXdDN0Sjdid1NyN3pfYnZmZ0RGTHBSSXJPd0p5LWh2V0l6WUtRNE1LWjR0azNLVnJYckR4STdweldLaUxTOVpZNlJXZ0o?oc=5",
-      "source_id": "creative-luma-updates",
-      "source_name": "Luma Dream Machine updates",
+      "title": "Best AI Video Generators for Creators in 2026 - The AI Journal",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBCel93RElxQVU0b0thN3dKUUdKc1VsMGFVcW4wblNMTDVpalNlM0w4ZFRqeDNvWGxCNjFEQWpCdERQMHZFZC0xMGJpSU5DYWlFSFd1d19HaEx1U0pzYUw1N2RoWDd5QndrUkRtWEtjSE02N0Fm?oc=5",
+      "source_id": "creative-pika-updates",
+      "source_name": "Pika updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-12T03:47:05+00:00",
-      "summary": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try PC Tech Magazine",
+      "published_at": "2026-06-16T05:43:09+00:00",
+      "summary": "Best AI Video Generators for Creators in 2026 The AI Journal",
       "category": "영상",
-      "score": 14.744,
+      "score": 14.388,
       "score_breakdown": {
-        "recency": 0.0,
+        "recency": 1.777,
         "authority": 9.0,
         "social": 0.0,
-        "relevance": 4.8,
-        "content": 0.944,
+        "relevance": 3.0,
+        "content": 0.611,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "best video generator text 2026 tools you need",
+      "story_key": "best video generators creators 2026 journal",
       "selection_decision": "rejected",
       "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-luma-updates",
-          "source_name": "Luma Dream Machine updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPSl9EbWpyaFJna1FPRUgwWDdudW9ZVU5zcHZDejN0UTcxQS1xSnJTcWRSenUzVU9LU0IwcG5HcERYNHp3NHdCd3VOMktTekFwSmo4bmlBUnVXdDN0Sjdid1NyN3pfYnZmZ0RGTHBSSXJPd0p5LWh2V0l6WUtRNE1LWjR0azNLVnJYckR4STdweldLaUxTOVpZNlJXZ0o?oc=5",
-          "title": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try - PC Tech Magazine",
-          "published_at": "2026-06-12T03:47:05+00:00",
-          "summary": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try PC Tech Magazine",
-          "metrics": {}
-        },
-        {
           "source_id": "creative-pika-updates",
           "source_name": "Pika updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPSl9EbWpyaFJna1FPRUgwWDdudW9ZVU5zcHZDejN0UTcxQS1xSnJTcWRSenUzVU9LU0IwcG5HcERYNHp3NHdCd3VOMktTekFwSmo4bmlBUnVXdDN0Sjdid1NyN3pfYnZmZ0RGTHBSSXJPd0p5LWh2V0l6WUtRNE1LWjR0azNLVnJYckR4STdweldLaUxTOVpZNlJXZ0o?oc=5",
-          "title": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try - PC Tech Magazine",
-          "published_at": "2026-06-12T03:47:05+00:00",
-          "summary": "Best AI Video Generator from Text in 2026: 8 Tools You Need to Try PC Tech Magazine",
+          "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBCel93RElxQVU0b0thN3dKUUdKc1VsMGFVcW4wblNMTDVpalNlM0w4ZFRqeDNvWGxCNjFEQWpCdERQMHZFZC0xMGJpSU5DYWlFSFd1d19HaEx1U0pzYUw1N2RoWDd5QndrUkRtWEtjSE02N0Fm?oc=5",
+          "title": "Best AI Video Generators for Creators in 2026 - The AI Journal",
+          "published_at": "2026-06-16T05:43:09+00:00",
+          "summary": "Best AI Video Generators for Creators in 2026 The AI Journal",
           "metrics": {}
         }
       ]
     },
     {
-      "title": "Why Tejal Patwardhan stopped underestimating the models - Episode 21",
-      "url": "https://www.youtube.com/watch?v=CFqjjKp9Y-Q",
-      "source_id": "youtube-openai",
-      "source_name": "OpenAI YouTube",
-      "source_group": "youtube",
-      "published_at": "2026-06-16T17:00:02+00:00",
-      "summary": "",
-      "category": "LLM / 모델",
-      "score": 14.727,
+      "title": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. - GIGAZINE",
+      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBoenJXUXVrb0hvUll4a2E3YmlfQVhBR2RQV1BGSXZZUms1dURlQXo1Tmc5RlhCbVZ2dzlPM3JqSW1Fb2oyNmRmN1ZVN2g4alFtalo4WTREWW9OcEpjYkxUUGVJLUtORWFHY19NdUdnMA?oc=5",
+      "source_id": "nvidia-robotics-motion-search",
+      "source_name": "NVIDIA Robotics / Motion search",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-15T02:10:00+00:00",
+      "summary": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. GIGAZINE",
+      "category": "3D / 공간",
+      "score": 13.558,
       "score_breakdown": {
-        "recency": 8.927,
-        "authority": 5.0,
+        "recency": 0.169,
+        "authority": 9.0,
         "social": 0.0,
-        "relevance": 0.8,
-        "content": 0.0,
-        "novelty": 0.0,
+        "relevance": 2.2,
+        "content": 0.889,
+        "novelty": 1.3,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "why tejal patwardhan stopped underestimating models episode",
+      "story_key": "nvidia announces motionbricks which generates over 350 000",
       "selection_decision": "rejected",
       "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "youtube-openai",
-          "source_name": "OpenAI YouTube",
-          "source_group": "youtube",
-          "url": "https://www.youtube.com/watch?v=CFqjjKp9Y-Q",
-          "title": "Why Tejal Patwardhan stopped underestimating the models - Episode 21",
-          "published_at": "2026-06-16T17:00:02+00:00",
-          "summary": "",
+          "source_id": "nvidia-robotics-motion-search",
+          "source_name": "NVIDIA Robotics / Motion search",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBoenJXUXVrb0hvUll4a2E3YmlfQVhBR2RQV1BGSXZZUms1dURlQXo1Tmc5RlhCbVZ2dzlPM3JqSW1Fb2oyNmRmN1ZVN2g4alFtalo4WTREWW9OcEpjYkxUUGVJLUtORWFHY19NdUdnMA?oc=5",
+          "title": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. - GIGAZINE",
+          "published_at": "2026-06-15T02:10:00+00:00",
+          "summary": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. GIGAZINE",
+          "metrics": {}
+        },
+        {
+          "source_id": "robot-motion-generation-search",
+          "source_name": "Robot motion generation search",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBoenJXUXVrb0hvUll4a2E3YmlfQVhBR2RQV1BGSXZZUms1dURlQXo1Tmc5RlhCbVZ2dzlPM3JqSW1Fb2oyNmRmN1ZVN2g4alFtalo4WTREWW9OcEpjYkxUUGVJLUtORWFHY19NdUdnMA?oc=5",
+          "title": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. - GIGAZINE",
+          "published_at": "2026-06-15T02:10:00+00:00",
+          "summary": "NVIDIA announces 'MotionBricks,' which generates over 350,000 different game and robot movements in real time. GIGAZINE",
           "metrics": {}
         }
       ]
@@ -2772,39 +2849,39 @@
       ]
     },
     {
-      "title": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models - NVIDIA Developer",
-      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNejFWb3Ruai1idzc3QUxBSDU4cjNvRGJRZkVJS204QWNxV1hkeXRfZl9Nc1plTk9PQ3hjU09uU3NwMXgzdHZUelJic2haajhzLVkwU3d1SjduOFltTXFoMEREWmNHMG9mOGI4STlZU1dTcUtua2Q1X1doWEMxMllsOU9hSHpoNTRqWTJuNUtfTk1ZVlFKWjkyODRqMTJaVjZVUm5BQjNsUFlaZw?oc=5",
-      "source_id": "creative-google-flow-veo",
-      "source_name": "Google Flow / Veo updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-15T12:08:09+00:00",
-      "summary": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models NVIDIA Developer",
-      "category": "영상",
-      "score": 12.763,
+      "title": "Why Tejal Patwardhan stopped underestimating the models - Episode 21",
+      "url": "https://www.youtube.com/watch?v=CFqjjKp9Y-Q",
+      "source_id": "youtube-openai",
+      "source_name": "OpenAI YouTube",
+      "source_group": "youtube",
+      "published_at": "2026-06-16T17:00:02+00:00",
+      "summary": "",
+      "category": "LLM / 모델",
+      "score": 12.756,
       "score_breakdown": {
-        "recency": 1.441,
-        "authority": 9.0,
+        "recency": 6.956,
+        "authority": 5.0,
         "social": 0.0,
-        "relevance": 1.6,
-        "content": 0.722,
+        "relevance": 0.8,
+        "content": 0.0,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "pretrained imagine fine tuned act rise world action",
+      "story_key": "why tejal patwardhan stopped underestimating models episode",
       "selection_decision": "rejected",
       "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-google-flow-veo",
-          "source_name": "Google Flow / Veo updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNejFWb3Ruai1idzc3QUxBSDU4cjNvRGJRZkVJS204QWNxV1hkeXRfZl9Nc1plTk9PQ3hjU09uU3NwMXgzdHZUelJic2haajhzLVkwU3d1SjduOFltTXFoMEREWmNHMG9mOGI4STlZU1dTcUtua2Q1X1doWEMxMllsOU9hSHpoNTRqWTJuNUtfTk1ZVlFKWjkyODRqMTJaVjZVUm5BQjNsUFlaZw?oc=5",
-          "title": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models - NVIDIA Developer",
-          "published_at": "2026-06-15T12:08:09+00:00",
-          "summary": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models NVIDIA Developer",
+          "source_id": "youtube-openai",
+          "source_name": "OpenAI YouTube",
+          "source_group": "youtube",
+          "url": "https://www.youtube.com/watch?v=CFqjjKp9Y-Q",
+          "title": "Why Tejal Patwardhan stopped underestimating the models - Episode 21",
+          "published_at": "2026-06-16T17:00:02+00:00",
+          "summary": "",
           "metrics": {}
         }
       ]
@@ -2848,39 +2925,77 @@
       ]
     },
     {
-      "title": "Robotic Hands Fold Balloon Dogs With Surprising Contact Skills - IEEE Spectrum",
-      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5qeFdnbDhIb1dVTVU0ZW9zV09CS0FWalNjVjRlQVU0RDlaRGI1UXJuMDQweDVGcVRKc2VNLTNxZDJJVGJ4MHc5ZUlFTzJOUW9YSUIzMXVteWhMcGt6dlptLTZfZGRNaTZSbnc4c1YwbS1zaG9BbmhMSHdIV1JEZw?oc=5",
-      "source_id": "robot-motion-generation-search",
-      "source_name": "Robot motion generation search",
+      "title": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? - The AI Journal",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPRm5OZnRlSTNFbDEyZVpJTHdhMDloa1JvNnpJeEt3ZmlOUlBISUlRNHZjb1JidDREZjFoRkpUUXplajJhcnZ2cUlESVJzR3RxZ243QmlLeDB6a2hzcHlhX0IxT2p0VW0tRlo1eGwxbHg3Tk9GWmFfeHdjYXY0emZleVVobmRyb1dCZ013M2dSZW9lNllVNU9LYWRJazdlckFSUHc?oc=5",
+      "source_id": "creative-elevenlabs-updates",
+      "source_name": "ElevenLabs updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-09T07:00:00+00:00",
-      "summary": "Robotic Hands Fold Balloon Dogs With Surprising Contact Skills IEEE Spectrum",
-      "category": "3D / 공간",
-      "score": 11.811,
+      "published_at": "2026-06-16T05:42:52+00:00",
+      "summary": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? The AI Journal",
+      "category": "음악 / 오디오",
+      "score": 12.409,
       "score_breakdown": {
-        "recency": 0.0,
+        "recency": 1.776,
         "authority": 9.0,
         "social": 0.0,
-        "relevance": 2.2,
-        "content": 0.611,
+        "relevance": 0.8,
+        "content": 0.833,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": 0.0
       },
-      "story_key": "robotic hands fold balloon dogs surprising contact skills",
+      "story_key": "which voice generator safest commercial projects clear licensing",
       "selection_decision": "rejected",
       "rejection_reason": "below_threshold",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "robot-motion-generation-search",
-          "source_name": "Robot motion generation search",
+          "source_id": "creative-elevenlabs-updates",
+          "source_name": "ElevenLabs updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5qeFdnbDhIb1dVTVU0ZW9zV09CS0FWalNjVjRlQVU0RDlaRGI1UXJuMDQweDVGcVRKc2VNLTNxZDJJVGJ4MHc5ZUlFTzJOUW9YSUIzMXVteWhMcGt6dlptLTZfZGRNaTZSbnc4c1YwbS1zaG9BbmhMSHdIV1JEZw?oc=5",
-          "title": "Robotic Hands Fold Balloon Dogs With Surprising Contact Skills - IEEE Spectrum",
-          "published_at": "2026-06-09T07:00:00+00:00",
-          "summary": "Robotic Hands Fold Balloon Dogs With Surprising Contact Skills IEEE Spectrum",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPRm5OZnRlSTNFbDEyZVpJTHdhMDloa1JvNnpJeEt3ZmlOUlBISUlRNHZjb1JidDREZjFoRkpUUXplajJhcnZ2cUlESVJzR3RxZ243QmlLeDB6a2hzcHlhX0IxT2p0VW0tRlo1eGwxbHg3Tk9GWmFfeHdjYXY0emZleVVobmRyb1dCZ013M2dSZW9lNllVNU9LYWRJazdlckFSUHc?oc=5",
+          "title": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? - The AI Journal",
+          "published_at": "2026-06-16T05:42:52+00:00",
+          "summary": "Which AI Voice Generator Is Safest for Commercial Projects With Clear Licensing? The AI Journal",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models - NVIDIA Developer",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNejFWb3Ruai1idzc3QUxBSDU4cjNvRGJRZkVJS204QWNxV1hkeXRfZl9Nc1plTk9PQ3hjU09uU3NwMXgzdHZUelJic2haajhzLVkwU3d1SjduOFltTXFoMEREWmNHMG9mOGI4STlZU1dTcUtua2Q1X1doWEMxMllsOU9hSHpoNTRqWTJuNUtfTk1ZVlFKWjkyODRqMTJaVjZVUm5BQjNsUFlaZw?oc=5",
+      "source_id": "creative-google-flow-veo",
+      "source_name": "Google Flow / Veo updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-15T12:08:09+00:00",
+      "summary": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models NVIDIA Developer",
+      "category": "영상",
+      "score": 12.073,
+      "score_breakdown": {
+        "recency": 0.751,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 1.6,
+        "content": 0.722,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": 0.0
+      },
+      "story_key": "pretrained imagine fine tuned act rise world action",
+      "selection_decision": "rejected",
+      "rejection_reason": "below_threshold",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-google-flow-veo",
+          "source_name": "Google Flow / Veo updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNejFWb3Ruai1idzc3QUxBSDU4cjNvRGJRZkVJS204QWNxV1hkeXRfZl9Nc1plTk9PQ3hjU09uU3NwMXgzdHZUelJic2haajhzLVkwU3d1SjduOFltTXFoMEREWmNHMG9mOGI4STlZU1dTcUtua2Q1X1doWEMxMllsOU9hSHpoNTRqWTJuNUtfTk1ZVlFKWjkyODRqMTJaVjZVUm5BQjNsUFlaZw?oc=5",
+          "title": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models - NVIDIA Developer",
+          "published_at": "2026-06-15T12:08:09+00:00",
+          "summary": "Pretrained to Imagine, Fine-Tuned to Act: The Rise of World-Action Models NVIDIA Developer",
           "metrics": {}
         }
       ]
@@ -2970,9 +3085,9 @@
       "published_at": "2026-06-15T19:18:52+00:00",
       "summary": "Elon Musk Sold Investors The Future. Now SpaceX Has To Build It. bigtechnology.com",
       "category": "영상",
-      "score": 11.581,
+      "score": 10.892,
       "score_breakdown": {
-        "recency": 1.859,
+        "recency": 1.17,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 0.0,
@@ -3072,6 +3187,16 @@
           "published_at": "2026-06-11T18:29:18+00:00",
           "summary": "Vidu AI Review: I Couldn’t Believe the Character Consistency Unite.AI",
           "metrics": {}
+        },
+        {
+          "source_id": "creative-luma-updates",
+          "source_name": "Luma Dream Machine updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE50VDlGcll2eHl4QnJSUFlpSmtLZ3lzUUh0dmdnWVVtMXhGNFhvdVpnZ2JLQ05nYk54dEJZMlpTSmhIYms3WDdvODY5d04?oc=5",
+          "title": "Vidu AI Review: I Couldn’t Believe the Character Consistency - Unite.AI",
+          "published_at": "2026-06-11T18:29:18+00:00",
+          "summary": "Vidu AI Review: I Couldn’t Believe the Character Consistency Unite.AI",
+          "metrics": {}
         }
       ]
     },
@@ -3114,27 +3239,27 @@
       ]
     },
     {
-      "title": "Imaginative Perception Tokens Enhance Spatial Reasoning in Multimodal Language Models",
-      "url": "https://huggingface.co/papers/2606.03988",
+      "title": "Latent Spatial Memory for Video World Models",
+      "url": "https://huggingface.co/papers/2606.09828",
       "source_id": "hf-daily",
       "source_name": "Hugging Face Daily Papers",
       "source_group": "hf",
-      "published_at": "2026-06-08T00:00:00+00:00",
-      "summary": "Vision language models (VLMs) excel at many tasks but still struggle with spatial reasoning when critical information is not directly observable. Many such problems require imaginative perception: inferring what would be seen from an unseen viewpoint, tracing paths through occluded spaces, or integrating partial observations into a coherent spatial representation. We introduce Imaginative Perception Tokens (IPT), intermediate perceptual representations that externalize what a VLM would perceive under alternative spatial configurations while remaining consistent with the observed input. To study this capability, we formulate three tasks, Perspective Taking (PET), Path Tracing (PT), and Multiview Counting (MVC), and construct datasets of approximately 20K examples with ground truth imaginations, answers, and evaluation benchmarks. Using the unified VLM BAGEL as the backbone, IPT supervision consistently improves spatial reasoning and often outperforms textual chain of thought training, even without generating images at inference time. On MVC, IPT improves accuracy by 3.4% and achieves competitive performance with strong closed-source models on PT. We further find that combining IPT and label-only supervision yields additional gains, whereas textual chain of thought can substantially degrade performance, suggesting a modality mismatch when spatial computation is forced through language. Overall, IPT provides a principled supervision signal for reasoning about unobserved spatial structure, improving generalization while producing interpretable intermediate representations.",
+      "published_at": "2026-06-09T00:00:00+00:00",
+      "summary": "Video world models that maintain 3D spatial consistency across generated frames typically rely on explicit point cloud memory constructed in RGB space. This design is both computationally expensive, requiring repeated rendering and VAE encoding, and inherently lossy, as the round trip through pixel space discards rich features of the learned latent representation. In this paper, we introduce latent spatial memory for video world models, a persistent 3D cache that stores scene information directly in the diffusion latent space, avoiding pixel-space reconstruction. Building on this, we propose Mirage, a latent-space spatial memory framework that constructs the memory by lifting latent tokens into 3D via depth-guided back-projection and queries it by synthesizing novel views through direct latent-space warping. This unified formulation eliminates both the information loss of pixel-space reconstruction and the computational burden of repeated encoding and rendering. Experiments show that latent spatial memory achieves up to 10.57times faster end-to-end video generation and 55times reduction in memory footprint relative to explicit 3D baselines. Leveraging the geometric prior of the diffusion model, Mirage attains state-of-the-art performance on WorldScore and strong reconstruction quality on RealEstate10K.",
       "category": "논문",
-      "score": -41.0,
+      "score": -39.7,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 6.0,
         "social": 6.0,
         "relevance": 12.0,
         "content": 5.0,
-        "novelty": 0.0,
+        "novelty": 1.3,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": -70.0
       },
-      "story_key": "imaginative perception tokens enhance spatial reasoning multimodal language",
+      "story_key": "latent spatial memory video world models",
       "selection_decision": "rejected",
       "rejection_reason": "period_outside",
       "selectable": true,
@@ -3143,78 +3268,78 @@
           "source_id": "hf-daily",
           "source_name": "Hugging Face Daily Papers",
           "source_group": "hf",
-          "url": "https://huggingface.co/papers/2606.03988",
-          "title": "Imaginative Perception Tokens Enhance Spatial Reasoning in Multimodal Language Models",
-          "published_at": "2026-06-08T00:00:00+00:00",
-          "summary": "Vision language models (VLMs) excel at many tasks but still struggle with spatial reasoning when critical information is not directly observable. Many such problems require imaginative perception: inferring what would be seen from an unseen viewpoint, tracing paths through occluded spaces, or integrating partial observations into a coherent spatial representation. We introduce Imaginative Perception Tokens (IPT), intermediate perceptual representations that externalize what a VLM would perceive under alternative spatial configurations while remaining consistent with the observed input. To study this capability, we formulate three tasks, Perspective Taking (PET), Path Tracing (PT), and Multiview Counting (MVC), and construct datasets of approximately 20K examples with ground truth imaginations, answers, and evaluation benchmarks. Using the unified VLM BAGEL as the backbone, IPT supervision consistently improves spatial reasoning and often outperforms textual chain of thought training, even without generating images at inference time. On MVC, IPT improves accuracy by 3.4% and achieves competitive performance with strong closed-source models on PT. We further find that combining IPT and label-only supervision yields additional gains, whereas textual chain of thought can substantially degrade performance, suggesting a modality mismatch when spatial computation is forced through language. Overall, IPT provides a principled supervision signal for reasoning about unobserved spatial structure, improving generalization while producing interpretable intermediate representations.",
+          "url": "https://huggingface.co/papers/2606.09828",
+          "title": "Latent Spatial Memory for Video World Models",
+          "published_at": "2026-06-09T00:00:00+00:00",
+          "summary": "Video world models that maintain 3D spatial consistency across generated frames typically rely on explicit point cloud memory constructed in RGB space. This design is both computationally expensive, requiring repeated rendering and VAE encoding, and inherently lossy, as the round trip through pixel space discards rich features of the learned latent representation. In this paper, we introduce latent spatial memory for video world models, a persistent 3D cache that stores scene information directly in the diffusion latent space, avoiding pixel-space reconstruction. Building on this, we propose Mirage, a latent-space spatial memory framework that constructs the memory by lifting latent tokens into 3D via depth-guided back-projection and queries it by synthesizing novel views through direct latent-space warping. This unified formulation eliminates both the information loss of pixel-space reconstruction and the computational burden of repeated encoding and rendering. Experiments show that latent spatial memory achieves up to 10.57times faster end-to-end video generation and 55times reduction in memory footprint relative to explicit 3D baselines. Leveraging the geometric prior of the diffusion model, Mirage attains state-of-the-art performance on WorldScore and strong reconstruction quality on RealEstate10K.",
           "metrics": {
-            "hf_upvotes": 122
+            "hf_upvotes": 67
           }
         }
       ]
     },
     {
-      "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
-      "url": "https://huggingface.co/papers/2606.07591",
+      "title": "Agents' Last Exam",
+      "url": "https://huggingface.co/papers/2606.05405",
       "source_id": "hf-daily",
       "source_name": "Hugging Face Daily Papers",
       "source_group": "hf",
-      "published_at": "2026-06-08T00:00:00+00:00",
-      "summary": "AI coding agents are increasingly used for scientific work, but their end-to-end autonomous research capability remains difficult to verify. We present ResearchClawBench, a benchmark for evaluating autonomous scientific research across 40 tasks from 10 scientific domains. Each task is grounded in a real published paper, provides related literature and raw data, and hides the target paper during evaluation. Expert-curated multimodal rubrics decompose the target scientific artifacts into weighted criteria, enabling evaluation of target-paper-level re-discovery while leaving room for new discovery. We evaluate seven autonomous research (auto-research) agents under a unified protocol and seventeen native LLMs through the lightweight ResearchHarness. Current systems remain far from reliable re-discovery: the strongest autonomous agent, Claude Code, averages 21.5, and the strongest ResearchHarness LLM, Claude-Opus-4.7, averages 20.7, with an LLM frontier mean of only 26.5. Error analysis shows that failures concentrate in experimental protocol mismatch, evidence mismatch, and missing scientific core. ResearchClawBench provides a reproducible evaluation frontier for measuring progress toward autonomous scientific research.",
-      "category": "논문",
-      "score": -44.0,
-      "score_breakdown": {
-        "recency": 0.0,
-        "authority": 6.0,
-        "social": 6.0,
-        "relevance": 9.0,
-        "content": 5.0,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": -70.0
-      },
-      "story_key": "researchclawbench benchmark end end autonomous scientific research",
-      "selection_decision": "rejected",
-      "rejection_reason": "period_outside",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "hf-daily",
-          "source_name": "Hugging Face Daily Papers",
-          "source_group": "hf",
-          "url": "https://huggingface.co/papers/2606.07591",
-          "title": "ResearchClawBench: A Benchmark for End-to-End Autonomous Scientific Research",
-          "published_at": "2026-06-08T00:00:00+00:00",
-          "summary": "AI coding agents are increasingly used for scientific work, but their end-to-end autonomous research capability remains difficult to verify. We present ResearchClawBench, a benchmark for evaluating autonomous scientific research across 40 tasks from 10 scientific domains. Each task is grounded in a real published paper, provides related literature and raw data, and hides the target paper during evaluation. Expert-curated multimodal rubrics decompose the target scientific artifacts into weighted criteria, enabling evaluation of target-paper-level re-discovery while leaving room for new discovery. We evaluate seven autonomous research (auto-research) agents under a unified protocol and seventeen native LLMs through the lightweight ResearchHarness. Current systems remain far from reliable re-discovery: the strongest autonomous agent, Claude Code, averages 21.5, and the strongest ResearchHarness LLM, Claude-Opus-4.7, averages 20.7, with an LLM frontier mean of only 26.5. Error analysis shows that failures concentrate in experimental protocol mismatch, evidence mismatch, and missing scientific core. ResearchClawBench provides a reproducible evaluation frontier for measuring progress toward autonomous scientific research.",
-          "metrics": {
-            "hf_upvotes": 91
-          }
-        }
-      ]
-    },
-    {
-      "title": "Your UnEmbedding Matrix is Secretly a Feature Lens for Text Embeddings",
-      "url": "https://huggingface.co/papers/2606.07502",
-      "source_id": "hf-daily",
-      "source_name": "Hugging Face Daily Papers",
-      "source_group": "hf",
-      "published_at": "2026-06-08T00:00:00+00:00",
-      "summary": "Large language models exhibit impressive zero-shot capabilities across a wide range of downstream tasks. However, they struggle to function as off-the-shelf embedding models, leading to suboptimal performance on massive text embedding benchmarks. In this paper, we identify a potential cause underlying this deficiency. Our motivation stems from an unexpected observation: text embeddings tend to align with frequent but uninformative tokens when projected onto the vocabulary space. We argue that this excessive expression of high-frequency tokens suppresses the model's ability to capture nuanced semantics. To address this, we introduce EmbedFilter, a simple linear transformation designed to refine text embeddings derived from LLMs directly. Specifically, we uncover that the unembedding matrix within LLMs encodes a latent space that is actively writing these frequent tokens into embedding space. By filtering out this subspace, EmbedFilter suppress the influence of high-frequency tokens, thereby enhancing semantic representations. As a compelling byproduct, this enables an inherent dimensionality reduction, lowering index storage and speedup retrieval while fully preserving the refined embedding quality. Our experiments across multiple LLM backbones demonstrate that LLMs equipped with EmbedFilter achieve superior zero-shot downstream performance even with significantly reduced embedding dimensions. We hope our findings provide deeper insights into the mechanisms of LLM-based representations and inspire more principled designs to improve text embeddings training. Our code is available at https://github.com/CentreChen/EmbFilter.",
+      "published_at": "2026-06-09T00:00:00+00:00",
+      "summary": "Recent AI systems have achieved strong results on a wide range of benchmarks, yet these gains have not translated into economically meaningful deployment across many professional domains. We argue that this gap is largely an evaluation problem: widely used benchmarks lack sustained performance measurement on real and economically valuable workflows. This paper introduces Agents' Last Exam (ALE), a benchmark designed to evaluate AI agents on long-horizon, economically valuable, real-world tasks with verifiable outcomes. Developed in collaboration with 250+ industry experts, ALE covers non-physical industries defined with reference to O*NET / SOC 2018 (the U.S. federal occupational taxonomy). It is organized around a task taxonomy with 55 subfields grouped into 13 industry clusters covering 1K+ tasks. Current results show that the hardest tier remains far from saturated: across mainstream harness and backbone configurations, the average full pass rate is 2.6%. ALE is designed as a living benchmark: its task pool grows continuously as new workflows and industries are onboarded. More broadly, ALE is intended not merely as another leaderboard, but as an instrument for closing the gap between benchmark success and GDP-relevant impact.",
       "category": "논문",
       "score": -45.3,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 6.0,
         "social": 6.0,
-        "relevance": 6.4,
+        "relevance": 7.4,
+        "content": 5.0,
+        "novelty": 0.30000000000000004,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": -70.0
+      },
+      "story_key": "agents last exam",
+      "selection_decision": "rejected",
+      "rejection_reason": "period_outside",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "hf-daily",
+          "source_name": "Hugging Face Daily Papers",
+          "source_group": "hf",
+          "url": "https://huggingface.co/papers/2606.05405",
+          "title": "Agents' Last Exam",
+          "published_at": "2026-06-09T00:00:00+00:00",
+          "summary": "Recent AI systems have achieved strong results on a wide range of benchmarks, yet these gains have not translated into economically meaningful deployment across many professional domains. We argue that this gap is largely an evaluation problem: widely used benchmarks lack sustained performance measurement on real and economically valuable workflows. This paper introduces Agents' Last Exam (ALE), a benchmark designed to evaluate AI agents on long-horizon, economically valuable, real-world tasks with verifiable outcomes. Developed in collaboration with 250+ industry experts, ALE covers non-physical industries defined with reference to O*NET / SOC 2018 (the U.S. federal occupational taxonomy). It is organized around a task taxonomy with 55 subfields grouped into 13 industry clusters covering 1K+ tasks. Current results show that the hardest tier remains far from saturated: across mainstream harness and backbone configurations, the average full pass rate is 2.6%. ALE is designed as a living benchmark: its task pool grows continuously as new workflows and industries are onboarded. More broadly, ALE is intended not merely as another leaderboard, but as an instrument for closing the gap between benchmark success and GDP-relevant impact.",
+          "metrics": {
+            "hf_upvotes": 354
+          }
+        }
+      ]
+    },
+    {
+      "title": "On the Geometry of On-Policy Distillation",
+      "url": "https://huggingface.co/papers/2606.07082",
+      "source_id": "hf-daily",
+      "source_name": "Hugging Face Daily Papers",
+      "source_group": "hf",
+      "published_at": "2026-06-09T00:00:00+00:00",
+      "summary": "On-policy distillation (OPD) is increasingly used to improve large language model reasoning, but its training dynamics remain poorly understood. We characterize the trajectory of OPD updates in parameter space and compare it with supervised fine-tuning (SFT) and reinforcement learning with verifiable rewards (RLVR). A suite of parameter-space diagnostics consistently places OPD in a relaxed off-principal regime: compared with SFT, its updates affect fewer weights and avoid principal directions more strongly, while compared with RLVR, they remain less tightly constrained. Beyond this static localization, OPD exhibits subspace locking: its cumulative updates rapidly enter a narrow low-dimensional channel. Constraining training to the update subspace formed early in training preserves OPD performance but substantially degrades SFT, indicating that the locked subspace is functionally sufficient for OPD. Control experiments further show that sparsifying the update tokens and shifting rollout generation off-policy preserve the rank dynamics, whereas mixing the OPD objective with RLVR changes them. Overall, these results suggest that OPD is not merely an intermediate point between SFT and RLVR, but induces its own update geometry in parameter space.",
+      "category": "논문",
+      "score": -46.1,
+      "score_breakdown": {
+        "recency": 0.0,
+        "authority": 6.0,
+        "social": 6.0,
+        "relevance": 5.6000000000000005,
         "content": 5.0,
         "novelty": 1.3,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": -70.0
       },
-      "story_key": "your unembedding matrix secretly feature lens text embeddings",
+      "story_key": "geometry policy distillation",
       "selection_decision": "rejected",
       "rejection_reason": "period_outside",
       "selectable": true,
@@ -3223,38 +3348,38 @@
           "source_id": "hf-daily",
           "source_name": "Hugging Face Daily Papers",
           "source_group": "hf",
-          "url": "https://huggingface.co/papers/2606.07502",
-          "title": "Your UnEmbedding Matrix is Secretly a Feature Lens for Text Embeddings",
-          "published_at": "2026-06-08T00:00:00+00:00",
-          "summary": "Large language models exhibit impressive zero-shot capabilities across a wide range of downstream tasks. However, they struggle to function as off-the-shelf embedding models, leading to suboptimal performance on massive text embedding benchmarks. In this paper, we identify a potential cause underlying this deficiency. Our motivation stems from an unexpected observation: text embeddings tend to align with frequent but uninformative tokens when projected onto the vocabulary space. We argue that this excessive expression of high-frequency tokens suppresses the model's ability to capture nuanced semantics. To address this, we introduce EmbedFilter, a simple linear transformation designed to refine text embeddings derived from LLMs directly. Specifically, we uncover that the unembedding matrix within LLMs encodes a latent space that is actively writing these frequent tokens into embedding space. By filtering out this subspace, EmbedFilter suppress the influence of high-frequency tokens, thereby enhancing semantic representations. As a compelling byproduct, this enables an inherent dimensionality reduction, lowering index storage and speedup retrieval while fully preserving the refined embedding quality. Our experiments across multiple LLM backbones demonstrate that LLMs equipped with EmbedFilter achieve superior zero-shot downstream performance even with significantly reduced embedding dimensions. We hope our findings provide deeper insights into the mechanisms of LLM-based representations and inspire more principled designs to improve text embeddings training. Our code is available at https://github.com/CentreChen/EmbFilter.",
+          "url": "https://huggingface.co/papers/2606.07082",
+          "title": "On the Geometry of On-Policy Distillation",
+          "published_at": "2026-06-09T00:00:00+00:00",
+          "summary": "On-policy distillation (OPD) is increasingly used to improve large language model reasoning, but its training dynamics remain poorly understood. We characterize the trajectory of OPD updates in parameter space and compare it with supervised fine-tuning (SFT) and reinforcement learning with verifiable rewards (RLVR). A suite of parameter-space diagnostics consistently places OPD in a relaxed off-principal regime: compared with SFT, its updates affect fewer weights and avoid principal directions more strongly, while compared with RLVR, they remain less tightly constrained. Beyond this static localization, OPD exhibits subspace locking: its cumulative updates rapidly enter a narrow low-dimensional channel. Constraining training to the update subspace formed early in training preserves OPD performance but substantially degrades SFT, indicating that the locked subspace is functionally sufficient for OPD. Control experiments further show that sparsifying the update tokens and shifting rollout generation off-policy preserve the rank dynamics, whereas mixing the OPD objective with RLVR changes them. Overall, these results suggest that OPD is not merely an intermediate point between SFT and RLVR, but induces its own update geometry in parameter space.",
           "metrics": {
-            "hf_upvotes": 95
+            "hf_upvotes": 72
           }
         }
       ]
     },
     {
-      "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
-      "url": "https://huggingface.co/papers/2606.05563",
+      "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+      "url": "https://huggingface.co/papers/2606.07297",
       "source_id": "hf-daily",
       "source_name": "Hugging Face Daily Papers",
       "source_group": "hf",
-      "published_at": "2026-06-08T00:00:00+00:00",
-      "summary": "Evaluating LLM mediators remains challenging, as mediation unfolds as a real-time trajectory shaped by disputants' shifting emotions, intentions, and context. Existing testbeds rely on a few expert-authored domains, vary mainly strategic posture, and score every turn against every topic, introducing off-topic noise. We introduce SoCRATES, a benchmark for evaluating proactive LLM mediators in realistic, multi-domain testbeds. It constructs scenarios from real conflicts through an agentic pipeline across eight domains, probes five socio-cognitive adaptation axes (strategic posture, party composition, history length, emotional reactivity, and cultural identity), and scores each topic only on the turns that advance it via a topic-localized evaluator. The evaluator reaches 0.82 alignment with human experts, more than doubling a per-turn baseline. Benchmarking eight frontier LLMs, we find that even the strongest mediator closes only about a third of the unmediated consensus gap under diverse and realistic testbeds, with performance varying sharply by socio-cognitive axis, highlighting that progress lies in social adaptation to diverse conditions.",
+      "published_at": "2026-06-09T00:00:00+00:00",
+      "summary": "Repository-level coding benchmarks such as SWE-bench have driven a rapid surge in the capabilities of coding agents. Yet they usually treat coding tasks as a holistic, binary prediction problem (e.g., resolved or unresolved), neglecting fine-grained agent capabilities such as repository understanding, context retrieval, code localization, and bug diagnosis. In this paper, we introduce SWE-Explore, a benchmark that isolates the evaluation of repository exploration, a critical capability of coding agents. Given a repository and an issue, SWE-Explore asks an explorer to return a ranked list of relevant code regions under a fixed line budget. SWE-Explore covers 848 issues across 10 programming languages and 203 open-source repositories. For each instance, we derive line-level ground truth from independent agent trajectories that successfully solved the same issue, distilling the specific code regions their solution paths actually consulted. We evaluate exploration along coverage, ranking, and context-efficiency dimensions, showing that these metrics strongly track downstream repair behavior. Across a broad set of retrieval methods, general coding agents, and specialized localizers, we find that agentic explorers form a clear tier above classical retrieval. While file-level localization is already strong for modern methods, line-level coverage and efficient ranking remain the key axes differentiating state-of-the-art explorers.",
       "category": "논문",
-      "score": -46.245,
+      "score": -47.4,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 6.0,
-        "social": 5.955,
-        "relevance": 6.800000000000001,
+        "social": 6.0,
+        "relevance": 5.6000000000000005,
         "content": 5.0,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": -70.0
       },
-      "story_key": "socrates towards reliable automated evaluation proactive llm mediation",
+      "story_key": "swe explore benchmarking how coding agents explore repositories",
       "selection_decision": "rejected",
       "rejection_reason": "period_outside",
       "selectable": true,
@@ -3263,12 +3388,12 @@
           "source_id": "hf-daily",
           "source_name": "Hugging Face Daily Papers",
           "source_group": "hf",
-          "url": "https://huggingface.co/papers/2606.05563",
-          "title": "SoCRATES: Towards Reliable Automated Evaluation of Proactive LLM Mediation across Domains and Socio-cognitive Variations",
-          "published_at": "2026-06-08T00:00:00+00:00",
-          "summary": "Evaluating LLM mediators remains challenging, as mediation unfolds as a real-time trajectory shaped by disputants' shifting emotions, intentions, and context. Existing testbeds rely on a few expert-authored domains, vary mainly strategic posture, and score every turn against every topic, introducing off-topic noise. We introduce SoCRATES, a benchmark for evaluating proactive LLM mediators in realistic, multi-domain testbeds. It constructs scenarios from real conflicts through an agentic pipeline across eight domains, probes five socio-cognitive adaptation axes (strategic posture, party composition, history length, emotional reactivity, and cultural identity), and scores each topic only on the turns that advance it via a topic-localized evaluator. The evaluator reaches 0.82 alignment with human experts, more than doubling a per-turn baseline. Benchmarking eight frontier LLMs, we find that even the strongest mediator closes only about a third of the unmediated consensus gap under diverse and realistic testbeds, with performance varying sharply by socio-cognitive axis, highlighting that progress lies in social adaptation to diverse conditions.",
+          "url": "https://huggingface.co/papers/2606.07297",
+          "title": "SWE-Explore: Benchmarking How Coding Agents Explore Repositories",
+          "published_at": "2026-06-09T00:00:00+00:00",
+          "summary": "Repository-level coding benchmarks such as SWE-bench have driven a rapid surge in the capabilities of coding agents. Yet they usually treat coding tasks as a holistic, binary prediction problem (e.g., resolved or unresolved), neglecting fine-grained agent capabilities such as repository understanding, context retrieval, code localization, and bug diagnosis. In this paper, we introduce SWE-Explore, a benchmark that isolates the evaluation of repository exploration, a critical capability of coding agents. Given a repository and an issue, SWE-Explore asks an explorer to return a ranked list of relevant code regions under a fixed line budget. SWE-Explore covers 848 issues across 10 programming languages and 203 open-source repositories. For each instance, we derive line-level ground truth from independent agent trajectories that successfully solved the same issue, distilling the specific code regions their solution paths actually consulted. We evaluate exploration along coverage, ranking, and context-efficiency dimensions, showing that these metrics strongly track downstream repair behavior. Across a broad set of retrieval methods, general coding agents, and specialized localizers, we find that agentic explorers form a clear tier above classical retrieval. While file-level localization is already strong for modern methods, line-level coverage and efficient ranking remain the key axes differentiating state-of-the-art explorers.",
           "metrics": {
-            "hf_upvotes": 52
+            "hf_upvotes": 116
           }
         }
       ]
@@ -3540,44 +3665,6 @@
       ]
     },
     {
-      "title": "Musicians’ Union Sues Major Labels for Artists’ Share of AI Song Generator Settlement Money - The Hollywood Reporter",
-      "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQeWxQeTZJMG9oOHRneE1LX2RkVHU0dW5oWkpReS1xODJFZ1pVcElTLTdxZUxTeHdXMmZJQms5ZFhZOXpvVkVwa1BVYWlQYzk5TkhqN1QzVV8zRkNtTUMycnU5YlRoZVVxaGw5RDVDdVpsMUJvTWt1aU1zSnJqcjBwbUYtYWx1aVFlMHVJNDc5d2RMQ19oV2dzbnV6U1o1aC1QTnZGbEJFMFZfaHIwamt4dV9XNlBSSEM4Z3d2S2JENEFFZw?oc=5",
-      "source_id": "creative-suno-updates",
-      "source_name": "Suno updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-05T07:00:00+00:00",
-      "summary": "Musicians’ Union Sues Major Labels for Artists’ Share of AI Song Generator Settlement Money The Hollywood Reporter",
-      "category": "음악 / 오디오",
-      "score": -52.656,
-      "score_breakdown": {
-        "recency": 0.0,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 7.4,
-        "content": 0.944,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": -70.0
-      },
-      "story_key": "musicians union sues major labels artists share song",
-      "selection_decision": "rejected",
-      "rejection_reason": "period_outside",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-suno-updates",
-          "source_name": "Suno updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQeWxQeTZJMG9oOHRneE1LX2RkVHU0dW5oWkpReS1xODJFZ1pVcElTLTdxZUxTeHdXMmZJQms5ZFhZOXpvVkVwa1BVYWlQYzk5TkhqN1QzVV8zRkNtTUMycnU5YlRoZVVxaGw5RDVDdVpsMUJvTWt1aU1zSnJqcjBwbUYtYWx1aVFlMHVJNDc5d2RMQ19oV2dzbnV6U1o1aC1QTnZGbEJFMFZfaHIwamt4dV9XNlBSSEM4Z3d2S2JENEFFZw?oc=5",
-          "title": "Musicians’ Union Sues Major Labels for Artists’ Share of AI Song Generator Settlement Money - The Hollywood Reporter",
-          "published_at": "2026-06-05T07:00:00+00:00",
-          "summary": "Musicians’ Union Sues Major Labels for Artists’ Share of AI Song Generator Settlement Money The Hollywood Reporter",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "https://blog.adobe.com/en/publish/2023/06/08/adobe-express-june-2023-release",
       "url": "https://blog.adobe.com/en/publish/2023/06/08/adobe-express-june-2023-release",
       "source_id": "official-adobe",
@@ -3654,21 +3741,21 @@
       ]
     },
     {
-      "title": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. - Yahoo Tech",
-      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQMUdGN0JKeGJGRHNMRFpYVUVnQ1NpeFRSb3daQ2NlWktnZHpEc0ZoVmRSQW0zUFpGOUdaYlluQmU5NmlhSEFhNWExZWhMbjJhUmIwTmJYNDdaVmdPdmJ6WlNsNFQ0WUJWOFljZUpDSDhQTFZrUFI2VzJOa2NHR1FLU2tuMlVhZFBxMkktNWhyTm0?oc=5",
+      "title": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. - AOL.com",
+      "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE53aGp2WUctdXNGd1p1b0tXNHRYaUNsOUJxYU5ldkRxcE1DXy1xdHAzVEpqLXhDZVIwWnNIZUNTZVMzNjRVM3JERGRXWjVYOUtKR2c1X044WHJRbWZVWGRMX3U5amRSSTlfZTRseHI4N0dEUEFmOVlObA?oc=5",
       "source_id": "creative-elevenlabs-updates",
       "source_name": "ElevenLabs updates",
       "source_group": "creative_tool",
       "published_at": "2026-06-06T09:18:01+00:00",
-      "summary": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. Yahoo Tech",
+      "summary": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. AOL.com",
       "category": "음악 / 오디오",
-      "score": -54.633,
+      "score": -54.689,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 5.2,
-        "content": 1.167,
+        "content": 1.111,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
@@ -3683,10 +3770,10 @@
           "source_id": "creative-elevenlabs-updates",
           "source_name": "ElevenLabs updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQMUdGN0JKeGJGRHNMRFpYVUVnQ1NpeFRSb3daQ2NlWktnZHpEc0ZoVmRSQW0zUFpGOUdaYlluQmU5NmlhSEFhNWExZWhMbjJhUmIwTmJYNDdaVmdPdmJ6WlNsNFQ0WUJWOFljZUpDSDhQTFZrUFI2VzJOa2NHR1FLU2tuMlVhZFBxMkktNWhyTm0?oc=5",
-          "title": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. - Yahoo Tech",
+          "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE53aGp2WUctdXNGd1p1b0tXNHRYaUNsOUJxYU5ldkRxcE1DXy1xdHAzVEpqLXhDZVIwWnNIZUNTZVMzNjRVM3JERGRXWjVYOUtKR2c1X044WHJRbWZVWGRMX3U5amRSSTlfZTRseHI4N0dEUEFmOVlObA?oc=5",
+          "title": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. - AOL.com",
           "published_at": "2026-06-06T09:18:01+00:00",
-          "summary": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. Yahoo Tech",
+          "summary": "I went to ElevenLabs' NYC pop-up. A robot poured me cold brew before I haggled with an AI shopkeeper. AOL.com",
           "metrics": {}
         }
       ]
@@ -3968,54 +4055,6 @@
       ]
     },
     {
-      "title": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case - Memeburn",
-      "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5PRVFoamthOWw1QnhIdVNmN1hjYk1EaGlET01PR3hwaVJEVXVKSUR0empES1Jkd09SSkxNRVgwRFEzWjVxSVgtVEJCUnpGUktmbU9UTzZ6cEhkRkxHNkVHTA?oc=5",
-      "source_id": "creative-luma-updates",
-      "source_name": "Luma Dream Machine updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-05T07:00:00+00:00",
-      "summary": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case Memeburn",
-      "category": "영상",
-      "score": -55.367,
-      "score_breakdown": {
-        "recency": 0.0,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 4.8,
-        "content": 0.833,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": -70.0
-      },
-      "story_key": "best video generator tools 2026 tested ranked compared",
-      "selection_decision": "rejected",
-      "rejection_reason": "period_outside",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-luma-updates",
-          "source_name": "Luma Dream Machine updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5PRVFoamthOWw1QnhIdVNmN1hjYk1EaGlET01PR3hwaVJEVXVKSUR0empES1Jkd09SSkxNRVgwRFEzWjVxSVgtVEJCUnpGUktmbU9UTzZ6cEhkRkxHNkVHTA?oc=5",
-          "title": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case - Memeburn",
-          "published_at": "2026-06-05T07:00:00+00:00",
-          "summary": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case Memeburn",
-          "metrics": {}
-        },
-        {
-          "source_id": "creative-pika-updates",
-          "source_name": "Pika updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5PRVFoamthOWw1QnhIdVNmN1hjYk1EaGlET01PR3hwaVJEVXVKSUR0empES1Jkd09SSkxNRVgwRFEzWjVxSVgtVEJCUnpGUktmbU9UTzZ6cEhkRkxHNkVHTA?oc=5",
-          "title": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case - Memeburn",
-          "published_at": "2026-06-05T07:00:00+00:00",
-          "summary": "Best AI Video Generator Tools 2026: Tested, Ranked & Compared for Every Use Case Memeburn",
-          "metrics": {}
-        }
-      ]
-    },
-    {
       "title": "Release Notes",
       "url": "https://suno.com/release-notes",
       "source_id": "official-suno",
@@ -4059,44 +4098,6 @@
           "title": "Release Notes",
           "published_at": null,
           "summary": "",
-          "metrics": {}
-        }
-      ]
-    },
-    {
-      "title": "Best AI Image Generator Tools for YouTubers - RadarOnline",
-      "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE9wc21KSWxOeGwybkgydW9lcG5YYWNHenI0aUJDS0o4c3pqWUNEX0lBVEpKd0JWc2NycnhtSVNRcDZwQ0FlMEF4c0lQanU5RkNBTmdCR2U4R1lmVll0c2xPUW5aRHo1VWYzakFEam9pOVdoVG5rbVVUTm9B?oc=5",
-      "source_id": "creative-midjourney-updates",
-      "source_name": "Midjourney updates",
-      "source_group": "creative_tool",
-      "published_at": "2026-06-08T18:33:56+00:00",
-      "summary": "Best AI Image Generator Tools for YouTubers RadarOnline",
-      "category": "이미지",
-      "score": -55.756,
-      "score_breakdown": {
-        "recency": 0.0,
-        "authority": 9.0,
-        "social": 0.0,
-        "relevance": 4.8,
-        "content": 0.444,
-        "novelty": 0.0,
-        "evidence": 0.0,
-        "evidence_count": 1.0,
-        "stale_penalty": -70.0
-      },
-      "story_key": "best image generator tools youtubers radaronline",
-      "selection_decision": "rejected",
-      "rejection_reason": "period_outside",
-      "selectable": true,
-      "evidence": [
-        {
-          "source_id": "creative-midjourney-updates",
-          "source_name": "Midjourney updates",
-          "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE9wc21KSWxOeGwybkgydW9lcG5YYWNHenI0aUJDS0o4c3pqWUNEX0lBVEpKd0JWc2NycnhtSVNRcDZwQ0FlMEF4c0lQanU5RkNBTmdCR2U4R1lmVll0c2xPUW5aRHo1VWYzakFEam9pOVdoVG5rbVVUTm9B?oc=5",
-          "title": "Best AI Image Generator Tools for YouTubers - RadarOnline",
-          "published_at": "2026-06-08T18:33:56+00:00",
-          "summary": "Best AI Image Generator Tools for YouTubers RadarOnline",
           "metrics": {}
         }
       ]
@@ -4216,39 +4217,39 @@
       ]
     },
     {
-      "title": "Video AI Wars: How Chinese Labs Are Winning The Race OpenAI Abandoned - Forbes",
-      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOSThpTmZPR3BnNURWR0E1aUZaWmpZcnhjeG10RVBOTGYteFlCVENaZmFvSXdaeFlMUUZ4OHdpMUZadkZsU01kdm5OM1ZwSHZKU2p2TXY5NUlWZXR1S2Q5WDQ0LXdHVFBkUmJLRjhxb2QyX2lwTGFkX0xaVWczMkRUZFoyeWJZTWowZkJsS3NONnd1MEp6MXAtYzlOZUt2SEFiTEtadXozQmJsb29zeXRxNnB2X1BaUVk4aXNrXw?oc=5",
-      "source_id": "creative-runway-updates",
-      "source_name": "Runway updates",
+      "title": "Pixel Interfaces: AI Workflows in ComfyUI - parametric-architecture.com",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNdTM4clBDeDIxNEc4ZG9CcEdaYUtvbENpNDQ1X2RKYmZfRUt3Y2xVUDdOZnUtR0p0eWRoNWk2R3VpU28wSHlmcXRfLTdjOWpEVjQ5d3ZlQWlQVDJkMy1OSlJ3UHJqRjNWb1dMZU9kMVR1WUVHTk1XV1pyM2JaUnI0cVNIdw?oc=5",
+      "source_id": "creative-comfyui-updates",
+      "source_name": "ComfyUI workflow updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-05T07:00:00+00:00",
-      "summary": "Video AI Wars: How Chinese Labs Are Winning The Race OpenAI Abandoned Forbes",
-      "category": "영상",
-      "score": -56.478,
+      "published_at": "2026-06-09T08:53:19+00:00",
+      "summary": "Pixel Interfaces: AI Workflows in ComfyUI parametric-architecture.com",
+      "category": "이미지",
+      "score": -56.711,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 9.0,
         "social": 0.0,
-        "relevance": 3.8000000000000003,
-        "content": 0.722,
-        "novelty": 0.0,
+        "relevance": 2.6,
+        "content": 0.389,
+        "novelty": 1.3,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": -70.0
       },
-      "story_key": "video wars how chinese labs winning race openai",
+      "story_key": "pixel interfaces workflows comfyui parametric architecture com",
       "selection_decision": "rejected",
       "rejection_reason": "period_outside",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-runway-updates",
-          "source_name": "Runway updates",
+          "source_id": "creative-comfyui-updates",
+          "source_name": "ComfyUI workflow updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOSThpTmZPR3BnNURWR0E1aUZaWmpZcnhjeG10RVBOTGYteFlCVENaZmFvSXdaeFlMUUZ4OHdpMUZadkZsU01kdm5OM1ZwSHZKU2p2TXY5NUlWZXR1S2Q5WDQ0LXdHVFBkUmJLRjhxb2QyX2lwTGFkX0xaVWczMkRUZFoyeWJZTWowZkJsS3NONnd1MEp6MXAtYzlOZUt2SEFiTEtadXozQmJsb29zeXRxNnB2X1BaUVk4aXNrXw?oc=5",
-          "title": "Video AI Wars: How Chinese Labs Are Winning The Race OpenAI Abandoned - Forbes",
-          "published_at": "2026-06-05T07:00:00+00:00",
-          "summary": "Video AI Wars: How Chinese Labs Are Winning The Race OpenAI Abandoned Forbes",
+          "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNdTM4clBDeDIxNEc4ZG9CcEdaYUtvbENpNDQ1X2RKYmZfRUt3Y2xVUDdOZnUtR0p0eWRoNWk2R3VpU28wSHlmcXRfLTdjOWpEVjQ5d3ZlQWlQVDJkMy1OSlJ3UHJqRjNWb1dMZU9kMVR1WUVHTk1XV1pyM2JaUnI0cVNIdw?oc=5",
+          "title": "Pixel Interfaces: AI Workflows in ComfyUI - parametric-architecture.com",
+          "published_at": "2026-06-09T08:53:19+00:00",
+          "summary": "Pixel Interfaces: AI Workflows in ComfyUI parametric-architecture.com",
           "metrics": {}
         }
       ]
@@ -4788,39 +4789,77 @@
       ]
     },
     {
-      "title": "Comfy Desktop makes ComfyUI easier for commercial AI builders - Startup Fortune",
-      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPVzUyQ3hiRWxXUTNXZWxKdUo1NGFXZjItQVNVYW9xNVBjekNzNnhfbUM2SW8wYmR1SGJYdXFCdFYxYUtJWXo4dmdHY2p4NmtoNGFIX2xBZnlFT3JtYi1UclhWaFV5TUFfZHdKaTFhWlNvRkRFblg5MkZhMUI0b0RiWUZmSExSUnJGN044bmUwRFN0aW8?oc=5",
-      "source_id": "creative-comfyui-updates",
-      "source_name": "ComfyUI workflow updates",
+      "title": "AI Video Generators Compared: Which One Should You Actually Use? - OCNJ Daily",
+      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPeS12TmR4RUNGMWtTWlplQjJWTkZaU3JyeDhIRTJrZWVDTFJEeEJYMFhOYlY4NG56N2R4T3FzV1lWaHh6bVd6YXI3VWY5Q3BvOURKSWJxdkFwVkJTSjZIX0VrTGJxcjlIbzdiOXB2TTFYeE1Lb2pxYzc4UEdwODBOUFI5QjNQaHM4TENuS2NPN0hXdjdZQjc2QmxJVHd5UVRZVTFTMQ?oc=5",
+      "source_id": "creative-pika-updates",
+      "source_name": "Pika updates",
       "source_group": "creative_tool",
-      "published_at": "2026-06-05T10:42:40+00:00",
-      "summary": "Comfy Desktop makes ComfyUI easier for commercial AI builders Startup Fortune",
-      "category": "이미지",
-      "score": -57.389,
+      "published_at": "2026-06-08T12:24:48+00:00",
+      "summary": "AI Video Generators Compared: Which One Should You Actually Use? OCNJ Daily",
+      "category": "영상",
+      "score": -57.333,
       "score_breakdown": {
         "recency": 0.0,
         "authority": 9.0,
         "social": 0.0,
         "relevance": 3.0,
-        "content": 0.611,
+        "content": 0.667,
         "novelty": 0.0,
         "evidence": 0.0,
         "evidence_count": 1.0,
         "stale_penalty": -70.0
       },
-      "story_key": "comfy desktop makes comfyui easier commercial builders startup",
+      "story_key": "video generators compared which one should you actually",
       "selection_decision": "rejected",
       "rejection_reason": "period_outside",
       "selectable": true,
       "evidence": [
         {
-          "source_id": "creative-comfyui-updates",
-          "source_name": "ComfyUI workflow updates",
+          "source_id": "creative-pika-updates",
+          "source_name": "Pika updates",
           "source_group": "creative_tool",
-          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPVzUyQ3hiRWxXUTNXZWxKdUo1NGFXZjItQVNVYW9xNVBjekNzNnhfbUM2SW8wYmR1SGJYdXFCdFYxYUtJWXo4dmdHY2p4NmtoNGFIX2xBZnlFT3JtYi1UclhWaFV5TUFfZHdKaTFhWlNvRkRFblg5MkZhMUI0b0RiWUZmSExSUnJGN044bmUwRFN0aW8?oc=5",
-          "title": "Comfy Desktop makes ComfyUI easier for commercial AI builders - Startup Fortune",
-          "published_at": "2026-06-05T10:42:40+00:00",
-          "summary": "Comfy Desktop makes ComfyUI easier for commercial AI builders Startup Fortune",
+          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPeS12TmR4RUNGMWtTWlplQjJWTkZaU3JyeDhIRTJrZWVDTFJEeEJYMFhOYlY4NG56N2R4T3FzV1lWaHh6bVd6YXI3VWY5Q3BvOURKSWJxdkFwVkJTSjZIX0VrTGJxcjlIbzdiOXB2TTFYeE1Lb2pxYzc4UEdwODBOUFI5QjNQaHM4TENuS2NPN0hXdjdZQjc2QmxJVHd5UVRZVTFTMQ?oc=5",
+          "title": "AI Video Generators Compared: Which One Should You Actually Use? - OCNJ Daily",
+          "published_at": "2026-06-08T12:24:48+00:00",
+          "summary": "AI Video Generators Compared: Which One Should You Actually Use? OCNJ Daily",
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "title": "Musicians shortchanged by AI deals with labels, lawsuit alleges - Los Angeles Times",
+      "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQUkZuNUx6OFltUThBUHZ6WU5EaDg1a2hhS2tNSk5VbnpFSXZPLUs5SVlrZGhjRFdlREJmTFk5VFVKZjZReVpXNzVRZGxfWUhlQnBEWVFSaVU2QTJpelhUV0lxWDJ0Z0otUW5qTWVkSjhYLUJDTjhQc0lGdE1vQTNabFpKNnpDVWZid1BXYkE0SGhaa05VdVZaWF80Y1lYRk15aVNyTmxuSUY0eWt0OUJKM0tOXzYybkVYczUyZEU5U3hvS0ZJVkEyaVNVdXpsOG1aUkFLV1VzOEJrYkZQNmtKTWRB?oc=5",
+      "source_id": "creative-suno-updates",
+      "source_name": "Suno updates",
+      "source_group": "creative_tool",
+      "published_at": "2026-06-08T07:00:00+00:00",
+      "summary": "Musicians shortchanged by AI deals with labels, lawsuit alleges Los Angeles Times",
+      "category": "음악 / 오디오",
+      "score": -57.333,
+      "score_breakdown": {
+        "recency": 0.0,
+        "authority": 9.0,
+        "social": 0.0,
+        "relevance": 3.0,
+        "content": 0.667,
+        "novelty": 0.0,
+        "evidence": 0.0,
+        "evidence_count": 1.0,
+        "stale_penalty": -70.0
+      },
+      "story_key": "musicians shortchanged deals labels lawsuit alleges los angeles",
+      "selection_decision": "rejected",
+      "rejection_reason": "period_outside",
+      "selectable": true,
+      "evidence": [
+        {
+          "source_id": "creative-suno-updates",
+          "source_name": "Suno updates",
+          "source_group": "creative_tool",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQUkZuNUx6OFltUThBUHZ6WU5EaDg1a2hhS2tNSk5VbnpFSXZPLUs5SVlrZGhjRFdlREJmTFk5VFVKZjZReVpXNzVRZGxfWUhlQnBEWVFSaVU2QTJpelhUV0lxWDJ0Z0otUW5qTWVkSjhYLUJDTjhQc0lGdE1vQTNabFpKNnpDVWZid1BXYkE0SGhaa05VdVZaWF80Y1lYRk15aVNyTmxuSUY0eWt0OUJKM0tOXzYybkVYczUyZEU5U3hvS0ZJVkEyaVNVdXpsOG1aUkFLV1VzOEJrYkZQNmtKTWRB?oc=5",
+          "title": "Musicians shortchanged by AI deals with labels, lawsuit alleges - Los Angeles Times",
+          "published_at": "2026-06-08T07:00:00+00:00",
+          "summary": "Musicians shortchanged by AI deals with labels, lawsuit alleges Los Angeles Times",
           "metrics": {}
         }
       ]
@@ -5094,21 +5133,21 @@
   ],
   "selected": [
     {
-      "title": "Adobe’s redesigned AI studio remembers what your creations look like",
-      "url": "https://www.theverge.com/tech/952104/adobe-firefly-ai-agent-elements-projects-update",
-      "source_name": "The Verge AI",
-      "published_at": "2026-06-18T13:00:00+00:00",
-      "summary": "Adobe is introducing some new capabilities for its Firefly AI assistant, alongside a \"reimagined\" AI studio that lets you edit and generate new designs from a single interface. The new Firefly experience launching today in private beta is designed to give you \"persistent context, reusable assets, and organized workflows\" across your projects, according to Adobe, […]",
-      "category": "이미지",
-      "links": {}
-    },
-    {
       "title": "Photoshop and Premiere now have AI assistants",
       "url": "https://www.theverge.com/tech/952099/adobe-ai-assistants-photoshop-premiere-illustrator-beta-launch",
       "source_name": "The Verge AI",
       "published_at": "2026-06-18T13:00:00+00:00",
       "summary": "Adobe's plan to stick AI assistants into all of its Creative Cloud suite is now fully underway, with new chatbots now rolling out to its biggest editing and design apps. As part of a public beta launching today, Photoshop, Premiere, Illustrator, InDesign, and Frame.io now each have a bespoke AI Assistant that can be used […]",
       "category": "주요 뉴스",
+      "links": {}
+    },
+    {
+      "title": "Researchers trained a Deep Research agent with 32 H100s and open-sourced everything",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9w6my/researchers_trained_a_deep_research_agent_with_32/",
+      "source_name": "r/LocalLLaMA",
+      "published_at": "2026-06-19T08:20:43+00:00",
+      "summary": "Ohio State University's NLP team released QUEST-35B, an open-source Deep Research agent trained using ~32 H100s and ~8K synthetic samples. The team open-sourced the training recipe, code, weights and datasets. Benchmark results show competitive performance against several frontier Deep Research systems. What do you think is the biggest remaining gap between open-source Deep Research agents and frontier closed systems? Source: Professor Yusu submitted by /u/BuildwithVignesh [link] [comments]",
+      "category": "LLM / 모델",
       "links": {}
     },
     {
@@ -5139,17 +5178,6 @@
       "links": {}
     },
     {
-      "title": "Rethinking Reward Supervision: Rubric-Conditioned Self-Distillation",
-      "url": "https://arxiv.org/abs/2606.19327v1",
-      "source_name": "arXiv cs.AI",
-      "published_at": "2026-06-17T17:54:04+00:00",
-      "summary": "Post-training of reasoning language models is commonly driven by supervised distillation and reinforcement learning with verifiable rewards. Distillation often relies on chain-of-thought annotations that are expensive to obtain and may themselves be noisy, incomplete, or partially incorrect; even when the final solution is correct, an imperfect rationale can interfere with learning. Reinforcement learning with verified rewards, on the other hand, typically compresses evaluative feedback into a scalar signal, obscuring which aspects of a response should be improved. We propose \\textbf{Rubric-Conditioned Self-Distillation}, a framework that incorporates rubrics as structured, fine-grained feedback for on-policy self-distillation. Our method conditions the teacher model on criterion-level rubrics and uses it to provide token-level guidance on the student's own sampled trajectories. This design avoids treating a single reference rationale as the sole supervision target. Instead, rubrics specify what a strong response should satisfy, enabling more fine-grained credit assignment over the reasoning process than scalar reward optimization. We instantiate this framework with a two-stage pipeline that first learns to generate task-specific rubrics and then trains a rubric-guided reasoner. We evaluate on a diverse suite of science reasoning benchmarks and results show that rubric-conditioned self-distillation effectively converts rubric-level criteria into token-level guidance over the reasoning process, surpassing GRPO by 1.0 points and OPSD by 0.9 points on average.",
-      "category": "논문",
-      "links": {
-        "논문": "https://arxiv.org/abs/2606.19327v1"
-      }
-    },
-    {
       "title": "Adobe Unveils Major Expansion of Creative Agent Across Firefly and Creative Cloud Apps Including Photoshop and Premiere - Adobe Newsroom",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1iM1dHcDBrc01VNWxESDBlN08tZ2UwQ2lJdENLU0ljeDhnaVdkaGltdW4tT0p5ZEFVSkRjYXRLUFdORGk3UWx4Z2xrVUFPMTl1NFlIVFhCemRjTXdzRXFkYjdmQ2pTbDh0UHNpQ2l0Y3JTXzA?oc=5",
       "source_name": "Adobe Firefly updates",
@@ -5159,13 +5187,55 @@
       "links": {}
     },
     {
-      "title": "New usage analytics and updated spend controls for enterprises",
-      "url": "https://openai.com/index/chatgpt-enterprise-spend-controls",
-      "source_name": "OpenAI News",
-      "published_at": "2026-06-18T17:00:00+00:00",
-      "summary": "OpenAI introduces new spend controls and usage analytics for ChatGPT Enterprise, helping organizations manage costs and scale AI with confidence.",
-      "category": "LLM / 모델",
+      "title": "Barret Zoph is out at OpenAI again after just five months",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/952837/barret-zoph-openai-thinking-machines-lab",
+      "source_name": "The Verge AI",
+      "published_at": "2026-06-19T04:49:33+00:00",
+      "summary": "Five months after returning to OpenAI, Barret Zoph - the company's head of enterprise AI sales - has departed, The Verge has learned. Zoph returned to OpenAI in mid-January after a stint as co-founder and CTO of Thinking Machines Lab, the competing AI company founded by former OpenAI CTO Mira Murati. Shortly after Zoph returned […]",
+      "category": "주요 뉴스",
       "links": {}
+    },
+    {
+      "title": "How Transparent is DiffusionGemma?",
+      "url": "https://arxiv.org/abs/2606.20560v1",
+      "source_name": "arXiv cs.AI",
+      "published_at": "2026-06-18T17:59:46+00:00",
+      "summary": "LLM reasoning transparency is a critical affordance for understanding model decisions, mitigating misuse and misalignment, and debugging surprising model behaviors. However, DiffusionGemma performs a larger fraction of its computation in a continuous latent space; does this make its reasoning less transparent? We study this question by decomposing transparency into two components: variable transparency, whether we understand intermediate snapshots of a model's computational state; and algorithmic transparency, whether we can use these snapshots to reconstruct the process by which the model arrived at its outputs. Naively, DiffusionGemma has poor variable transparency: its opaque serial depth, the amount of serial computation that occurs in between interpretable model states, seems at first 28.6X higher than the corresponding autoregressive Gemma 4 model. However, we show that we can map the information flowing between denoising steps through an interpretable token bottleneck with no decrease in downstream performance. Treating these intermediate states as interpretable reduces the opaque serial depth to just 1.1X that of Gemma 4. Algorithmic transparency is harder for diffusion models than for autoregressive models because all token predictions in the canvas can change at every denoising step, giving the model the power to implement complicated distributed algorithms during the denoising process. To begin bridging this gap, we conduct a suite of interpretability case studies, uncovering initial evidence of novel diffusion-specific phenomena such as non-chronological reasoning, token and sequence smearing, and intermediate-context reasoning. Finally, we test monitorability, a key application of transparency that measures whether model outputs are useful for downstream tasks. We find that DiffusionGemma is similarly monitorable to Gemma 4.",
+      "category": "논문",
+      "links": {
+        "논문": "https://arxiv.org/abs/2606.20560v1"
+      }
+    },
+    {
+      "title": "Toward Calibrated Mixture-of-Experts Under Distribution Shift",
+      "url": "https://arxiv.org/abs/2606.20544v1",
+      "source_name": "arXiv cs.AI",
+      "published_at": "2026-06-18T17:55:00+00:00",
+      "summary": "Calibration aligns a model's predictive uncertainty with the frequencies of its empirical outcomes and is important for understanding and trusting reported probabilities. Recent work shows that enforcing calibration at the level of individual predictors can improve ensemble accuracy and calibration, with mixture-of-experts (MoE) models showing strong empirical improvements in particular; however, the conditions under which calibration helps MoE are not well understood. In this work, we study how MoE models behave under distribution shift, focusing on how routing mechanisms interact with expert-level calibration. We show that expert calibration is sufficient to ensure calibration of the overall model under a broad class of distribution shifts in hard-routed models, but is insufficient for calibrating soft-routed models. To address this, we propose an adversarial reweighting that penalizes calibration errors of the routed aggregate under distribution shift, and we demonstrate that it improves the accuracy-calibration tradeoff both on average and on difficult subsets of the data, across model classes, prediction tasks, and distribution shifts.",
+      "category": "논문",
+      "links": {
+        "논문": "https://arxiv.org/abs/2606.20544v1"
+      }
+    },
+    {
+      "title": "xAI has made its video generation AI 'Grok Imagine Video 1.5' generally available, and a high-speed model, 'Grok Imagine Video 1.5 Fast,' has also been released. - GIGAZINE",
+      "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5obUpVUUJIdXRpd24yYTBpcW9MYUphUVpzejFLR05pMUFZWXlob2RJS1VuS1lIQTJaa0lNX1AteVpDaHZHV0l4b3NKOENlTUE0RnB4U05vMnFwT2Z3RU9KQ2RVUDY5V1JIVXZTNzhRVDNWdGs?oc=5",
+      "source_name": "Midjourney updates",
+      "published_at": "2026-06-18T02:15:00+00:00",
+      "summary": "xAI has made its video generation AI 'Grok Imagine Video 1.5' generally available, and a high-speed model, 'Grok Imagine Video 1.5 Fast,' has also been released. GIGAZINE",
+      "category": "이미지",
+      "links": {}
+    },
+    {
+      "title": "Structuring and Tokenizing Distributed User Interest Context for Generative Recommendation",
+      "url": "https://arxiv.org/abs/2606.20554v1",
+      "source_name": "arXiv cs.AI",
+      "published_at": "2026-06-18T17:58:32+00:00",
+      "summary": "Generative recommendation is an emerging paradigm that has shown promise in industrial recommendation systems, aiming to predict users' next interactions from their historical behaviors. At the core of generative recommendation lies item tokenization, which bridges item semantics and recommendation models. However, existing methods often struggle to effectively organize and inject complex user-behavioral and item-semantic contexts into recommendation models simultaneously. On the one hand, existing graph-based integration methods, such as graph serialization and graph neural networks, either suffer from scalability issues or exploit only local graph information. On the other hand, existing semantic tokenization methods typically rely on heuristics and lack explicit supervision signals, which may lead to inaccurate or suboptimal semantic representations. To address these limitations in user interest context modeling, we propose G2Rec, a scalable framework that unifies holistic graph-based user co-engagement modeling with semantic tokenization for industrial-scale generative recommendation. Overall, G2Rec enables recommendation models to capture holistic and semantically grounded user interest prototypes without requiring ground-truth user interests, thereby providing more comprehensive and accurate modeling of user behavior contexts in industrial sequential recommendation. Online deployment across product surfaces and extensive experiments on public datasets demonstrate the superiority of G2Rec over existing methods.",
+      "category": "논문",
+      "links": {
+        "논문": "https://arxiv.org/abs/2606.20554v1"
+      }
     },
     {
       "title": "Snap spins off AI video team into new company, Dotmo, due to costs",
@@ -5186,21 +5256,10 @@
       "links": {}
     },
     {
-      "title": "Data Intelligence Agents: Interpreting, Modeling, and Querying Enterprise Data via Autonomous Coding Agents",
-      "url": "https://arxiv.org/abs/2606.19319v1",
-      "source_name": "arXiv cs.AI",
-      "published_at": "2026-06-17T17:45:32+00:00",
-      "summary": "Production data integration is bottlenecked by repeated, lossy handoffs between data owners, engineers, and analysts who must collaboratively discover, structure, and query enterprise data. We present Data Intelligence Agents (DIA), a system of three agents (Data Interpreter, Schema Creator, and Query Generator) that compresses this workflow by treating autonomous coding agents (ACAs) as a first-class abstraction: rather than emitting text, the agents generate, execute, validate, and repair concrete artifacts, draw on a shared memory for experience reuse, and surface each for review by domain experts. DIA is deployed in production for enterprise customers. We study the Query Generator in depth and evaluate it in fully autonomous mode across seven SQL benchmarks spanning four task categories and four dialects. It matches or surpasses the best published results on all seven, demonstrating that an architecture grounded in execution, built on ACAs and a shared memory, generalizes across the data intelligence workload with adaptation confined to natural-language instructions.",
-      "category": "논문",
-      "links": {
-        "논문": "https://arxiv.org/abs/2606.19319v1"
-      }
-    },
-    {
       "title": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI - Business Insider",
       "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNY2l4MVVNeXdIeGVtN3o2OHM2cnZoT0prZE9UOGoxdmFYcWlFRnJ3cG1jdnJpcjQ3cWxYVmxFT0xPYVhjRkVEU281NFBtN1R2OUhSZTZkcnFYY1k0V3ZCNjRxbGc5TmUtRF9LdGZYRWxWcUhrVzVmQmFibTNSMG1fNkNKbGc3aDkxVzJhUnk1UF9tdFBOYXFJdg?oc=5",
       "source_name": "Higgsfield updates",
-      "published_at": "2026-06-18T11:00:18+00:00",
+      "published_at": "2026-06-18T11:00:00+00:00",
       "summary": "An AI video startup says revenue surged to $500 million in ARR as brands race to make ads with AI Business Insider",
       "category": "영상",
       "links": {}
@@ -5215,20 +5274,11 @@
       "links": {}
     },
     {
-      "title": "OpenAI is bringing on some big guns in the lead-up to its IPO",
-      "url": "https://techcrunch.com/2026/06/18/openai-is-bringing-on-some-big-guns-in-the-lead-up-to-its-ipo/",
+      "title": "Source: Elastic agrees to buy CRV-backed DeductiveAI for up to $85M",
+      "url": "https://techcrunch.com/2026/06/18/source-elastic-agrees-to-buy-crv-backed-deductiveai-for-up-to-85m/",
       "source_name": "TechCrunch AI",
-      "published_at": "2026-06-18T19:59:22+00:00",
-      "summary": "OpenAI is bulking up before its IPO, landing Transformer co-inventor Noam Shazeer from Google DeepMind and former Trump AI policy official Dean Ball in the same week.",
-      "category": "정책 / 저작권",
-      "links": {}
-    },
-    {
-      "title": "Almost half of U.S. singles feel negatively about AI in dating, Match says",
-      "url": "https://techcrunch.com/2026/06/18/almost-half-of-u-s-singles-feel-negatively-about-ai-in-dating-match-says/",
-      "source_name": "TechCrunch AI",
-      "published_at": "2026-06-18T18:51:46+00:00",
-      "summary": "About 47% of singles look negatively at the use of AI in dating -- but, many dating app users are open to AI helping with profile punch-ups and conversation starters.",
+      "published_at": "2026-06-19T00:51:11+00:00",
+      "summary": "DeductiveAI, a startup that uses AI to catch and resolve bugs in software, was founded just three years ago.",
       "category": "주요 뉴스",
       "links": {}
     },
@@ -5240,17 +5290,6 @@
       "summary": "Startup Baseten is reportedly close to finalizing a $1.5 billion round at a $13 billion as the “inference gold rush\" marches on.",
       "category": "하드웨어 / 인프라",
       "links": {}
-    },
-    {
-      "title": "UBP2: Uncertainty-Balanced Preference Planning for Efficient Preference-based Reinforcement Learning",
-      "url": "https://arxiv.org/abs/2606.19328v1",
-      "source_name": "arXiv cs.AI",
-      "published_at": "2026-06-17T17:54:32+00:00",
-      "summary": "Preference-based RL provides an approach to learning reward models from pairwise comparisons of behaviors, bypassing the need for explicit reward design. However, existing methods typically rely on passive data collection and suffer from poor sample efficiency, especially during the early stages of learning. We introduce a model-based approach that actively directs exploration by jointly reasoning over uncertainties in the reward, dynamics, and value functions. Our method, Uncertainty-Balanced Preference Planning (UBP2), uses ensembles of reward, dynamics, and value function models to evaluate candidate trajectories according to a unified score that combines expected reward, terminal value, and epistemic uncertainty. Planning under this objective yields an explicit tradeoff between exploitation and information acquisition without requiring ad hoc exploration heuristics. Under standard regularity assumptions, we establish sublinear regret guarantees for both finite-horizon and infinite-horizon settings. Empirically, experiments on the Meta-World benchmark show UBP2 achieves substantially higher sample efficiency than model-free preference-based methods and non-optimistic model-based baselines.",
-      "category": "논문",
-      "links": {
-        "논문": "https://arxiv.org/abs/2606.19328v1"
-      }
     },
     {
       "title": "Poland invests $11M in ElevenLabs and launches AI Lab Poland to grow its next generation of AI startups - Tech Funding News",
