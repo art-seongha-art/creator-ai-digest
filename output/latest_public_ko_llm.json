@@ -16,7 +16,8 @@
       "url": "https://www.theverge.com/tech/952099/adobe-ai-assistants-photoshop-premiere-illustrator-beta-launch",
       "links": {},
       "media_source": "source_page_metadata",
-      "image_source": "source_page_metadata"
+      "image_source": "source_page_metadata",
+      "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
       "category": "이미지",
@@ -35,7 +36,8 @@
         "Adobe 원문": "https://news.adobe.com/news/2026/06/adobe-unveils-major-expansion"
       },
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
       "category": "영상",
@@ -52,7 +54,8 @@
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5obUpVUUJIdXRpd24yYTBpcW9MYUphUVpzejFLR05pMUFZWXlob2RJS1VuS1lIQTJaa0lNX1AteVpDaHZHV0l4b3NKOENlTUE0RnB4U05vMnFwT2Z3RU9KQ2RVUDY5V1JIVXZTNzhRVDNWdGs?oc=5",
       "links": {},
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
       "category": "영상",
@@ -71,7 +74,8 @@
         "Google 공식 소개": "https://blog.google/innovation-and-ai/products/google-flow-veo-ai-filmmaking-tool/"
       },
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
       "category": "창작·디자인 사례",
@@ -90,7 +94,8 @@
         "Business Insider 보도": "https://africa.businessinsider.com/news/move-over-cursor-this-ai-video-startup-is-having-its-own-breakout-moment/73nmmvt"
       },
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
       "category": "에이전트 / 코딩",
@@ -123,7 +128,8 @@
         "논문": "https://arxiv.org/abs/2606.20560v1"
       },
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_label": "관련 이미지를 생성했습니다"
     }
   ],
   "period": {

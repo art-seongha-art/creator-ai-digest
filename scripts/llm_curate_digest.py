@@ -215,17 +215,19 @@ def image_html(item: dict) -> str:
     prompt = item.get('image_prompt_ko') or ''
     title = item.get('title_ko') or ''
     if media_url and media_type == 'video':
+        label = item.get('media_label') or '원문/공개 영상에서 가져온 영상'
         youtube_id = youtube_video_id(media_url)
         if youtube_id:
-            return f'<figure class="thumb"><iframe src="https://www.youtube.com/embed/{esc(youtube_id)}" title="{esc(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><figcaption>관련 영상</figcaption></figure>'
+            return f'<figure class="thumb"><iframe src="https://www.youtube.com/embed/{esc(youtube_id)}" title="{esc(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><figcaption>{esc(label)}</figcaption></figure>'
         if media_url.lower().split('?',1)[0].endswith('.mp4'):
-            return f'<figure class="thumb"><video src="{esc(media_url)}" controls muted playsinline preload="metadata"></video><figcaption>관련 영상</figcaption></figure>'
-        return f'<figure class="thumb"><a class="video-card" href="{esc(media_url)}">관련 영상 열기</a><figcaption>관련 영상 링크</figcaption></figure>'
+            return f'<figure class="thumb"><video src="{esc(media_url)}" controls muted playsinline preload="metadata"></video><figcaption>{esc(label)}</figcaption></figure>'
+        return f'<figure class="thumb"><a class="video-card" href="{esc(media_url)}">영상 열기</a><figcaption>{esc(label)}</figcaption></figure>'
     if media_url:
-        return f'<figure class="thumb"><img src="{esc(media_url)}" alt="{esc(title)}" loading="lazy"><figcaption>관련 이미지</figcaption></figure>'
+        label = item.get('media_label') or media_label_for_url(media_url)
+        return f'<figure class="thumb"><img src="{esc(media_url)}" alt="{esc(title)}" loading="lazy"><figcaption>{esc(label)}</figcaption></figure>'
     if prompt:
         asset = prompt_asset(title, prompt, item.get('category') or '')
-        return f'<figure class="thumb"><img src="{esc(asset)}" alt="{esc(title)}" loading="lazy"><figcaption>AI 생성용 시각 프롬프트 기반 이미지</figcaption></figure>'
+        return f'<figure class="thumb"><img src="{esc(asset)}" alt="{esc(title)}" loading="lazy"><figcaption>관련 이미지를 생성했습니다</figcaption></figure>'
     return ''
 
 
@@ -271,6 +273,13 @@ def prompt_asset(title: str, prompt: str, category: str = '') -> str:
         path.write_text('\n'.join(parts), encoding='utf-8')
     return f'assets/{path.name}'
 
+
+
+def media_label_for_url(url: str) -> str:
+    url = url or ''
+    if url.startswith('assets/diffusiongemma-visual-reasoning') or 'prompt-visual-' in url:
+        return '관련 이미지를 생성했습니다'
+    return '원문 페이지에서 가져온 이미지'
 
 def youtube_video_id(url: str) -> str:
     m = re.search(r'(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{6,})', url or '')
