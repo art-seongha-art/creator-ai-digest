@@ -341,7 +341,8 @@ h3{{font-size:20px;line-height:1.34;margin:0 0 8px;letter-spacing:0}}
 p{{margin:0 0 10px;color:#333;line-height:1.62}}
 .application{{background:#fff;border-left:4px solid #21528d;padding:10px 12px;color:#222}}
 .thumb{{margin:10px 0 12px;border:1px solid #deded6;background:#fff;border-radius:12px;overflow:hidden}}
-.thumb img,.thumb video,.thumb iframe{{display:block;width:100%;aspect-ratio:16/9;max-height:520px;object-fit:contain;background:#000;border:0}}
+.thumb img,.thumb video{{display:block;max-width:100%;width:auto;height:auto;max-height:70vh;object-fit:contain;background:#000;margin:0 auto}}
+.thumb iframe{{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000}}
 .thumb figcaption{{font-size:12px;color:#777;padding:7px 10px;border-top:1px solid #ecece6}}
 .digest-nav{{margin-top:34px;padding-top:20px;border-top:3px solid #151515}}
 .digest-nav-buttons{{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}}
