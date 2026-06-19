@@ -26,12 +26,14 @@
       "summary_ko": "어도비가 Firefly의 생성 기능과 에이전트(자율 처리) 도구를 크리에이티브 클라우드 전체 앱으로 확장한다고 발표했습니다. 단순 이미지 생성을 넘어, 여러 단계의 작업을 AI가 스스로 판단하며 처리하는 '에이전트 방식'이 포토샵·일러스트레이터 등에 녹아듭니다. 어도비 공식 발표이므로 기능 업데이트 일정과 적용 범위를 공식 채널에서 확인하는 것이 정확합니다.",
       "insight_ko": "단순 필터나 생성 버튼을 넘어, AI가 맥락을 파악해 여러 단계를 자동으로 처리해주는 방향으로 어도비 전 제품이 바뀌고 있습니다. 지금부터 Firefly 에이전트 기능에 익숙해져두면 워크플로우 혁신의 체감 속도가 빠릅니다.",
       "image_prompt_ko": "어도비 Firefly 인터페이스에서 AI 에이전트가 여러 크리에이티브 작업을 동시에 처리하는 추상적인 흐름도, 오렌지·레드 어도비 브랜드 컬러, 16:9",
-      "image_url": "",
-      "media_url": "",
-      "media_type": "",
+      "image_url": "https://news.adobe.com/news/2026/06/media_10dcff3a7609ee2a784c16a2f2e7b7fe6fcee7ff7.png?width=1200&format=png&optimize=medium",
+      "media_url": "https://news.adobe.com/news/2026/06/media_10dcff3a7609ee2a784c16a2f2e7b7fe6fcee7ff7.png?width=1200&format=png&optimize=medium",
+      "media_type": "image",
       "quality": "A",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1iM1dHcDBrc01VNWxESDBlN08tZ2UwQ2lJdENLU0ljeDhnaVdkaGltdW4tT0p5ZEFVSkRjYXRLUFdORGk3UWx4Z2xrVUFPMTl1NFlIVFhCemRjTXdzRXFkYjdmQ2pTbDh0UHNpQ2l0Y3JTXzA?oc=5",
-      "links": {},
+      "links": {
+        "Adobe 원문": "https://news.adobe.com/news/2026/06/adobe-unveils-major-expansion"
+      },
       "media_source": "not_found",
       "image_source": "not_found"
     },
@@ -97,15 +99,10 @@
       "title_ko": "가스 센서가 AI의 '감정'을 바꾼다 — 물리 센서와 LLM 파라미터를 실시간 연결한 로봇",
       "summary_ko": "한 제작자가 가방 안에 MQ-2 가스 센서를 설치하고 이를 로컬 LLM 샘플러와 직접 연결한 로봇 'Sparky'를 공개했습니다. 연기 강도가 올라갈수록 AI의 temperature·top_p·top_k 파라미터가 실시간으로 높아지며, AI의 언어가 점점 더 비선형적이고 연상적으로 변합니다. 스크립트 없이 오직 파라미터 조작만으로 '감각에 반응하는 AI 퍼소나'를 구현한 인터랙티브 아트 실험입니다.",
       "insight_ko": "온도·조도·소리 같은 환경 센서를 AI 생성 파라미터와 연결하면 공간과 반응하는 인터랙티브 미디어아트를 만들 수 있습니다. 아두이노 + 로컬 LLM(Ollama) 조합으로 지금 바로 실험해볼 수 있는 구조예요.",
-      "image_prompt_ko": "낡은 여행 가방 안에 센서와 회로기판이 설치된 로봇, 연기 속에서 LED가 반짝이고 AI 텍스트 출력이 화면에 흐르는 장면, 인터랙티브 아트 분위기, 16:9",
-      "image_url": "",
-      "media_url": "https://www.youtube.com/watch?v=rrZgW3itzH0",
-      "media_type": "video",
+      "image_prompt_ko": "여행가방 형태의 작은 로컬 AI 로봇이 작업대 위에 있고, 가스 센서와 전선이 LLM 샘플러 파라미터를 나타내는 추상적인 빛의 흐름으로 연결된다. 텍스트 없음, 로고 없음, 인터랙티브 미디어아트 실험 분위기, 16:9.",
       "quality": "B",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/",
-      "links": {
-        "영상": "https://www.youtube.com/watch?v=rrZgW3itzH0"
-      },
+      "links": {},
       "media_source": "not_found",
       "image_source": "not_found"
     },
@@ -117,9 +114,9 @@
       "summary_ko": "구글의 확산(Diffusion) 방식 언어 모델 DiffusionGemma가 '어떻게 답을 냈는지' 그 과정을 얼마나 들여다볼 수 있는지 분석한 논문입니다. 기존 LLM과 달리 연속적인 잠재 공간에서 계산이 이루어져 중간 과정 해석이 어렵다는 문제를 '변수 투명성'과 '알고리즘 투명성' 두 축으로 나눠 체계적으로 분석합니다. AI 결과물을 설명해야 하는 교육·연구·심사 장면에서 해석 가능성이 왜 중요한지를 이론적으로 정리한 자료입니다.",
       "insight_ko": "AI 생성 결과를 학생이나 클라이언트에게 설명해야 하는 교육·발표 상황이라면 '왜 이 결과가 나왔나'를 설명할 수 있는 모델 선택이 중요해집니다. 이 논문은 다음 세대 AI 도구를 고를 때 투명성 기준을 어떻게 잡을지 힌트를 줍니다.",
       "image_prompt_ko": "반투명한 신경망 레이어들이 겹쳐진 추상적 다이어그램, 내부 계산 과정이 빛으로 시각화되는 연구 그래픽, 차가운 블루·화이트 팔레트, 16:9",
-      "image_url": "",
-      "media_url": "",
-      "media_type": "",
+      "image_url": "assets/diffusiongemma-visual-reasoning.png",
+      "media_url": "assets/diffusiongemma-visual-reasoning.png",
+      "media_type": "image",
       "quality": "C",
       "url": "https://arxiv.org/abs/2606.20560v1",
       "links": {
