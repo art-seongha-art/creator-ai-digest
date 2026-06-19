@@ -215,9 +215,12 @@ def image_html(item: dict) -> str:
     prompt = item.get('image_prompt_ko') or ''
     title = item.get('title_ko') or ''
     if media_url and media_type == 'video':
+        youtube_id = youtube_video_id(media_url)
+        if youtube_id:
+            return f'<figure class="thumb"><iframe src="https://www.youtube.com/embed/{esc(youtube_id)}" title="{esc(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><figcaption>관련 영상</figcaption></figure>'
         if media_url.lower().split('?',1)[0].endswith('.mp4'):
             return f'<figure class="thumb"><video src="{esc(media_url)}" controls muted playsinline preload="metadata"></video><figcaption>관련 영상</figcaption></figure>'
-        return f'<figure class="thumb placeholder"><div>관련 영상: <a href="{esc(media_url)}">영상 열기</a></div><figcaption>관련 영상 링크</figcaption></figure>'
+        return f'<figure class="thumb"><a class="video-card" href="{esc(media_url)}">관련 영상 열기</a><figcaption>관련 영상 링크</figcaption></figure>'
     if media_url:
         return f'<figure class="thumb"><img src="{esc(media_url)}" alt="{esc(title)}" loading="lazy"><figcaption>관련 이미지</figcaption></figure>'
     if prompt:
@@ -267,6 +270,11 @@ def prompt_asset(title: str, prompt: str, category: str = '') -> str:
         ]
         path.write_text('\n'.join(parts), encoding='utf-8')
     return f'assets/{path.name}'
+
+
+def youtube_video_id(url: str) -> str:
+    m = re.search(r'(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{6,})', url or '')
+    return m.group(1) if m else ''
 
 def page(start: datetime, end: datetime, body: str) -> str:
     return f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>창작자를 위한 AI 다이제스트 - {end.strftime('%Y.%m.%d')}</title><style>
