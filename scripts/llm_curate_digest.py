@@ -9,6 +9,8 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import html
+import hashlib
+import textwrap
 
 BASE = Path('.')
 OUTROOT = Path('docs')
@@ -219,9 +221,52 @@ def image_html(item: dict) -> str:
     if media_url:
         return f'<figure class="thumb"><img src="{esc(media_url)}" alt="{esc(title)}" loading="lazy"><figcaption>관련 이미지</figcaption></figure>'
     if prompt:
-        return f'<figure class="thumb placeholder"><div>{esc(prompt)}</div><figcaption>이미지 생성 프롬프트</figcaption></figure>'
+        asset = prompt_asset(title, prompt, item.get('category') or '')
+        return f'<figure class="thumb"><img src="{esc(asset)}" alt="{esc(title)}" loading="lazy"><figcaption>AI 생성용 시각 프롬프트 기반 이미지</figcaption></figure>'
     return ''
 
+
+
+def prompt_asset(title: str, prompt: str, category: str = '') -> str:
+    """Create a lightweight SVG visual card when no official image/video is available."""
+    h = hashlib.sha1((title + '|' + prompt).encode('utf-8')).hexdigest()[:12]
+    assets = OUTROOT / 'assets'
+    assets.mkdir(parents=True, exist_ok=True)
+    path = assets / f'prompt-visual-{h}.svg'
+    if not path.exists():
+        palette = [
+            ('#171717', '#7c3aed', '#06b6d4'),
+            ('#111827', '#ef4444', '#f59e0b'),
+            ('#0f172a', '#2563eb', '#22c55e'),
+            ('#1f2937', '#ec4899', '#8b5cf6'),
+        ][int(h[0], 16) % 4]
+        bg, a, b = palette
+        title_lines = textwrap.wrap(title, width=28)[:3]
+        prompt_lines = textwrap.wrap(prompt, width=42)[:4]
+        def tspan(lines, x, y, size, weight='500', fill='#ffffff'):
+            out=[]
+            for i,line in enumerate(lines):
+                out.append(f'<text x="{x}" y="{y+i*(size+8)}" font-size="{size}" font-weight="{weight}" fill="{fill}" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">{html.escape(line)}</text>')
+            return '\n'.join(out)
+        parts = [
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">',
+            '<defs>',
+            f'<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{bg}"/><stop offset="0.55" stop-color="{a}"/><stop offset="1" stop-color="{b}"/></linearGradient>',
+            '<filter id="blur"><feGaussianBlur stdDeviation="36"/></filter>',
+            '</defs>',
+            '<rect width="1200" height="675" fill="url(#g)"/>',
+            '<circle cx="940" cy="120" r="210" fill="#ffffff" opacity="0.13" filter="url(#blur)"/>',
+            '<circle cx="170" cy="560" r="260" fill="#ffffff" opacity="0.12" filter="url(#blur)"/>',
+            '<rect x="70" y="70" width="1060" height="535" rx="34" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.28"/>',
+            f'<text x="96" y="124" font-size="24" font-weight="800" fill="#e5e7eb" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">창작자를 위한 AI 다이제스트 · {html.escape(category or "AI")}</text>',
+            tspan(title_lines, 96, 220, 48, '850'),
+            '<rect x="96" y="408" width="1008" height="1" fill="#ffffff" opacity="0.35"/>',
+            '<text x="96" y="462" font-size="20" font-weight="800" fill="#dbeafe" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">시각 프롬프트</text>',
+            tspan(prompt_lines, 96, 505, 24, '500', '#f8fafc'),
+            '</svg>',
+        ]
+        path.write_text('\n'.join(parts), encoding='utf-8')
+    return f'assets/{path.name}'
 
 def page(start: datetime, end: datetime, body: str) -> str:
     return f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>창작자를 위한 AI 다이제스트 - {end.strftime('%Y.%m.%d')}</title><style>
