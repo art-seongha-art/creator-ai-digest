@@ -1,0 +1,123 @@
+{
+  "period": {
+    "start": "2026-06-18T00:00:00+09:00",
+    "end": "2026-06-18T23:59:00+09:00"
+  },
+  "curation": {
+    "writer": "hermes",
+    "mode": "corrected_2026_06_18_digest",
+    "required_by_user": [
+      "LTX Trainer",
+      "Alibaba HappyOyster 1.0"
+    ]
+  },
+  "items": [
+    {
+      "category": "영상",
+      "source_name": "Alibaba Cloud / Alizila",
+      "published_at": "2026-06-18T09:00:00+09:00",
+      "title_ko": "Alibaba HappyOyster 1.0 — 영상 생성에서 실시간 인터랙티브 월드로",
+      "summary_ko": "6월 18일자 핵심 지정 항목입니다. Alibaba ATH가 소개한 HappyOyster 1.0은 프롬프트로 영상을 한 번 뽑는 도구라기보다, 생성된 세계 안에서 사용자가 탐험하고 조작하며 장면·카메라·캐릭터·이야기 흐름을 바꾸는 실시간 인터랙티브 월드 모델 방향의 제품입니다.",
+      "insight_ko": "창작자에게 중요한 점은 AI 영상이 “완성 클립”에서 “들어가서 조작하는 무대/공간/캐릭터 시스템”으로 이동한다는 신호입니다. 게임, 영화 프리비즈, 가상 프로덕션, 교육용 시뮬레이션까지 연결해 볼 수 있습니다. 단, 공식 문서와 접근 경로는 계속 추적이 필요합니다.",
+      "url": "https://www.alibabacloud.com/blog/alibaba-launches-happyoyster-a-world-model-product-for-real-time-immersive-creation-and-interaction_603048",
+      "links": {
+        "Alizila 보도": "https://www.alizila.com/alibaba-launches-happyoyster-a-world-model-product-for-real-time-immersive-creation-and-interaction/"
+      },
+      "media_url": "https://yqintl.alicdn.com/547051f30d5d9f71651ddb8b75d29d3c2d38e330.png",
+      "media_type": "image",
+      "image_url": "https://yqintl.alicdn.com/547051f30d5d9f71651ddb8b75d29d3c2d38e330.png",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "영상",
+      "source_name": "Lightricks / LTX",
+      "published_at": "2026-06-18T09:10:00+09:00",
+      "title_ko": "LTX Trainer 공개 — 비디오 생성도 직접 LoRA·IC-LoRA 학습 단계로",
+      "summary_ko": "6월 18일자 핵심 지정 항목입니다. Lightricks가 LTX-2/LTX-2.3용 오픈소스 학습 프레임워크를 공개하면서, 사용자가 직접 데이터셋을 준비해 영상 생성 모델을 LoRA, full fine-tuning, IC-LoRA 방식으로 커스터마이징할 수 있는 길이 열렸습니다.",
+      "insight_ko": "이 소식은 새 영상 모델 하나가 더 나온 정도가 아니라, 창작자가 프롬프트 소비자에서 모델 커스터마이징 제작자로 넘어가는 흐름입니다. 작품 스타일, 캐릭터 일관성, 움직임 레퍼런스, 립싱크·복원·후반작업 자동화 교육에 직접 연결됩니다. 다만 Linux/CUDA, LTX 체크포인트, Gemma encoder, 32GB~80GB급 VRAM 등 진입 장벽은 분명합니다.",
+      "url": "https://github.com/Lightricks/LTX-2/tree/main/packages/ltx-trainer",
+      "links": {
+        "LTX-2 GitHub": "https://github.com/Lightricks/LTX-2",
+        "LTX-2.3 Hugging Face": "https://huggingface.co/Lightricks/LTX-2.3",
+        "LTX LoRA 튜토리얼": "https://ltx.io/model/model-blog/how-to-fine-tune-a-video-generation-model-with-lora"
+      },
+      "media_url": "https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx2.3-open.png",
+      "media_type": "image",
+      "image_url": "https://huggingface.co/Lightricks/LTX-2.3/resolve/main/ltx2.3-open.png",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "바로 써볼 AI 도구",
+      "source_name": "The Verge",
+      "published_at": "2026-06-18T13:00:00+00:00",
+      "title_ko": "포토샵·프리미어·일러스트레이터에 AI 어시스턴트 공개 베타 출시",
+      "summary_ko": "어도비가 포토샵, 프리미어, 일러스트레이터, 인디자인, Frame.io에 전용 AI 어시스턴트를 공개 베타로 탑재했습니다. 앱 안에서 채팅하듯 작업을 지시하거나 기능을 물어볼 수 있어 반복 편집과 메뉴 탐색 부담을 줄이는 방향입니다.",
+      "insight_ko": "Creative Cloud를 쓰는 창작자라면 지금 바로 베타 기능을 확인할 만합니다. “레이어 배경을 흐리게 해줘”처럼 말로 편집하는 흐름이 디자인·영상 교육의 기본 워크플로우가 될 가능성이 큽니다.",
+      "url": "https://www.theverge.com/tech/952099/adobe-ai-assistants-photoshop-premiere-illustrator-beta-launch",
+      "links": {},
+      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/06/Adobe-Photoshop-AI-assistant-hero.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+      "media_type": "image",
+      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/06/Adobe-Photoshop-AI-assistant-hero.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "영상",
+      "source_name": "Google Flow / Veo updates",
+      "published_at": "2026-06-18T18:37:01+00:00",
+      "title_ko": "구글 Flow 완전 정리 — Veo 기반 AI 영상 창작 플랫폼이란?",
+      "summary_ko": "Google Flow는 Veo 모델을 기반으로 텍스트와 이미지에서 영상을 만들고, 씬 단위 편집과 카메라 움직임 제어를 지원하는 AI 영상 제작 플랫폼입니다. 영상 생성이 단발성 클립 제작에서 기획·시안·스토리보드 단계로 들어오는 흐름을 보여줍니다.",
+      "insight_ko": "영상 수업이나 제안서 단계에서 정지 스토리보드 대신 움직이는 시안을 바로 확인하는 도구로 활용할 수 있습니다. 짧은 장면을 빠르게 만들고, 카메라 워크와 톤을 비교하는 실험에 적합합니다.",
+      "url": "https://blog.google/innovation-and-ai/products/google-flow-veo-ai-filmmaking-tool/",
+      "links": {},
+      "media_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Flow_Sizzle_Thumbnail_1280_x_720_1.width-1300.png",
+      "media_type": "image",
+      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Flow_Sizzle_Thumbnail_1280_x_720_1.width-1300.png",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "창작·디자인 사례",
+      "source_name": "Business Insider",
+      "published_at": "2026-06-18T11:00:00+00:00",
+      "title_ko": "AI 영상 스타트업 연매출 5억 달러 돌파 — 광고 시장의 AI 전환 가속",
+      "summary_ko": "AI 영상 제작 스타트업의 ARR이 5억 달러 규모에 도달했다는 보도입니다. 브랜드들이 TV 광고와 소셜 콘텐츠를 AI로 제작하려는 수요가 커지면서, AI 영상이 실험 단계가 아니라 상업 광고 제작의 주요 옵션으로 들어오고 있습니다.",
+      "insight_ko": "영상·광고 의뢰를 받는 크리에이터라면 “빠른 시안 + 저비용 + 반복 수정”을 제공하는 AI 영상 워크플로우를 포트폴리오에 포함해야 할 시점입니다.",
+      "url": "https://africa.businessinsider.com/news/move-over-cursor-this-ai-video-startup-is-having-its-own-breakout-moment/73nmmvt",
+      "links": {},
+      "media_url": "https://ocdn.eu/pulscms-transforms/1/OcWktkuTURBXy9kMzhhNzBiMC0zY2MzLTQxOWUtODRkNi00MWYzYzM0MTYyYTcuanBlZ5GTBc0EsM0Cdg",
+      "media_type": "image",
+      "image_url": "https://ocdn.eu/pulscms-transforms/1/OcWktkuTURBXy9kMzhhNzBiMC0zY2MzLTQxOWUtODRkNi00MWYzYzM0MTYyYTcuanBlZ5GTBc0EsM0Cdg",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "에이전트 / 코딩",
+      "source_name": "r/LocalLLaMA",
+      "published_at": "2026-06-18T15:52:34+00:00",
+      "title_ko": "가스 센서가 AI의 감정을 바꾼다 — 물리 센서와 LLM 파라미터를 실시간 연결한 로봇",
+      "summary_ko": "제작자가 MQ-2 가스 센서를 로컬 LLM 샘플러에 연결해, 연기 농도에 따라 temperature, top_p, top_k가 실시간으로 변하도록 만든 실험입니다. 스크립트가 아니라 파라미터 변화만으로 AI 말투와 반응성이 바뀌는 인터랙티브 로봇 사례입니다.",
+      "insight_ko": "환경 센서와 생성 파라미터를 연결하면 공간에 반응하는 AI 설치 작업을 만들 수 있습니다. 조도, 소리, 거리, 온도 센서를 언어·이미지·음향 생성에 붙이는 미디어아트 실험으로 확장 가능합니다.",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/",
+      "links": {
+        "원문 Reddit": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/"
+      },
+      "media_url": "assets/reddit-sensor-robot.mp4",
+      "media_type": "video",
+      "media_label": "원문 Reddit 영상에서 가져와 로컬 MP4로 안정화했습니다"
+    },
+    {
+      "category": "연구·논문",
+      "source_name": "arXiv cs.AI",
+      "published_at": "2026-06-18T17:59:46+00:00",
+      "title_ko": "DiffusionGemma는 얼마나 투명한가? — 확산 언어 모델의 추론 해석 가능성 연구",
+      "summary_ko": "확산 방식 언어 모델 DiffusionGemma의 중간 추론 과정을 얼마나 해석할 수 있는지 분석한 논문입니다. 연속 잠재 공간에서 답이 만들어지는 모델을 변수 투명성과 알고리즘 투명성 관점으로 나누어 살펴봅니다.",
+      "insight_ko": "AI 결과물을 학생이나 클라이언트에게 설명해야 하는 교육·발표 환경에서는 “왜 이런 결과가 나왔는가”를 설명할 수 있는지가 중요합니다. 다음 세대 생성 모델을 평가할 때 투명성 기준을 잡는 참고가 됩니다.",
+      "url": "https://arxiv.org/abs/2606.20560v1",
+      "links": {
+        "논문": "https://arxiv.org/pdf/2606.20560v1"
+      },
+      "media_url": "assets/diffusiongemma-visual-reasoning.png",
+      "media_type": "image",
+      "image_url": "assets/diffusiongemma-visual-reasoning.png",
+      "media_label": "관련 이미지를 생성했습니다"
+    }
+  ]
+}
