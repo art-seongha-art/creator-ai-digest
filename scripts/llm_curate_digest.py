@@ -69,7 +69,7 @@ def main() -> int:
     period_end = parse_dt(public.get('period', {}).get('end')) or datetime.now()
     archive_dir = Path(args.archive_dir)
     archive_dir.mkdir(parents=True, exist_ok=True)
-    archive = archive_dir / f'weekly-ai-digest-v2-{period_end.strftime("%Y-%m-%d")}-llm-ko.html'
+    archive = archive_dir / f'weekly-ai-digest-v2-{period_end.strftime("%Y-%m-%d")}.html'
     archive.write_text(html_text, encoding='utf-8')
     print(json.dumps({'output_json': str(output_json), 'output_html': str(output_html), 'archive': str(archive), 'items': len(public['items'])}, ensure_ascii=False, indent=2))
     return 0
@@ -285,6 +285,46 @@ def youtube_video_id(url: str) -> str:
     m = re.search(r'(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]{6,})', url or '')
     return m.group(1) if m else ''
 
+
+def digest_entries() -> list[dict]:
+    """User-facing digest archive list. Keep only canonical/public items here."""
+    entries = [
+        {
+            'date': '2026-06-19',
+            'title': '2026.06.19 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+        },
+        {
+            'date': '2026-06-18',
+            'title': '2026.06.18 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-18.html',
+        },
+        {
+            'date': '2026-06-17',
+            'title': '2026.06.17 다이제스트',
+            'url': 'http://100.74.241.125:8088/project/vertex_artlab/08_outputs/ai_digest/weekly-ai-digest-v2-2026-06-17-llm-ko-images.html',
+        },
+    ]
+    return sorted(entries, key=lambda x: x['date'], reverse=True)
+
+
+def digest_nav_html(current: datetime) -> str:
+    current_key = current.strftime('%Y-%m-%d')
+    entries = digest_entries()
+    asc = sorted(entries, key=lambda x: x['date'])
+    prev_entry = next((e for e in reversed(asc) if e['date'] < current_key), None)
+    next_entry = next((e for e in asc if e['date'] > current_key), None)
+    buttons = []
+    if prev_entry:
+        buttons.append(f'<a class="navbtn" href="{esc(prev_entry["url"])}">← 이전 다이제스트 보기</a>')
+    if next_entry:
+        buttons.append(f'<a class="navbtn" href="{esc(next_entry["url"])}">다음 다이제스트 보기 →</a>')
+    rows = []
+    for e in entries:
+        active = ' active' if e['date'] == current_key else ''
+        rows.append(f'<li class="digest-row{active}"><span>{esc(e["date"].replace("-", "."))}</span><a href="{esc(e["url"])}">{esc(e["title"])}</a></li>')
+    return '<nav class="digest-nav" aria-label="이전 다이제스트">' + '<div class="digest-nav-buttons">' + ''.join(buttons) + '</div>' + '<h2>이전 다이제스트</h2><ul>' + ''.join(rows) + '</ul></nav>'
+
 def page(start: datetime, end: datetime, body: str) -> str:
     return f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>창작자를 위한 AI 다이제스트 - {end.strftime('%Y.%m.%d')}</title><style>
 body{{margin:0;background:#f7f7f4;color:#151515;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}}
@@ -301,12 +341,21 @@ h3{{font-size:20px;line-height:1.34;margin:0 0 8px;letter-spacing:0}}
 p{{margin:0 0 10px;color:#333;line-height:1.62}}
 .application{{background:#fff;border-left:4px solid #21528d;padding:10px 12px;color:#222}}
 .thumb{{margin:10px 0 12px;border:1px solid #deded6;background:#fff;border-radius:12px;overflow:hidden}}
-.thumb img,.thumb video{{display:block;width:100%;max-height:420px;object-fit:cover;background:#000}}
+.thumb img,.thumb video,.thumb iframe{{display:block;width:100%;aspect-ratio:16/9;max-height:520px;object-fit:contain;background:#000;border:0}}
 .thumb figcaption{{font-size:12px;color:#777;padding:7px 10px;border-top:1px solid #ecece6}}
+.digest-nav{{margin-top:34px;padding-top:20px;border-top:3px solid #151515}}
+.digest-nav-buttons{{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}}
+.navbtn{{display:inline-block;background:#151515;color:#fff;text-decoration:none;border-radius:10px;padding:10px 13px;font-weight:800}}
+.digest-nav ul{{list-style:none;margin:0;padding:0;border:1px solid #deded6;border-radius:14px;overflow:hidden;background:#fff}}
+.digest-row{{display:flex;gap:14px;align-items:center;padding:12px 14px;border-bottom:1px solid #ecece6}}
+.digest-row:last-child{{border-bottom:0}}
+.digest-row span{{font-weight:900;color:#21528d;min-width:96px}}
+.digest-row a{{color:#151515;text-decoration:none;font-weight:700}}
+.digest-row.active{{background:#f0f6ff}}
 .thumb.placeholder div{{min-height:120px;padding:18px;color:#555;background:linear-gradient(135deg,#f0f3f7,#ffffff);font-size:14px;line-height:1.55}}
 .links a{{display:inline-block;border:1px solid #d4d4cc;border-radius:8px;padding:6px 9px;margin-right:6px;font-size:13px;color:#222;text-decoration:none;background:#fff}}
 @media(max-width:760px){{header{{display:block}}h1{{font-size:36px}}.period{{margin-top:10px}}}}
-</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">발행일 {end.strftime('%Y.%m.%d')}</div></header>{body}</main></body></html>'''
+</style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">발행일 {end.strftime('%Y.%m.%d')}</div></header>{body}{digest_nav_html(end)}</main></body></html>'''
 
 
 def esc(value: object) -> str:

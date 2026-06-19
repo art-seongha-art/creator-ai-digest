@@ -112,9 +112,9 @@
       },
       "media_source": "not_found",
       "image_source": "not_found",
-      "media_url": "https://v.redd.it/vcjjqb9xb28h1/CMAF_96.mp4",
+      "media_url": "assets/reddit-sensor-robot.mp4",
       "media_type": "video",
-      "media_label": "원문 Reddit 영상에서 가져온 영상"
+      "media_label": "원문 Reddit 영상에서 가져와 로컬 MP4로 안정화했습니다"
     },
     {
       "category": "연구·논문",
