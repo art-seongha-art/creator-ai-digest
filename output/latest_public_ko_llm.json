@@ -107,9 +107,14 @@
       "image_prompt_ko": "여행가방 형태의 작은 로컬 AI 로봇이 작업대 위에 있고, 가스 센서와 전선이 LLM 샘플러 파라미터를 나타내는 추상적인 빛의 흐름으로 연결된다. 텍스트 없음, 로고 없음, 인터랙티브 미디어아트 실험 분위기, 16:9.",
       "quality": "B",
       "url": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/",
-      "links": {},
+      "links": {
+        "원문 Reddit": "https://www.reddit.com/r/LocalLLaMA/comments/1u9a17y/my_suitcase_robot_gets_high_now_off_a_real_gas/"
+      },
       "media_source": "not_found",
-      "image_source": "not_found"
+      "image_source": "not_found",
+      "media_url": "https://v.redd.it/vcjjqb9xb28h1/CMAF_96.mp4",
+      "media_type": "video",
+      "media_label": "원문 Reddit 영상에서 가져온 영상"
     },
     {
       "category": "연구·논문",
