@@ -1,0 +1,101 @@
+{
+  "period": {
+    "start": "2026-06-20T00:00:00+09:00",
+    "end": "2026-06-20T23:59:00+09:00"
+  },
+  "curation": {
+    "writer": "hermes",
+    "mode": "corrected_2026_06_20_digest",
+    "dedupe_against": [
+      "2026-06-19",
+      "2026-06-18"
+    ]
+  },
+  "items": [
+    {
+      "category": "이미지",
+      "source_name": "Adobe / Computerworld",
+      "published_at": "2026-06-20T09:00:00+09:00",
+      "title_ko": "Adobe Firefly Graph — 창작 워크플로우를 재사용 가능한 자산으로 바꾸다",
+      "summary_ko": "Adobe Firefly Graph는 생성형 AI 작업 과정을 노드 기반 워크플로우로 구성하고, 반복 제작에 다시 쓸 수 있는 자산으로 저장하는 방향의 도구입니다. 단발성 이미지 생성보다 “제작 공정”을 설계하는 쪽에 가깝습니다.",
+      "insight_ko": "디자이너와 교육자에게 중요한 점은 프롬프트 하나가 아니라 재사용 가능한 제작 파이프라인입니다. 브랜드 이미지 대량 생산, 수업용 템플릿, 반복 홍보물 제작에 바로 연결됩니다.",
+      "url": "https://www.computerworld.com/article/4186410/adobe-new-firefly-graph-can-turn-creative-workflows-into-reusable-assets.html",
+      "links": {},
+      "media_url": "https://www.computerworld.com/wp-content/uploads/2026/06/4186410-0-42161300-1781879400-media_1171709ba3514e1616438abcd7c4a72c12a3a895c.png.webp?w=1024",
+      "media_type": "image",
+      "image_url": "https://www.computerworld.com/wp-content/uploads/2026/06/4186410-0-42161300-1781879400-media_1171709ba3514e1616438abcd7c4a72c12a3a895c.png.webp?w=1024",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "에이전트 / 코딩",
+      "source_name": "r/LocalLLaMA",
+      "published_at": "2026-06-20T09:10:00+09:00",
+      "title_ko": "2026년 6월 로컬 AI 에이전트 논의 — 내 컴퓨터에서 굴리는 작업자들",
+      "summary_ko": "LocalLLaMA 커뮤니티에서 2026년 6월 기준 로컬 에이전트 도구들을 비교하는 논의가 올라왔습니다. 클라우드 서비스만 쓰는 것이 아니라, 개인 장비에서 직접 에이전트를 돌리는 워크플로우가 계속 성숙하고 있습니다.",
+      "insight_ko": "창작자와 연구자에게는 개인정보·작업 파일·실험 코드를 외부 서비스에 덜 맡기고, 로컬 장비에서 반복 작업자를 운영하는 선택지가 중요해집니다. 4090 같은 현장 머신을 팀 작업자로 쓰는 방향과도 맞닿아 있습니다.",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uaebfe/best_local_agents_jun_2026/",
+      "links": {},
+      "media_url": "assets/local-agents-2026-06-20.png",
+      "media_type": "image",
+      "image_url": "assets/local-agents-2026-06-20.png",
+      "media_label": "관련 이미지를 생성했습니다"
+    },
+    {
+      "category": "에이전트 / 코딩",
+      "source_name": "VentureBeat",
+      "published_at": "2026-06-20T09:20:00+09:00",
+      "title_ko": "오픈소스 AI 검색 에이전트 Harness-1 — 자료 찾기 성능 경쟁이 본격화",
+      "summary_ko": "연구자들이 오픈소스 AI 검색 에이전트 Harness-1을 공개하며, 긴 문서와 자료 더미에서 관련 정보를 찾아내는 능력을 강조했습니다. 단순 챗봇보다 자료 검색·검증·회수 능력이 중요해지는 흐름입니다.",
+      "insight_ko": "논문 조사, 공모 자료 탐색, 수업 자료 큐레이션처럼 “많은 자료에서 맞는 근거를 찾는 일”은 에이전트의 핵심 업무입니다. 창작자에게도 리서치 스태프형 AI가 더 현실적인 도구가 되고 있습니다.",
+      "url": "https://venturebeat.com/orchestration/researchers-trained-an-open-source-ai-search-agent-harness-1-that-outperforms-gpt-5-4-on-recalling-relevant-information",
+      "links": {},
+      "media_url": "assets/open-source-search-agent-2026-06-20.png",
+      "media_type": "image",
+      "image_url": "assets/open-source-search-agent-2026-06-20.png",
+      "media_label": "관련 이미지를 생성했습니다"
+    },
+    {
+      "category": "영상",
+      "source_name": "Quasa / Viggle",
+      "published_at": "2026-06-20T09:30:00+09:00",
+      "title_ko": "Viggle 캐릭터 애니메이션 — 모션 트랜스퍼가 더 쉬워지는 영상 제작",
+      "summary_ko": "Viggle은 캐릭터 이미지나 영상을 다른 움직임에 맞춰 애니메이션화하는 모션 트랜스퍼 도구로 소개되고 있습니다. 복잡한 리깅 없이 캐릭터에 동작을 입히는 방향의 영상 제작 흐름입니다.",
+      "insight_ko": "무용, 퍼포먼스, 조각 캐릭터, 교육용 아바타를 움직이는 데 활용 가능성이 있습니다. 정교한 3D 제작 전에 빠르게 동작 시안을 확인하는 도구로 볼 수 있습니다.",
+      "url": "https://quasa.io/video/viggle-review-the-best-ai-character-animation-motion-transfer-tool",
+      "links": {
+        "영상 리뷰": "https://www.youtube.com/watch?v=ilZs8Fw_aEs"
+      },
+      "media_url": "https://www.youtube.com/watch?v=ilZs8Fw_aEs",
+      "media_type": "video",
+      "media_label": "원문/공개 영상에서 가져온 영상"
+    },
+    {
+      "category": "음악 / 오디오",
+      "source_name": "Music Business Worldwide",
+      "published_at": "2026-06-20T09:40:00+09:00",
+      "title_ko": "Warner Music China, AI 가상 가수 이후 디지털 아티스트 전략 확대",
+      "summary_ko": "Warner Music China가 AI 가상 가수 Wu AI-Hua 이후 Dream Maker와의 전략적 협업을 통해 디지털 아티스트 사업을 확대한다는 보도입니다. 가상 싱어와 AI 캐릭터가 음악 산업의 실험을 넘어 사업 전략으로 들어가고 있습니다.",
+      "insight_ko": "음악·영상·캐릭터 작업을 함께 하는 창작자에게는 “노래하는 이미지”가 아니라 IP, 팬덤, 공연, 숏폼 콘텐츠가 결합된 디지털 퍼포머 전략으로 읽어야 할 소식입니다.",
+      "url": "https://www.musicbusinessworldwide.com/months-after-its-ai-virtual-singer-wu-ai-hua-went-viral-warner-music-china-doubles-down-on-digital-artists-via-strategic-deal-with-dream-maker/",
+      "links": {},
+      "media_url": "https://www.musicbusinessworldwide.com/files/2026/06/Screenshot-2026-06-15-at-18.06.31-e1781543275189.jpg",
+      "media_type": "image",
+      "image_url": "https://www.musicbusinessworldwide.com/files/2026/06/Screenshot-2026-06-15-at-18.06.31-e1781543275189.jpg",
+      "media_label": "원문 페이지에서 가져온 이미지"
+    },
+    {
+      "category": "연구·논문",
+      "source_name": "OpenAI",
+      "published_at": "2026-06-20T09:50:00+09:00",
+      "title_ko": "AI 화학자 실험 — 자동화된 탐색이 까다로운 반응을 개선하다",
+      "summary_ko": "OpenAI가 AI가 화학 반응 개선에 관여한 사례를 소개했습니다. 생성형 AI가 텍스트 응답을 넘어 실험 설계, 조건 탐색, 결과 개선처럼 물리 세계의 연구 공정에 들어가는 흐름입니다.",
+      "insight_ko": "예술·디자인 분야에서도 재료 실험, 제작 조건 탐색, 공정 최적화에 AI를 붙이는 상상이 필요해집니다. 창작 도구가 화면 안에만 머무르지 않고 실험실·공방의 의사결정으로 확장되는 사례입니다.",
+      "url": "https://openai.com/index/ai-chemist-improves-reaction",
+      "links": {},
+      "media_url": "assets/ai-chemist-2026-06-20.png",
+      "media_type": "image",
+      "image_url": "assets/ai-chemist-2026-06-20.png",
+      "media_label": "관련 이미지를 생성했습니다"
+    }
+  ]
+}
