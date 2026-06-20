@@ -74,17 +74,20 @@
       "media_label": "원문 페이지에서 가져온 이미지"
     },
     {
-      "category": "에이전트 / 코딩",
-      "source_name": "r/LocalLLaMA",
+      "category": "음악 / 오디오",
+      "source_name": "ElevenLabs / Tech Funding News",
       "published_at": "2026-06-20T09:40:00+09:00",
-      "title_ko": "2026년 6월 로컬 AI 에이전트 논의 — 개인 장비·소규모 팀이 어디까지 맡길 수 있나",
-      "summary_ko": "LocalLLaMA 커뮤니티에서 2026년 6월 기준 로컬 AI 에이전트 도구들을 비교하는 논의가 올라왔습니다. 여기서 “로컬”은 모두가 고성능 GPU PC를 갖고 있다는 뜻이 아닙니다. 개인 노트북에서 돌아가는 작은 모델, 연구실·스튜디오 공용 워크스테이션, 학교 서버, 임대 GPU, 사내 보안망처럼 클라우드 대형 서비스와 다른 운영 방식을 통칭하는 쪽에 가깝습니다.",
-      "insight_ko": "창작자에게 이 논의가 중요한 이유는 AI 에이전트를 어디까지 자기 작업 환경 안에 들여놓을 수 있느냐입니다. 예를 들어 파일 정리, 레퍼런스 수집, 코드 보조, 이미지 배치 실험, 문서 초안처럼 민감한 작업은 외부 서비스에 전부 올리기 부담스러울 수 있습니다. 로컬 에이전트는 그런 작업을 더 통제 가능한 환경에서 처리할 가능성을 줍니다. 다만 고성능 장비가 없으면 속도와 모델 크기에 한계가 있고, 설치·업데이트·보안 책임도 사용자가 떠안습니다. 따라서 이 항목은 “4090이 있으면 된다”가 아니라, 개인/소규모 팀이 비용·보안·성능 사이에서 어떤 운영 방식을 고를지에 대한 참고로 보는 것이 맞습니다.",
-      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uaebfe/best_local_agents_jun_2026/",
-      "links": {},
-      "media_url": "assets/local-agents-2026-06-20.png",
+      "title_ko": "ElevenLabs와 AI Lab Poland — 음성 AI가 국가 단위 창작·교육 인프라로 커지는 흐름",
+      "summary_ko": "폴란드 정부 산하 Vinci/BGK가 ElevenLabs에 투자하고, ElevenLabs와 함께 AI Lab Poland를 출범한다는 소식입니다. ElevenLabs는 이미 음성 합성·더빙·다국어 내레이션 분야에서 강한 존재감을 가진 회사이고, 이번 투자는 한 기업의 성장 뉴스라기보다 음성 AI를 국가 단위 연구·스타트업·콘텐츠 생태계와 연결하려는 움직임으로 볼 수 있습니다. 특히 음성 기술이 단순 TTS 도구에서 교육, 공공 서비스, 접근성, 미디어 제작 인프라로 확장되고 있다는 점이 핵심입니다.",
+      "insight_ko": "창작자에게 중요한 지점은 ‘목소리 생성’ 자체보다 음성 제작의 운영 방식이 바뀐다는 점입니다. 전시 해설, 교육 콘텐츠, 다국어 안내, 영상 내레이션, 캐릭터 보이스처럼 원래 성우·녹음·편집 비용이 들어가던 영역을 더 빠르게 실험할 수 있습니다. 다만 목소리 권리, 실제 성우와의 계약, 합성 음성 고지, 다국어 번역의 뉘앙스 검수는 반드시 남습니다. 따라서 이 항목은 ‘음성 AI를 아무 데나 써도 된다’가 아니라, 음성 콘텐츠 제작을 프로젝트 초반부터 설계해야 하는 인프라 변화로 보는 것이 맞습니다.",
+      "url": "https://elevenlabs.io/blog/poland-invests-in-elevenlabs",
+      "links": {
+        "Tech Funding News 보도": "https://techfundingnews.com/poland-vinci-fund-11m-elevenlabs-ai-lab-poland/",
+        "UK 공공서비스 음성 AI 협력": "https://elevenlabs.io/blog/uk-mou-and-expansion"
+      },
+      "media_url": "assets/elevenlabs-voice-infrastructure-2026-06-20.png",
       "media_type": "image",
-      "image_url": "assets/local-agents-2026-06-20.png",
+      "image_url": "assets/elevenlabs-voice-infrastructure-2026-06-20.png",
       "media_label": "관련 이미지를 생성했습니다"
     },
     {
