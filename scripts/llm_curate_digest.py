@@ -70,9 +70,17 @@ def main() -> int:
     archive_dir = Path(args.archive_dir)
     archive_dir.mkdir(parents=True, exist_ok=True)
     archive = archive_dir / f'weekly-ai-digest-v2-{period_end.strftime("%Y-%m-%d")}.html'
-    archive.write_text(html_text, encoding='utf-8')
+    archive.write_text(rewrite_asset_paths_for_archive(html_text), encoding='utf-8')
     print(json.dumps({'output_json': str(output_json), 'output_html': str(output_html), 'archive': str(archive), 'items': len(public['items'])}, ensure_ascii=False, indent=2))
     return 0
+
+
+def rewrite_asset_paths_for_archive(html_text: str) -> str:
+    """Archive pages live one directory below docs/, so local asset URLs need ../assets/."""
+    return (html_text
+            .replace('src="assets/', 'src="../assets/')
+            .replace('poster="assets/', 'poster="../assets/')
+            .replace('href="assets/', 'href="../assets/'))
 
 
 def prioritize_for_llm(items: list[dict], limit: int) -> list[dict]:

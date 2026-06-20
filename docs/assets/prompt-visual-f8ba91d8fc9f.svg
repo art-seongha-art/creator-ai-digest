@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1f2937"/><stop offset="0.55" stop-color="#ec4899"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="36"/></filter>
+</defs>
+<rect width="1200" height="675" fill="url(#g)"/>
+<circle cx="940" cy="120" r="210" fill="#ffffff" opacity="0.13" filter="url(#blur)"/>
+<circle cx="170" cy="560" r="260" fill="#ffffff" opacity="0.12" filter="url(#blur)"/>
+<rect x="70" y="70" width="1060" height="535" rx="34" fill="#ffffff" opacity="0.12" stroke="#ffffff" stroke-opacity="0.28"/>
+<text x="96" y="124" font-size="24" font-weight="800" fill="#e5e7eb" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">창작자를 위한 AI 다이제스트 · 창작·디자인 사례</text>
+<text x="96" y="220" font-size="48" font-weight="850" fill="#ffffff" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">AI 영상 스타트업, 브랜드 광고 수요에 힘입어 연</text>
+<text x="96" y="276" font-size="48" font-weight="850" fill="#ffffff" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">매출 5500억 원 돌파</text>
+<rect x="96" y="408" width="1008" height="1" fill="#ffffff" opacity="0.35"/>
+<text x="96" y="462" font-size="20" font-weight="800" fill="#dbeafe" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">시각 프롬프트</text>
+<text x="96" y="505" font-size="24" font-weight="500" fill="#f8fafc" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">현대적인 광고 에이전시 사무실에서 대형 스크린에 AI가 생성한 광고 영상이</text>
+<text x="96" y="537" font-size="24" font-weight="500" fill="#f8fafc" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">재생되고 팀원들이 함께 검토하는 장면, 16:9, 세련된 비즈니스 환경,</text>
+<text x="96" y="569" font-size="24" font-weight="500" fill="#f8fafc" font-family="Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif">따뜻한 앰버 조명</text>
+</svg>
