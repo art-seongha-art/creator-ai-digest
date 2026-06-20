@@ -1,0 +1,16 @@
+{
+  "date": "2026-06-21",
+  "status": "required_candidate_from_user",
+  "source": "Threads",
+  "author": "CHOI (@choi.openai)",
+  "url": "https://www.threads.com/@choi.openai/post/DZy_74birMR?xmt=AQG0a7OQqIeGV-XvT0QsKWP1MUGGUuOR1SKjV2dVMfxZz0YKG36WCGVWs0SVeBT5sxghPRLp&slof=1",
+  "topic": "Epic Games Unreal Engine 5.8 MCP support",
+  "extracted_text": "Epic Games가 Unreal Engine 5.8에 MCP(Model Context Protocol) 지원을 추가. Claude, Codex, Gemini 같은 AI 에이전트를 언리얼 에디터와 연결해 자연어로 오브젝트 배치, 도시 생성, 조명 설정 같은 작업을 수행할 수 있게 되었다는 내용.",
+  "public_digest_angle": "게임 개발, 실감미디어, 가상 프로덕션, 공간 시뮬레이션, 전시 프리비즈에서 엔진 조작을 AI 에이전트에게 자연어로 지시하는 제작 워크플로우로 다룬다. 내부 시스템/장비명 없이 Unreal Editor/MCP/agentic workflow 중심으로 설명한다.",
+  "media_hint": "Threads page includes an Instagram CDN image. Prefer source media if stable; otherwise use Epic/Unreal official page media or generated image labeled accordingly.",
+  "notes": [
+    "User explicitly requested: '이거 내일 넣어줘'.",
+    "Must verify with official Epic/Unreal 5.8 MCP source if possible before final publication.",
+    "Do not write generic 'world changes fast' filler; explain concrete workflow change and limits."
+  ]
+}
