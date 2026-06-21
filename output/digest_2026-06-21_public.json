@@ -1,0 +1,39 @@
+{
+  "period": {
+    "start": "2026-06-21T00:00:00+09:00",
+    "end": "2026-06-21T23:59:00+09:00"
+  },
+  "curation": {
+    "mode": "creator_ai_digest_2026_06_21",
+    "notes": [
+      "Headline item sourced from a community signal (Threads) and cross-verified against official Epic Developer documentation for Unreal MCP",
+      "Epic documentation marks the Unreal MCP plugin as experimental; framed accordingly without overstatement",
+      "Threads source image relies on an external CDN and is unstable, so a clearly labeled placeholder is used instead of source media",
+      "Summary and insight are 2-3 sentences each"
+    ]
+  },
+  "items": [
+    {
+      "category": "실감미디어 / 게임엔진",
+      "source_name": "Epic Games / Unreal Engine",
+      "published_at": "2026-06-21T09:00:00+09:00",
+      "title_ko": "언리얼 엔진 5.8, 에디터에 MCP 서버 탑재 — AI 에이전트가 자연어로 씬을 조작한다",
+      "summary_ko": "Epic Games가 6월에 공개한 언리얼 엔진 5.8에는 에디터 안에서 Model Context Protocol(MCP) 서버를 실행하는 실험적(experimental) Unreal MCP 플러그인이 포함됩니다. 플러그인을 켜면 Claude Code, Codex, Gemini 같은 MCP 호환 AI 에이전트가 기본 로컬 MCP 엔드포인트로 에디터에 붙어 액터 배치, 조명·머티리얼 설정, 블루프린트 탐색, 자동화 테스트 같은 작업을 '도구'처럼 호출할 수 있습니다. 이 항목은 한 창작자의 Threads 공유에서 출발했지만, 공식 Epic Developer 문서에 'Unreal MCP in Unreal Editor'로 기재된 사실로 교차 확인했으며 문서에는 아직 실험 단계임이 명시되어 있습니다.",
+      "insight_ko": "실감미디어, 가상 프로덕션, 전시 프리비즈를 다루는 창작자에게 이 변화는 '엔진 조작을 자연어로 지시하는' 제작 워크플로우의 출발점입니다. 도시·공간 시뮬레이션 셋업이나 라이팅 시안처럼 반복적인 작업을 에이전트에게 맡기고, 작가는 연출과 서사 판단에 집중하는 분업을 실험해 볼 수 있습니다. 다만 공식 문서가 명시하듯 experimental 단계이고 로컬 서버를 여는 구조이므로, 결과 검수·버전 호환·보안 설정을 반드시 함께 확인해야 하며 'AI가 알아서 게임을 만든다'는 식의 과장과는 거리가 있습니다.",
+      "url": "https://dev.epicgames.com/documentation/unreal-engine/unreal-mcp-in-unreal-editor",
+      "links": {
+        "Engadget 보도": "https://www.engadget.com/2196807/epic-games-details-how-its-embracing-gen-ai-in-unreal-engine/",
+        "커뮤니티 신호 (Threads)": "https://www.threads.com/@choi.openai/post/DZy_74birMR"
+      },
+      "media_url": null,
+      "media_type": "placeholder",
+      "media_label": "안정적 원본 미디어 없음 — 자리표시 이미지 (원본 Threads 이미지는 외부 CDN 의존으로 미게시)",
+      "verification": {
+        "status": "verified_experimental",
+        "source_signal": "Threads community post by a creator",
+        "official_confirmation": "Epic Developer documentation — Unreal MCP in Unreal Editor (Unreal Engine 5.8)",
+        "note": "Epic documentation labels the plugin as experimental"
+      }
+    }
+  ]
+}
