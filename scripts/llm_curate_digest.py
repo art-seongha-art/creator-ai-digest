@@ -298,9 +298,19 @@ def digest_entries() -> list[dict]:
     """User-facing digest archive list. Keep only canonical/public items here."""
     entries = [
         {
+            'date': '2026-06-22',
+            'title': '2026.06.22 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+        },
+        {
+            'date': '2026-06-21',
+            'title': '2026.06.21 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-21.html',
+        },
+        {
             'date': '2026-06-20',
             'title': '2026.06.20 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-20.html',
         },
         {
             'date': '2026-06-19',
@@ -315,11 +325,10 @@ def digest_entries() -> list[dict]:
         {
             'date': '2026-06-17',
             'title': '2026.06.17 다이제스트',
-            'url': 'http://100.74.241.125:8088/project/vertex_artlab/08_outputs/ai_digest/weekly-ai-digest-v2-2026-06-17-llm-ko-images.html',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-17.html',
         },
     ]
     return sorted(entries, key=lambda x: x['date'], reverse=True)
-
 
 def digest_nav_html(current: datetime) -> str:
     current_key = current.strftime('%Y-%m-%d')
@@ -330,8 +339,12 @@ def digest_nav_html(current: datetime) -> str:
     buttons = []
     if prev_entry:
         buttons.append(f'<a class="navbtn" href="{esc(prev_entry["url"])}">← 이전 다이제스트 보기</a>')
+    else:
+        buttons.append('<span class="navbtn disabled" aria-disabled="true">← 이전 다이제스트 없음</span>')
     if next_entry:
         buttons.append(f'<a class="navbtn" href="{esc(next_entry["url"])}">다음 다이제스트 보기 →</a>')
+    else:
+        buttons.append('<span class="navbtn disabled" aria-disabled="true">다음 다이제스트 준비 중 →</span>')
     rows = []
     for e in entries:
         active = ' active' if e['date'] == current_key else ''
@@ -360,6 +373,7 @@ p{{margin:0 0 10px;color:#333;line-height:1.62}}
 .digest-nav{{margin-top:34px;padding-top:20px;border-top:3px solid #151515}}
 .digest-nav-buttons{{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}}
 .navbtn{{display:inline-block;background:#151515;color:#fff;text-decoration:none;border-radius:10px;padding:10px 13px;font-weight:800}}
+.navbtn.disabled{{background:#d7d7d0;color:#666}}
 .digest-nav ul{{list-style:none;margin:0;padding:0;border:1px solid #deded6;border-radius:14px;overflow:hidden;background:#fff}}
 .digest-row{{display:flex;gap:14px;align-items:center;padding:12px 14px;border-bottom:1px solid #ecece6}}
 .digest-row:last-child{{border-bottom:0}}
