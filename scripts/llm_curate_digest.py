@@ -298,9 +298,14 @@ def digest_entries() -> list[dict]:
     """User-facing digest archive list. Keep only canonical/public items here."""
     entries = [
         {
+            'date': '2026-06-26',
+            'title': '2026.06.26 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+        },
+        {
             'date': '2026-06-25',
             'title': '2026.06.25 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-25.html',
         },
         {
             'date': '2026-06-22',

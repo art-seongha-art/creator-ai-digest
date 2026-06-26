@@ -11,7 +11,7 @@
       "title": "언리얼 엔진 5.8, MCP 서버 탑재 — AI 에이전트가 에디터 안에서 씬을 조작한다",
       "media": "https://dev.epicgames.com/community/api/documentation/image/meta_tag?path=en-us/unreal-engine/unreal-mcp-in-unreal-editor&application_version=5.8",
       "caption": "원문 페이지에서 가져온 이미지",
-      "summary": "Epic Games가 Unreal Engine 5.8에 실험적 MCP(Model Context Protocol) 플러그인을 포함했습니다. 이 기능은 Unreal Editor 내부에 MCP 서버를 두고, MCP를 지원하는 AI 클라이언트가 에디터 기능을 도구처럼 호출할 수 있게 하는 구조입니다. 성하님이 공유한 Threads 글은 이 변화가 Claude, Codex, Gemini 같은 에이전트형 도구와 언리얼 제작 환경이 연결되는 흐름이라는 점을 짚고 있었고, 공식 Epic 문서에서도 Unreal MCP가 에디터 기능을 구동하는 워크플로우로 설명됩니다.",
+      "summary": "Epic Games가 Unreal Engine 5.8에 실험적 MCP(Model Context Protocol) 플러그인을 포함했습니다. 이 기능은 Unreal Editor 내부에 MCP 서버를 두고, MCP를 지원하는 AI 클라이언트가 에디터 기능을 도구처럼 호출할 수 있게 하는 구조입니다. 함께 확인한 Threads 글은 이 변화가 Claude, Codex, Gemini 같은 에이전트형 도구와 언리얼 제작 환경이 연결되는 흐름이라는 점을 짚고 있었고, 공식 Epic 문서에서도 Unreal MCP가 에디터 기능을 구동하는 워크플로우로 설명됩니다.",
       "insight": "실감미디어, 게임, 가상 프로덕션, 전시 프리비즈 작업에서는 “엔진을 직접 조작하는 시간”이 제작 병목이 되는 경우가 많습니다. MCP 기반 연결이 안정화되면 오브젝트 배치, 라이트 조정, 씬 구성, 블루프린트 탐색, 반복 테스트 같은 작업을 자연어 지시와 에이전트 도구 호출로 나눠 실험할 수 있습니다. 다만 아직 실험적 기능이고, AI가 만든 씬을 그대로 믿는 단계가 아니라 사람이 구조·성능·연출 의도를 검수해야 하므로, 지금은 완성 자동화보다 제작 보조/프리비즈 자동화의 시작점으로 보는 것이 정확합니다.",
       "links": [
         [
