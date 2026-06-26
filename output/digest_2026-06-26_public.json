@@ -5,17 +5,33 @@
     "end": "2026-06-26T10:00:00+09:00"
   },
   "curation": {
-    "note": "Required 2026-06-21 Unreal MCP candidate was read and verified against Epic documentation; it remains published in the 2026-06-21 issue and is not repeated here to avoid adjacent topic-family duplication."
+    "note": "Required 2026-06-21 Unreal MCP candidate was read and verified against Epic documentation; it remains published in the 2026-06-21 issue and is not repeated here to avoid adjacent topic-family deduplication."
   },
   "items": [
     {
+      "category": "수업·워크숍 아이디어",
+      "source_name": "Songscription AI",
+      "published_at": "2026-06-24T09:00:00+09:00",
+      "title_ko": "음악 수업용 AI 채보 가이드 — 학생이 원하는 곡을 악보·난이도·조성으로 바꾼다",
+      "summary_ko": "Songscription AI가 음악 교사를 위한 AI 채보 활용 가이드를 공개했습니다. 글은 학생이 고른 곡을 악보로 옮기고, 연주 수준에 맞게 단순화하거나, 특정 악기와 조성에 맞춰 옮기는 수업 흐름을 제안합니다. 생성형 음악 자체보다 '듣고 적는 노동'을 줄여 개인별 레퍼토리와 과제를 빨리 준비하는 교육 도구로 AI를 보는 접근입니다.",
+      "insight_ko": "음악 교육자에게는 최신 유행곡을 수업 자료로 바꾸는 시간이 줄어드는 장점이 있지만, 자동 채보는 리듬·화성·보이싱을 틀릴 수 있어 교사의 귀와 이론 검수가 필수입니다. 학생에게는 AI가 만든 악보를 그대로 제출하게 하기보다, 원곡과 비교해 틀린 마디를 찾고 왜 수정했는지 설명하게 하면 청음·편곡 훈련으로 이어집니다. 저작권이 있는 곡을 공개 배포용 악보로 만들 때는 사용 허락과 배포 범위를 따로 확인해야 합니다.",
+      "image_url": "",
+      "media_url": "",
+      "media_type": "image",
+      "media_label": "관련 이미지를 생성했습니다",
+      "quality": "B",
+      "url": "https://www.songscription.ai/blog/ai-transcription-for-teachers",
+      "links": {
+        "Songscription 가이드": "https://www.songscription.ai/blog/ai-transcription-for-teachers"
+      }
+    },
+    {
       "category": "창작·디자인 사례",
       "source_name": "Google DeepMind / A24 / Deadline",
-      "published_at": "2026-06-23T02:00:21+09:00",
+      "published_at": "2026-06-23T02:00:00+09:00",
       "title_ko": "Google DeepMind와 A24가 영화 제작용 AI 도구를 함께 실험한다",
-      "summary_ko": "Google DeepMind가 A24와 연구 파트너십을 맺고, 실제 영화 제작자가 참여해 AI 기반 제작 도구의 방향을 정하는 프로젝트를 시작했습니다. 보도에 따르면 목표는 완성물을 자동으로 대신 만드는 도구가 아니라, 감독·편집자·제작진이 프리비즈, 반복 시안, 장면 탐색 같은 단계에서 쓸 수 있는 기술을 현장 피드백으로 다듬는 것입니다. 독립영화 스튜디오와 대형 AI 연구 조직이 직접 연결됐다는 점에서, 생성 AI가 ‘데모 영상’ 단계를 넘어 제작 파이프라인 설계 문제로 들어왔다는 신호입니다.",
+      "summary_ko": "Google DeepMind가 A24와 연구 파트너십을 맺고, 실제 영화 제작자가 참여해 AI 기반 제작 도구의 방향을 정하는 프로젝트를 시작했습니다. 보도에 따르면 목표는 완성물을 자동으로 대신 만드는 도구가 아니라, 감독·편집자·제작진이 프리비즈, 반복 시안, 장면 탐색 같은 단계에서 쓸 수 있는 기술을 현장 피드백으로 다듬는 것입니다. 독립영화 스튜디오와 대형 AI 연구 조직이 직접 연결됐다는 점에서, 생성 AI가 '데모 영상' 단계를 넘어 제작 파이프라인 설계 문제로 들어왔다는 신호입니다.",
       "insight_ko": "창작자에게 중요한 질문은 어떤 모델이 더 화려한 장면을 뽑느냐보다, 제작진의 의도·권리·크레딧·보안이 지켜지는 작업 구조를 만들 수 있느냐입니다. 영화·영상 수업에서는 이 사례를 두고 AI를 콘셉트 아트, 샷 리스트, 사전 시각화에 어디까지 허용할지 정하고, 최종 연출 판단과 저작권 검수는 사람이 맡는 기준표를 만들어볼 수 있습니다. 아직 공개 제품이 아니므로 당장 사용할 도구라기보다, 스튜디오형 AI 제작 도구가 어떤 조건을 요구받는지 보여주는 사례로 보는 편이 정확합니다.",
-      "image_prompt_ko": "independent film production team reviewing AI-assisted storyboard and previs panels in a studio meeting",
       "image_url": "https://deadline.com/wp-content/uploads/2022/03/A24-logo-featured.jpg?w=1000",
       "media_url": "https://deadline.com/wp-content/uploads/2022/03/A24-logo-featured.jpg?w=1000",
       "media_type": "image",
@@ -28,33 +44,12 @@
       }
     },
     {
-      "category": "정책·저작권",
-      "source_name": "Deadline / Variety / CNET",
-      "published_at": "2026-06-25T20:17:52+09:00",
-      "title_ko": "아동 배우의 목소리를 AI에 쓰는 계약 조항이 논란이 됐다",
-      "summary_ko": "영국 아동·청소년 배우 에이전트 단체가 ‘아동 배우의 음성을 AI에 사용할 수 있게 하는 계약 조항’에 반대하는 공개서한을 냈고, Deadline과 Variety는 이 논란이 『Peppa Pig』 관련 계약에서 촉발됐다고 보도했습니다. 핵심 쟁점은 AI 음성 복제나 학습 사용이 출연자의 명확한 동의, 보호자 설명, 보상, 사용 범위 제한 없이 계약에 포함될 수 있느냐입니다. Hasbro 측은 공개서한을 인지하고 있으며 논의를 진행하겠다는 입장을 냈다고 보도됐습니다.",
-      "insight_ko": "오디오북, 애니메이션, 게임 더빙, 교육용 캐릭터 음성을 만드는 팀이라면 ‘AI 음성 사용 가능’이라는 한 줄로 권리를 처리하려 해서는 안 됩니다. 특히 미성년자 목소리는 장기적 재사용과 정체성 보호 문제가 커서, 사용 목적·기간·지역·학습 여부·철회권·보상 방식을 세분화해야 합니다. 창작 교육에서는 음성 합성 실습을 할 때도 본인 목소리와 타인 목소리의 허락 범위를 문서화하는 절차를 함께 가르치는 것이 안전합니다.",
-      "image_prompt_ko": "voice acting contract review with waveform consent checklist and child performer rights protection",
-      "image_url": "https://deadline.com/wp-content/uploads/2018/05/peppa-pig.jpg?w=1000",
-      "media_url": "https://deadline.com/wp-content/uploads/2018/05/peppa-pig.jpg?w=1000",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "A",
-      "url": "https://deadline.com/2026/06/peppa-pig-hasbro-child-actors-ai-backlash-1236967142/",
-      "links": {
-        "Deadline 보도": "https://deadline.com/2026/06/peppa-pig-hasbro-child-actors-ai-backlash-1236967142/",
-        "Variety 보도": "https://variety.com/2026/tv/news/open-letter-major-studio-hasbro-children-ai-peppa-pig-1236790351/",
-        "CNET 해설": "https://www.cnet.com/tech/services-and-software/peppa-pig-ai-voice-contract-hasbro-aypa-open-letter/"
-      }
-    },
-    {
       "category": "창작·디자인 사례",
       "source_name": "The Hollywood Reporter",
-      "published_at": "2026-06-26T02:38:56+09:00",
+      "published_at": "2026-06-26T02:38:00+09:00",
       "title_ko": "Cannes Lions 2026의 키워드: AI 제작, 크리에이터, 그리고 신뢰 문제",
       "summary_ko": "The Hollywood Reporter는 Cannes Lions 2026 현장에서 AI, 크리에이터 경제, 숏폼·버티컬 콘텐츠, 허위정보와 플랫폼 신뢰가 주요 의제로 떠올랐다고 정리했습니다. 브랜드와 에이전시는 생성 AI로 광고 시안과 개인화 소재를 빠르게 만들 수 있게 됐지만, 동시에 합성 콘텐츠가 캠페인의 진정성과 안전성을 흔들 수 있다는 우려도 함께 다뤘습니다. 마케팅 행사가 단순한 광고제에서 AI 제작 윤리와 크리에이터 협업 모델을 논의하는 장으로 바뀌고 있다는 점이 눈에 띕니다.",
-      "insight_ko": "디자이너와 콘텐츠 제작자는 AI를 ‘많이 뽑는 도구’로만 쓰면 브랜드 신뢰를 깎을 수 있습니다. 캠페인 실무에서는 생성물의 출처 표시, 인물·제품 표현 검수, 크리에이터와의 역할 분담, 플랫폼별 허위정보 리스크를 제작 체크리스트에 넣어야 합니다. 수업에서는 같은 제품을 AI 광고, 실제 촬영 광고, 크리에이터 협업 콘텐츠로 나눠 만들고 신뢰도와 설득력을 비교해보면 좋습니다.",
-      "image_prompt_ko": "Cannes advertising festival panel about AI creators vertical video and misinformation in brand campaigns",
+      "insight_ko": "디자이너와 콘텐츠 제작자는 AI를 '많이 뽑는 도구'로만 쓰면 브랜드 신뢰를 깎을 수 있습니다. 캠페인 실무에서는 생성물의 출처 표시, 인물·제품 표현 검수, 크리에이터와의 역할 분담, 플랫폼별 허위정보 리스크를 제작 체크리스트에 넣어야 합니다. 수업에서는 같은 제품을 AI 광고, 실제 촬영 광고, 크리에이터 협업 콘텐츠로 나눠 만들고 신뢰도와 설득력을 비교해보면 좋습니다.",
       "image_url": "https://www.hollywoodreporter.com/wp-content/uploads/2026/06/GettyImages-2283244091.jpg?w=1440&h=810&crop=1",
       "media_url": "https://www.hollywoodreporter.com/wp-content/uploads/2026/06/GettyImages-2283244091.jpg?w=1440&h=810&crop=1",
       "media_type": "image",
@@ -66,21 +61,22 @@
       }
     },
     {
-      "category": "수업·워크숍 아이디어",
-      "source_name": "Songscription AI",
-      "published_at": "2026-06-24T09:00:00+09:00",
-      "title_ko": "음악 수업용 AI 채보 가이드 — 학생이 원하는 곡을 악보·난이도·조성으로 바꾼다",
-      "summary_ko": "Songscription AI가 음악 교사를 위한 AI 채보 활용 가이드를 공개했습니다. 글은 학생이 고른 곡을 악보로 옮기고, 연주 수준에 맞게 단순화하거나, 특정 악기와 조성에 맞춰 옮기는 수업 흐름을 제안합니다. 생성형 음악 자체보다 ‘듣고 적는 노동’을 줄여 개인별 레퍼토리와 과제를 빨리 준비하는 교육 도구로 AI를 보는 접근입니다.",
-      "insight_ko": "음악 교육자에게는 최신 유행곡을 수업 자료로 바꾸는 시간이 줄어드는 장점이 있지만, 자동 채보는 리듬·화성·보이싱을 틀릴 수 있어 교사의 귀와 이론 검수가 필수입니다. 학생에게는 AI가 만든 악보를 그대로 제출하게 하기보다, 원곡과 비교해 틀린 마디를 찾고 왜 수정했는지 설명하게 하면 청음·편곡 훈련으로 이어집니다. 저작권이 있는 곡을 공개 배포용 악보로 만들 때는 사용 허락과 배포 범위를 따로 확인해야 합니다.",
-      "image_prompt_ko": "music teacher using AI transcription to create leveled sheet music for different instruments in a classroom",
-      "image_url": "",
-      "media_url": "",
-      "media_type": "",
-      "media_label": "관련 이미지를 생성했습니다",
-      "quality": "B",
-      "url": "https://www.songscription.ai/blog/ai-transcription-for-teachers",
+      "category": "정책·저작권",
+      "source_name": "Deadline / Variety / CNET",
+      "published_at": "2026-06-25T20:17:00+09:00",
+      "title_ko": "아동 배우의 목소리를 AI에 쓰는 계약 조항이 논란이 됐다",
+      "summary_ko": "영국 아동·청소년 배우 에이전트 단체가 '아동 배우의 음성을 AI에 사용할 수 있게 하는 계약 조항'에 반대하는 공개서한을 냈고, Deadline과 Variety는 이 논란이 『Peppa Pig』 관련 계약에서 촉발됐다고 보도했습니다. 핵심 쟁점은 AI 음성 복제나 학습 사용이 출연자의 명확한 동의, 보호자 설명, 보상, 사용 범위 제한 없이 계약에 포함될 수 있느냐입니다. Hasbro 측은 공개서한을 인지하고 있으며 논의를 진행하겠다는 입장을 냈다고 보도됐습니다.",
+      "insight_ko": "오디오북, 애니메이션, 게임 더빙, 교육용 캐릭터 음성을 만드는 팀이라면 'AI 음성 사용 가능'이라는 한 줄로 권리를 처리하려 해서는 안 됩니다. 특히 미성년자 목소리는 장기적 재사용과 정체성 보호 문제가 커서, 사용 목적·기간·지역·학습 여부·철회권·보상 방식을 세분화해야 합니다. 창작 교육에서는 음성 합성 실습을 할 때도 본인 목소리와 타인 목소리의 허락 범위를 문서화하는 절차를 함께 가르치는 것이 안전합니다.",
+      "image_url": "https://deadline.com/wp-content/uploads/2018/05/peppa-pig.jpg?w=1000",
+      "media_url": "https://deadline.com/wp-content/uploads/2018/05/peppa-pig.jpg?w=1000",
+      "media_type": "image",
+      "media_label": "원문 페이지에서 가져온 이미지",
+      "quality": "A",
+      "url": "https://deadline.com/2026/06/peppa-pig-hasbro-child-actors-ai-backlash-1236967142/",
       "links": {
-        "Songscription 가이드": "https://www.songscription.ai/blog/ai-transcription-for-teachers"
+        "Deadline 보도": "https://deadline.com/2026/06/peppa-pig-hasbro-child-actors-ai-backlash-1236967142/",
+        "Variety 보도": "https://variety.com/2026/tv/news/open-letter-major-studio-hasbro-children-ai-peppa-pig-1236790351/",
+        "CNET 해설": "https://www.cnet.com/tech/services-and-software/peppa-pig-ai-voice-contract-hasbro-aypa-open-letter/"
       }
     }
   ]
