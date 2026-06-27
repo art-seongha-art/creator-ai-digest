@@ -16,7 +16,7 @@ BASE = Path('.')
 OUTROOT = Path('docs')
 
 CATEGORIES = [
-    '바로 써볼 AI 도구', '수업·워크숍 아이디어', '창작·디자인 사례', '연구·논문', '정책·저작권',
+    '바로 써볼 AI 도구', '수업·워크숍 아이디어', '창작·디자인 사례', '실감미디어 / 게임엔진', '연구·논문', '정책·저작권',
     'LLM / 모델', '이미지', '영상', '음악 / 오디오', '3D / 공간', '에이전트 / 코딩', '하드웨어 / 인프라', '주요 뉴스'
 ]
 
@@ -298,9 +298,14 @@ def digest_entries() -> list[dict]:
     """User-facing digest archive list. Keep only canonical/public items here."""
     entries = [
         {
+            'date': '2026-06-27',
+            'title': '2026.06.27 다이제스트',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+        },
+        {
             'date': '2026-06-26',
             'title': '2026.06.26 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-26.html',
         },
         {
             'date': '2026-06-25',
