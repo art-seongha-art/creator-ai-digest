@@ -405,7 +405,6 @@ p{{margin:0 0 10px;color:#333;line-height:1.62}}
 .digest-row span{{font-weight:900;color:#21528d;min-width:96px}}
 .digest-row a{{color:#151515;text-decoration:none;font-weight:700}}
 .digest-row.active{{background:#f0f6ff}}
-.thumb.placeholder div{{min-height:120px;padding:18px;color:#555;background:linear-gradient(135deg,#f0f3f7,#ffffff);font-size:14px;line-height:1.55}}
 .links a{{display:inline-block;border:1px solid #d4d4cc;border-radius:8px;padding:6px 9px;margin-right:6px;font-size:13px;color:#222;text-decoration:none;background:#fff}}
 @media(max-width:760px){{header{{display:block}}h1{{font-size:36px}}.period{{margin-top:10px}}}}
 </style></head><body><main class="wrap"><header><h1>창작자를 위한 AI 다이제스트</h1><div class="period">발행일 {end.strftime('%Y.%m.%d')}</div></header>{body}{digest_nav_html(end)}</main></body></html>'''
