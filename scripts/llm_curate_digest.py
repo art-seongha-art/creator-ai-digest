@@ -304,60 +304,40 @@ def youtube_video_id(url: str) -> str:
     return m.group(1) if m else ''
 
 
-def digest_entries() -> list[dict]:
-    """User-facing digest archive list. Keep only canonical/public items here."""
-    entries = [
-        {
-            'date': '2026-06-27',
-            'title': '2026.06.27 다이제스트',
+def digest_entries(current: datetime | None = None, limit: int = 10) -> list[dict]:
+    """Build the user-facing archive list dynamically from docs/archive.
+
+    The previous implementation hard-coded early June dates, so newer issues did
+    not appear in the "이전 다이제스트" section. The latest issue lives at the
+    site root while dated copies live under docs/archive/.
+    """
+    entries_by_date: dict[str, dict[str, str]] = {}
+    archive_dir = OUTROOT / 'archive'
+    if archive_dir.exists():
+        for path in archive_dir.glob('weekly-ai-digest-v2-*.html'):
+            date = path.stem.replace('weekly-ai-digest-v2-', '')
+            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date):
+                continue
+            dotted = date.replace('-', '.')
+            entries_by_date[date] = {
+                'date': date,
+                'title': f'{dotted} 다이제스트',
+                'url': f'https://art-seongha-art.github.io/creator-ai-digest/archive/{path.name}',
+            }
+    if current is not None:
+        current_key = current.strftime('%Y-%m-%d')
+        entries_by_date[current_key] = {
+            'date': current_key,
+            'title': f'{current.strftime("%Y.%m.%d")} 다이제스트',
             'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
-        },
-        {
-            'date': '2026-06-26',
-            'title': '2026.06.26 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-26.html',
-        },
-        {
-            'date': '2026-06-25',
-            'title': '2026.06.25 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-25.html',
-        },
-        {
-            'date': '2026-06-22',
-            'title': '2026.06.22 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-22.html',
-        },
-        {
-            'date': '2026-06-21',
-            'title': '2026.06.21 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-21.html',
-        },
-        {
-            'date': '2026-06-20',
-            'title': '2026.06.20 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-20.html',
-        },
-        {
-            'date': '2026-06-19',
-            'title': '2026.06.19 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-19.html',
-        },
-        {
-            'date': '2026-06-18',
-            'title': '2026.06.18 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-18.html',
-        },
-        {
-            'date': '2026-06-17',
-            'title': '2026.06.17 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/archive/weekly-ai-digest-v2-2026-06-17.html',
-        },
-    ]
-    return sorted(entries, key=lambda x: x['date'], reverse=True)
+        }
+    entries = sorted(entries_by_date.values(), key=lambda x: x['date'], reverse=True)
+    return entries[:limit]
+
 
 def digest_nav_html(current: datetime) -> str:
     current_key = current.strftime('%Y-%m-%d')
-    entries = digest_entries()
+    entries = digest_entries(current)
     asc = sorted(entries, key=lambda x: x['date'])
     prev_entry = next((e for e in reversed(asc) if e['date'] < current_key), None)
     next_entry = next((e for e in asc if e['date'] > current_key), None)
