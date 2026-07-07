@@ -52,13 +52,13 @@ def main() -> int:
         raise SystemExit('No selected items in input JSON')
     selected = prioritize_for_llm(selected, args.max_llm_items)
     prompt = build_prompt(data, selected)
-    raw = run_claude(prompt, args.model, args.timeout)
+    raw = run_code_curator(prompt, args.model, args.timeout)
     public = extract_json(raw)
     validate_public(public)
     public['period'] = data.get('period', {})
     public['curation'] = {
-        'writer': 'claude-cli',
-        'mode': 'llm_korean_digest_copy',
+        'writer': 'code-curator',
+        'mode': 'codex_or_code_korean_digest_copy',
         'source_json': str(Path(args.input_json)),
     }
     output_json = Path(args.output_json)
@@ -133,17 +133,22 @@ quality: A=실제 기능/모델 업데이트, B=창작 도구·산업 사례, C=
 """.strip()
 
 
-def run_claude(prompt: str, model: str, timeout: int) -> str:
-    cmd = [
-        'claude', '-p', prompt,
-        '--model', model,
-        '--output-format', 'text',
-        '--max-budget-usd', '1.00',
-        '--no-session-persistence',
-    ]
-    proc = subprocess.run(cmd, cwd=str(BASE), text=True, capture_output=True, timeout=timeout)
+def run_code_curator(prompt: str, model: str, timeout: int) -> str:
+    """Run the Korean digest curator without Claude CLI.
+
+    Default path uses Codex CLI (`codex exec`). Override with
+    DIGEST_CURATOR_COMMAND if this host uses another `code`/Codex wrapper.
+    The command must read the prompt from stdin and print JSON to stdout.
+    """
+    template = os.environ.get('DIGEST_CURATOR_COMMAND', '').strip()
+    if template:
+        cmd = template
+        proc = subprocess.run(cmd, input=prompt, shell=True, cwd=str(BASE), text=True, capture_output=True, timeout=timeout)
+    else:
+        cmd = ['codex', 'exec', '--model', model, '--sandbox', 'workspace-write', '--cd', str(BASE), '-']
+        proc = subprocess.run(cmd, input=prompt, cwd=str(BASE), text=True, capture_output=True, timeout=timeout)
     if proc.returncode != 0:
-        raise RuntimeError(f'claude failed rc={proc.returncode} stdout={proc.stdout[-2000:]} stderr={proc.stderr[-2000:]}')
+        raise RuntimeError(f'code curator failed rc={proc.returncode} stdout={proc.stdout[-2000:]} stderr={proc.stderr[-2000:]}')
     return proc.stdout
 
 
