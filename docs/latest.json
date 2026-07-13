@@ -1,130 +1,111 @@
 {
   "title": "창작자를 위한 AI 다이제스트",
   "period": {
-    "start": "2026-07-02T09:00:00+09:00",
-    "end": "2026-07-12T09:00:00+09:00"
+    "start": "2026-07-06T00:00:00+09:00",
+    "end": "2026-07-13T09:00:00+09:00"
   },
   "items": [
     {
-      "category": "실감미디어 / 게임엔진",
-      "source_name": "AlayaLab / arXiv",
-      "published_at": "2026-07-08T00:00:00+00:00",
-      "title_ko": "AlayaWorld, 1분 이상 이어지는 ‘플레이 가능한’ 월드모델 공개",
-      "summary_ko": "Alaya Lab이 공개한 AlayaWorld는 게임 플레이처럼 카메라와 행동을 넣어 장면을 계속 이어가는 오픈소스 인터랙티브 월드모델 프레임워크입니다. 영상 생성이 짧은 클립을 넘어 ‘조작 가능한 공간 스케치’로 확장되는 흐름을 보여줍니다.",
-      "insight_ko": "미디어아트·게임 수업에서는 완성도보다 ‘상호작용형 콘셉트 영상’을 빠르게 검증하는 데 먼저 써볼 만합니다. 다만 실제 제작 투입 전에는 로컬 실행 요구사항과 라이선스를 확인해야 합니다.",
-      "image_prompt_ko": "interactive generative world model, abstract controllable landscape, camera paths, creators testing a simulated scene, editorial illustration",
-      "image_url": "https://opengraph.githubassets.com/868720c0e74c8247b10e3e667fad0f82e1a78d02751e8368faa9b5f46a635143/AlayaLab/AlayaWorld",
-      "media_url": "https://opengraph.githubassets.com/868720c0e74c8247b10e3e667fad0f82e1a78d02751e8368faa9b5f46a635143/AlayaLab/AlayaWorld",
+      "category": "3D / 공간",
+      "source_name": "r/LocalLLaMA / Modelr",
+      "published_at": "2026-07-12T14:00:21+00:00",
+      "title_ko": "로컬 이미지→3D: Apple Silicon·아이폰까지 내려온 3D 생성 실험",
+      "summary_ko": "Hunyuan3D Shape/Paint를 MLX로 포팅한 Modelr가 공유되었습니다. 글쓴이는 Apple Silicon에서 이미지 한 장을 3D 형태로 바꾸는 데 수십 초 수준의 벤치마크를 제시했고, 별도 데스크톱 앱 형태도 공개했습니다.",
+      "insight_ko": "제품 사진, 캐릭터 스케치, 수업용 오브젝트를 빠르게 3D 초안으로 바꿔본 뒤 Blender나 게임엔진에서 다듬는 워크플로우를 시험해볼 만합니다. 다만 Reddit 기반 공개라 성능·라이선스는 추적 필요입니다.",
+      "image_prompt_ko": "사진 한 장이 3D 메시 오브젝트로 변환되는 창작자 작업대",
+      "image_url": "assets/gpt-image2-20260713-local-image-to-3d.png",
+      "media_url": "",
       "media_type": "image",
+      "media_label": "GPT Image로 생성한 관련 이미지",
       "quality": "A",
-      "url": "https://github.com/AlayaLab/AlayaWorld",
-      "links": {
-        "논문": "https://arxiv.org/html/2607.06291v1"
-      },
-      "media_source": "source_page_metadata",
-      "image_source": "source_page_metadata"
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uuga40/local_image_to_3d_2gb_ram_20s_apple_silicon_iphone/",
+      "links": {}
     },
     {
-      "category": "영상",
-      "source_name": "Runway",
-      "published_at": "2026-07-10T00:00:00+00:00",
-      "title_ko": "Runway, Aleph 2.0·Edit Studio 중심의 영상 편집 워크플로우 강화",
-      "summary_ko": "Runway changelog와 제품 문서는 한 프레임을 원하는 방향으로 고치면 나머지 영상도 그 수정에 맞춰 따라가도록 하는 Aleph 2.0 / Edit Studio 흐름을 강조합니다. 단순 텍스트-투-비디오보다 ‘이미 찍은 영상의 수정’이 창작 파이프라인의 핵심으로 이동하고 있습니다.",
-      "insight_ko": "교육 현장에서는 10초 내외 원본 영상을 먼저 촬영한 뒤, 색감·소품·배경만 AI로 바꾸는 과제로 설계하면 저작권과 결과 통제가 더 쉬워집니다.",
-      "image_prompt_ko": "video editor timeline, one keyframe transforming a short film sequence, cinematic studio desk, no text, editorial illustration",
-      "image_url": "assets/gpt-image2-runway-20260712.png",
-      "media_url": "assets/gpt-image2-runway-20260712.png",
+      "category": "LLM / 모델",
+      "source_name": "r/LocalLLaMA / Moondream",
+      "published_at": "2026-07-12T18:40:55+00:00",
+      "title_ko": "Moondream 3.1: 작은 비전 언어 모델이 탐지·포인팅·캡션까지 구조화 출력",
+      "summary_ko": "Moondream 3.1-9B-A2B가 9B 총 파라미터, 2B 활성 MoE 구조의 비전 언어 모델로 소개되었습니다. 이미지 질의, 객체 탐지, 포인트 지정, 캡션 생성을 네이티브 기능으로 제공하고 구조화된 결과를 돌려주는 점이 핵심입니다.",
+      "insight_ko": "전시 안내 키오스크, 워크숍용 이미지 분석, 로컬 프로토타입처럼 빠르고 저렴한 시각 AI가 필요한 상황에 맞습니다. 공식 릴리스와 모델 카드 세부 조건은 추적 필요입니다.",
+      "image_prompt_ko": "작은 비전 AI가 이미지 속 요소를 분석해 구조화된 신호를 내보내는 장면",
+      "image_url": "assets/gpt-image2-20260713-moondream-vlm.png",
+      "media_url": "",
       "media_type": "image",
+      "media_label": "GPT Image로 생성한 관련 이미지",
       "quality": "A",
-      "url": "https://runwayml.com/changelog",
-      "links": {
-        "Aleph 2.0": "https://runwayml.com/product/aleph-2",
-        "API Changelog": "https://docs.dev.runwayml.com/api-details/api_changelog/"
-      },
-      "media_source": "gpt_image_generated",
-      "image_source": "gpt_image_generated",
-      "media_label": "GPT Image로 생성한 관련 이미지"
-    },
-    {
-      "category": "바로 써볼 AI 도구",
-      "source_name": "Google Gemini",
-      "published_at": "2026-07-05T00:00:00+00:00",
-      "title_ko": "Gemini의 사진→영상 흐름, 짧은 사운드 포함 클립 제작을 더 가깝게 만듦",
-      "summary_ko": "Google의 Gemini 영상 생성 안내는 사진을 업로드하고 장면·오디오 지시를 더해 짧은 영상으로 바꾸는 사용 방식을 전면에 내세웁니다. 한 장의 레퍼런스 이미지에서 움직임과 분위기를 뽑아내는 워크플로우가 홍보 영상·수업 예시 제작에 더 직접적으로 들어오고 있습니다.",
-      "insight_ko": "디자이너는 최종 영상보다 ‘무드보드 이미지 3장 → 8초 움직임 시안 3개’처럼 클라이언트 대화용 중간 산출물로 쓰는 편이 안전합니다.",
-      "image_prompt_ko": "a still photograph expanding into a short cinematic clip with sound waves and motion trails, creative studio, no text, editorial illustration",
-      "image_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/PhototoVideo_SS.width-1300.png",
-      "media_url": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/PhototoVideo_SS.width-1300.png",
-      "media_type": "image",
-      "quality": "B",
-      "url": "https://blog.google/products-and-platforms/products/gemini/photo-to-video/",
-      "links": {
-        "Gemini video generation": "https://gemini.google/overview/video-generation/"
-      },
-      "media_source": "source_page_metadata",
-      "image_source": "source_page_metadata"
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1uunqcz/moondream319ba2b/",
+      "links": {}
     },
     {
       "category": "정책·저작권",
-      "source_name": "The Verge / TechCrunch",
-      "published_at": "2026-07-10T23:49:50+00:00",
-      "title_ko": "Meta, 공개 계정 기반 Instagram AI 이미지 기능을 반발 뒤 중단",
-      "summary_ko": "Meta가 공개 Instagram 계정을 태그해 해당 계정의 콘텐츠 스타일을 AI 이미지 생성에 참조하게 하던 기능을 이용자 반발 뒤 중단했습니다. 창작자 동의, 공개 게시물의 2차 활용, 플랫폼 신뢰 문제가 다시 전면에 나온 사례입니다.",
-      "insight_ko": "브랜드·수업용 AI 실습에서도 ‘공개되어 있다’와 ‘학습·참조에 동의했다’는 다르다는 점을 명확히 설명해야 합니다. 학생 과제에는 본인 촬영물·명시적 허가 자료만 쓰는 규칙을 붙이는 것이 좋습니다.",
-      "image_prompt_ko": "social media portrait silhouettes with consent shield and creative rights symbols, editorial illustration, no logos, no text",
-      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/07/meta-muse-image-instagram-tag.png?quality=90&strip=all&crop=0,16.342557965595,100,67.314884068811",
-      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/07/meta-muse-image-instagram-tag.png?quality=90&strip=all&crop=0,16.342557965595,100,67.314884068811",
+      "source_name": "TechCrunch AI",
+      "published_at": "2026-07-10T23:55:07+00:00",
+      "title_ko": "Meta, 공개 Instagram 계정 기반 AI 이미지 기능을 반발 뒤 중단",
+      "summary_ko": "Meta가 공개 Instagram 계정을 태그해 해당 계정의 콘텐츠를 참고한 AI 이미지를 만들 수 있던 기능을 반발 이후 제거했습니다. 회사는 창작 도구와 통제권을 의도했지만 이용자 피드백을 받아 기능을 더 이상 제공하지 않는다고 밝혔습니다.",
+      "insight_ko": "브랜드·학생·작가의 공개 게시물을 AI 레퍼런스로 쓰는 기능은 ‘공개’와 ‘동의’가 다르다는 점을 다시 보여줍니다. 교육 현장에서는 레퍼런스 수집 동의와 결과물 표기 규칙을 먼저 정하는 것이 안전합니다.",
+      "image_prompt_ko": "창작자의 공개 콘텐츠 주변에 동의와 프라이버시 보호막이 생기는 장면",
+      "image_url": "assets/gpt-image2-20260713-ai-consent.png",
+      "media_url": "",
       "media_type": "image",
+      "media_label": "GPT Image로 생성한 관련 이미지",
       "quality": "A",
-      "url": "https://www.theverge.com/tech/964416/meta-instagram-ai-muse-image-deepfakes",
+      "url": "https://techcrunch.com/2026/07/10/meta-removes-controversial-ai-feature-on-instagram-after-backlash/",
       "links": {
-        "TechCrunch": "https://techcrunch.com/2026/07/10/meta-removes-controversial-ai-feature-on-instagram-after-backlash/"
-      },
-      "media_source": "source_page_metadata",
-      "image_source": "source_page_metadata"
+        "The Verge 보도": "https://www.theverge.com/tech/964416/meta-instagram-ai-muse-image-deepfakes"
+      }
     },
     {
       "category": "연구·논문",
-      "source_name": "arXiv",
+      "source_name": "arXiv cs.AI",
       "published_at": "2026-07-09T17:58:29+00:00",
-      "title_ko": "OpenCoF: ‘영상 프레임의 흐름’으로 추론하는 모델 연구",
-      "summary_ko": "OpenCoF 논문은 텍스트 Chain-of-Thought 대신 시간적으로 연결된 프레임을 통해 추론을 펼치는 Chain-of-Frame 개념을 다룹니다. 영상 생성 모델이 단지 장면을 그리는 도구를 넘어, 원인과 결과를 시각적으로 검증하는 방향으로 연구되고 있음을 보여줍니다.",
-      "insight_ko": "교육자는 과학·디자인 프로세스를 ‘단계별 장면’으로 설명하게 하는 실습에 응용할 수 있습니다. 아직 연구 단계이므로 제작 도구라기보다 다음 세대 영상 AI의 방향으로 보는 것이 적절합니다.",
-      "image_prompt_ko": "sequence of abstract video frames forming a reasoning path, visual logic, research lab, editorial illustration, no text",
-      "image_url": "assets/gpt-image2-opencof-20260712.png",
-      "media_url": "assets/gpt-image2-opencof-20260712.png",
+      "title_ko": "OpenCoF: 영상을 생성하며 추론하는 Chain-of-Frame 연구",
+      "summary_ko": "OpenCoF는 텍스트로 사고 과정을 쓰는 Chain-of-Thought 대신, 시간적으로 이어지는 프레임을 통해 추론을 펼치는 Chain-of-Frame 접근을 다룹니다. 논문은 비디오 생성 모델에 CoF 추론을 위한 데이터와 설계를 보강하는 방향을 제안합니다.",
+      "insight_ko": "영상 생성이 단순 ‘그럴듯한 클립’에서 스토리보드·원인결과·절차 설명을 다루는 도구로 이동할 가능성을 보여줍니다. 수업에서는 같은 문제를 글, 이미지, 프레임 시퀀스로 각각 설명하게 해 비교해볼 수 있습니다.",
+      "image_prompt_ko": "스토리보드 프레임들이 시간 순서로 이어지며 추론 흐름을 만드는 장면",
+      "image_url": "assets/gpt-image2-20260713-opencof-video.png",
+      "media_url": "",
       "media_type": "image",
-      "quality": "B",
+      "media_label": "GPT Image로 생성한 관련 이미지",
+      "quality": "A",
       "url": "https://arxiv.org/abs/2607.08763v1",
-      "links": {},
-      "media_source": "gpt_image_generated",
-      "image_source": "gpt_image_generated",
-      "media_label": "GPT Image로 생성한 관련 이미지"
+      "links": {}
     },
     {
-      "category": "영상",
-      "source_name": "Lightricks / LTX",
-      "published_at": "2026-07-11T00:00:00+00:00",
-      "title_ko": "LTX Trainer·LoRA 문서, 영상 효과를 작은 어댑터로 훈련하는 방향 제시",
-      "summary_ko": "Lightricks의 LTX-Video/Trainer 자료는 특정 캐릭터, 스타일, 움직임, 효과를 LoRA·어댑터 형태로 학습시키는 예시를 제공합니다. 대형 모델 전체를 다시 학습하기보다 작은 가중치로 영상 스타일을 재사용하는 방식이 제작자에게 중요해지고 있습니다.",
-      "insight_ko": "작은 팀은 ‘프로젝트 전용 모션/룩 LoRA’를 만들어 반복 컷의 일관성을 확보하는 전략을 검토할 수 있습니다. 공개 모델·데이터셋 라이선스와 초상권 확인은 필수입니다.",
-      "image_prompt_ko": "modular video generation workflow, small adapters connecting to a film reel and character style boards, editorial illustration, no text",
-      "image_url": "https://opengraph.githubassets.com/6cd2eff5a7045cc5553bdaf0b262ca21369a85e997f3903404662335381f423c/Lightricks/LTX-Video-Trainer",
-      "media_url": "https://opengraph.githubassets.com/6cd2eff5a7045cc5553bdaf0b262ca21369a85e997f3903404662335381f423c/Lightricks/LTX-Video-Trainer",
+      "category": "이미지",
+      "source_name": "Hugging Face Daily Papers",
+      "published_at": "2026-07-06T00:00:00+00:00",
+      "title_ko": "OrbitQuant: 이미지·비디오 Diffusion Transformer를 가볍게 쓰려는 양자화 연구",
+      "summary_ko": "OrbitQuant는 이미지와 비디오 Diffusion Transformer를 데이터 없이 양자화하는 방법을 다룬 연구입니다. 생성 모델을 더 작은 메모리와 비용으로 운용하려는 흐름과 맞닿아 있습니다.",
+      "insight_ko": "개인 작업실이나 학교 실습실에서 고해상도 생성 모델을 돌릴 때 병목은 GPU 메모리입니다. 이런 연구는 로컬 생성, 사내 서버, 워크숍 장비 구성의 선택지를 넓힐 수 있습니다.",
+      "image_prompt_ko": "생성 모델 최적화를 상징하는 기하학 토큰과 렌더 큐브",
+      "image_url": "assets/gpt-image2-20260713-orbitquant.png",
+      "media_url": "",
       "media_type": "image",
+      "media_label": "GPT Image로 생성한 관련 이미지",
       "quality": "B",
-      "url": "https://github.com/Lightricks/LTX-Video-Trainer",
-      "links": {
-        "LTX-Video": "https://github.com/Lightricks/LTX-Video",
-        "LoRA 문서": "https://docs.ltx.video/open-source-model/usage-guides/lo-ra"
-      },
-      "media_source": "source_page_metadata",
-      "image_source": "source_page_metadata"
+      "url": "https://huggingface.co/papers/2607.02461",
+      "links": {}
+    },
+    {
+      "category": "창작·디자인 사례",
+      "source_name": "OpenAI News",
+      "published_at": "2026-07-09T10:00:00+00:00",
+      "title_ko": "ChatGPT, ‘큰 작업의 파트너’ 방향으로 제품 메시지 강화",
+      "summary_ko": "OpenAI는 ChatGPT를 더 긴 작업, 협업, 분석, 제작 보조에 쓰는 파트너로 소개하는 업데이트를 게시했습니다. 새 모델 자체보다도 AI가 문서·기획·제작 흐름 안으로 더 깊게 들어가는 제품 방향을 읽을 수 있습니다.",
+      "insight_ko": "창작자는 아이디어 발상만 맡기는 대신 리서치 노트 정리, 콘셉트 보드 설명, 피드백 체크리스트, 발표문 초안까지 한 프로젝트 폴더 단위로 AI를 배치해볼 수 있습니다.",
+      "image_prompt_ko": "",
+      "image_url": "",
+      "media_url": "",
+      "media_type": "",
+      "quality": "B",
+      "url": "https://openai.com/index/chatgpt-for-your-most-ambitious-work",
+      "links": {}
     }
   ],
   "curation": {
-    "writer": "python-curator",
-    "mode": "manual_source_backed_cron_fallback_no_codex_cli",
-    "source_json": "docs/latest_candidates.json"
+    "writer": "manual-code-curator",
+    "mode": "scheduled_digest_no_codex_cli_available",
+    "source_json": "output/latest_candidates.json"
   }
 }
