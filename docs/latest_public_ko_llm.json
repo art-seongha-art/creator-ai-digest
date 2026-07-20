@@ -1,126 +1,123 @@
 {
   "title": "창작자를 위한 AI 다이제스트",
   "period": {
-    "start": "2026-07-09T01:00:50+00:00",
-    "end": "2026-07-19T01:00:50+00:00"
+    "start": "2026-07-17T01:00:58+00:00",
+    "end": "2026-07-20T01:00:58+00:00"
   },
   "items": [
     {
-      "category": "정책·저작권",
+      "category": "음악 / 오디오",
       "source_name": "The Verge",
-      "published_at": "2026-07-17T19:34:30+00:00",
-      "title_ko": "TikTok, AI로 만든 ‘내 얼굴’ 도용을 찾는 신고 도구를 시험 중",
-      "summary_ko": "TikTok이 일부 미국 크리에이터를 대상으로 AI likeness detection 도구를 시험하고 있습니다. 사용자가 선택하면 플랫폼 안에서 자신의 얼굴·목소리와 비슷하게 만든 AI 콘텐츠를 찾아 신고할 수 있게 하는 방식이며, YouTube가 준비 중인 유사 기능과 같은 흐름입니다.",
-      "insight_ko": "강의자, 배우, 인플루언서, 작가처럼 얼굴과 목소리 자체가 자산인 창작자에게는 포트폴리오 보호 장치가 될 수 있습니다. 다만 자동 탐지는 패러디·팬아트·합법적 리믹스까지 오탐할 수 있어, 공개 범위와 신고 기준을 미리 정해 두는 운영 감각이 필요합니다.",
-      "image_prompt_ko": "AI 초상권 탐지와 크리에이터 보호를 상징하는 소셜 비디오 플랫폼 일러스트",
-      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/23951408/STK051_VRG_Illo_N_Barclay_4_tiktok.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+      "published_at": "2026-07-19T17:35:54+00:00",
+      "title_ko": "Suno로 만든 노래가 ‘AI 음악은 재미없다’는 선입견을 흔들다",
+      "summary_ko": "The Verge는 1010Benja의 ‘Semiramis Dream’을 두고, Suno로 만든 음악이 단순한 자동 생성물 이상으로 들릴 수 있다는 사례를 다뤘습니다. 기사는 도구 자체보다 창작자가 어떤 취향, 편집, 맥락을 얹느냐에 따라 결과물의 설득력이 달라진다는 점을 짚습니다.",
+      "insight_ko": "뮤지션과 사운드 디자이너에게는 AI 음악을 ‘완성곡 버튼’이 아니라 스케치, 샘플링, 낯선 질감 탐색 도구로 보는 접근이 더 현실적입니다. 다만 학습 데이터와 저작권 논란이 계속되는 영역이므로 상업 배포 전 권리 확인, 크레딧 표기, 인간 창작 기여도를 명확히 남기는 습관이 필요합니다.",
+      "image_prompt_ko": "AI 음악 도구와 인간 프로듀서의 취향 편집이 만나는 스튜디오 장면",
+      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/07/Screenshot-2026-07-19-at-1.30.30-PM.png?quality=90&strip=all&crop=0%2C3.7236463698791%2C100%2C53.407996633678&w=1200",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
       "quality": "A",
-      "url": "https://www.theverge.com/tech/967486/tiktok-ai-likeness-detection-tool",
+      "url": "https://www.theverge.com/entertainment/967678/1010benja-semiramis-dream-suno-ai-music",
       "links": {}
     },
     {
-      "category": "창작·디자인 사례",
-      "source_name": "The Verge",
-      "published_at": "2026-07-18T20:54:42+00:00",
-      "title_ko": "작가 Dave Eggers, OpenAI 직원들에게 “ChatGPT가 한 세대를 침묵시킨다”고 경고",
-      "summary_ko": "The Verge는 작가 Dave Eggers가 OpenAI 직원 대상 강연에서 생성형 AI가 젊은 작가들의 목소리와 시행착오를 약화시킬 수 있다고 비판했다고 전했습니다. 핵심은 AI가 문장을 대신 써 주는 편리함보다, 글을 고치고 실패하며 자기 언어를 찾는 과정이 사라질 수 있다는 문제 제기입니다.",
-      "insight_ko": "글쓰기 수업이나 스토리 개발 워크숍에서는 AI를 “초안 생산기”보다 질문자·편집자·반론자로 제한해 쓰는 설계가 중요해집니다. 창작 속도는 빨라질 수 있지만, 작품의 관점과 책임이 흐려지지 않도록 AI 사용 로그와 인간의 결정 지점을 남기는 습관이 필요합니다.",
-      "image_prompt_ko": "작가와 AI 글쓰기 도구 사이의 긴장감을 표현한 편집실 장면",
-      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/07/gettyimages-2157758001.jpg?quality=90&strip=all&crop=0%2C2.5961195218394%2C100%2C43.073649479563&w=1200",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "B",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/967630/dave-eggers-openai-chatgpt-silencing-an-entire-generation",
-      "links": {}
-    },
-    {
-      "category": "연구·논문",
-      "source_name": "arXiv",
-      "published_at": "2026-07-16T17:59:06+00:00",
-      "title_ko": "RoboTTT, 긴 작업 맥락을 기억하는 로봇 정책 연구",
-      "summary_ko": "RoboTTT는 로봇이 아주 짧은 순간만 보고 움직이는 대신, 최대 8K 타임스텝의 긴 시각·동작 맥락을 압축해 활용하도록 만든 연구입니다. 논문은 사람의 영상 시연을 보고 한 번에 따라 하기, 작업 중 즉석 개선, 여러 단계 조립 같은 장기 과제에서 기존 짧은 맥락 모델보다 나은 성능을 보였다고 설명합니다.",
-      "insight_ko": "공연·전시·메이커 교육에서 로봇을 쓰는 팀이라면 “한 동작 생성”보다 “긴 리허설을 기억하는 동작 시스템”으로 사고를 넓혀볼 만합니다. 아직 연구 단계이고 실제 장비·안전 검증 비용이 크므로, 당장은 모션 캡처·시뮬레이션·워크플로우 설계 아이디어로 참고하는 편이 현실적입니다.",
-      "image_prompt_ko": "긴 시연 영상을 기억하며 다단계 조립을 배우는 로봇 연구",
-      "image_url": "https://research.nvidia.com/labs/gear/robottt/og.png",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "A",
-      "url": "https://arxiv.org/abs/2607.15275v1",
-      "links": {
-        "프로젝트": "https://research.nvidia.com/labs/gear/robottt/",
-        "논문": "https://arxiv.org/abs/2607.15275v1"
-      }
-    },
-    {
-      "category": "연구·논문",
-      "source_name": "arXiv",
-      "published_at": "2026-07-16T17:58:36+00:00",
-      "title_ko": "SciDiagramEdit, 논문 그림 수정을 자연어 지시로 돕는 벤치마크",
-      "summary_ko": "SciDiagramEdit는 논문 개정 과정에서 실제로 바뀐 그림의 전후 버전을 모아, 과학 도표를 자연어 지시로 고치는 문제를 다룹니다. 단순 이미지 편집이 아니라 SVG 같은 편집 가능한 벡터 소스의 화살표, 라벨, 패널, 그래프 요소를 사람이 다시 확인하고 공동 편집할 수 있게 하는 접근입니다.",
-      "insight_ko": "연구자와 교육자는 학술 포스터, 수업 자료, 데이터 시각화의 “마지막 손질”을 AI와 나누는 워크플로우를 상상해볼 수 있습니다. 하지만 도표는 숫자·축·범례가 조금만 틀려도 의미가 바뀌므로, 자동 편집 결과를 원자료와 대조하는 검수 단계가 반드시 필요합니다.",
-      "image_prompt_ko": "복잡한 과학 도표를 벡터 레이어로 편집하는 연구자와 AI 보조 도구",
-      "image_url": "assets/openai_codex_gpt-image-2-high_20260719_100401_e1de15f9.png",
-      "media_type": "image",
-      "media_label": "관련 이미지를 생성했습니다",
-      "quality": "A",
-      "url": "https://arxiv.org/abs/2607.15272v1",
-      "links": {
-        "논문": "https://arxiv.org/abs/2607.15272v1"
-      }
-    },
-    {
-      "category": "3D / 공간",
-      "source_name": "arXiv",
-      "published_at": "2026-07-16T17:55:15+00:00",
-      "title_ko": "SceneBind, 이미지·소리·언어를 3D 공간 이해로 묶는 연구",
-      "summary_ko": "SceneBind는 장면 안에 무엇이 있는지뿐 아니라 어디에 있는지를 이미지, 바이노럴 오디오, 언어 표현과 함께 맞추려는 멀티모달 표현 연구입니다. 객체 단위의 의미와 공간 정보를 슬롯처럼 다루고, 장면 검색과 오디오-비주얼 위치 찾기에서 활용할 수 있도록 설계됐습니다.",
-      "insight_ko": "전시 사운드 디자인, VR/AR 수업, 게임 레벨 디자인에서는 “소리로 공간을 찾는” 인터랙션이나 접근성 도구를 떠올릴 수 있습니다. 아직 데이터셋과 평가 중심의 연구라 바로 제품에 붙이기는 어렵지만, 공간 컴퓨팅 콘텐츠에서 시각 중심 인터페이스를 넘어서는 단서가 됩니다.",
-      "image_prompt_ko": "3D 공간 속 객체와 소리, 언어가 연결되는 멀티모달 장면 이해",
-      "image_url": "assets/openai_codex_gpt-image-2-high_20260719_100652_bbffa3ca.png",
-      "media_type": "image",
-      "media_label": "관련 이미지를 생성했습니다",
-      "quality": "A",
-      "url": "https://arxiv.org/abs/2607.15265v1",
-      "links": {
-        "논문": "https://arxiv.org/abs/2607.15265v1"
-      }
-    },
-    {
-      "category": "LLM / 모델",
+      "category": "주요 뉴스",
       "source_name": "TechCrunch",
-      "published_at": "2026-07-18T18:51:07+00:00",
-      "title_ko": "Moonshot AI의 새 Kimi 모델, 저비용 고성능 경쟁을 다시 흔들다",
-      "summary_ko": "TechCrunch는 중국 Moonshot AI의 새 Kimi 모델 공개가 오픈 모델·저가 추론 경쟁에 대한 논쟁을 키웠다고 전했습니다. 기사에서 다루는 핵심은 특정 모델 하나의 벤치마크보다, 빠르게 낮아지는 비용과 공개 모델 생태계가 서비스 제작자의 선택지를 넓히고 있다는 점입니다.",
-      "insight_ko": "소규모 스튜디오나 교육 현장은 번역, 리서치, 코드 보조 같은 반복 작업을 더 낮은 비용으로 실험할 여지가 커집니다. 반대로 모델 출처, 데이터 거버넌스, 지역별 규제 리스크가 프로젝트 납품 조건에 영향을 줄 수 있으므로 민감한 원고·클라이언트 자료는 분리해서 테스트해야 합니다.",
-      "image_prompt_ko": "여러 언어 모델이 비용과 성능을 두고 경쟁하는 추상적 그래픽",
-      "image_url": "https://techcrunch.com/wp-content/uploads/2026/01/GettyImages-2254580342.jpg?w=1024",
+      "published_at": "2026-07-19T14:00:00+00:00",
+      "title_ko": "Current AI, 누구나 쓰는 ‘공공 AI 웹’을 만들겠다는 비영리 실험을 확대",
+      "summary_ko": "TechCrunch는 비영리 조직 Current AI가 문화와 언어가 소외되지 않는 공개 AI 인프라를 목표로 속도를 내고 있다고 보도했습니다. 기사에서 Current AI는 기기, 대화형 AI, 데이터 접근성 등 여러 층위에서 상업 플랫폼 바깥의 공공적 선택지를 만들려는 프로젝트로 소개됩니다.",
+      "insight_ko": "교육자와 지역 문화기관에는 영어권 대형 서비스만 전제로 하지 않는 AI 수업·아카이브·번역 실험의 기반이 될 수 있습니다. 아직 실제 품질, 지속 가능한 운영비, 데이터 거버넌스가 검증되어야 하므로 중요한 창작물이나 학습자 데이터를 맡길 때는 공개 범위와 보존 정책을 먼저 확인해야 합니다.",
+      "image_prompt_ko": "여러 문화와 언어가 연결되는 공공 AI 네트워크",
+      "image_url": "https://techcrunch.com/wp-content/uploads/2025/10/GettyImages-1370479417.jpg?resize=1200,806",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "B",
-      "url": "https://techcrunch.com/2026/07/18/kimi-threat-or-menace/",
+      "quality": "A",
+      "url": "https://techcrunch.com/2026/07/19/nonprofit-current-ai-is-racing-to-build-the-world-wide-web-of-ai-free-for-all/",
       "links": {}
+    },
+    {
+      "category": "연구·논문",
+      "source_name": "Hugging Face Papers",
+      "published_at": "2026-07-17T00:00:00+00:00",
+      "title_ko": "VideoChat3, 긴 영상 이해를 더 가볍게 열어 보려는 공개 비디오 MLLM",
+      "summary_ko": "VideoChat3는 다양한 영상 유형을 이해하는 멀티모달 대형언어모델을 더 공개적이고 효율적으로 만들려는 연구입니다. 논문은 I3D-ViT와 적응형 프레임 해상도 설계를 통해 영상 입력 처리 비용을 낮추고, 합성·큐레이션된 학습 데이터로 긴 영상과 스트리밍 상황까지 다루려 합니다.",
+      "insight_ko": "영상 수업, 미디어 아카이브, 크리에이터 분석 워크플로우에서는 촬영본 요약, 장면 검색, 피드백 자동화 같은 보조 기능을 더 낮은 비용으로 실험할 여지가 생깁니다. 연구 단계 모델은 특정 장르나 문화적 맥락을 오독할 수 있으므로, 편집 판단과 평가 언어는 사람이 최종 확인하는 구조가 필요합니다.",
+      "image_prompt_ko": "비디오 이해 모델이 다양한 영상 타임라인을 분석하는 장면",
+      "image_url": "assets/openai_codex_gpt-image-2-high_20260720_100731_af9ae4e5.png",
+      "media_type": "image",
+      "media_label": "관련 이미지를 생성했습니다",
+      "quality": "A",
+      "url": "https://huggingface.co/papers/2607.14935",
+      "links": {
+        "논문": "https://arxiv.org/abs/2607.14935"
+      }
     },
     {
       "category": "영상",
-      "source_name": "Lapaas Voice",
-      "published_at": "2026-07-17T05:09:52+00:00",
-      "title_ko": "Decart AI ‘Lucy 2.5’, 실시간 영상 편집형 AI를 전면에 내세우다",
-      "summary_ko": "Lapaas Voice는 Decart AI가 Lucy 2.5를 공개하며 실시간 영상 편집을 강조했다고 보도했습니다. 보도 내용상 핵심은 완성된 영상을 나중에 고치는 방식보다, 프롬프트와 장면 조정이 더 짧은 루프로 오가도록 만드는 영상 제작 워크플로우입니다.",
-      "insight_ko": "영상 제작자는 콘티, 광고 시안, 강의용 클립을 빠르게 바꿔 보며 클라이언트나 학생과 즉석 피드백을 나누는 실험을 해볼 수 있습니다. 다만 보도 기반 정보가 제한적이므로 최종 품질, 저작권 처리, 일관된 캐릭터 유지 능력은 실제 프로젝트 투입 전에 별도로 검증해야 합니다.",
-      "image_prompt_ko": "실시간 AI 영상 편집과 스토리보드 변환을 표현한 제작 스튜디오 장면",
-      "image_url": "assets/openai_codex_gpt-image-2-high_20260719_101011_89bd0642.png",
+      "source_name": "Hugging Face Papers",
+      "published_at": "2026-07-17T00:00:00+00:00",
+      "title_ko": "KeyFrame-Compass, 키프레임 기반 AI 영상 생성이 지시를 얼마나 지키는지 재는 벤치마크",
+      "summary_ko": "KeyFrame-Compass는 여러 장의 기준 이미지를 넣어 영상을 만드는 워크플로우를 평가하기 위한 벤치마크입니다. 386개 샘플을 장르, 구조, 프롬프트 세부도, 키프레임 밀도별로 구성하고, 존재 여부·충실도·순서·위치·지속성·고유성 같은 기준으로 키프레임 실행력을 나눠 봅니다.",
+      "insight_ko": "광고 콘티, 뮤직비디오, 교육용 애니메이션처럼 특정 장면을 반드시 지켜야 하는 제작에서는 ‘예쁘게 보이는가’보다 ‘지정한 컷을 놓치지 않는가’가 중요합니다. 이 벤치마크는 도구 비교와 QA 체크리스트에 도움이 되지만, 브랜드 톤·연기 감정·편집 리듬 같은 미학적 판단은 별도로 사람이 검수해야 합니다.",
+      "image_prompt_ko": "키프레임으로 제어되는 AI 영상 제작 콘티와 평가 지표",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2607.14202/gradient.png",
+      "media_type": "image",
+      "media_label": "원문 페이지에서 가져온 이미지",
+      "quality": "A",
+      "url": "https://huggingface.co/papers/2607.14202",
+      "links": {
+        "논문": "https://arxiv.org/abs/2607.14202"
+      }
+    },
+    {
+      "category": "에이전트 / 코딩",
+      "source_name": "OpenAI YouTube",
+      "published_at": "2026-07-16T18:00:16+00:00",
+      "title_ko": "ChatGPT가 컴퓨터에서 작업을 끝내는 에이전트형 사용법을 공개 영상으로 설명",
+      "summary_ko": "OpenAI는 ChatGPT가 사용자의 컴퓨터에서 여러 단계 작업을 수행하는 방식을 설명하는 영상을 공개했습니다. 브라우징, 문서 정리, 반복 입력처럼 손이 많이 가는 작업을 대화형 지시와 실행으로 연결하는 에이전트형 인터페이스가 핵심입니다.",
+      "insight_ko": "디자이너와 교육자는 자료 수집, 폴더 정리, 간단한 양식 입력, 수업 준비 체크리스트 같은 반복 업무를 자동화하는 실험을 해볼 수 있습니다. 대신 화면 조작 권한이 넓어질수록 개인정보 노출, 잘못된 클릭, 유료 결제 같은 위험도 커지므로 별도 작업 계정과 승인 단계가 필요합니다.",
+      "image_prompt_ko": "대화형 AI가 컴퓨터 작업을 단계별로 돕는 화면",
+      "media_url": "https://www.youtube.com/watch?v=dB6pOolO7io",
+      "media_type": "video",
+      "media_label": "원문/공개 영상에서 가져온 영상",
+      "quality": "B",
+      "url": "https://www.youtube.com/watch?v=dB6pOolO7io",
+      "links": {}
+    },
+    {
+      "category": "정책·저작권",
+      "source_name": "OpenAI",
+      "published_at": "2026-07-17T10:00:00+00:00",
+      "title_ko": "OpenAI, AI 시대를 평가할 ‘스코어카드’가 필요하다고 제안",
+      "summary_ko": "OpenAI는 AI가 경제, 교육, 안전, 생산성에 미치는 영향을 단일 성과 지표가 아니라 여러 항목의 스코어카드로 보자는 글을 냈습니다. 핵심은 모델 성능 순위만으로는 사회적 효용과 위험을 설명하기 어렵고, 실제 사용 결과와 제도적 대응을 함께 추적해야 한다는 주장입니다.",
+      "insight_ko": "학교와 창작 조직은 AI 도입을 ‘더 빨라졌는가’만이 아니라 학습 품질, 저작권 분쟁, 접근성, 노동 부담 변화까지 함께 기록하는 방식으로 평가할 수 있습니다. 다만 기업이 제안한 지표는 이해관계가 반영될 수 있으므로, 현장 사용자와 독립 연구자의 기준을 함께 놓고 보는 균형이 중요합니다.",
+      "image_prompt_ko": "AI 시대의 교육과 창작 영향을 여러 지표로 평가하는 스코어카드",
+      "image_url": "https://openai.com/favicon.ico",
+      "media_type": "image",
+      "media_label": "원문 페이지에서 가져온 이미지",
+      "quality": "B",
+      "url": "https://openai.com/index/a-scorecard-for-the-ai-age",
+      "links": {}
+    },
+    {
+      "category": "하드웨어 / 인프라",
+      "source_name": "r/LocalLLaMA",
+      "published_at": "2026-07-19T19:00:20+00:00",
+      "title_ko": "Hugging Face 보안 사고 논의, AI 에이전트 시대의 제작 도구 신뢰 문제를 드러내다",
+      "summary_ko": "LocalLLaMA 커뮤니티에는 Hugging Face 보안 사고 보고서를 둘러싸고, 공격과 방어 양쪽에서 AI 에이전트가 쓰인 정황을 논의하는 글이 올라왔습니다. 게시글의 요지는 AI가 보안 탐지와 분석을 돕는 동시에, 자동화된 공격 흐름도 더 빠르게 만들 수 있다는 문제입니다.",
+      "insight_ko": "크리에이터 팀이 모델 허브, 플러그인, 워크플로우 노드를 가져다 쓸 때는 기능보다 출처 검증과 권한 범위 확인이 먼저가 됩니다. 특히 에이전트가 파일, API 키, 클라우드 저장소에 접근하는 환경에서는 실험용 계정 분리, 토큰 최소 권한, 설치 기록 관리가 실제 제작 리스크를 줄입니다.",
+      "image_prompt_ko": "AI 에이전트와 창작 도구 공급망 보안을 상징하는 일러스트",
+      "image_url": "assets/openai_codex_gpt-image-2-high_20260720_100631_e722303c.png",
       "media_type": "image",
       "media_label": "관련 이미지를 생성했습니다",
       "quality": "B",
-      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPd0h3ZlIzN3NlbjNYLUxLYjBjRGEwRUVpZ2U4X3FJdTJtVUNqRkpNeEJDMmxQWlRobVJFSW5PNVVlWjdXRlRNaHFyZ2QyTU51blJ6WDBnb0N6Y04tbm5zc3VSRGFvSzlPWjFXd2NldDNwR2ttMXR3RmpLZlJiSjhxcXZIQQ?oc=5",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1v0ywoi/huggingface_security_incident_report_the_attacker/",
       "links": {}
     }
   ],
   "curation": {
-    "writer": "manual-public-curation",
-    "required_inbox": "none for 2026-07-19",
-    "date_checked": "2026-07-19 10:00:50 KST (+0900)"
+    "writer": "manual-public-curator",
+    "mode": "scheduled_digest_run_with_verified_candidates",
+    "source_json": "output/digest_2026-07-20_public.json"
   }
 }
