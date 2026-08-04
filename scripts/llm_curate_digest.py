@@ -327,14 +327,14 @@ def digest_entries(current: datetime | None = None, limit: int = 10) -> list[dic
             entries_by_date[date] = {
                 'date': date,
                 'title': f'{dotted} 다이제스트',
-                'url': f'https://art-seongha-art.github.io/creator-ai-digest/archive/{path.name}',
+                'url': f'/creator-ai-digest/archive/{path.name}',
             }
     if current is not None:
         current_key = current.strftime('%Y-%m-%d')
         entries_by_date[current_key] = {
             'date': current_key,
             'title': f'{current.strftime("%Y.%m.%d")} 다이제스트',
-            'url': 'https://art-seongha-art.github.io/creator-ai-digest/',
+            'url': '/creator-ai-digest/',
         }
     entries = sorted(entries_by_date.values(), key=lambda x: x['date'], reverse=True)
     return entries[:limit]
