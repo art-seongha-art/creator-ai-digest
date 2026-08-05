@@ -1,121 +1,114 @@
 {
-  "title": "창작자를 위한 AI 다이제스트",
+  "date": "2026-08-05",
+  "url": "https://art-seongha-art.github.io/creator-ai-digest/",
   "items": [
     {
-      "category": "LLM / 모델",
+      "category": "수업·워크숍 아이디어",
       "source_name": "OpenAI News",
-      "published_at": "2026-08-03T07:00:00+00:00",
-      "title_ko": "GPT Live의 ‘끊기지 않는 음성 대화’가 제작 도구 안으로 들어올 준비",
-      "summary_ko": "OpenAI는 GPT Live 기반의 실시간 음성 시스템을 여섯 달 동안 구축한 과정을 공개했다. 핵심은 사용자가 말하는 도중에도 모델이 맥락을 유지하고, 지연을 줄이며, 자연스럽게 끼어들거나 기다릴 수 있게 만드는 스트리밍 구조다. 음성 AI가 단순 받아쓰기에서 벗어나 회의, 튜터링, 리허설, 편집 피드백처럼 흐름이 중요한 작업에 가까워지고 있음을 보여준다.",
-      "insight_ko": "교육자와 영상·팟캐스트 제작자는 대본 리허설, 인터뷰 질문 연습, 실시간 피드백 보조처럼 ‘말하면서 고치는’ 워크플로를 설계해볼 수 있다. 다만 음성은 감정과 개인정보가 많이 담기므로 녹음 동의, 보관 기간, 오류가 난 발화를 사람이 다시 확인하는 절차가 필요하다. 특히 수업에서는 AI가 학생 발화를 평가하는 기준을 투명하게 설명해야 신뢰를 잃지 않는다.",
-      "image_prompt_ko": "실시간 음성 AI가 팟캐스트 녹음실과 온라인 수업에서 대화를 보조하는 장면",
-      "image_url": "assets/generated-gpt-live-voice-20260804.png",
-      "media_url": "assets/generated-gpt-live-voice-20260804.png",
+      "published_at": "2026-08-04T00:00:00+00:00",
+      "title_ko": "ChatGPT Work·Codex 교육 플러그인: 수업 자료와 에이전트 실습을 한데 묶다",
+      "summary_ko": "OpenAI는 ChatGPT Work와 Codex에서 쓸 수 있는 교육용 플러그인 3종을 공개했다. 이 플러그인은 교사, 대학 교육자, 학생이 선택한 수업 자료와 맥락을 바탕으로 학습, 연구, 코딩·제작 과제를 시작할 수 있게 앱, 역할별 스킬, 지침, 워크플로를 묶어 제공한다. 복잡한 프롬프트를 매번 새로 짜기보다 수업 단위의 에이전트 작업 틀을 배포하려는 흐름으로 볼 수 있다.",
+      "insight_ko": "교육자와 워크숍 진행자는 과제 분석, 자료 요약, 코드 리뷰, 프로젝트 피드백 같은 반복 절차를 플러그인 형태의 체크리스트로 설계해볼 수 있다. 다만 학생 결과물을 AI가 대신 완성하지 않도록 중간 산출물, 출처 기록, 사람이 판단한 수정 이유를 함께 제출하게 하는 장치가 필요하다. 학교나 기관에서는 계정 권한, 자료 업로드 범위, 학생 개인정보 처리 기준을 먼저 정해야 안전하게 쓸 수 있다.",
+      "image_prompt_ko": "교실과 제작 워크숍에서 교육자와 학생들이 AI 에이전트로 수업 자료와 프로토타입을 정리하는 장면",
+      "image_url": "assets/generated-openai-education-20260805.png",
+      "media_url": "assets/generated-openai-education-20260805.png",
       "media_type": "image",
       "media_label": "관련 이미지를 생성했습니다",
       "quality": "A",
-      "url": "https://openai.com/index/continuous-voice-interaction-with-gpt-live",
+      "url": "https://openai.com/index/learn-teach-chatgpt-work-codex",
       "links": {
-        "OpenAI 발표": "https://openai.com/index/continuous-voice-interaction-with-gpt-live"
+        "OpenAI 발표": "https://openai.com/index/learn-teach-chatgpt-work-codex"
+      }
+    },
+    {
+      "category": "영상",
+      "source_name": "Runway News",
+      "published_at": "2026-08-03T17:36:41+00:00",
+      "title_ko": "NVIDIA가 말한 미디어·엔터테인먼트용 AI: ‘도구’보다 새로운 연산 방식에 가깝다",
+      "summary_ko": "Runway는 NVIDIA의 Richard Kerris와 진행한 대화를 통해 실시간 생성, 지시를 이해하는 에이전트, 미디어 제작 파이프라인에서 AI가 맡을 역할을 소개했다. 핵심 메시지는 AI가 특정 앱 하나의 기능이 아니라, 렌더링·시뮬레이션·편집·배포 전반을 바꾸는 새로운 컴퓨팅 방식이라는 점이다. 영상 제작자는 생성 모델을 후반 작업 플러그인으로만 보지 않고, 기획 단계부터 반복 실험을 빠르게 만드는 제작 환경으로 다루게 된다.",
+      "insight_ko": "스튜디오와 교육 현장은 콘티, 프리비즈, 테스트 컷, 버전 비교처럼 실패 비용이 낮은 단계부터 실시간 생성 도구를 넣어볼 수 있다. 반대로 최종 결과물에 바로 적용하면 스타일 일관성, 저작권, 배우·목소리 동의, 품질 검수 문제가 커질 수 있다. 수업에서는 ‘AI가 만든 장면’보다 어떤 의사결정을 빠르게 시험하게 해주는지에 초점을 맞추면 더 생산적인 실습이 된다.",
+      "image_prompt_ko": "영상 스튜디오에서 실시간 생성 AI와 렌더링 파이프라인을 함께 검토하는 제작팀",
+      "image_url": "https://d3phaj0sisr2ct.cloudfront.net/site/images/sanity/2026/07/073026-casestudy-06-9663d2ef-3007-44fe-9b6f-52f058271253.png",
+      "media_url": "https://d3phaj0sisr2ct.cloudfront.net/site/images/sanity/2026/07/073026-casestudy-06-9663d2ef-3007-44fe-9b6f-52f058271253.png",
+      "media_type": "image",
+      "media_label": "원문 페이지에서 가져온 이미지",
+      "quality": "A",
+      "url": "https://runway.com/news/customers/nvidia-nyc-summit-2026",
+      "links": {
+        "Runway 인터뷰": "https://runway.com/news/customers/nvidia-nyc-summit-2026"
+      }
+    },
+    {
+      "category": "정책·저작권",
+      "source_name": "TechCrunch",
+      "published_at": "2026-08-04T20:05:26+00:00",
+      "title_ko": "오픈웨이트 모델은 프런티어에 가까워졌지만, 안전 격차도 함께 보인다",
+      "summary_ko": "TechCrunch는 SaferAI 보고서를 인용해 Z.ai의 오픈웨이트 GLM-5.2가 프런티어 모델 수준에 가까운 능력을 보이지만 안전 완화 장치는 상대적으로 부족하다고 전했다. 공개 가중치 모델은 연구와 제품 실험의 접근성을 높이지만, 한 번 배포되면 사용 방식과 재배포를 통제하기 어렵다. 성능 경쟁이 빨라질수록 모델 카드, 평가 결과, 위험한 기능 제한을 어떻게 공개하고 검증할지가 더 중요해진다.",
+      "insight_ko": "창작자와 디자인 스튜디오는 오픈웨이트 모델을 번역, 자료 분류, 초안 생성처럼 낮은 위험 작업부터 비교하며 비용과 품질을 확인할 수 있다. 하지만 공개 모델이라는 말이 곧 상업 이용 가능, 저작권 안전, 개인정보 안전을 뜻하지는 않는다. 작품·수업 자료·클라이언트 데이터를 넣기 전에는 라이선스, 데이터 저장 위치, 금지 용도, 편향·유해 출력 대응 절차를 별도로 점검해야 한다.",
+      "image_prompt_ko": "크리에이티브 스튜디오에서 오픈웨이트 AI 모델의 안전성과 라이선스를 검토하는 장면",
+      "image_url": "https://techcrunch.com/wp-content/uploads/2026/08/Z.ai-GLM-5.2-chat.png?resize=1200,576",
+      "media_url": "https://techcrunch.com/wp-content/uploads/2026/08/Z.ai-GLM-5.2-chat.png?resize=1200,576",
+      "media_type": "image",
+      "media_label": "원문 페이지에서 가져온 이미지",
+      "quality": "A",
+      "url": "https://techcrunch.com/2026/08/04/open-weight-ai-models-are-catching-up-to-the-frontier-the-safety-gap-remains/",
+      "links": {
+        "원문": "https://techcrunch.com/2026/08/04/open-weight-ai-models-are-catching-up-to-the-frontier-the-safety-gap-remains/"
       }
     },
     {
       "category": "바로 써볼 AI 도구",
       "source_name": "TechCrunch",
-      "published_at": "2026-08-03T18:43:43+00:00",
-      "title_ko": "Apple의 새 Siri 평가: ‘좋은 기본 비서’만으로는 부족해진 AI 도구 경쟁",
-      "summary_ko": "TechCrunch는 Apple의 AI 개편 이후 Siri가 드디어 더 제대로 된 어시스턴트처럼 작동하지만, 시장 기대에 비하면 다소 늦고 평범하게 느껴진다고 평가했다. 일정, 앱 실행, 정보 검색처럼 기본 작업의 품질은 중요하지만, 사용자는 이미 문서 작성, 이미지·음성 생성, 복잡한 업무 자동화까지 기대하고 있다. 모바일 AI가 창작자의 일상 도구가 되려면 단순 답변보다 앱 사이의 실제 작업 흐름을 얼마나 이어주는지가 관건이다.",
-      "insight_ko": "크리에이터와 교육자는 휴대폰 비서를 아이디어 메모, 촬영 체크리스트, 일정 정리, 현장 자료 검색처럼 낮은 위험 작업에 먼저 써보는 편이 현실적이다. 다만 음성 비서는 실수로 메시지를 보내거나 민감한 정보를 읽을 수 있으므로, 공개 발송·결제·파일 삭제 같은 단계에는 확인 절차가 필요하다. 플랫폼별 AI 기능이 달라질수록 수업 자료나 제작 매뉴얼은 특정 앱 이름보다 ‘검토 가능한 자동화’ 원칙으로 설계하는 것이 좋다.",
-      "image_prompt_ko": "모바일 AI 비서가 촬영 일정과 창작 체크리스트를 정리하는 장면",
-      "image_url": "https://techcrunch.com/wp-content/uploads/2026/06/Screenshot-2026-06-08-at-1.42.13-PM.png?w=808",
-      "media_url": "https://techcrunch.com/wp-content/uploads/2026/06/Screenshot-2026-06-08-at-1.42.13-PM.png?w=808",
+      "published_at": "2026-08-04T19:34:34+00:00",
+      "title_ko": "Wrinkles: 주변 장소의 숨은 이야기를 들려주는 AI 오디오 투어 앱",
+      "summary_ko": "TechCrunch는 iOS와 Android에서 제공되는 Wrinkles를 소개했다. 이 앱은 사용자의 위치 주변에 있는 역사, 지역 이야기, 잘 알려지지 않은 맥락을 AI가 오디오 투어처럼 들려주는 방식으로 구성된다. 여행·도시 산책·전시 관람에서 검색창을 열지 않고도 장소 기반 내러티브를 발견하게 만드는 사례다.",
+      "insight_ko": "전시 기획자, 로컬 크리에이터, 교육자는 장소 리서치와 오디오 스토리텔링 수업의 레퍼런스로 활용할 수 있다. 학생들에게 같은 장소를 두고 AI가 제안한 이야기와 실제 사료·주민 인터뷰를 비교하게 하면, ‘그럴듯한 설명’과 검증된 기록의 차이를 배우기 좋다. 위치 데이터와 지역 문화 해석이 걸려 있으므로 출처 확인, 민감한 장소의 공개 범위, 잘못된 역사 서술을 수정하는 절차가 중요하다.",
+      "image_prompt_ko": "도시 골목을 걸으며 AI 오디오 투어로 장소의 숨은 이야기를 듣는 사람들",
+      "image_url": "https://techcrunch.com/wp-content/uploads/2026/08/Great-British-Image.png?resize=1200,675",
+      "media_url": "https://techcrunch.com/wp-content/uploads/2026/08/Great-British-Image.png?resize=1200,675",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
       "quality": "B",
-      "url": "https://techcrunch.com/2026/08/03/apple-finally-fixed-siri-so-why-does-it-feel-anticlimactic/",
+      "url": "https://techcrunch.com/2026/08/04/meet-wrinkles-an-ai-app-that-uncovers-the-hidden-stories-of-the-places-around-you/",
       "links": {
-        "원문": "https://techcrunch.com/2026/08/03/apple-finally-fixed-siri-so-why-does-it-feel-anticlimactic/"
+        "원문": "https://techcrunch.com/2026/08/04/meet-wrinkles-an-ai-app-that-uncovers-the-hidden-stories-of-the-places-around-you/"
       }
     },
     {
-      "category": "창작·디자인 사례",
-      "source_name": "TechCrunch",
-      "published_at": "2026-08-03T19:28:57+00:00",
-      "title_ko": "Design Arena 투자 유치: AI 모델 평가에 ‘취향’과 디자인 감각을 넣으려는 시도",
-      "summary_ko": "TechCrunch는 Design Arena 제작자들이 790만 달러 투자를 유치했다고 보도했다. Design Arena는 이용자들이 두 결과물을 비교해 더 나은 디자인을 고르는 방식으로 모델의 미적 품질과 사용감을 평가하는 플랫폼이다. 텍스트 정확도만 보던 AI 평가가 레이아웃, 브랜드 감각, 시각적 설득력 같은 창작 기준으로 확장되는 흐름이다.",
-      "insight_ko": "디자이너와 교육자는 학생 작업이나 AI 시안 비교 수업에서 ‘왜 이 결과가 더 낫다고 느끼는가’를 언어화하는 평가 루브릭을 만들 수 있다. 이런 데이터가 모델 개선에 쓰이면 더 세련된 시안 생성이 가능해지지만, 다수 취향이 소수 문화나 실험적 스타일을 밀어낼 위험도 있다. 창작 현장에서는 점수보다 선택 이유와 맥락을 함께 기록하는 방식이 더 안전하다.",
-      "image_prompt_ko": "두 AI 디자인 시안을 비교하며 취향과 품질을 평가하는 크리에이티브 리뷰 보드",
-      "image_url": "https://techcrunch.com/wp-content/uploads/2026/08/Screenshot-2026-08-03-at-12.31.35-PM.jpg?resize=1200,739",
-      "media_url": "https://techcrunch.com/wp-content/uploads/2026/08/Screenshot-2026-08-03-at-12.31.35-PM.jpg?resize=1200,739",
+      "category": "음악 / 오디오",
+      "source_name": "arXiv",
+      "published_at": "2026-08-03T00:00:00+00:00",
+      "title_ko": "SwanTale: 대사·효과음·노래·음악을 한 모델에서 다루려는 오디오 생성 연구",
+      "summary_ko": "SwanTale 논문은 지시 기반 생성과 제로샷 생성 모두에서 여러 화자의 말, 일반 오디오, 간헐적 노래, 음악을 하나의 네트워크로 다루는 방식을 제안한다. 목표는 음성 구간의 내용, 억양, 화자 연속성을 유지하면서도 장면에 필요한 효과음과 음악적 요소를 함께 생성하는 것이다. 아직 연구 단계이지만, 오디오 제작 파이프라인이 ‘TTS 따로, 효과음 따로, 음악 따로’에서 통합 프롬프트 기반으로 이동할 가능성을 보여준다.",
+      "insight_ko": "팟캐스트, 애니메이션, 게임 사운드 수업에서는 한 장면의 대사·배경음·효과음·음악을 한 번에 설계하는 실습 아이디어로 연결할 수 있다. 다만 실제 제작에서는 목소리 권리, 음악 저작권, 화자 유사도, 장면별 믹싱 품질을 사람이 따로 검수해야 한다. 특히 배우나 학생의 목소리를 흉내 내는 실험은 사전 동의와 사용 범위를 명확히 정하지 않으면 윤리적 문제가 커질 수 있다.",
+      "image_prompt_ko": "하나의 AI 오디오 모델이 대사, 효과음, 노래, 음악 레이어를 함께 생성하는 제작 데스크",
+      "image_url": "assets/generated-swantale-audio-20260805.png",
+      "media_url": "assets/generated-swantale-audio-20260805.png",
       "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
+      "media_label": "관련 이미지를 생성했습니다",
       "quality": "A",
-      "url": "https://techcrunch.com/2026/08/03/designarena-creators-raise-7-9-million-to-bring-taste-to-ai-models/",
+      "url": "https://arxiv.org/html/2608.02023",
       "links": {
-        "원문": "https://techcrunch.com/2026/08/03/designarena-creators-raise-7-9-million-to-bring-taste-to-ai-models/"
-      }
-    },
-    {
-      "category": "3D / 공간",
-      "source_name": "Google DeepMind Blog",
-      "published_at": "2026-07-30T16:00:00+00:00",
-      "title_ko": "Gemini Robotics 2, 손끝 동작과 전신 제어를 함께 다루는 로봇 모델 공개",
-      "summary_ko": "Google DeepMind는 Gemini Robotics 2가 걷기, 웅크리기, 팔 뻗기, 물체 조작을 한 흐름 안에서 추론하도록 설계됐다고 소개했다. 발표는 손과 그리퍼의 세밀한 조작, 여러 로봇의 협업, 새로운 로봇 몸체에 더 빠르게 적응하는 방향을 강조한다. 로봇 연구 뉴스이지만, 캐릭터 모션과 인터랙티브 설치에서 ‘몸 전체가 생각하며 움직이는’ 표현을 상상하게 만드는 사례다.",
-      "insight_ko": "게임·애니메이션·미디어아트 제작자는 캐릭터가 목표 지점으로만 이동하는 대신 균형, 손 사용, 주변 사물과의 관계를 함께 고려하는 모션 설계를 참고할 수 있다. 교육에서는 로봇 영상을 보고 동작을 ‘인지-계획-실행-안전’ 단계로 나누어 분석하는 워크숍이 가능하다. 실제 공연이나 전시장 적용에는 센서 지연, 충돌, 관객 안전 문제가 남아 있으므로 시뮬레이션 결과를 그대로 믿어서는 안 된다.",
-      "image_prompt_ko": "휴머노이드 로봇이 방 안에서 전신 균형과 손동작을 함께 조절하는 장면",
-      "image_url": "https://lh3.googleusercontent.com/VZ5KwQMxv9xBcQnYipsQB2EUj3oX1yvFYLktIamY8V2a76Y6ctEEuaLF59TuPdnaVn6OAMINDilqnuhju1O-AXc7QlOVmcogjskrWxS7xVQ1mc5S7g=w1200-h630-n-nu-rw",
-      "media_url": "https://lh3.googleusercontent.com/VZ5KwQMxv9xBcQnYipsQB2EUj3oX1yvFYLktIamY8V2a76Y6ctEEuaLF59TuPdnaVn6OAMINDilqnuhju1O-AXc7QlOVmcogjskrWxS7xVQ1mc5S7g=w1200-h630-n-nu-rw",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "A",
-      "url": "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/",
-      "links": {
-        "Google DeepMind 발표": "https://deepmind.google/blog/gemini-robotics-2-brings-whole-body-intelligence-to-robots/"
+        "논문": "https://arxiv.org/html/2608.02023"
       }
     },
     {
       "category": "LLM / 모델",
-      "source_name": "The Verge",
-      "published_at": "2026-08-03T11:01:11+00:00",
-      "title_ko": "Alibaba Qwen3.8-Max 공개: 오픈웨이트 모델 경쟁이 다시 빨라진다",
-      "summary_ko": "The Verge는 Alibaba가 Qwen3.8-Max를 공개하며 Claude, OpenAI 모델, 중국 내 경쟁 모델과 비교되는 성능을 주장했다고 전했다. 중요한 점은 대형 모델 성능 경쟁이 폐쇄형 API만이 아니라 공개 가중치와 로컬·프라이빗 배포 선택지로도 확장되고 있다는 것이다. 창작 도구 회사와 스튜디오는 비용, 데이터 통제, 언어 지원을 놓고 더 많은 조합을 검토하게 된다.",
-      "insight_ko": "디자인 스튜디오나 교육기관은 공개 모델을 바로 운영하기보다 번역, 자료 분류, 수업용 챗봇 같은 낮은 위험 업무부터 비교 평가해볼 수 있다. 오픈웨이트라는 말이 곧 무료·안전·상업 사용 가능을 뜻하지는 않으므로 라이선스, 모델 크기, GPU 비용, 개인정보 처리 조건을 따로 확인해야 한다. 한국어·시각 자료 설명 품질은 벤치마크와 실제 작업 사이에 차이가 날 수 있다.",
-      "image_prompt_ko": "오픈웨이트 대형 언어 모델을 여러 창작 도구와 연결해 비교하는 스튜디오",
-      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/gettyimages-2266883826.jpg?quality=90&strip=all&crop=0%2C10.737892056687%2C100%2C78.524215886627&w=1200",
-      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/gettyimages-2266883826.jpg?quality=90&strip=all&crop=0%2C10.737892056687%2C100%2C78.524215886627&w=1200",
+      "source_name": "OpenAI News",
+      "published_at": "2026-08-04T19:00:00+00:00",
+      "title_ko": "제3자 사이버 평가 공개: AI 모델 검증도 ‘누가, 어떤 조건에서’ 했는지가 중요해진다",
+      "summary_ko": "OpenAI는 자사 모델을 대상으로 한 제3자 사이버 보안 평가와 관련된 사건을 설명하고, 향후 평가 절차와 보호 장치를 강화하겠다고 밝혔다. 고성능 모델은 외부 연구자와 기관의 검증을 받아야 하지만, 평가 과정 자체가 민감한 기능과 취약점을 다룰 수 있다는 점이 드러난 사례다. 모델 성능뿐 아니라 평가 계약, 접근 권한, 결과 공개 방식도 신뢰의 일부가 되고 있다.",
+      "insight_ko": "창작 도구를 운영하는 팀은 모델을 도입할 때 ‘유명한 모델인가’보다 어떤 독립 평가와 레드팀 검증을 거쳤는지 확인해야 한다. 특히 사용자 업로드 파일, 비공개 프로젝트, 수업 데이터가 들어가는 서비스라면 보안 평가 범위와 사고 대응 절차를 문서로 남기는 것이 좋다. 공개 자료만으로 모든 위험을 판단하기는 어려우므로, 중요한 워크플로에는 사람이 검토하고 로그를 점검하는 단계가 필요하다.",
+      "image_prompt_ko": "AI 모델 검증 회의에서 외부 평가 결과와 보안 체크리스트를 검토하는 장면",
+      "image_url": "assets/generated-openweight-safety-20260805.png",
+      "media_url": "assets/generated-openweight-safety-20260805.png",
       "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
+      "media_label": "관련 이미지를 생성했습니다",
       "quality": "B",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/974342/alibaba-qwen-max-open-weight-ai",
+      "url": "https://openai.com/index/third-party-cyber-evaluations-involving-openai-models",
       "links": {
-        "원문": "https://www.theverge.com/ai-artificial-intelligence/974342/alibaba-qwen-max-open-weight-ai"
-      }
-    },
-    {
-      "category": "창작·디자인 사례",
-      "source_name": "TechCrunch",
-      "published_at": "2026-08-03T19:09:56+00:00",
-      "title_ko": "OpenAI 인플루언서 초청 논란, AI 브랜드와 창작자 협업의 투명성 문제를 드러내다",
-      "summary_ko": "TechCrunch는 OpenAI가 처음 진행한 인플루언서 중심 브랜드 여행이 온라인 반발을 불렀다고 보도했다. 생성 AI가 창작 노동과 저작권 논쟁의 한가운데에 있는 상황에서, 크리에이터 마케팅이 충분한 설명 없이 ‘호화 초청’ 이미지로 보이면 신뢰를 잃기 쉽다. AI 기업과 창작자 사이의 협찬 관계도 일반 광고보다 더 높은 투명성을 요구받는다는 신호다.",
-      "insight_ko": "콘텐츠 제작자는 AI 도구 협찬을 받을 때 사용 경험, 보상 여부, 한계와 비판 지점을 명확히 밝히는 편이 장기적으로 안전하다. 교육 현장에서는 학생들에게 ‘도구 리뷰’와 ‘광고성 콘텐츠’를 구분하는 표시 기준을 토론하게 만들 수 있다. AI에 대한 사회적 긴장이 큰 만큼, 브랜드 협업은 기능 소개보다 창작자 권리와 데이터 사용 질문에 답할 준비가 되어 있어야 한다.",
-      "image_prompt_ko": "AI 브랜드 행사와 크리에이터 리뷰 화면을 둘러싼 투명성 논쟁",
-      "image_url": "https://techcrunch.com/wp-content/uploads/2024/05/GettyImages-1502799666.jpg?resize=1200,633",
-      "media_url": "https://techcrunch.com/wp-content/uploads/2024/05/GettyImages-1502799666.jpg?resize=1200,633",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "B",
-      "url": "https://techcrunch.com/2026/08/03/influencers-draw-backlash-for-attending-openais-first-luxury-trip/",
-      "links": {
-        "원문": "https://techcrunch.com/2026/08/03/influencers-draw-backlash-for-attending-openais-first-luxury-trip/"
+        "OpenAI 발표": "https://openai.com/index/third-party-cyber-evaluations-involving-openai-models"
       }
     }
-  ],
-  "period": {
-    "start": "2026-07-25T01:00:18+00:00",
-    "end": "2026-08-04T01:00:18+00:00"
-  },
-  "curation": {
-    "writer": "manual-public-curation",
-    "mode": "verified_creator_digest_copy"
-  }
+  ]
 }
