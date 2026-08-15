@@ -1,119 +1,111 @@
 {
   "title": "창작자를 위한 AI 다이제스트",
   "period": {
-    "start": "2026-08-03T01:00:55+00:00",
-    "end": "2026-08-10T01:00:55+00:00"
+    "start": "2026-08-15T00:00:00+09:00",
+    "end": "2026-08-15T10:00:13+09:00"
+  },
+  "curation": {
+    "writer": "public-editor",
+    "date_rule": "live KST date from local date command"
   },
   "items": [
     {
-      "category": "영상",
-      "source_name": "Forbes",
-      "published_at": "2026-08-08T00:00:00+00:00",
-      "title_ko": "Higgsfield의 AI 장편 영화가 ‘초상권 라이선스’ 모델을 실험했다",
-      "summary_ko": "Forbes는 Higgsfield가 AI로 제작한 장편 영화 <The Cully Hill Boys>를 공개하며 유명인·크리에이터의 초상과 캐릭터를 허가받아 쓰는 방식을 전면에 내세웠다고 보도했다. 기사에 따르면 이 프로젝트는 단순한 데모 영상이 아니라 출연자 이미지 사용 계약, 배포, 수익 배분을 함께 시험하는 사례로 소개됐다.",
-      "insight_ko": "영상 제작자에게는 생성형 영상의 다음 쟁점이 ‘만들 수 있느냐’에서 ‘누구의 얼굴과 목소리를 어떤 조건으로 쓸 수 있느냐’로 옮겨가고 있음을 보여준다. 교육 현장에서는 AI 영화 제작 과제를 할 때 배우 동의서, 퍼블리시티권, 크레딧 표기, 수익 배분을 시나리오 단계부터 설계하게 하는 실습으로 연결할 수 있다.",
-      "image_prompt_ko": "AI 영화 시사회와 초상권 계약이 함께 진행되는 제작 현장",
-      "image_url": "https://imageio.forbes.com/specials-images/imageserve/6a768b22a3e7a504486b8bd8/0x0.jpg?format=jpg&crop=3897,2193,x0,y0,safe&height=900&width=1600&fit=bounds",
-      "media_url": "https://imageio.forbes.com/specials-images/imageserve/6a768b22a3e7a504486b8bd8/0x0.jpg?format=jpg&crop=3897,2193,x0,y0,safe&height=900&width=1600&fit=bounds",
+      "category": "이미지",
+      "source_name": "The Verge",
+      "published_at": "2026-08-14T16:39:32+00:00",
+      "title_ko": "Gemini와 Flow의 보이는 워터마크를 끌 수 있게 된다",
+      "summary_ko": "Google이 Gemini와 영상 생성 도구 Flow에서 결과물 오른쪽 아래에 붙던 ‘반짝이’ 형태의 보이는 워터마크를 사용자가 끌 수 있도록 바꿨습니다. 설정에서 Media watermark를 끄면 이미지·영상·음악 결과물의 눈에 보이는 표시가 사라지지만, SynthID 같은 비가시적 식별 기술은 별도로 유지되는 구조입니다.",
+      "insight_ko": "포트폴리오, 수업 자료, 클라이언트 시안처럼 화면 구성이 중요한 작업에서는 후반 편집 부담이 줄어듭니다. 다만 눈에 보이는 표식이 줄수록 출처 고지와 동의 확인 책임은 제작자 쪽으로 더 이동하므로, 공개물에는 사용 도구와 생성 범위를 별도 크레딧으로 남기는 습관이 필요합니다.",
+      "image_prompt_ko": "AI 이미지와 영상 워터마크 설정을 조정하는 창작 스튜디오 장면",
+      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/02/STK255_Google_Gemini_D.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/02/STK255_Google_Gemini_D.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
       "quality": "A",
-      "url": "https://www.forbes.com/sites/luisromero/2026/08/08/higgsfields-latest-ai-film-proves-likeness-licensing-works-and-scales/",
-      "links": {
-        "Inc 보도": "https://www.inc.com/victoria-salves/higgsfield-ai-just-debuted-first-fully-ai-generated-feature-film/91385305"
-      }
-    },
-    {
-      "category": "에이전트 / 코딩",
-      "source_name": "Anthropic / TechCrunch",
-      "published_at": "2026-08-09T19:20:32+00:00",
-      "title_ko": "Claude Code의 자동 모드가 기본값으로 바뀐다",
-      "summary_ko": "TechCrunch는 Anthropic이 8월 14일부터 Pro, Max, Team 계정의 Claude Code에서 자동 모드를 기본값으로 켠다고 전했다. 공식 설명은 반복 승인 절차를 줄여 더 긴 코딩 작업을 이어가게 하되, 위험한 명령은 분류기와 권한 설정으로 걸러내겠다는 방향이다.",
-      "insight_ko": "웹 전시, 인터랙티브 수업 자료, 소규모 앱을 만드는 창작자는 에이전트에게 파일 수정과 테스트 실행을 더 오래 맡기는 흐름을 준비해야 한다. 편리함이 커지는 만큼 저장소 권한, 삭제·배포 명령, 비공개 자료 접근 범위를 좁혀두고 변경 사항은 반드시 리뷰와 테스트를 통과시켜야 한다.",
-      "image_prompt_ko": "코딩 에이전트가 프로젝트 파일을 자동으로 수정하되 위험 명령은 안전 장치가 막는 화면",
-      "image_url": "https://techcrunch.com/wp-content/uploads/2026/04/GettyImages-2269811684.jpg?w=1024",
-      "media_url": "https://techcrunch.com/wp-content/uploads/2026/04/GettyImages-2269811684.jpg?w=1024",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "A",
-      "url": "https://techcrunch.com/2026/08/09/anthropic-is-turning-claude-codes-auto-mode-on-by-default/",
-      "links": {
-        "Anthropic 안내": "https://claude.com/blog/auto-mode-default-in-claude-code"
-      }
-    },
-    {
-      "category": "에이전트 / 코딩",
-      "source_name": "The Next Web",
-      "published_at": "2026-08-06T22:21:32+00:00",
-      "title_ko": "AI 에이전트 플러그인을 한 번 만들면 여러 도구에서 쓰게 하려는 표준이 나왔다",
-      "summary_ko": "The Next Web는 OpenAI와 여러 개발 도구 회사가 에이전트용 플러그인 표준을 발표했다고 전했다. 목표는 지시문, 스크립트, MCP 연결 정보를 하나의 패키지로 묶어 서로 다른 에이전트 환경에서 재사용하게 만드는 것이다.",
-      "insight_ko": "교육자와 미디어 제작자는 반복 작업용 도구를 특정 서비스 하나에 묶어두지 않고 수업·제작 워크플로별 ‘작업 키트’로 설계할 가능성을 볼 수 있다. 다만 표준이 곧바로 호환성과 보안을 보장하지는 않으므로, 외부 플러그인을 설치할 때 권한·실행 코드·데이터 이동 경로를 확인해야 한다.",
-      "image_prompt_ko": "여러 AI 에이전트 도구가 하나의 플러그인 패키지를 공유하는 네트워크 장면",
-      "image_url": "https://media.thenextweb.com/2026/07/bots-outnumber-humans-internet-ai-agents-traffic.jpg",
-      "media_url": "https://media.thenextweb.com/2026/07/bots-outnumber-humans-internet-ai-agents-traffic.jpg",
-      "media_type": "image",
-      "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "B",
-      "url": "https://thenextweb.com/news/openai-agent-plugins-open-standard-skills-mcp",
+      "url": "https://www.theverge.com/tech/980416/google-gemini-ai-watermarks-removal",
       "links": {}
     },
     {
-      "category": "3D / 공간",
-      "source_name": "Hugging Face Daily Papers",
-      "published_at": "2026-08-03T00:00:00+00:00",
-      "title_ko": "Meshy T2 논문: 게임·영상용 3D 메시 생성을 더 빠르게 만들려는 접근",
-      "summary_ko": "Hugging Face Daily Papers와 arXiv에 올라온 Meshy T2는 폴리곤 메시를 긴 토큰열로 순서대로 생성하는 대신, 플로 매칭 기반의 네이티브 메시 생성 프레임워크를 제안한다. 논문은 추론 속도와 오류 누적 문제를 줄여 영화, 게임, 인터랙티브 3D 파이프라인에 맞는 토폴로지와 다중 파트 메시 생성을 목표로 한다고 설명한다.",
-      "insight_ko": "3D 디자이너와 게임 교육자는 ‘이미지에서 3D’가 보기 좋은 미리보기에서 끝나지 않고 실제 편집 가능한 메시 품질로 가야 한다는 점을 토론하기 좋다. 아직 연구 단계이므로 바로 제작 표준으로 쓰기보다는 토폴로지, 리깅 가능성, 라이선스, 후처리 시간을 함께 검토하는 비교 실험 소재로 보는 편이 현실적이다.",
-      "image_prompt_ko": "3D 아티스트 작업대에서 흐름 기반 알고리즘이 폴리곤 메시를 생성하는 장면",
-      "image_url": "assets/meshy-t2-flow-mesh-20260810.png",
-      "media_url": "assets/meshy-t2-flow-mesh-20260810.png",
+      "category": "LLM / 모델",
+      "source_name": "OpenAI News",
+      "published_at": "2026-08-14T17:19:17+00:00",
+      "title_ko": "OpenAI, GPT-5.6 Sol용 ‘Ultrafast’ 모드를 예고했다",
+      "summary_ko": "OpenAI가 API에서 GPT-5.6 Sol을 최대 14배 빠르게 실행하는 Ultrafast 서비스 티어를 미리 공개했습니다. Cerebras 기반으로 초당 최대 750개 출력 토큰을 목표로 하며, 긴 대기시간이 치명적인 실시간 대화형 서비스와 제작 보조 도구를 겨냥한 발표입니다.",
+      "insight_ko": "창작 도구 안에서 프롬프트를 고치고, 장면 설명을 재작성하고, 수업 중 즉석 예시를 생성하는 흐름은 모델 품질만큼 반응 속도에 크게 좌우됩니다. 비용·가용 지역·품질 차이가 실제 도입의 관건이므로, 프로덕션 적용 전에는 일반 모드와 같은 프롬프트 세트로 응답 안정성과 단가를 함께 비교해야 합니다.",
+      "image_prompt_ko": "초고속 언어 모델 API가 창작 툴에 실시간으로 문장과 아이디어를 스트리밍하는 장면",
+      "image_url": "assets/openai-ultrafast-generated-20260815.png",
+      "media_url": "assets/openai-ultrafast-generated-20260815.png",
       "media_type": "image",
       "media_label": "관련 이미지를 생성했습니다",
       "quality": "A",
-      "url": "https://huggingface.co/papers/2607.28675",
-      "links": {
-        "arXiv": "https://arxiv.org/abs/2607.28675",
-        "GitHub": "https://github.com/meshy-dev/meshy-t2"
-      }
+      "url": "https://openai.com/index/previewing-ultrafast",
+      "links": {}
     },
     {
       "category": "음악 / 오디오",
       "source_name": "The Verge",
-      "published_at": "2026-08-07T20:01:51+00:00",
-      "title_ko": "‘Rubberz’ 논란이 AI 음악의 출처 표시 문제를 대중 사례로 만들었다",
-      "summary_ko": "The Verge는 Fenix Flexin의 곡 ‘Rubberz’가 Treblo(옛 Sonauto)로 만들어졌다는 의혹과 당사자의 반응을 다뤘다. Treblo 쪽 탐지 도구와 프로듀서들의 검증 영상이 겹치면서, AI로 만든 음악이 차트와 팬덤 안에서 어떻게 받아들여지는지가 논쟁이 됐다.",
-      "insight_ko": "음악 창작자는 AI 보컬·스타일 변환을 썼는지 숨기는 문제가 단순한 기술 논쟁이 아니라 신뢰와 크레딧의 문제라는 점을 확인할 수 있다. 수업에서는 같은 곡을 두고 생성 과정 공개, 샘플·모델 출처, 마케팅 문구가 청중의 판단을 어떻게 바꾸는지 비교해보는 토론 주제로 활용하기 좋다.",
-      "image_prompt_ko": "AI 음악 트랙의 생성 출처와 크레딧을 확인하는 음악 스튜디오 장면",
-      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/artworks-WsdIgVXV8NOV-0-t1080x1080.jpg?quality=90&strip=all&crop=0,23.821989528796,100,52.356020942408",
-      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/artworks-WsdIgVXV8NOV-0-t1080x1080.jpg?quality=90&strip=all&crop=0,23.821989528796,100,52.356020942408",
+      "published_at": "2026-08-13T16:00:00+00:00",
+      "title_ko": "Suno Studio 2.0, AI 음악 앱에서 제작 툴에 가까워진다",
+      "summary_ko": "Suno가 Studio 2.0을 공개하며 단순 생성·편집 앱에서 디지털 오디오 워크스테이션에 가까운 방향으로 기능을 확장했습니다. 핵심은 MIDI 지원, 챗봇 기반 편집, 커스텀 효과 등으로, 생성된 곡을 다시 편곡하고 구조화하는 후반 작업을 강화한 점입니다.",
+      "insight_ko": "음악을 ‘한 번 뽑고 끝’내는 방식보다, 멜로디·악기·구간을 나눠 수정하는 워크플로가 중요해지고 있습니다. 교육 현장에서는 AI 음악을 결과물보다 편곡·저작권·믹싱 판단을 토론하는 재료로 쓰기 좋지만, 학습 데이터와 권리 분쟁은 여전히 프로젝트 공개 범위를 정할 때 확인해야 할 리스크입니다.",
+      "image_prompt_ko": "AI 음악 생성 결과를 MIDI 트랙과 오디오 타임라인으로 편집하는 스튜디오",
+      "image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/Suno_Studio2.0_Press_Hero.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
+      "media_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/Suno_Studio2.0_Press_Hero.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
-      "quality": "B",
-      "url": "https://www.theverge.com/ai-artificial-intelligence/976801/fenix-flexin-rubberz-ai-song-treblo",
+      "quality": "A",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/979345/suno-studio-2-0-midi-chatbot-custom-effects",
       "links": {}
     },
     {
-      "category": "수업·워크숍 아이디어",
-      "source_name": "Ars Technica",
-      "published_at": "2026-08-09T18:12:01+00:00",
-      "title_ko": "Google WeatherNext 2가 허리케인 예보 시간을 하루 앞당겼다는 보도",
-      "summary_ko": "Ars Technica는 DeepMind의 WeatherNext AI 모델이 열대성 저기압 예측에서 기존 방식보다 평균 하루 더 이른 수준의 정확도를 보였다고 소개했다. 관련 논문은 Nature에 실렸고, 공개 저장소를 통해 모델과 자료를 살펴볼 수 있다는 점도 커뮤니티에서 주목받았다.",
-      "insight_ko": "창작자에게 직접적인 생성 도구는 아니지만, 데이터 시각화·과학 커뮤니케이션·재난 교육 콘텐츠를 만드는 사람에게는 강한 사례다. 예보 AI를 다룰 때는 ‘정확도가 높아졌다’는 메시지만 강조하기보다 불확실성, 지역별 대응 체계, 모델이 틀렸을 때의 책임을 함께 설명해야 한다.",
-      "image_prompt_ko": "허리케인 위성 이미지와 AI 예측 경로를 교육용 데이터 시각화로 보여주는 장면",
-      "image_url": "https://cdn.arstechnica.net/wp-content/uploads/2023/12/hurricane-1152x648.jpg",
-      "media_url": "https://cdn.arstechnica.net/wp-content/uploads/2023/12/hurricane-1152x648.jpg",
+      "category": "영상",
+      "source_name": "Kling AI Blog",
+      "published_at": "2026-08-13T15:08:38+00:00",
+      "title_ko": "Seedance 2.5, 30초 영상과 네이티브 오디오를 전면에 내세웠다",
+      "summary_ko": "Kling AI Blog와 관련 보도에 따르면 ByteDance의 Seedance 2.5는 최대 30초 분량의 영상 생성, 여러 이미지·텍스트 참조를 함께 쓰는 멀티모달 입력, 네이티브 오디오와 3D 프리비주얼라이제이션 기능을 강조합니다. 짧은 클립을 이어 붙이는 방식보다 한 번에 더 긴 장면 단위를 설계하려는 흐름이 뚜렷합니다.",
+      "insight_ko": "뮤직비디오, 전시 티저, 수업용 콘셉트 영상에서는 ‘장면 지속 시간’과 사운드 동기화가 곧 제작 가능성을 좌우합니다. 다만 긴 생성일수록 캐릭터 일관성, 컷 연결, 저작권 있는 참조 이미지 사용 문제가 커지므로, 공개 프로젝트에는 스토리보드·참조 출처·후반 편집 단계를 분리해 관리하는 편이 안전합니다.",
+      "image_prompt_ko": "여러 참조 이미지와 오디오 타임라인으로 30초 AI 영상을 만드는 스토리보드 작업대",
+      "image_url": "assets/seedance-generated-20260815.png",
+      "media_url": "assets/seedance-generated-20260815.png",
+      "media_type": "image",
+      "media_label": "관련 이미지를 생성했습니다",
+      "quality": "B",
+      "url": "https://klingaio.com/blogs/seedance-2_5-official-release",
+      "links": {
+        "관련 보도": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxPSW9zalB1N3lTM1hPdFpZdXphS3lpMVNYZFZIR0NzVE5mQXhBaFVwMmJITm1fdkphekRuN3puNXc3dnZiVURIR2Z2M1BxUmNQZ3QzRGNHRjhBMDA0Q29sTzdEajlqYXh4SXIxQ2JOZFIyZ1o1aGJic055OEc4dHZqYWl5WGhzRkxxcVB3Y3hJOVFJYU50QVdnTTREQVRoREM1aXBOSHRRdGdtLUh5ZVByTnJIdVBWUTVMMVRYdnlKdFJZaG5vWG5yYzAtTVBfTEJISGV5WXI1ZVNsRHRBOWxUblotWVBMWm1vLV96TC1VMnU?oc=5"
+      }
+    },
+    {
+      "category": "연구·논문",
+      "source_name": "arXiv cs.AI",
+      "published_at": "2026-08-13T17:59:57+00:00",
+      "title_ko": "AutoDesign, 논문을 포스터로 바꾸는 ‘디자인 에이전트’ 실험",
+      "summary_ko": "AutoDesign 논문은 긴 논문을 학회 포스터 같은 구조화된 시각 결과물로 바꾸는 과정을 장기 에이전트 작업으로 다룹니다. 연구진은 PosterBench를 만들고, 코드 에이전트가 반복 피드백을 받아 레이아웃·요약·시각 구성을 개선하는 DesignHarness를 학습시켜 상용 시스템보다 높은 평가를 얻었다고 보고했습니다.",
+      "insight_ko": "교수자와 디자이너에게 중요한 점은 ‘자동 포스터 생성’ 자체보다 복잡한 자료를 어떤 순서와 밀도로 재구성할지 에이전트가 반복 학습한다는 방향입니다. 실제 수업이나 전시 리서치에 쓸 때는 원문 이해 오류, 도표 재해석 오류, 시각 위계의 획일화를 사람이 검수해야 하며, 최종 디자인 판단까지 맡기기보다는 초안 생성기로 보는 것이 현실적입니다.",
+      "image_prompt_ko": "AI 에이전트가 논문, 도표, 이미지 자료를 학회 포스터 레이아웃으로 재구성하는 장면",
+      "image_url": "assets/autodesign-generated-20260815.png",
+      "media_url": "assets/autodesign-generated-20260815.png",
+      "media_type": "image",
+      "media_label": "관련 이미지를 생성했습니다",
+      "quality": "A",
+      "url": "https://arxiv.org/abs/2608.13560v1",
+      "links": {}
+    },
+    {
+      "category": "LLM / 모델",
+      "source_name": "TechCrunch",
+      "published_at": "2026-08-14T15:43:28+00:00",
+      "title_ko": "Meta의 Glimmer 공개, ‘열린 AI’ 논쟁을 다시 키웠다",
+      "summary_ko": "TechCrunch는 Meta가 이번 주 자체 하드웨어에서 내려받아 실행할 수 있는 오픈 웨이트 모델 Glimmer를 내놓았다고 전했습니다. 동시에 더 강력한 Muse Spark는 API 뒤에 남겨 두면서, ‘모두를 위한 AI’라는 메시지와 실제 공개 범위 사이의 간극이 논쟁이 되고 있습니다.",
+      "insight_ko": "로컬·개인 장비에서 돌릴 수 있는 모델은 창작자에게 비용 통제, 데이터 보안, 오프라인 실험이라는 장점을 줍니다. 하지만 오픈 웨이트라고 해서 학습 데이터, 라이선스, 상업 사용 조건이 모두 자유로운 것은 아니므로, 수업·클라이언트 작업에는 모델 카드와 사용 약관을 함께 확인해야 합니다.",
+      "image_prompt_ko": "오픈 웨이트 AI 모델을 개인 작업실 컴퓨터에서 실행하고 창작 도구와 연결하는 장면",
+      "image_url": "https://techcrunch.com/wp-content/uploads/2026/08/GettyImages-2239280474.jpg?resize=1200,800",
+      "media_url": "https://techcrunch.com/wp-content/uploads/2026/08/GettyImages-2239280474.jpg?resize=1200,800",
       "media_type": "image",
       "media_label": "원문 페이지에서 가져온 이미지",
       "quality": "B",
-      "url": "https://arstechnica.com/science/2026/08/deepminds-hurricane-model-bought-forecasters-an-extra-day/",
-      "links": {
-        "WeatherNext 저장소": "https://github.com/google-deepmind/weathernext"
-      }
+      "url": "https://techcrunch.com/video/does-mark-zuckerberg-really-believe-ai-is-for-everyone/",
+      "links": {}
     }
-  ],
-  "curation": {
-    "writer": "manual-public-curation",
-    "mode": "verified_candidate_and_web_sources",
-    "source_json": "output/digest_2026-08-10_candidates_raw.json"
-  }
+  ]
 }
