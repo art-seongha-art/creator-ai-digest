@@ -340,6 +340,37 @@ class BackendTests(unittest.TestCase):
             self.assertEqual((home / "args.txt").read_text().count("-i "), 2)
             self.assertIn("EDIT", (home / "prompt.txt").read_text())
 
+    @unittest.skipIf(os.name == "nt", "fake executable needs a POSIX shell")
+    def test_codex_backend_passes_absolute_workdir(self):
+        # Regression: a relative out path used to be passed to `-C` while cwd was
+        # already that folder -> codex exec failed with "No such file or directory".
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp).resolve()
+            home = tmp / "codex_home"
+            (home / "generated_images").mkdir(parents=True)
+            fake = tmp / "codex"
+            fake.write_text(textwrap.dedent(f"""\
+                #!/usr/bin/env python3
+                import sys, pathlib
+                from PIL import Image
+                args = sys.argv[1:]
+                sys.stdin.read()
+                c = pathlib.Path(args[args.index("-C") + 1])
+                o = pathlib.Path(args[args.index("-o") + 1])
+                assert c.is_absolute() and c.is_dir(), f"-C must be an absolute existing dir: {{c}}"
+                assert o.is_absolute(), f"-o must be absolute: {{o}}"
+                Image.new("RGB", (8, 8)).save(c / "face_01.png")
+                """), encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            cwd = os.getcwd()
+            os.chdir(tmp)
+            try:
+                backend = B.CodexBackend(codex_bin=str(fake), codex_home=home)
+                r = backend.generate("P", Path("out") / "face_01.png")
+                self.assertTrue(r.path.exists())
+            finally:
+                os.chdir(cwd)
+
     def test_codex_backend_missing_binary(self):
         backend = B.CodexBackend(codex_bin="definitely-not-a-real-codex-binary")
         with tempfile.TemporaryDirectory() as tmp:

@@ -5,6 +5,7 @@
     python -m browlab restyle   photo.jpg --styles straight,soft_arch,feathered
     python -m browlab calibrate
     python -m browlab presets
+    python -m browlab web       --port 8177 --password-file ~/.config/browlab/password.txt
 """
 from __future__ import annotations
 
@@ -25,6 +26,7 @@ from . import masks as M
 from . import presets as P
 from . import prompts as PR
 from . import sheet as S
+from . import web as W
 
 DEFAULT_OUT = Path("output") / "browlab"
 QUALITY_CHOICES = ["low", "medium", "high", "xhigh", "max", "auto"]
@@ -511,6 +513,12 @@ def build_parser() -> argparse.ArgumentParser:
     # presets ----------------------------------------------------------------
     p = sub.add_parser("presets", help="선택 가능한 값 목록을 보여줍니다")
     p.set_defaults(func=cmd_presets)
+
+    # web --------------------------------------------------------------------
+    w = sub.add_parser("web", help="브라우저/휴대폰용 웹 UI 서버를 띄웁니다",
+                       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    W.add_web_args(w)
+    w.set_defaults(func=W.cmd_web)
     return parser
 
 

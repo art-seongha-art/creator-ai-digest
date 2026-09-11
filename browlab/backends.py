@@ -148,6 +148,9 @@ class CodexBackend(BaseBackend):
             raise GenerationError(
                 f"Codex CLI not found ({self.codex_bin}). Install with `npm install -g @openai/codex` and run `codex login`."
             )
+        # codex resolves -C relative to its own cwd (which we also set to work_dir),
+        # so a relative work_dir would be looked up twice -> "No such file or directory".
+        work_dir = Path(work_dir).resolve()
         work_dir.mkdir(parents=True, exist_ok=True)
         last_msg = work_dir / ".browlab_last_message.txt"
         cmd = [
