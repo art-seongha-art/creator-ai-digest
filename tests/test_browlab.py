@@ -569,7 +569,14 @@ class BackendTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}):
             self.assertIsInstance(B.make_backend("codex"), B.FallbackBackend)   # key present: Codex first, then the API
             self.assertIsInstance(B.make_backend("codex-only"), B.CodexBackend)
-        self.assertIsInstance(B.make_backend("api"), B.OpenAIBackend)
+        api = B.make_backend("api")
+        self.assertIsInstance(api, B.FallbackBackend)  # API-only ladder, no Codex step
+        self.assertEqual(api.name, "api")
+        self.assertEqual([l for l, _ in api.attempts], [
+            "api:gpt-image-2.5-flare|gpt-image-2.5-sunburst", "api:gpt-image-2", "api:gpt-image-1.5", "api:gpt-image-1", "api:gpt-image-1-mini",
+        ])
+        self.assertEqual([l for l, _ in B.make_backend("api", model="gpt-image-1.5").attempts], ["api:gpt-image-1.5", "api:gpt-image-1", "api:gpt-image-1-mini"])
+        self.assertEqual([l for l, _ in B.make_backend("api", model="gpt-image-2.5-sunburst").attempts][0], "api:gpt-image-2.5-sunburst")
         self.assertIsInstance(B.make_backend("manual"), B.ManualBackend)
         with self.assertRaises(ValueError):
             B.make_backend("nope")
@@ -682,7 +689,9 @@ class FallbackBackendTests(unittest.TestCase):
             ])
             self.assertTrue(any("codex" in n for n in fb.notes))
             pinned = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model="gpt-image-2")
-            self.assertEqual([l for l, _ in pinned.attempts], ["api:gpt-image-2"])
+            self.assertEqual([l for l, _ in pinned.attempts], ["api:gpt-image-2", "api:gpt-image-1.5", "api:gpt-image-1", "api:gpt-image-1-mini"])
+            last = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model="gpt-image-1-mini")
+            self.assertEqual([l for l, _ in last.attempts], ["api:gpt-image-1-mini"])
             custom = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model_chain=["gpt-image-2", "gpt-image-1-mini"])
             self.assertEqual([l for l, _ in custom.attempts], ["api:gpt-image-2", "api:gpt-image-1-mini"])
             both = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model_chain=["gpt-image-2"], edit_model_chain=["gpt-image-2.5-sunburst"])

@@ -441,6 +441,7 @@ class FallbackBackend(BaseBackend):
     name = "auto"
 
     def __init__(self, attempts: Sequence[Tuple[str, BaseBackend]], notes: Sequence[str] = ()) -> None:
+        self.name = "auto"  # "api" for an API-only ladder (set by make_api_backend)
         self.attempts: List[Tuple[str, BaseBackend]] = list(attempts)
         self.skipped: Dict[str, str] = {}
         self.notes: List[str] = list(notes)
@@ -493,6 +494,57 @@ class FallbackBackend(BaseBackend):
         return self._try_all("edit", call)
 
 
+def _ladder_from(model: Optional[str], default_chain: Sequence[str]) -> List[str]:
+    """Models to try, starting at ``model`` and walking down the default ladder."""
+    if not model:
+        return list(default_chain)
+    if model in default_chain:
+        return list(default_chain[list(default_chain).index(model):])
+    return [model] + [m for m in default_chain if m != model]
+
+
+def _api_attempts(
+    gen_chain: Sequence[str], edit_chain: Sequence[str], *, api_key: Optional[str], timeout: int,
+) -> List[Tuple[str, BaseBackend]]:
+    attempts: List[Tuple[str, BaseBackend]] = []
+    for i in range(max(len(gen_chain), len(edit_chain))):
+        g = gen_chain[min(i, len(gen_chain) - 1)]
+        e = edit_chain[min(i, len(edit_chain) - 1)]
+        label = f"api:{g}" if g == e else f"api:{g}|{e}"
+        attempts.append((label, OpenAIBackend(model=g, edit_model=e, api_key=api_key, timeout=timeout)))
+    return attempts
+
+
+def _api_chains(
+    model: Optional[str], edit_model: Optional[str],
+    model_chain: Optional[Sequence[str]], edit_model_chain: Optional[Sequence[str]],
+) -> Tuple[List[str], List[str]]:
+    gen_chain = [m for m in (list(model_chain) if model_chain else _ladder_from(model, GENERATE_MODEL_CHAIN)) if m]
+    if edit_model_chain:
+        edit_chain = [m for m in edit_model_chain if m]
+    elif model_chain:  # a custom generate chain drives edits too unless an edit chain / edit model is given
+        edit_chain = list(gen_chain)
+    else:
+        edit_chain = _ladder_from(edit_model or model, EDIT_MODEL_CHAIN)
+    return gen_chain, edit_chain
+
+
+def make_api_backend(
+    *,
+    model: Optional[str] = None,
+    edit_model: Optional[str] = None,
+    model_chain: Optional[Sequence[str]] = None,
+    edit_model_chain: Optional[Sequence[str]] = None,
+    timeout: int = 600,
+    api_key: Optional[str] = None,
+) -> FallbackBackend:
+    """Images API only, walking 2.5 -> 2 -> 1.5 -> 1 -> 1-mini (or down from a pinned model)."""
+    gen_chain, edit_chain = _api_chains(model, edit_model, model_chain, edit_model_chain)
+    fb = FallbackBackend(_api_attempts(gen_chain, edit_chain, api_key=api_key, timeout=timeout))
+    fb.name = "api"
+    return fb
+
+
 def make_auto_backend(
     *,
     codex_bin: str = "codex",
@@ -504,23 +556,16 @@ def make_auto_backend(
     edit_model_chain: Optional[Sequence[str]] = None,
     api_key: Optional[str] = None,
 ) -> FallbackBackend:
-    """Codex first, then the Images API with 2.5 -> 2 -> 1.5 -> 1 -> 1-mini (or a pinned model)."""
+    """Codex first, then the Images API with 2.5 -> 2 -> 1.5 -> 1 -> 1-mini (or down from a pinned model)."""
     notes: List[str] = []
     attempts: List[Tuple[str, BaseBackend]] = []
     if shutil.which(codex_bin) is not None:
         attempts.append(("codex", CodexBackend(codex_bin=codex_bin, timeout=timeout, extra_args=extra_args)))
     else:
         notes.append(f"codex 실행 파일({codex_bin})이 없어 Codex 단계는 건너뜁니다.")
-    gen_chain = [m for m in (model_chain or ([model] if model else GENERATE_MODEL_CHAIN)) if m]
-    # a custom generate chain also drives edits unless an edit chain / edit model is given explicitly
-    edit_default = list(model_chain) if model_chain else ([model] if model else EDIT_MODEL_CHAIN)
-    edit_chain = [m for m in (edit_model_chain or ([edit_model] if edit_model else edit_default)) if m]
     if api_key or os.environ.get("OPENAI_API_KEY"):
-        for i in range(max(len(gen_chain), len(edit_chain))):
-            g = gen_chain[min(i, len(gen_chain) - 1)]
-            e = edit_chain[min(i, len(edit_chain) - 1)]
-            label = f"api:{g}" if g == e else f"api:{g}|{e}"
-            attempts.append((label, OpenAIBackend(model=g, edit_model=e, api_key=api_key, timeout=timeout)))
+        gen_chain, edit_chain = _api_chains(model, edit_model, model_chain, edit_model_chain)
+        attempts += _api_attempts(gen_chain, edit_chain, api_key=api_key, timeout=timeout)
     else:
         notes.append("OPENAI_API_KEY 가 없어 API 단계는 건너뜁니다 (Codex만 시도).")
     return FallbackBackend(attempts, notes)
@@ -551,7 +596,13 @@ def make_backend(name: str, **kwargs: Any) -> BaseBackend:
             extra_args=kwargs.get("extra_args", ()),
         )
     if name in ("api", "openai"):
-        return OpenAIBackend(model=kwargs.get("model"), edit_model=kwargs.get("edit_model"), timeout=kwargs.get("timeout", 600))
+        return make_api_backend(
+            model=kwargs.get("model"),
+            edit_model=kwargs.get("edit_model"),
+            model_chain=kwargs.get("model_chain"),
+            edit_model_chain=kwargs.get("edit_model_chain"),
+            timeout=kwargs.get("timeout", 600),
+        )
     if name == "manual":
         return ManualBackend()
     raise ValueError(f"unknown backend: {name}")

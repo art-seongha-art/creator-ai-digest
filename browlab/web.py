@@ -864,7 +864,7 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
             {"key": "auto", "ko": "자동 (Codex 먼저 → 안 되면 API 2.5→2→1.5→1→1-mini)",
              "available": shutil.which(cfg.codex_bin) is not None or bool(os.environ.get("OPENAI_API_KEY"))},
             {"key": "codex-only", "ko": "Codex만 (ChatGPT 구독, 한도 소진 시 실패)", "available": shutil.which(cfg.codex_bin) is not None},
-            {"key": "api", "ko": "OpenAI API (키 필요, 장당 과금)", "available": bool(os.environ.get("OPENAI_API_KEY"))},
+            {"key": "api", "ko": "OpenAI API만 (2.5→2→1.5→1→1-mini, 장당 과금)", "available": bool(os.environ.get("OPENAI_API_KEY"))},
             {"key": "manual", "ko": "프롬프트만 저장 (직접 생성)", "available": True},
         ],
         "default_backend": cfg.default_backend,

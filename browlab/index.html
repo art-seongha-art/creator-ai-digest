@@ -379,7 +379,7 @@ function updateEngineHints(){
     box.replaceChildren();
     box.appendChild(el('span','tag '+(b.available?'ok':'bad'), key==='auto'?'자동':(key==='codex'||key==='codex-only')?'Codex':key==='api'?'OpenAI API':'프롬프트만'));
     const per=form.id==='fRestyle'?'스타일당':'장당';
-    box.appendChild(el('span','', key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진·모델은 작업 상세에 표시`: (key==='codex'||key==='codex-only')?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`GPT Image 2.5 · 장당 과금(high 1536×2304 ≈ $0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
+    box.appendChild(el('span','', key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진·모델은 작업 상세에 표시`: (key==='codex'||key==='codex-only')?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`API만: GPT Image 2.5 → 2 → 1.5 → 1 → 1-mini 순으로 시도 · 장당 과금(high 1536×2304 ≈ $0.06)`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
     if(!b.available) box.appendChild(el('span','',key==='auto'?'· codex 실행 파일도 OPENAI_API_KEY 도 없습니다':(key==='codex'||key==='codex-only')?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
   });
 }

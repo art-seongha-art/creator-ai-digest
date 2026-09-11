@@ -91,6 +91,7 @@ python -m browlab presets
 
 `--backend auto`(기본값, 웹 UI 엔진 "자동")는 한 장마다 아래 순서로 시도하고, 처음 성공한 결과를 씁니다.
 `--backend codex` 도 API 키가 있으면 같은 순서로 넘어갑니다(예전 페이지·설정 호환). Codex 만 쓰려면 `--backend codex-only`.
+`--backend api` 는 Codex 없이 같은 모델 순서(2.5 → 2 → 1.5 → 1 → 1-mini)로 시도합니다. `--model` 을 주면 그 모델부터 아래로 내려갑니다.
 
 1. **Codex** (`codex exec` + `$imagegen`, ChatGPT 구독 한도)
 2. **API gpt-image-2.5** (생성 flare / 편집 sunburst)
