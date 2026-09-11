@@ -45,7 +45,7 @@ KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기"
 # shorter chip labels for the page (full names stay in presets.py)
 BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
                  "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음"}
-BACKENDS = ("auto", "codex", "api", "manual")
+BACKENDS = ("auto", "codex", "codex-only", "api", "manual")
 LAYOUTS = ("face", "browzone", "both")
 SHEETS = ("none", "grid", "browzone", "both")
 LANDMARKS = ("auto", "mediapipe", "codex", "manual", "none")
@@ -863,17 +863,57 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
         "backends": [
             {"key": "auto", "ko": "자동 (Codex 먼저 → 안 되면 API 2.5→2→1.5→1→1-mini)",
              "available": shutil.which(cfg.codex_bin) is not None or bool(os.environ.get("OPENAI_API_KEY"))},
-            {"key": "codex", "ko": "Codex (ChatGPT 구독, 추가 요금 없음)", "available": shutil.which(cfg.codex_bin) is not None},
+            {"key": "codex-only", "ko": "Codex만 (ChatGPT 구독, 한도 소진 시 실패)", "available": shutil.which(cfg.codex_bin) is not None},
             {"key": "api", "ko": "OpenAI API (키 필요, 장당 과금)", "available": bool(os.environ.get("OPENAI_API_KEY"))},
             {"key": "manual", "ko": "프롬프트만 저장 (직접 생성)", "available": True},
         ],
         "default_backend": cfg.default_backend,
+        "server": server_info(cfg.repo_root),
         "models": [
             {"key": "", "ko": "기본 · 최신 GPT Image 2.5 (생성 flare · 편집 sunburst)"},
             {"key": "gpt-image-2.5-sunburst", "ko": "gpt-image-2.5-sunburst 로 생성도 (정밀, 느림)"},
             {"key": "gpt-image-1-mini", "ko": "gpt-image-1-mini — 임시 (2.5 가 열릴 때까지만, 품질 낮음)"},
         ],
     }
+
+
+# ---------------------------------------------------------------------------
+# self update: git pull + re-exec (so the phone UI can update the server itself)
+# ---------------------------------------------------------------------------
+def _git(repo_root: Path, *args: str, timeout: int = 180) -> "subprocess.CompletedProcess[str]":
+    return subprocess.run(["git", "-C", str(repo_root), *args], capture_output=True, text=True, timeout=timeout)
+
+
+def server_info(repo_root: Path) -> Dict[str, Any]:
+    """Version + git commit of the code this server process was started from."""
+    try:
+        commit = _git(repo_root, "rev-parse", "--short", "HEAD", timeout=10).stdout.strip()
+        branch = _git(repo_root, "rev-parse", "--abbrev-ref", "HEAD", timeout=10).stdout.strip()
+    except Exception:
+        commit, branch = "", ""
+    return {"version": __version__, "commit": commit, "branch": branch}
+
+
+def git_update(repo_root: Path) -> Dict[str, Any]:
+    """Fast-forward the checkout to its upstream. Returns what happened; never raises."""
+    try:
+        before = _git(repo_root, "rev-parse", "--short", "HEAD", timeout=10).stdout.strip()
+        pull = _git(repo_root, "pull", "--ff-only")
+        after = _git(repo_root, "rev-parse", "--short", "HEAD", timeout=10).stdout.strip()
+    except Exception as exc:  # git missing, timeout...
+        return {"ok": False, "before": "", "after": "", "changed": False, "output": str(exc)}
+    output = (pull.stdout + pull.stderr).strip()[-4000:]
+    return {"ok": pull.returncode == 0, "before": before, "after": after, "changed": before != after, "output": output}
+
+
+def schedule_restart(delay: float = 1.0) -> None:
+    """Re-exec this server with the same arguments once the HTTP response is out."""
+
+    def _go() -> None:
+        time.sleep(delay)
+        os.execv(sys.executable, [sys.executable, "-m", "browlab"] + sys.argv[1:])
+
+    threading.Thread(target=_go, daemon=True).start()
 
 
 # ---------------------------------------------------------------------------
@@ -1124,6 +1164,19 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/settings":
                 self.server.store.set_settings(body)
                 self.send_json(self.server.store.usage_totals())
+                return
+            if path == "/api/update":
+                active = [j for j in list(self.server.store.jobs.values()) if j.status in ("queued", "running")]
+                if active and not body.get("force"):
+                    self.send_json({"error": f"진행 중인 작업이 {len(active)}개 있어 업데이트를 미룹니다. 끝난 뒤 다시 누르세요."}, HTTPStatus.CONFLICT)
+                    return
+                result = git_update(self.server.cfg.repo_root)
+                restart = bool(body.get("restart", True))
+                result["restarting"] = restart
+                result["server"] = server_info(self.server.cfg.repo_root)
+                self.send_json(result)
+                if restart:
+                    schedule_restart()
                 return
             m = re.match(r"^/api/jobs/([A-Za-z0-9_]+)/cancel$", path)
             if m:

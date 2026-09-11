@@ -569,9 +569,9 @@ def cmd_presets(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 def _add_backend_args(p: argparse.ArgumentParser, *, with_size: bool) -> None:
     g = p.add_argument_group("생성 백엔드")
-    g.add_argument("--backend", choices=["auto", "codex", "api", "manual"], default="auto",
-                   help="auto: Codex 먼저, 안 되면 API를 2.5 → 2 → 1.5 → 1 → 1-mini 순으로(기본값) / codex: Codex CLI 내장 이미지 생성(ChatGPT 로그인) / "
-                        "api: OpenAI Images API(OPENAI_API_KEY) / manual: 프롬프트만 저장")
+    g.add_argument("--backend", choices=["auto", "codex", "codex-only", "api", "manual"], default="auto",
+                   help="auto: Codex 먼저, 안 되면 API를 2.5 → 2 → 1.5 → 1 → 1-mini 순으로(기본값) / codex: auto 와 같음(API 키가 없으면 Codex만) / "
+                        "codex-only: Codex 만 / api: OpenAI Images API(OPENAI_API_KEY) / manual: 프롬프트만 저장")
     g.add_argument("--model", help="api·auto: 이미지 모델 고정(기본 생성 gpt-image-2.5-flare, 편집 gpt-image-2.5-sunburst) / codex: 에이전트 모델(-m)")
     g.add_argument("--model-chain", help="auto: API 생성 모델 순서(쉼표 구분). 기본 " + ",".join(B.GENERATE_MODEL_CHAIN))
     g.add_argument("--edit-model-chain", help="auto: API 편집 모델 순서(쉼표 구분). 기본 " + ",".join(B.EDIT_MODEL_CHAIN))

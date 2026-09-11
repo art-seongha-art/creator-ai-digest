@@ -529,6 +529,10 @@ def make_auto_backend(
 # ---------------------------------------------------------------------------
 def make_backend(name: str, **kwargs: Any) -> BaseBackend:
     name = (name or "auto").lower()
+    # "codex" means "Codex first, then the API" whenever an API key is available: a job must not die
+    # on the Codex usage limit just because an older page/server still sends backend=codex.
+    if name == "codex" and os.environ.get("OPENAI_API_KEY"):
+        name = "auto"
     if name == "auto":
         return make_auto_backend(
             codex_bin=kwargs.get("codex_bin", "codex"),
@@ -539,7 +543,7 @@ def make_backend(name: str, **kwargs: Any) -> BaseBackend:
             model_chain=kwargs.get("model_chain"),
             edit_model_chain=kwargs.get("edit_model_chain"),
         )
-    if name == "codex":
+    if name in ("codex", "codex-only"):
         return CodexBackend(
             codex_bin=kwargs.get("codex_bin", "codex"),
             model=kwargs.get("model"),

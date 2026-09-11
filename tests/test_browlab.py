@@ -563,7 +563,12 @@ class BackendTests(unittest.TestCase):
                 os.environ["OPENAI_API_KEY"] = old
 
     def test_make_backend(self):
-        self.assertIsInstance(B.make_backend("codex"), B.CodexBackend)
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertIsInstance(B.make_backend("codex"), B.CodexBackend)      # no key: Codex only
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}):
+            self.assertIsInstance(B.make_backend("codex"), B.FallbackBackend)   # key present: Codex first, then the API
+            self.assertIsInstance(B.make_backend("codex-only"), B.CodexBackend)
         self.assertIsInstance(B.make_backend("api"), B.OpenAIBackend)
         self.assertIsInstance(B.make_backend("manual"), B.ManualBackend)
         with self.assertRaises(ValueError):

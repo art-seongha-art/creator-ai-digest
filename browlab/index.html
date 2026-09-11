@@ -303,6 +303,9 @@ pre.log{margin:8px 0 0;background:#1f1d1b;color:#e8e2da;padding:12px;border-radi
         <label class="field"><span>메모 (선택)</span><input name="budget_note" type="text" maxlength="80" placeholder="예: 9/12 첫 충전"></label>
         <div class="row" style="align-items:center"><button class="btn dark" type="submit" style="height:40px;padding:0 16px">저장</button><span class="msg" data-msg></span></div>
       </form>
+      <div class="kv2"><span>서버 코드</span><b id="uServer">—</b></div>
+      <div class="row" style="align-items:center;gap:8px"><button id="updateBtn" class="btn" type="button" style="height:40px;padding:0 16px">서버 업데이트 (git pull + 재시작)</button><span class="msg" id="updateMsg"></span></div>
+      <pre id="updateOut" class="prompt" hidden></pre>
       <div class="hint">추정치 = 각 API 응답의 토큰 수 × 공식 단가(이미지 출력 $30/M · 이미지 입력 $8/M · 텍스트 $5/M). 실제 청구액은 <a href="https://platform.openai.com/usage" target="_blank" rel="noopener">platform.openai.com/usage</a> 에서 확인하세요. Codex 모드는 구독 한도를 쓰므로 여기에 잡히지 않습니다. 삭제한 작업은 서버의 trash 폴더로 옮겨집니다.</div>
     </div>
   </div>
@@ -374,10 +377,10 @@ function updateEngineHints(){
   $$('form [data-engine]').forEach(box=>{
     const form=box.closest('form'); const sel=$('select[name=backend]',form); const key=sel?sel.value:presets.default_backend; const b=presets.backends.find(x=>x.key===key)||{};
     box.replaceChildren();
-    box.appendChild(el('span','tag '+(b.available?'ok':'bad'), key==='auto'?'자동':key==='codex'?'Codex':key==='api'?'OpenAI API':'프롬프트만'));
+    box.appendChild(el('span','tag '+(b.available?'ok':'bad'), key==='auto'?'자동':(key==='codex'||key==='codex-only')?'Codex':key==='api'?'OpenAI API':'프롬프트만'));
     const per=form.id==='fRestyle'?'스타일당':'장당';
-    box.appendChild(el('span','', key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진·모델은 작업 상세에 표시`: key==='codex'?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`GPT Image 2.5 · 장당 과금(high 1536×2304 ≈ $0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
-    if(!b.available) box.appendChild(el('span','',key==='auto'?'· codex 실행 파일도 OPENAI_API_KEY 도 없습니다':key==='codex'?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
+    box.appendChild(el('span','', key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진·모델은 작업 상세에 표시`: (key==='codex'||key==='codex-only')?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`GPT Image 2.5 · 장당 과금(high 1536×2304 ≈ $0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
+    if(!b.available) box.appendChild(el('span','',key==='auto'?'· codex 실행 파일도 OPENAI_API_KEY 도 없습니다':(key==='codex'||key==='codex-only')?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
   });
 }
 function updateRestyleLabel(){ const n=$$('#fRestyle input[name=styles]:checked').length; const l=$('[data-restyle-label]'); if(l) l.textContent=n?`눈썹 ${n}가지로 바꾸기`:'스타일을 고르세요'; }
@@ -449,7 +452,8 @@ function renderUsage(){
   const f=$('#fBudget'); if(document.activeElement!==f.budget_usd) f.budget_usd.value=u.budget_usd!=null?u.budget_usd:''; if(document.activeElement!==f.budget_note) f.budget_note.value=u.budget_note||'';
 }
 async function loadUsage(){ try{ usage=await api('api/usage'); renderUsage(); }catch(e){} }
-$('#usageBtn').onclick=()=>{ $('#settingsOv').hidden=false; loadUsage(); };
+$('#usageBtn').onclick=()=>{ $('#settingsOv').hidden=false; loadUsage(); if(presets&&presets.server) $('#uServer').textContent=(presets.server.commit||'?')+' · v'+presets.server.version+(presets.server.branch?' · '+presets.server.branch:''); };
+$('#updateBtn').onclick=async()=>{ const b=$('#updateBtn'), m=$('#updateMsg'), o=$('#updateOut'); b.disabled=true; m.textContent='업데이트 중…'; try{ const r=await post('api/update',{restart:true}); o.hidden=false; o.textContent=(r.before||'?')+' → '+(r.after||'?')+'\n'+(r.output||''); if(r.restarting){ m.textContent='재시작 중… 10초 뒤 새로고침합니다'; setTimeout(()=>location.reload(), 10000); } else { m.textContent=r.ok?'최신 상태':'실패'; b.disabled=false; } }catch(e){ m.textContent=e.message; b.disabled=false; } };
 $('#settingsClose').onclick=()=>{ $('#settingsOv').hidden=true; };
 $('#settingsOv').addEventListener('click',e=>{ if(e.target===e.currentTarget) $('#settingsOv').hidden=true; });
 $('#fBudget').onsubmit=async e=>{ e.preventDefault(); const f=e.target; const msg=$('[data-msg]',f); msg.textContent=''; try{ usage=await post('api/settings',{budget_usd:f.budget_usd.value, budget_note:f.budget_note.value}); renderUsage(); msg.style.color='var(--ok)'; msg.textContent='저장됨'; setTimeout(()=>{msg.textContent='';msg.style.color='';},1500); }catch(err){ msg.textContent=err.message; } };

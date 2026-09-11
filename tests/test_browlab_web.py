@@ -14,6 +14,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 from http.cookiejar import CookieJar
 from pathlib import Path
 from urllib import error, request
@@ -129,9 +130,25 @@ class WebServerTest(unittest.TestCase):
         status, presets, _ = self.call("/api/presets")
         self.assertEqual(status, 200)
         self.assertEqual(len(presets["brow_styles"]), 12)
-        self.assertEqual([b["key"] for b in presets["backends"]], ["auto", "codex", "api", "manual"])
-        self.assertFalse(next(b for b in presets["backends"] if b["key"] == "codex")["available"])  # fake codex binary
+        self.assertEqual([b["key"] for b in presets["backends"]], ["auto", "codex-only", "api", "manual"])
+        self.assertFalse(next(b for b in presets["backends"] if b["key"] == "codex-only")["available"])  # fake codex binary
+        self.assertEqual(presets["server"]["version"], W.__version__)
+        self.assertIsInstance(presets["server"]["commit"], str)
         self.assertEqual(presets["default_backend"], "manual")
+
+    def test_02b_update_endpoint(self):
+        self.login()
+        canned = {"ok": True, "before": "aaa1111", "after": "bbb2222", "changed": True, "output": "Updating aaa1111..bbb2222"}
+        with mock.patch.object(W, "git_update", lambda repo_root: canned), mock.patch.object(W, "schedule_restart") as restart:
+            status, body, _ = self.call("/api/update", {"restart": False})
+            self.assertEqual(status, 200, body)
+            self.assertEqual((body["before"], body["after"], body["changed"], body["restarting"]), ("aaa1111", "bbb2222", True, False))
+            self.assertIn("commit", body["server"])
+            restart.assert_not_called()
+            status, body, _ = self.call("/api/update", {"restart": True})
+            self.assertEqual(status, 200, body)
+            self.assertTrue(body["restarting"])
+            restart.assert_called_once()
 
     def test_03_calibrate_job_files_and_traversal(self):
         self.login()
@@ -301,6 +318,41 @@ class _NoRedirect(request.HTTPRedirectHandler):
 
 
 @unittest.skipIf(Image is None, "Pillow is required")
+class GitUpdateTest(unittest.TestCase):
+    def test_git_update_fast_forwards_from_upstream(self):
+        import subprocess
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            upstream, clone = tmp / "up", tmp / "clone"
+            env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+
+            def git(cwd, *args):
+                return subprocess.run(["git", "-C", str(cwd), *args], check=True, capture_output=True, text=True, env=env).stdout.strip()
+
+            upstream.mkdir()
+            git(upstream, "init", "-q", "-b", "main")
+            (upstream / "f.txt").write_text("1")
+            git(upstream, "add", "f.txt")
+            git(upstream, "commit", "-q", "-m", "one")
+            subprocess.run(["git", "clone", "-q", str(upstream), str(clone)], check=True, env=env)
+            first = W.git_update(clone)
+            self.assertTrue(first["ok"], first)
+            self.assertFalse(first["changed"])
+            (upstream / "f.txt").write_text("2")
+            git(upstream, "commit", "-q", "-am", "two")
+            second = W.git_update(clone)
+            self.assertTrue(second["ok"], second)
+            self.assertTrue(second["changed"])
+            self.assertNotEqual(second["before"], second["after"])
+            self.assertEqual((clone / "f.txt").read_text(), "2")
+            info = W.server_info(clone)
+            self.assertEqual(info["commit"], second["after"])
+            self.assertEqual(info["branch"], "main")
+            broken = W.git_update(tmp / "missing")
+            self.assertFalse(broken["ok"])
+
+
 class ArgvBuilderTest(unittest.TestCase):
     def cfg(self, tmp: str) -> "W.WebConfig":
         return W.WebConfig(data_dir=Path(tmp), repo_root=REPO, password=None, codex_bin="/opt/codex", default_backend="codex", timeout=42, font="/f.ttf")

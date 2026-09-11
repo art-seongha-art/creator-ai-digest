@@ -90,6 +90,7 @@ python -m browlab presets
 ## 2.5 자동 백엔드 (기본값): Codex 먼저, 안 되면 API
 
 `--backend auto`(기본값, 웹 UI 엔진 "자동")는 한 장마다 아래 순서로 시도하고, 처음 성공한 결과를 씁니다.
+`--backend codex` 도 API 키가 있으면 같은 순서로 넘어갑니다(예전 페이지·설정 호환). Codex 만 쓰려면 `--backend codex-only`.
 
 1. **Codex** (`codex exec` + `$imagegen`, ChatGPT 구독 한도)
 2. **API gpt-image-2.5** (생성 flare / 편집 sunburst)
@@ -168,6 +169,11 @@ python -m browlab sheet face.png --landmarks manual --pupils 412,590,688,592   #
 인쇄 후 자로 재서 정확하면 얼굴 시트도 1:1로 나옵니다.
 
 ---
+
+## 3.5 웹 UI에서 서버 업데이트
+
+설정(사용량) 창의 **"서버 업데이트 (git pull + 재시작)"** 버튼은 서버 저장소를 `git pull --ff-only` 한 뒤 같은 인자로 서버를 다시 실행합니다(`POST /api/update`).
+진행 중인 작업이 있으면 미룹니다. 같은 창에 지금 서버가 돌고 있는 코드의 커밋이 표시됩니다.
 
 ## 4. 인쇄 방법 (중요)
 
