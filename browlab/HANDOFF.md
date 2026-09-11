@@ -118,6 +118,12 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 - 실측(원격, 합성 편집): 균일 캐스트는 이전과 비슷(1.77 → 1.72), **좌우로 밝기가 다른 캐스트에서 8.26 → 0.93** (마스크 안 피부의 원본 대비 평균 채널 오차).
 - 로컬 확인 필요: 실제 사진에서 경계가 사라졌는지, 보정이 과해 눈썹 색까지 바뀌지는 않는지(과하면 `--no-tone-match`).
 
+### 3.2.5 모델 가용성 확인 (2026-09-12 추가, 원격 세션)
+
+- `backends.check_models(models=None, probe=False)`: 모델마다 `models.retrieve`(무료)로 계정 가시성 확인 → `probe=True` 면 보이는 모델 중 위에서부터 하나만 실제 `images.generate`(1024x1024, low, 약 $0.01)로 시험, 실패하면 다음 모델로 내려감. 상태: ok / visible / limit0 / not_found / auth / quota / error (`PROBE_LABELS` 에 한국어 라벨).
+- 노출: `POST /api/models/check {probe}` · 웹 설정 창 버튼 2개 · `python -m browlab models [--probe]`.
+- 원격 세션은 OpenAI 접근이 막혀 있어 실제 확인 불가. 9/19 이후 추가 충전으로 Tier 1 이 되면 이 버튼으로 2.5 개방 여부를 바로 확인할 것.
+
 ### 3.3 Codex 백엔드가 실제로 실행하는 것
 
 ```bash

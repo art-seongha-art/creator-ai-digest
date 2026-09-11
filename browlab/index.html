@@ -552,6 +552,14 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <div style="display:flex;gap:9px;align-items:center"><button class="btn dark" type="submit" style="height:38px;padding:0 16px">저장</button><span class="msg" data-msg></span></div>
     </form>
     <div class="divide"></div>
+    <div class="eyebrow">쓸 수 있는 이미지 모델</div>
+    <div class="kv" id="modelRows"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button id="modelCheck" class="btn" type="button">모델 확인 (무료)</button>
+      <button id="modelProbe" class="btn" type="button">1장 생성해 확인 (~$0.01)</button>
+      <span class="msg" id="modelMsg"></span>
+    </div>
+    <div class="divide"></div>
     <div class="kv"><span>서버 코드</span><b id="uServer" style="font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere">—</b></div>
     <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap"><button id="updateBtn" class="btn" type="button">서버 업데이트 (git pull + 재시작)</button><span class="msg" id="updateMsg"></span></div>
     <pre id="updateOut" class="log" hidden style="margin:0"></pre>
@@ -793,6 +801,29 @@ $('#fBudget').onsubmit=async e=>{ e.preventDefault(); const f=e.target; const ms
   try{ usage=await post('api/settings',{budget_usd:f.budget_usd.value, budget_note:f.budget_note.value}); renderUsage();
     msg.className='msg ok'; msg.textContent='저장됨'; setTimeout(()=>{msg.textContent='';msg.className='msg';},1600);
   }catch(err){ msg.className='msg'; msg.textContent=err.message; } };
+function renderModels(rows, probed){
+  const box=$('#modelRows'); box.replaceChildren();
+  rows.forEach(r=>{
+    box.appendChild(el('span','',r.model));
+    const b=el('b'); b.style.display='flex'; b.style.alignItems='center'; b.style.justifyContent='flex-end'; b.style.gap='6px';
+    const dot=el('i','dot'); dot.style.cssText='width:7px;height:7px;border-radius:999px;flex:0 0 7px;background:'+(r.usable?'var(--ok)':r.status==='limit0'?'var(--wait)':'var(--warn)');
+    b.appendChild(dot); b.appendChild(el('span','',r.label+(r.cost_usd?' · '+usd(r.cost_usd):'')));
+    b.style.color=r.usable?'var(--ok)':r.status==='limit0'?'var(--wait)':'var(--warn)';
+    box.appendChild(b);
+  });
+  const best=rows.find(r=>r.usable);
+  $('#modelMsg').className='msg '+(best?'ok':'');
+  $('#modelMsg').textContent=best?('지금 쓰이는 모델: '+best.model+(probed?'':' · 한도 0 여부는 "1장 생성해 확인"')):'쓸 수 있는 모델이 없습니다';
+}
+async function checkModels(probe){
+  const b1=$('#modelCheck'), b2=$('#modelProbe'), m=$('#modelMsg');
+  b1.disabled=b2.disabled=true; m.className='msg'; m.textContent=probe?'1장 생성해 확인 중… 최대 1분':'확인 중…';
+  try{ const r=await post('api/models/check',{probe:!!probe}); renderModels(r.models, r.probed); }
+  catch(e){ m.className='msg'; m.textContent=e.message; }
+  finally{ b1.disabled=b2.disabled=false; }
+}
+$('#modelCheck').onclick=()=>checkModels(false);
+$('#modelProbe').onclick=()=>checkModels(true);
 $('#updateBtn').onclick=async()=>{ const b=$('#updateBtn'), m=$('#updateMsg'), o=$('#updateOut'); b.disabled=true; m.className='msg'; m.textContent='업데이트 중…';
   try{ const r=await post('api/update',{restart:true}); o.hidden=false; o.textContent=(r.before||'?')+' → '+(r.after||'?')+'\n'+(r.output||'');
     if(r.restarting){ m.textContent='재시작 중… 10초 뒤 새로고침합니다'; setTimeout(()=>location.reload(),10000); }

@@ -385,6 +385,89 @@ class OpenAIBackend(BaseBackend):
 
 
 # ---------------------------------------------------------------------------
+# "Which image models can this key actually use?"
+# ---------------------------------------------------------------------------
+PROBE_PROMPT = "A plain light grey square on a white background. No text, no objects."
+
+# status -> (Korean label, usable)
+PROBE_LABELS: Dict[str, Tuple[str, bool]] = {
+    "ok": ("사용 가능 (실제 생성 성공)", True),
+    "visible": ("계정에 열려 있음", True),
+    "limit0": ("한도 0 — 조직 인증·티어 대기", False),
+    "not_found": ("이 계정에서는 안 보임", False),
+    "auth": ("API 키 오류", False),
+    "quota": ("크레딧/결제 문제", False),
+    "error": ("확인 실패", False),
+}
+
+
+def _classify(exc: BaseException) -> str:
+    text = str(exc)
+    if "Limit 0" in text:
+        return "limit0"
+    if "must be verified" in text:
+        return "limit0"
+    if "invalid_api_key" in text or "Incorrect API key" in text or "Error code: 401" in text:
+        return "auth"
+    if "insufficient_quota" in text or "exceeded your current quota" in text or "billing" in text:
+        return "quota"
+    if "model_not_found" in text or "does not exist" in text or "Error code: 404" in text or "Error code: 403" in text:
+        return "not_found"
+    return "error"
+
+
+def check_models(
+    models: Optional[Sequence[str]] = None,
+    *,
+    api_key: Optional[str] = None,
+    client: Any = None,
+    probe: bool = False,
+    timeout: int = 90,
+) -> List[Dict[str, Any]]:
+    """Report, per image model, whether this API key can use it.
+
+    Without ``probe`` only free calls are made (``models.retrieve``), which says
+    whether the model is visible to the account but not whether its rate limit is
+    zero. With ``probe`` the best visible model is also asked for one small image
+    (about $0.01), which is the only way to prove the limit is not zero.
+    """
+    names = list(models or GENERATE_MODEL_CHAIN)
+    backend = OpenAIBackend(api_key=api_key, client=client, timeout=timeout)
+    try:
+        api = backend.client()
+    except GenerationError as exc:
+        return [{"model": m, "status": "auth", "detail": str(exc), "usable": False} for m in names]
+
+    rows: List[Dict[str, Any]] = []
+    probed = False
+    for name in names:
+        row: Dict[str, Any] = {"model": name, "status": "error", "detail": "", "usable": False, "cost_usd": None}
+        try:
+            api.models.retrieve(name)
+            row["status"] = "visible"
+        except Exception as exc:
+            row["status"] = _classify(exc)
+            row["detail"] = _first_line(exc)
+        if probe and row["status"] == "visible" and not probed:
+            probed = True
+            try:
+                resp = api.images.generate(model=name, prompt=PROBE_PROMPT, n=1, size="1024x1024",
+                                           quality="low", output_format="png")
+                usage = usage_dict(resp)
+                row["status"] = "ok"
+                row["cost_usd"] = estimate_cost_usd(usage, name)
+            except Exception as exc:
+                row["status"] = _classify(exc)
+                row["detail"] = _first_line(exc)
+                probed = False          # that model is out; try the next one instead
+        label, usable = PROBE_LABELS.get(row["status"], PROBE_LABELS["error"])
+        row["label"] = label
+        row["usable"] = usable
+        rows.append(row)
+    return rows
+
+
+# ---------------------------------------------------------------------------
 # Automatic fallback: Codex first, then the Images API down the model ladder
 # ---------------------------------------------------------------------------
 GENERATE_MODEL_CHAIN: List[str] = ["gpt-image-2.5-flare", "gpt-image-2", "gpt-image-1.5", "gpt-image-1", "gpt-image-1-mini"]

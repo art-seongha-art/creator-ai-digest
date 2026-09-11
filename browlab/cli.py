@@ -549,6 +549,20 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_models(args: argparse.Namespace) -> int:
+    """Which image models can the configured API key actually use?"""
+    rows = B.check_models(probe=args.probe, timeout=args.timeout)
+    width = max(len(r["model"]) for r in rows)
+    print("\n이미지 모델 사용 가능 여부" + (" (실제 생성 1장으로 확인)" if args.probe else " (무료 확인 · 한도 0 여부는 --probe 로)"))
+    for r in rows:
+        mark = "O" if r["usable"] else "X"
+        cost = f"  (${r['cost_usd']:.4f})" if r.get("cost_usd") else ""
+        detail = f"  {r['detail'][:90]}" if r.get("detail") and not r["usable"] else ""
+        print(f"  {mark}  {r['model'].ljust(width)}  {r['label']}{cost}{detail}")
+    print()
+    return 0 if any(r["usable"] for r in rows) else 1
+
+
 def cmd_presets(args: argparse.Namespace) -> int:
     def table(title: str, rows: List[Tuple[str, str]]) -> None:
         print(f"\n## {title}")
@@ -690,6 +704,13 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--out-dir", help="출력 폴더")
     _add_sheet_args(c)
     c.set_defaults(func=cmd_calibrate)
+
+    # models -----------------------------------------------------------------
+    m = sub.add_parser("models", help="API 키로 쓸 수 있는 이미지 모델을 확인합니다",
+                       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    m.add_argument("--probe", action="store_true", help="실제로 1장(1024x1024, low) 생성해 한도 0 여부까지 확인 (약 $0.01)")
+    m.add_argument("--timeout", type=int, default=180, help="확인 제한 시간(초)")
+    m.set_defaults(func=cmd_models)
 
     # presets ----------------------------------------------------------------
     p = sub.add_parser("presets", help="선택 가능한 값 목록을 보여줍니다")

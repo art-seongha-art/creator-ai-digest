@@ -150,6 +150,26 @@ class WebServerTest(unittest.TestCase):
             self.assertTrue(body["restarting"])
             restart.assert_called_once()
 
+    def test_02c_models_check_endpoint(self):
+        self.login()
+        canned = [{"model": "gpt-image-2.5-flare", "status": "limit0", "label": "한도 0 — 조직 인증·티어 대기",
+                   "usable": False, "cost_usd": None, "detail": ""}]
+        seen = {}
+        def fake(models=None, *, probe=False, timeout=90, **kw):
+            seen["probe"] = probe
+            return canned
+        with mock.patch.object(W, "__name__", W.__name__):
+            import browlab.backends as B
+            with mock.patch.object(B, "check_models", fake):
+                status, body, _ = self.call("/api/models/check", {"probe": False})
+                self.assertEqual(status, 200, body)
+                self.assertEqual(body["models"], canned)
+                self.assertFalse(body["probed"])
+                self.assertFalse(seen["probe"])
+                status, body, _ = self.call("/api/models/check", {"probe": True})
+                self.assertTrue(body["probed"])
+                self.assertTrue(seen["probe"])
+
     def test_03_calibrate_job_files_and_traversal(self):
         self.login()
         status, job, _ = self.call("/api/jobs", {"kind": "calibrate", "ipd_mm": "63"})

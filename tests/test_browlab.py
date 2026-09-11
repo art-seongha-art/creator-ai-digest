@@ -669,6 +669,65 @@ LIMIT0 = RuntimeError("Error code: 429 - {'error': {'code': 'rate_limit_exceeded
                       "(for limit gpt-image) in organization org-x: Limit 0, Used 0, Requested 1.'}}")
 
 
+class ModelCheckTests(unittest.TestCase):
+    """check_models answers "which image models can this key use?" without guessing."""
+
+    class _Api:
+        def __init__(self, visible, generate_error=None):
+            outer = self
+            class Models:
+                def retrieve(self, m):
+                    if m not in visible:
+                        raise RuntimeError("Error code: 404 - {'error': {'code': 'model_not_found'}}")
+                    return {"id": m}
+            class Usage:
+                input_tokens = 20; output_tokens = 300; total_tokens = 320
+                input_tokens_details = None
+            class Images:
+                def generate(self, **kw):
+                    outer.calls.append(kw)
+                    if generate_error:
+                        raise generate_error
+                    return type("R", (), {"data": [type("I", (), {"b64_json": None, "url": None})()], "usage": Usage()})()
+            self.models = Models(); self.images = Images(); self.calls = []
+
+    def test_free_check_reports_visibility_only(self):
+        api = self._Api({"gpt-image-1", "gpt-image-1-mini"})
+        rows = B.check_models(client=api)
+        self.assertEqual([r["model"] for r in rows], B.GENERATE_MODEL_CHAIN)
+        by = {r["model"]: r for r in rows}
+        self.assertEqual(by["gpt-image-2.5-flare"]["status"], "not_found")
+        self.assertFalse(by["gpt-image-2.5-flare"]["usable"])
+        self.assertEqual(by["gpt-image-1"]["status"], "visible")
+        self.assertTrue(by["gpt-image-1"]["usable"])
+        self.assertEqual(api.calls, [])                      # free: nothing was generated
+
+    def test_probe_confirms_the_first_visible_model(self):
+        api = self._Api(set(B.GENERATE_MODEL_CHAIN))
+        rows = B.check_models(client=api, probe=True)
+        self.assertEqual(rows[0]["status"], "ok")
+        self.assertEqual(len(api.calls), 1)                  # only the best model costs money
+        self.assertEqual(api.calls[0]["size"], "1024x1024")
+        self.assertEqual(api.calls[0]["quality"], "low")
+        self.assertGreater(rows[0]["cost_usd"], 0)
+        self.assertEqual(rows[1]["status"], "visible")       # the rest stay at the free answer
+
+    def test_probe_walks_down_when_the_limit_is_zero(self):
+        err = RuntimeError("Error code: 429 - rate_limit_exceeded (for limit gpt-image) ... Limit 0, Requested 1.")
+        api = self._Api(set(B.GENERATE_MODEL_CHAIN), generate_error=err)
+        rows = B.check_models(client=api, probe=True)
+        self.assertTrue(all(r["status"] == "limit0" for r in rows), [r["status"] for r in rows])
+        self.assertFalse(any(r["usable"] for r in rows))
+        self.assertEqual(len(api.calls), len(B.GENERATE_MODEL_CHAIN))
+        self.assertIn("조직 인증", rows[0]["label"])
+
+    def test_missing_key_is_reported_per_model(self):
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with mock.patch.dict(os.environ, env, clear=True):
+            rows = B.check_models()
+        self.assertTrue(all(r["status"] == "auth" and not r["usable"] for r in rows))
+
+
 class FallbackBackendTests(unittest.TestCase):
     def test_unavailable_backends_are_skipped_for_the_rest_of_the_run(self):
         codex = _StubBackend("codex", None, [B.GenerationError("codex exec finished but no image was produced.\nstderr: ERROR: You've hit your usage limit")])

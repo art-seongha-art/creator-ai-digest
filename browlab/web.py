@@ -1167,6 +1167,12 @@ class Handler(BaseHTTPRequestHandler):
                 self.server.store.set_settings(body)
                 self.send_json(self.server.store.usage_totals())
                 return
+            if path == "/api/models/check":
+                from . import backends as B
+
+                rows = B.check_models(probe=bool(body.get("probe")), timeout=180)
+                self.send_json({"models": rows, "probed": bool(body.get("probe"))})
+                return
             if path == "/api/update":
                 active = [j for j in list(self.server.store.jobs.values()) if j.status in ("queued", "running")]
                 if active and not body.get("force"):
