@@ -382,6 +382,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       </button>
       <div style="display:flex;gap:6px">
         <button class="btn ghost icon" id="themeBtn" title="화면 테마" aria-label="화면 테마"></button>
+        <button class="btn ghost" id="settingsBtn" style="flex:1">설정</button>
         <button class="btn ghost" id="logoutBtn" style="flex:1">로그아웃</button>
       </div>
     </div>
@@ -394,6 +395,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
     </div>
     <span class="sp"></span>
     <button class="btn ghost icon" id="themeBtn2" aria-label="화면 테마"></button>
+    <button class="btn ghost" id="settingsBtn2" title="설정 · 서버 업데이트">설정</button>
     <button class="btn" id="usageBtn2"><span class="num" id="usageAmt2">$0.00</span></button>
   </header>
 
@@ -546,7 +548,11 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 
 <div id="settingsOv" class="ov" hidden>
   <div class="sheet" role="dialog" aria-label="설정과 사용량">
-    <h2>설정 · API 사용량 <button id="settingsClose" class="btn ghost icon" type="button" aria-label="닫기"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button></h2>
+    <h2>설정 · 사용량 · 서버 업데이트 <button id="settingsClose" class="btn ghost icon" type="button" aria-label="닫기"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button></h2>
+    <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap"><button id="updateBtn" class="btn dark" type="button" style="height:38px;padding:0 16px">서버 업데이트 (git pull + 재시작)</button><span class="msg" id="updateMsg"></span></div>
+    <div class="kv"><span>서버 코드</span><b id="uServer" style="font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere">—</b></div>
+    <pre id="updateOut" class="log" hidden style="margin:0"></pre>
+    <div class="divide"></div>
     <div class="big"><b id="uTotal">$0.00</b><span>누적 API 지출 추정</span></div>
     <div class="track"><i id="uBar"></i></div>
     <div class="kv">
@@ -568,10 +574,6 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <button id="modelProbe" class="btn" type="button">1장 생성해 확인 (~$0.01)</button>
       <span class="msg" id="modelMsg"></span>
     </div>
-    <div class="divide"></div>
-    <div class="kv"><span>서버 코드</span><b id="uServer" style="font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere">—</b></div>
-    <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap"><button id="updateBtn" class="btn" type="button">서버 업데이트 (git pull + 재시작)</button><span class="msg" id="updateMsg"></span></div>
-    <pre id="updateOut" class="log" hidden style="margin:0"></pre>
     <div class="hint">추정치 = API 응답의 토큰 수 × 공식 단가(이미지 출력 $30/M · 입력 $8/M · 텍스트 $5/M). 실제 청구액은 <a href="https://platform.openai.com/usage" target="_blank" rel="noopener">platform.openai.com/usage</a> 에서 확인하세요. Codex 모드는 구독 한도를 쓰므로 여기에 잡히지 않습니다. 삭제한 작업은 서버의 trash 폴더로 옮겨집니다.</div>
   </div>
 </div>
@@ -804,6 +806,7 @@ function openSettings(){ $('#settingsOv').hidden=false; loadUsage();
   if(presets&&presets.server){ const sv=presets.server; const br=(sv.branch||'').split('/').pop();
     $('#uServer').textContent=(sv.commit||'?')+' · v'+sv.version+(br?' · '+br:''); } }
 $('#usageBtn').onclick=openSettings; $('#usageBtn2').onclick=openSettings;
+$('#settingsBtn').onclick=openSettings; $('#settingsBtn2').onclick=openSettings;
 $('#settingsClose').onclick=()=>{ $('#settingsOv').hidden=true; };
 $('#settingsOv').addEventListener('click',e=>{ if(e.target===e.currentTarget) $('#settingsOv').hidden=true; });
 $('#fBudget').onsubmit=async e=>{ e.preventDefault(); const f=e.target; const msg=$('[data-msg]',f); msg.textContent='';
