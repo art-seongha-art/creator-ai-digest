@@ -808,6 +808,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({
                     "authed": self.authed(), "auth_required": sessions.required, "version": __version__,
                     "locked": sessions.required and sessions.locked(self.client_ip()),
+                    "codex": shutil.which(self.server.cfg.codex_bin) is not None,
+                    "api_key": bool(os.environ.get("OPENAI_API_KEY")),
                 })
                 return
             if not path.startswith(("/api/", "/files/")):

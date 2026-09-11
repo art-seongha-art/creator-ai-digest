@@ -18,21 +18,16 @@
 2. 이름 `browlab`, 권한은 기본(All) 그대로 → **Create**.
 3. `sk-proj-…` 로 시작하는 키를 **그 자리에서 복사**합니다. 창을 닫으면 다시 볼 수 없습니다(그때는 새로 만들면 됨).
 
-## 3. 4090 서버에 넣기 (맥 터미널)
+## 3. 4090 서버에 넣기 (맥 터미널에서 한 줄)
 
 ```bash
-ssh 4090
+ssh -t 4090 '~/project/creator-ai-digest/browlab/tools/set_api_key.sh'
 ```
 
-```bash
-nano ~/.config/browlab/env
-```
+"OpenAI API 키를 붙여넣고 Enter" 가 나오면 키를 붙여넣습니다(화면에 안 보임). 스크립트가 `~/.config/browlab/env` 에 저장하고
+서비스를 재시작한 뒤 "완료: 서비스가 API 키를 읽었습니다" 를 찍습니다. 키를 지우려면 같은 명령 끝에 `--remove` 를 붙입니다.
 
-파일 안의 `#OPENAI_API_KEY=sk-...` 줄에서 앞의 `#` 을 지우고 복사한 키를 붙여넣습니다. 저장은 Ctrl+O → Enter, 나가기는 Ctrl+X. 그다음:
-
-```bash
-systemctl --user restart browlab
-```
+손으로 하려면: `ssh 4090` → `nano ~/.config/browlab/env` 에서 `#OPENAI_API_KEY=sk-...` 줄의 `#` 을 지우고 키를 넣고 저장(Ctrl+O, Enter, Ctrl+X) → `systemctl --user restart browlab`.
 
 ## 4. 확인
 

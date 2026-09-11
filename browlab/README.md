@@ -255,7 +255,7 @@ python -m browlab web --host 127.0.0.1 --port 8177 \
 | 코드 | `~/project/creator-ai-digest` (브랜치 `claude/eyebrow-tattoo-design-tool-q5twu7`), venv `.venv` (Python 3.12) |
 | 서비스 | `~/.config/systemd/user/browlab.service` (`systemctl --user status/restart browlab`, 로그 `journalctl --user -u browlab -f`) |
 | 작업 폴더 | `~/browlab_data/jobs/` |
-| API 키 | `~/.config/browlab/env` 의 `OPENAI_API_KEY=...` 주석 해제 후 `systemctl --user restart browlab` |
+| API 키 | 맥에서 `ssh -t 4090 '~/project/creator-ai-digest/browlab/tools/set_api_key.sh'` (숨김 입력 → `~/.config/browlab/env` 저장 → 서비스 재시작 → 확인). 삭제는 `--remove` |
 | codex | `~/.nvm/versions/node/v22.22.3/bin/codex` (ChatGPT 로그인 상태). node 를 올리면 유닛의 경로 두 곳을 바꿀 것 |
 
 코드 갱신: `cd ~/project/creator-ai-digest && git pull && systemctl --user restart browlab`.
@@ -281,7 +281,7 @@ ChatGPT 구독의 Codex 한도를 씁니다. 추가 요금은 없지만 이미�
 2. **Settings → Billing → Add payment method** 에서 카드 등록 → **Add to credit balance** 로 선결제 크레딧 구매.
    최소 $5, 기본 $10, 크레딧은 1년 뒤 만료·환불 불가. 자동 충전(Auto recharge)은 켜지 않아도 됨.
 3. **Dashboard → API keys → Create new secret key** 로 키 생성. 키는 만들 때 한 번만 보이므로 바로 복사.
-4. 4090 에서 `~/.config/browlab/env` 의 `OPENAI_API_KEY=` 줄에 붙여넣고 `systemctl --user restart browlab`.
+4. 맥 터미널에서 `ssh -t 4090 '~/project/creator-ai-digest/browlab/tools/set_api_key.sh'` 를 실행해 키를 붙여넣습니다(숨김 입력, 자동 재시작·확인).
    (로컬 CLI 는 `export OPENAI_API_KEY=sk-...`)
 5. 사용량·청구는 https://platform.openai.com/usage 에서 확인.
 

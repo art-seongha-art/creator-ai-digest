@@ -116,6 +116,8 @@ class WebServerTest(unittest.TestCase):
         status, me, _ = self.call("/api/me")
         self.assertFalse(me["authed"])
         self.assertTrue(me["auth_required"])
+        self.assertFalse(me["codex"])  # fake binary
+        self.assertIsInstance(me["api_key"], bool)
 
     def test_02_login_wrong_then_right(self):
         self.jar.clear()
