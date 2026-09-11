@@ -128,6 +128,23 @@ class PromptTests(unittest.TestCase):
         self.assertIn("change only the eyebrows", text)
         self.assertNotIn("Image 2", PR.build_restyle_prompt("straight"))
 
+    def test_restyle_prompt_pins_the_brow_height(self):
+        """Models lift the brows onto the forehead unless the height is stated."""
+        text = PR.build_restyle_prompt("soft_arch", "dark_brown")
+        self.assertIn("Eyebrow height (most important)", text)
+        self.assertIn("keep the new brows at exactly the height of the existing ones", text)
+        self.assertIn("lower edge of each new brow must follow the lower edge of the existing brow", text)
+        self.assertIn("gap between the upper eyelid and the brow must stay exactly as it is", text)
+        self.assertIn("Never move the brows up", text)
+        self.assertIn("raising the brows higher on the forehead", text)      # in Avoid
+        self.assertIn("horizontal only", text)                                # the nostril lines are horizontal guides
+        up = PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="slight_up")
+        self.assertIn("raise the brows very slightly, by at most 2-3 mm", up)
+        self.assertNotIn("keep the new brows at exactly the height", up)
+        self.assertIn("Never move the brows up", up)                          # the hard limits still apply
+        with self.assertRaises(KeyError):
+            PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="sky")
+
     def test_spec_roundtrip(self):
         spec = PR.make_specs(1, seed=9)[0]
         d = spec.to_dict()

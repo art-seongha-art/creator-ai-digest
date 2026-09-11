@@ -232,11 +232,12 @@ class WebServerTest(unittest.TestCase):
         self.login()
         status, job, _ = self.call("/api/jobs", {
             "kind": "restyle", "photo": "data:image/png;base64," + _png_b64((640, 640)), "photo_name": "me.png",
-            "styles": ["straight", "feathered", "bogus"], "color": "dark_brown", "backend": "manual",
+            "styles": ["straight", "feathered", "bogus"], "color": "dark_brown", "backend": "manual", "height": "nope",
             "landmarks": "none", "sheet": "none",
         })
         self.assertEqual(status, 201, job)
         self.assertEqual(job["params"]["styles"], ["straight", "feathered"])
+        self.assertEqual(job["params"]["height"], "keep")   # unknown value falls back to the safe default
         done = self.wait(job["id"])
         self.assertEqual(done["status"], "done", done["log"])
         names = [f["name"] for f in done["files"]]

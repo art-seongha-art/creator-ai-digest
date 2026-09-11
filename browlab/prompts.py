@@ -225,11 +225,13 @@ def build_restyle_prompt(
     style_key: str,
     color_key: str = "match_hair",
     *,
+    height_key: str = "keep",
     with_guide_image: bool = False,
     notes: str = "",
 ) -> str:
     style = P.BROW_STYLES[style_key]
     colour = P.BROW_COLORS[color_key]["prompt"]
+    height = P.BROW_HEIGHTS[height_key]["prompt"]
     inputs = "Input images: Image 1: edit target (the client's photo)"
     if with_guide_image:
         inputs += "; Image 2: region guide - the translucent red area marks the only region that may change"
@@ -242,10 +244,17 @@ def build_restyle_prompt(
             f"Eyebrow colour: {colour}."
         ),
         (
-            "Eyebrow placement: the brow head starts on the vertical line rising from the outer edge of the nostril; "
-            "the arch peak sits on the line from the nostril through the outer edge of the iris; the tail ends on the "
-            "line from the nostril through the outer corner of the eye, level with or slightly above the head; both "
-            "brows symmetrical; realistic individual hairs with natural growth direction, matching the lighting of the photo"
+            f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - redraw them "
+            "in place. The lower edge of each new brow must follow the lower edge of the existing brow, and the gap "
+            "between the upper eyelid and the brow must stay exactly as it is in the photo. Never move the brows up "
+            "onto the forehead and never widen the eye-to-brow distance; the face must not look surprised or lifted."
+        ),
+        (
+            "Eyebrow placement (horizontal only): the brow head starts on the vertical line rising from the outer edge "
+            "of the nostril; the arch peak sits on the line from the nostril through the outer edge of the iris; the "
+            "tail ends on the line from the nostril through the outer corner of the eye, level with or slightly above "
+            "the head; both brows symmetrical; realistic individual hairs with natural growth direction, matching the "
+            "lighting of the photo"
         ),
         (
             "Constraints: change only the eyebrows; keep the face identity, skin texture, eyes, eyelids, nose, mouth, "
@@ -253,8 +262,9 @@ def build_restyle_prompt(
             "retouching or smoothing; the result must look like the same photograph with new eyebrows"
         ),
         (
-            "Avoid: changing eye shape or eyelids, adding makeup, smoothing or brightening skin, cropping or "
-            "re-framing, adding text or watermark"
+            "Avoid: raising the brows higher on the forehead, widening the gap between the eye and the brow, a lifted "
+            "or surprised expression, changing eye shape or eyelids, adding makeup, smoothing or brightening skin, "
+            "cropping or re-framing, adding text or watermark"
         ),
     ]
     if notes:

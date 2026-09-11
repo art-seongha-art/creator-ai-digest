@@ -124,6 +124,14 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 - 노출: `POST /api/models/check {probe}` · 웹 설정 창 버튼 2개 · `python -m browlab models [--probe]`.
 - 원격 세션은 OpenAI 접근이 막혀 있어 실제 확인 불가. 9/19 이후 추가 충전으로 Tier 1 이 되면 이 버튼으로 2.5 개방 여부를 바로 확인할 것.
 
+### 3.2.6 눈썹 높이 고정 (2026-09-12 추가, 원격 세션)
+
+- 증상(연구자 사진 4장): 새 눈썹이 원래보다 확연히 위에 그려져 눈-눈썹 간격이 벌어짐. 원인은 편집 프롬프트에 **세로 위치 지시가 전혀 없었던 것**(콧방울 기준선은 전부 가로 기준). 모델이 "예쁜" 높이로 올림.
+- 수정: `build_restyle_prompt` 맨 앞에 "Eyebrow height (most important)" 블록 추가 — 기존 눈썹 아래선을 따라갈 것, 윗눈꺼풀-눈썹 간격 유지, 이마 쪽으로 올리지 말 것, 놀란 표정 금지. 기존 배치 문장은 "horizontal only" 로 명시. Avoid 에 "raising the brows higher on the forehead" 추가.
+- 선택지: `P.BROW_HEIGHTS` (keep 기본 / slight_up / slight_down, 2~3mm). CLI `--height`, 웹 restyle 패널의 "높이" 칩 행, manifest `height`.
+- 마스크 위 여유(`--mask-up` 0.14 IPD)는 그대로 둠. 줄이면 모델이 높게 그렸을 때 눈썹 윗부분이 잘려 더 나빠짐. 프롬프트로 잡는 것이 맞음.
+- 로컬 확인 필요: 같은 사진으로 재실행해 눈-눈썹 간격이 원본과 같은지. 그래도 올라가면 `--mask-up 0.10` 을 함께 시험.
+
 ### 3.3 Codex 백엔드가 실제로 실행하는 것
 
 ```bash

@@ -328,6 +328,23 @@ BROW_STYLES: Dict[str, BrowStyle] = {
     ),
 }
 
+# How high the new brows sit. "keep" is the default: models otherwise lift the
+# brows onto the forehead and the eye-to-brow gap opens up.
+BROW_HEIGHTS: Dict[str, Dict[str, str]] = {
+    "keep": {
+        "ko": "원래 높이 그대로",
+        "prompt": "keep the new brows at exactly the height of the existing ones",
+    },
+    "slight_up": {
+        "ko": "살짝 올림",
+        "prompt": "raise the brows very slightly, by at most 2-3 mm on the real face, and no more",
+    },
+    "slight_down": {
+        "ko": "살짝 내림",
+        "prompt": "lower the brows very slightly, by at most 2-3 mm on the real face, and no more",
+    },
+}
+
 BROW_COLORS: Dict[str, Dict[str, str]] = {
     "match_hair": {"ko": "머리색에 맞춤", "prompt": "a colour that naturally matches the person's hair and skin tone"},
     "natural_black": {"ko": "내추럴 블랙", "prompt": "soft natural black-brown"},
@@ -346,3 +363,4 @@ BROW_CONDITION_CHOICES: List[str] = list(BROW_CONDITIONS) + ["random"]
 ETHNICITY_CHOICES: List[str] = list(ETHNICITIES) + ["random", "any"]
 BROW_STYLE_CHOICES: List[str] = list(BROW_STYLES)
 BROW_COLOR_CHOICES: List[str] = list(BROW_COLORS)
+BROW_HEIGHT_CHOICES: List[str] = list(BROW_HEIGHTS)

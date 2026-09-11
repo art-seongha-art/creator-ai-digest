@@ -421,6 +421,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         "tile": {"box": list(box), "size": list(tile_size)} if box is not None else None,
         "backend": backend.name,
         "color": args.color,
+        "height": args.height,
         "styles": styles,
         "landmarks": lm_full.to_dict() if lm_full else None,
         "variants": [],
@@ -430,8 +431,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     colour_ko = P.BROW_COLORS[args.color]["ko"]
     for i, style in enumerate(styles, 1):
         st = P.BROW_STYLES[style]
-        prompt_codex = PR.build_restyle_prompt(style, args.color, with_guide_image=use_guide, notes=args.notes or "")
-        prompt_api = PR.build_restyle_prompt(style, args.color, with_guide_image=False, notes=args.notes or "")
+        prompt_codex = PR.build_restyle_prompt(style, args.color, height_key=args.height, with_guide_image=use_guide, notes=args.notes or "")
+        prompt_api = PR.build_restyle_prompt(style, args.color, height_key=args.height, with_guide_image=False, notes=args.notes or "")
         prompt = prompt_codex if backend.name == "codex" else prompt_api
         out_path = out_dir / f"{i:02d}_{style}_{args.color}.png"
         entry: Dict[str, Any] = {"style": style, "style_ko": st.ko, "prompt": prompt, "image": str(out_path)}
@@ -577,6 +578,7 @@ def cmd_presets(args: argparse.Namespace) -> int:
     table("인종/외모 (--ethnicity)", [(k, f"{v.ko} (가중치 {v.weight:g})") for k, v in P.ETHNICITIES.items()] + [("random", "가중 무작위(한국인 비중 높음)"), ("any", "균등 무작위")])
     table("눈썹 스타일 (restyle --styles)", [(k, v.ko) for k, v in P.BROW_STYLES.items()] + [("all", "전체"), ("random:N", "N개 무작위")])
     table("눈썹 색 (restyle --color)", [(k, v["ko"]) for k, v in P.BROW_COLORS.items()])
+    table("눈썹 높이 (restyle --height)", [(k, v["ko"]) for k, v in P.BROW_HEIGHTS.items()])
     print()
     return 0
 
@@ -670,6 +672,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--styles", default="korean_natural,straight,soft_arch,feathered",
                    help="쉼표로 구분한 스타일 키, all, random:N")
     r.add_argument("--color", choices=P.BROW_COLOR_CHOICES, default="match_hair")
+    r.add_argument("--height", choices=P.BROW_HEIGHT_CHOICES, default="keep",
+                   help="새 눈썹의 높이. keep: 원래 눈썹 높이 그대로(기본) / slight_up·slight_down: 2~3mm 만 올리거나 내림")
     r.add_argument("--notes", help="편집 프롬프트에 덧붙일 지시문")
     r.add_argument("--seed", type=int, help="random:N 스타일 선택 시드")
     r.add_argument("--out-dir", help="출력 폴더 (기본 output/browlab/restyle_<파일명>_<시각>)")

@@ -154,6 +154,7 @@ python -m browlab sheet face.png --landmarks manual --pupils 412,590,688,592   #
 | --- | --- |
 | `--styles` | `korean_natural` 자연, `straight` 일자, `soft_arch` 부드러운 아치, `angled_arch` 각진 아치, `rounded` 둥근, `high_arch` 하이 아치, `puppy` 처진(강아지상), `bold_thick` 볼드, `feathered` 결눈썹(엠보), `ombre_powder` 옴브레 파우더, `combo` 콤보, `s_curve` S자. `all`, `random:3` 가능 |
 | `--color` | `match_hair`(기본), `natural_black`, `dark_brown`, `medium_brown`, `ash_brown`, `light_brown`, `gray_brown` |
+| `--height` | `keep`(기본) 원래 눈썹 높이 그대로 · `slight_up` / `slight_down` 2~3mm 만 올리거나 내림. 지정하지 않으면 모델이 눈썹을 이마 쪽으로 올려 눈과 눈썹 사이가 벌어집니다 |
 | `--mask-shape` | `brow`(기본): 검출된 눈썹 윤곽을 따라가는 마스크 / `box`: 눈썹을 감싸는 둥근 사각형 |
 | `--mask-side/--mask-up/--mask-down` | 마스크 여유(동공 간 거리 배수, 기본 0.10 / 0.14 / 0.06 ≈ 6 / 9 / 4 mm). 높은 아치나 두꺼운 디자인이면 `--mask-up 0.25` |
 | `--tile-size` | 얼굴 타일 크기(기본 `1024x1536`, 모든 gpt-image 모델 호환). 2.x 전용이면 `1536x2304` 가능 |
