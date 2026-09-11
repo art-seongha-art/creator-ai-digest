@@ -183,7 +183,13 @@ def build_face_prompt(spec: FaceSpec) -> str:
         (
             f"Eyebrows (most important): {cond.prompt}. The brow bone, the skin above and around both eyebrows and "
             "the whole forehead must be fully visible and unobstructed, because new eyebrows will be drawn by hand "
-            "on top of the printed photo. Do not draw full, groomed or well-defined eyebrows."
+            "on top of the printed photo. "
+            + (
+                "Draw the eyebrows exactly in this natural, untouched shape: real hair only, no makeup, "
+                "no pencil, no tattooed or drawn-on brows, no grooming or trimming."
+                if cond.shape
+                else "Do not draw full, groomed or well-defined eyebrows."
+            )
         ),
         (
             "Style/medium: photorealistic studio photograph with a clinical beauty-reference look, 85mm lens, "

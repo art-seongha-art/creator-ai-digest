@@ -44,7 +44,9 @@ KINDS = ("generate", "restyle", "sheet", "calibrate")
 KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기", "sheet": "사진을 1:1 시트로", "calibrate": "프린터 보정 시트"}
 # shorter chip labels for the page (full names stay in presets.py)
 BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
-                 "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음"}
+                 "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음",
+                 "arch": "아치", "high_arch": "높은 아치", "straight_flat": "일자", "half": "반토막", "thin": "얇음",
+                 "thick": "두꺼움", "spread": "퍼짐"}
 BACKENDS = ("auto", "codex", "codex-only", "api", "manual")
 LAYOUTS = ("face", "browzone", "both")
 SHEETS = ("none", "grid", "browzone", "both")

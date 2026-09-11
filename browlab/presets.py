@@ -160,6 +160,7 @@ class BrowCondition:
     key: str
     ko: str
     prompt: str
+    shape: bool = False   # True: an existing brow SHAPE to design over, not a lack of hair
 
 
 BROW_CONDITIONS: Dict[str, BrowCondition] = {
@@ -198,6 +199,46 @@ BROW_CONDITIONS: Dict[str, BrowCondition] = {
     "almost_none": BrowCondition(
         "almost_none", "거의 없는 눈썹",
         "almost no eyebrow hair at all, just faint traces on smooth skin over the brow bone",
+    ),
+    # ── existing brow shapes: the client already has brows, and a new design is drawn over them ──
+    "arch": BrowCondition(
+        "arch", "아치형 눈썹",
+        "naturally arched eyebrows with a clear rounded peak about two thirds along the brow and a tapered tail, "
+        "medium thickness and medium density",
+        shape=True,
+    ),
+    "high_arch": BrowCondition(
+        "high_arch", "높은 아치 눈썹",
+        "high, steeply arched eyebrows whose peak sits high above the eye and close to the outer third, "
+        "with a short slim tail",
+        shape=True,
+    ),
+    "straight_flat": BrowCondition(
+        "straight_flat", "일자 눈썹",
+        "straight flat eyebrows running almost horizontally with no arch at all, even thickness from head to tail",
+        shape=True,
+    ),
+    "half": BrowCondition(
+        "half", "1/2 반토막 눈썹",
+        "eyebrows that stop at their midpoint: the inner half has normal hair and the outer half is completely "
+        "bare skin, so each brow looks cut in half",
+        shape=True,
+    ),
+    "thin": BrowCondition(
+        "thin", "얇은 눈썹",
+        "naturally thin, narrow eyebrows: a continuous but very low line of hair, only a few millimetres tall",
+        shape=True,
+    ),
+    "thick": BrowCondition(
+        "thick", "두꺼운 눈썹",
+        "naturally thick, wide and dense eyebrows with strong dark hair covering a tall brow area",
+        shape=True,
+    ),
+    "spread": BrowCondition(
+        "spread", "퍼진 눈썹",
+        "spread-out eyebrows whose hairs fan outwards in several directions beyond the brow line, "
+        "so the outline is wide, fuzzy and hard to read",
+        shape=True,
     ),
 }
 

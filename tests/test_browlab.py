@@ -106,6 +106,20 @@ class PromptTests(unittest.TestCase):
         self.assertNotIn("Additional notes", text)
         self.assertIn("Additional notes: freckles", PR.build_face_prompt(PR.FaceSpec(20, "female", "oval", "faint", "japanese", notes="freckles")))
 
+    def test_shape_conditions_ask_for_the_shape_not_for_faint_brows(self):
+        shapes = [k for k, v in P.BROW_CONDITIONS.items() if v.shape]
+        self.assertEqual(shapes, ["arch", "high_arch", "straight_flat", "half", "thin", "thick", "spread"])
+        for key in shapes:
+            text = PR.build_face_prompt(PR.FaceSpec(30, "female", "oval", key, "korean"))
+            self.assertIn(P.BROW_CONDITIONS[key].prompt, text)
+            self.assertIn("natural, untouched shape", text)
+            self.assertNotIn("Do not draw full", text)          # a thick or arched brow must not be told to stay faint
+            self.assertIn("no tattooed or drawn-on brows", text)
+        # the sparse conditions keep the original instruction
+        faint = PR.build_face_prompt(PR.FaceSpec(30, "female", "oval", "sparse", "korean"))
+        self.assertIn("Do not draw full", faint)
+        self.assertNotIn("natural, untouched shape", faint)
+
     def test_restyle_prompt_content(self):
         text = PR.build_restyle_prompt("feathered", "ash_brown", with_guide_image=True)
         self.assertIn(P.BROW_STYLES["feathered"].prompt, text)
