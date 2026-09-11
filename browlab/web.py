@@ -846,6 +846,7 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
         "models": [
             {"key": "", "ko": "기본 · 최신 GPT Image 2.5 (생성 flare · 편집 sunburst)"},
             {"key": "gpt-image-2.5-sunburst", "ko": "gpt-image-2.5-sunburst 로 생성도 (정밀, 느림)"},
+            {"key": "gpt-image-1-mini", "ko": "gpt-image-1-mini — 임시 (2.5 가 열릴 때까지만, 품질 낮음)"},
         ],
     }
 
