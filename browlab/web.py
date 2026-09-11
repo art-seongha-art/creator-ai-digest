@@ -708,7 +708,7 @@ class JobStore:
         return cur
 
     @staticmethod
-    def job_cost(manifest: Dict[str, Any]) -> Tuple[float, int]:
+    def job_cost(manifest: Dict[str, Any], params: Optional[Dict[str, Any]] = None) -> Tuple[float, int]:
         """(estimated USD, number of API images) from the token usage in a job's manifest.
 
         Re-priced with the current rate table on every read, so a corrected rate applies to old jobs too.
@@ -722,7 +722,8 @@ class JobStore:
             if not e.get("usage"):
                 continue
             n += 1
-            model = e.get("model") or manifest.get("model")
+            p = params or {}
+            model = e.get("model") or manifest.get("model") or p.get("edit_model") or p.get("model")
             cost += B.estimate_cost_usd(e["usage"], model) or float(e.get("cost_usd") or 0.0)
         return round(cost, 6), n
 
@@ -731,7 +732,7 @@ class JobStore:
         with self.lock:
             jobs = list(self.jobs.values())
         for j in jobs:
-            cost, n = self.job_cost(self._manifest(j))
+            cost, n = self.job_cost(self._manifest(j), j.params)
             if n:
                 total += cost
                 images += n
@@ -748,7 +749,7 @@ class JobStore:
 
     def summary(self, job: Job) -> Dict[str, Any]:
         manifest = self._manifest(job)
-        cost, api_images = self.job_cost(manifest)
+        cost, api_images = self.job_cost(manifest, job.params)
         progress = ""
         if job.kind == "generate" and job.status == "running":
             progress = f"{len(manifest.get('faces', []))}/{job.params.get('count', 1)}"

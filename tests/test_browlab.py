@@ -452,7 +452,7 @@ class BackendTests(unittest.TestCase):
         # 120 text x $5/M + 2127 image-out x $30/M
         self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-2.5-flare"), 0.06441, places=5)
         self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-1"), 0.0857, places=4)
-        self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-1-mini"), 0.0502, places=4)  # 120x2 + 2127x8 per M
+        self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-1-mini"), 0.017256, places=6)  # (120x2 + 2127x8) / 1M
         self.assertIsNone(B.usage_dict(object()))
         self.assertIsNone(B.estimate_cost_usd(None, "gpt-image-2"))
 
