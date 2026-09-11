@@ -112,6 +112,16 @@ pre.log{margin:8px 0 0;background:#1f1d1b;color:#e8e2da;padding:12px;border-radi
 .files a{display:inline-block;margin:2px 10px 2px 0;font-size:12.5px;color:var(--accent)}
 .empty{font-size:13px;color:var(--muted);padding:6px 2px}
 .note{background:#fbf3ea;border:1px solid #f0dcc8;border-radius:10px;padding:10px 12px;font-size:12.5px}
+.ov{position:fixed;inset:0;background:rgba(31,28,25,.38);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.sheet{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:var(--surface);border-radius:16px 16px 0 0;padding:18px 18px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.sheet h2{margin:0;font-size:16px;display:flex;align-items:center;justify-content:space-between}
+.big{font-size:28px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.big small{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
+.bar2{height:8px;border-radius:999px;background:#ece7e0;overflow:hidden}
+.bar2 i{display:block;height:100%;background:var(--accent);width:0}
+.kv2{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;color:var(--muted)}
+.kv2 b{color:var(--ink);font-weight:600}
+@media (min-width:1000px){.ov{align-items:center}.sheet{border-radius:16px}}
 @media (min-width:1000px){
   main{grid-template-columns:minmax(0,720px) minmax(360px,1fr);gap:24px;padding:24px 28px}
   .right{display:block}
@@ -130,6 +140,10 @@ pre.log{margin:8px 0 0;background:#1f1d1b;color:#e8e2da;padding:12px;border-radi
   <div class="brand"><b>BrowLab</b><span>눈썹 디자인 연습 · A4 실물 크기 시트</span></div>
   <span class="sp"></span>
   <div class="status" id="status"></div>
+  <button id="usageBtn" class="btn pill" hidden title="설정 · 사용량">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    <span id="usageAmt">$0.00</span>
+  </button>
   <button id="jobsBtn" class="btn pill" hidden>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg>
     작업 <span class="count" id="jobCount"></span>
@@ -242,6 +256,26 @@ pre.log{margin:8px 0 0;background:#1f1d1b;color:#e8e2da;padding:12px;border-radi
     </div>
   </section>
 
+  <div id="settingsOv" class="ov" hidden>
+    <div class="sheet" role="dialog" aria-label="설정과 사용량">
+      <h2>설정 · API 사용량 <button id="settingsClose" class="btn" type="button">닫기</button></h2>
+      <div class="big"><span id="uTotal">$0.00</span><small>API 지출 추정 (누적)</small></div>
+      <div class="bar2"><i id="uBar"></i></div>
+      <div class="kv2">
+        <span>충전 누계</span><b id="uBudget">설정 안 됨</b>
+        <span>남은 금액 (추정)</span><b id="uRemain">—</b>
+        <span>API 이미지</span><b id="uImages">0장</b>
+        <span>집계 시작</span><b id="uSince">—</b>
+      </div>
+      <form id="fBudget" style="display:flex;flex-direction:column;gap:8px">
+        <label class="field"><span>충전 누계 (USD) — 충전할 때마다 합계로 고쳐 쓰세요</span><input name="budget_usd" type="number" step="0.01" min="0" placeholder="예: 10"></label>
+        <label class="field"><span>메모 (선택)</span><input name="budget_note" type="text" maxlength="80" placeholder="예: 9/12 첫 충전"></label>
+        <div class="row" style="align-items:center"><button class="btn dark" type="submit" style="height:40px;padding:0 16px">저장</button><span class="msg" data-msg></span></div>
+      </form>
+      <div class="hint">추정치 = 각 API 응답의 토큰 수 × 공식 단가(이미지 출력 $30/M · 이미지 입력 $8/M · 텍스트 $5/M). 실제 청구액은 <a href="https://platform.openai.com/usage" target="_blank" rel="noopener">platform.openai.com/usage</a> 에서 확인하세요. Codex 모드는 구독 한도를 쓰므로 여기에 잡히지 않습니다.</div>
+    </div>
+  </div>
+
   <aside class="right" id="jobsPane" hidden>
     <div class="card">
       <div class="jobs-head">
@@ -270,11 +304,29 @@ async function api(path, opts={}){
 }
 const post=(path, body)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
 
-function showLogin(){ stopPolling(); $('#login').hidden=false; $('#app').hidden=true; $('#jobsPane').hidden=true; $('#logoutBtn').hidden=true; $('#jobsBtn').hidden=true; document.body.classList.remove('show-jobs'); $('#pw').focus(); }
+function showLogin(){ stopPolling(); $('#login').hidden=false; $('#app').hidden=true; $('#jobsPane').hidden=true; $('#logoutBtn').hidden=true; $('#jobsBtn').hidden=true; $('#usageBtn').hidden=true; document.body.classList.remove('show-jobs'); $('#pw').focus(); }
 async function showApp(){
-  $('#login').hidden=true; $('#app').hidden=false; $('#jobsPane').hidden=false; $('#logoutBtn').hidden=false; $('#jobsBtn').hidden=false;
-  presets=await api('api/presets'); buildForms(); await refreshJobs(); startPolling();
+  $('#login').hidden=true; $('#app').hidden=false; $('#jobsPane').hidden=false; $('#logoutBtn').hidden=false; $('#jobsBtn').hidden=false; $('#usageBtn').hidden=false;
+  presets=await api('api/presets'); buildForms(); await refreshJobs(); await loadUsage(); startPolling();
 }
+const usd=v=>'$'+(Math.round((+v||0)*100)/100).toFixed(2);
+let usage=null;
+function renderUsage(){
+  if(!usage) return; const u=usage;
+  $('#usageAmt').textContent=usd(u.total_usd)+(u.budget_usd!=null?' / '+usd(u.budget_usd):'');
+  $('#uTotal').textContent=usd(u.total_usd);
+  $('#uBudget').textContent=u.budget_usd!=null?usd(u.budget_usd)+(u.budget_note?' · '+u.budget_note:''):'설정 안 됨';
+  $('#uRemain').textContent=u.remaining_usd!=null?usd(u.remaining_usd):'—';
+  $('#uImages').textContent=u.api_images+'장 · 작업 '+u.api_jobs+'개';
+  $('#uSince').textContent=u.first?u.first.replace('T',' '):'—';
+  const pct=u.budget_usd?Math.min(100,100*u.total_usd/u.budget_usd):0; $('#uBar').style.width=pct+'%';
+  const f=$('#fBudget'); if(document.activeElement!==f.budget_usd) f.budget_usd.value=u.budget_usd!=null?u.budget_usd:''; if(document.activeElement!==f.budget_note) f.budget_note.value=u.budget_note||'';
+}
+async function loadUsage(){ try{ usage=await api('api/usage'); renderUsage(); }catch(e){} }
+$('#usageBtn').onclick=()=>{ $('#settingsOv').hidden=false; loadUsage(); };
+$('#settingsClose').onclick=()=>{ $('#settingsOv').hidden=true; };
+$('#settingsOv').addEventListener('click',e=>{ if(e.target===e.currentTarget) $('#settingsOv').hidden=true; });
+$('#fBudget').onsubmit=async e=>{ e.preventDefault(); const f=e.target; const msg=$('[data-msg]',f); msg.textContent=''; try{ usage=await post('api/settings',{budget_usd:f.budget_usd.value, budget_note:f.budget_note.value}); renderUsage(); msg.style.color='var(--ok)'; msg.textContent='저장됨'; setTimeout(()=>{msg.textContent='';msg.style.color='';},1500); }catch(err){ msg.textContent=err.message; } };
 
 function buildForms(){
   const codex=presets.backends.find(b=>b.key==='codex'), apiB=presets.backends.find(b=>b.key==='api');
@@ -371,7 +423,7 @@ async function refreshJobs(){
   jobs.forEach(j=>{
     const row=el('button','job'+(j.id===current?' sel':'')); row.type='button'; row.onclick=()=>openJob(j.id);
     if(j.thumb){ const im=document.createElement('img'); im.loading='lazy'; im.src=j.thumb+'?w=120'; im.alt=''; row.appendChild(im); } else row.appendChild(el('div','noimg'));
-    const t=el('div','t'); t.appendChild(el('b','',j.title||j.kind_ko)); t.appendChild(el('span','',j.kind_ko+(j.params&&j.params.backend?' · '+j.params.backend:'')));
+    const t=el('div','t'); t.appendChild(el('b','',j.title||j.kind_ko)); t.appendChild(el('span','',j.kind_ko+(j.params&&j.params.backend?' · '+j.params.backend:'')+(j.cost_usd?' · '+usd(j.cost_usd):'')));
     const meta=el('div','meta'); meta.appendChild(el('span','pill '+j.status,(STATUS_KO[j.status]||j.status)+(j.status==='running'&&j.progress?' '+j.progress:''))); const tm=document.createElement('time'); tm.textContent=fmtTime(j.created)+(j.status==='done'?' · '+dur(j):''); meta.appendChild(tm); t.appendChild(meta);
     row.appendChild(t); list.appendChild(row);
   });
@@ -382,7 +434,7 @@ function imgLabel(name){ const b=name.split('/').pop(); if(/calibration/.test(b)
 async function renderJob(){
   if(!current) return; let j; try{ j=await api('api/jobs/'+current); }catch(e){ return; }
   const box=$('#jobDetail'); box.hidden=false; box.replaceChildren();
-  const head=el('div','head'); const hl=el('div'); hl.appendChild(el('h3','',j.title||j.kind_ko)); hl.appendChild(el('div','sub',j.kind_ko+' · '+fmtTime(j.created)+(j.status==='done'?' · '+dur(j):'')+(j.error?' · '+j.error:''))); head.appendChild(hl);
+  const head=el('div','head'); const hl=el('div'); hl.appendChild(el('h3','',j.title||j.kind_ko)); hl.appendChild(el('div','sub',j.kind_ko+' · '+fmtTime(j.created)+(j.status==='done'?' · '+dur(j):'')+(j.cost_usd?' · API 추정 '+usd(j.cost_usd)+' ('+j.api_images+'장)':'')+(j.error?' · '+j.error:''))); head.appendChild(hl);
   const right=el('div'); right.style.display='flex'; right.style.gap='6px'; right.style.alignItems='center'; right.appendChild(el('span','pill '+j.status,STATUS_KO[j.status]||j.status));
   if(j.status==='running'||j.status==='queued'){ const c=el('button','btn','취소'); c.type='button'; c.onclick=async()=>{ await post('api/jobs/'+j.id+'/cancel'); renderJob(); refreshJobs(); }; right.appendChild(c); }
   head.appendChild(right); box.appendChild(head);
@@ -394,7 +446,7 @@ async function renderJob(){
   if(others.length){ const d=el('div','files'); others.forEach(f=>{ const a=el('a','',f.name); a.href=f.url; a.target='_blank'; d.appendChild(a); }); det.appendChild(d); }
   const pre=el('pre','log', j.log||'(아직 없음)'); det.appendChild(pre); if(j.status==='failed') det.open=true; box.appendChild(det); pre.scrollTop=pre.scrollHeight;
 }
-function startPolling(){ stopPolling(); timer=setInterval(async()=>{ try{ const active=jobs.some(j=>j.status==='running'||j.status==='queued'); if(active){ await refreshJobs(); const cur=jobs.find(j=>j.id===current); if(cur) await renderJob(); } }catch(e){} }, 4000); }
+function startPolling(){ stopPolling(); timer=setInterval(async()=>{ try{ const active=jobs.some(j=>j.status==='running'||j.status==='queued'); if(active){ await refreshJobs(); const cur=jobs.find(j=>j.id===current); if(cur) await renderJob(); await loadUsage(); } }catch(e){} }, 4000); }
 function stopPolling(){ if(timer) clearInterval(timer); timer=null; }
 (async()=>{ try{ const me=await api('api/me'); renderStatus(!!me.codex, !!me.api_key); if(me.authed) await showApp(); else showLogin(); }catch(e){ showLogin(); } })();
 </script>

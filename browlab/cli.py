@@ -59,6 +59,17 @@ def _write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _record_usage(entry: Dict[str, Any], result: B.GenResult, manifest: Dict[str, Any]) -> None:
+    """Keep the Images API token usage and cost estimate in the manifest (API backend only)."""
+    if not result.usage:
+        return
+    entry["usage"] = result.usage
+    entry["cost_usd"] = result.cost_usd
+    manifest["cost_usd"] = round(float(manifest.get("cost_usd") or 0.0) + float(result.cost_usd or 0.0), 6)
+    _log(f"토큰: 입력 {result.usage['input_tokens']} (텍스트 {result.usage['text_tokens']} · 이미지 {result.usage['image_tokens']})"
+         f" · 출력 {result.usage['output_tokens']} · 추정 ${result.cost_usd:.4f} (누적 ${manifest['cost_usd']:.4f})")
+
+
 def _backend(args: argparse.Namespace) -> B.BaseBackend:
     return B.make_backend(
         args.backend,
@@ -193,6 +204,7 @@ def cmd_generate(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         entry["pending"] = result.pending
+        _record_usage(entry, result, manifest)
         if result.pending:
             _log(f"수동 모드: 프롬프트를 저장했습니다 -> {result.log}")
         elif not args.no_sheet:
@@ -329,6 +341,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         entry["pending"] = result.pending
+        _record_usage(entry, result, manifest)
         if result.pending:
             manifest["variants"].append(entry)
             _write_json(manifest_path, manifest)
@@ -451,7 +464,8 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--gender", choices=P.GENDER_CHOICES, default="random")
     g.add_argument("--face-shape", choices=P.FACE_SHAPE_CHOICES, default="random")
     g.add_argument("--brow-condition", choices=P.BROW_CONDITION_CHOICES, default="random")
-    g.add_argument("--ethnicity", choices=P.ETHNICITY_CHOICES, default="random")
+    g.add_argument("--ethnicity", choices=P.ETHNICITY_CHOICES, default="korean",
+                   help="외모. 기본 korean(한국인 100%%). random 은 한국인 비중 높은 가중 무작위, any 는 균등")
     g.add_argument("--notes", help="프롬프트에 덧붙일 자유 지시문")
     g.add_argument("--seed", type=int, help="무작위 조합 재현용 시드")
     g.add_argument("--out-dir", help="출력 폴더 (기본 output/browlab/faces_<시각>)")

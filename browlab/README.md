@@ -98,7 +98,7 @@ python -m browlab presets
 | `--gender` | `female`, `male`, `random` | 성별 |
 | `--face-shape` | `oval` 계란형, `round` 둥근형, `square` 각진형, `long` 긴형, `heart` 하트형, `diamond` 다이아몬드형, `triangle` 삼각형, `random` | 얼굴형 |
 | `--brow-condition` | `sparse` 모량 부족, `faint` 연함, `patchy` 군데군데 빔, `missing_tail` 꼬리 없음, `asymmetric` 비대칭, `overplucked` 과도하게 뽑음, `undefined` 형태 불분명, `scar_gap` 흉터, `almost_none` 거의 없음, `random` | 눈썹 상태 |
-| `--ethnicity` | `korean`, `japanese`, `chinese`, `southeast_asian`, `south_asian`, `middle_eastern`, `european`, `mediterranean`, `african`, `latino`, `mixed`, `random`, `any` | 외모. `random` 은 한국인 비중을 높게 둔 가중 무작위, `any` 는 균등 |
+| `--ethnicity` | `korean`(기본), `japanese`, `chinese`, `southeast_asian`, `south_asian`, `middle_eastern`, `european`, `mediterranean`, `african`, `latino`, `mixed`, `random`, `any` | 외모. 기본은 한국인 100%. `random` 은 한국인 비중을 높게 둔 가중 무작위, `any` 는 균등 |
 | `--seed` | 정수 | 같은 시드면 같은 조합(나이·성별·얼굴형…)이 나옵니다. 이미지 자체는 매번 달라집니다 |
 | `--notes` | 문장 | 프롬프트 끝에 덧붙일 지시문 |
 | `--backend` | `codex`(기본), `api`, `manual` | 이미지 생성 방법 |

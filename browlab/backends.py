@@ -34,6 +34,44 @@ class GenResult:
     model: Optional[str] = None
     log: str = ""
     pending: bool = False
+    usage: Optional[Dict[str, int]] = None   # token usage reported by the Images API
+    cost_usd: Optional[float] = None         # estimate from usage x official per-token rates
+
+
+# Official per-1M-token rates in USD (developers.openai.com/api/docs/pricing, read 2026-09-12).
+# gpt-image-1.5 / gpt-image-2 / gpt-image-2.5-* share the "default" row.
+IMAGE_RATES: Dict[str, Dict[str, float]] = {
+    "gpt-image-1": {"text_in": 5.0, "image_in": 10.0, "image_out": 40.0},
+    "default": {"text_in": 5.0, "image_in": 8.0, "image_out": 30.0},
+}
+
+
+def usage_dict(resp: Any) -> Optional[Dict[str, int]]:
+    """Flatten an Images API response's ``usage`` object (None when the response has none)."""
+    u = getattr(resp, "usage", None)
+    if u is None:
+        return None
+    det = getattr(u, "input_tokens_details", None)
+    out = {
+        "input_tokens": int(getattr(u, "input_tokens", 0) or 0),
+        "output_tokens": int(getattr(u, "output_tokens", 0) or 0),
+        "total_tokens": int(getattr(u, "total_tokens", 0) or 0),
+        "text_tokens": int(getattr(det, "text_tokens", 0) or 0) if det is not None else 0,
+        "image_tokens": int(getattr(det, "image_tokens", 0) or 0) if det is not None else 0,
+    }
+    if det is None:  # no breakdown: treat all input as text (the cheaper rate is not assumed)
+        out["text_tokens"] = out["input_tokens"]
+    return out
+
+
+def estimate_cost_usd(usage: Optional[Dict[str, int]], model: Optional[str]) -> Optional[float]:
+    if not usage:
+        return None
+    key = "gpt-image-1" if (model or "").startswith("gpt-image-1") and not (model or "").startswith("gpt-image-1.5") else "default"
+    r = IMAGE_RATES[key]
+    cost = (usage.get("text_tokens", 0) * r["text_in"] + usage.get("image_tokens", 0) * r["image_in"]
+            + usage.get("output_tokens", 0) * r["image_out"]) / 1_000_000
+    return round(cost, 6)
 
 
 class BaseBackend:
@@ -287,7 +325,9 @@ class OpenAIBackend(BaseBackend):
         kwargs: Dict[str, Any] = dict(model=self.model, prompt=prompt, n=1, size=size, quality=quality, output_format="png")
         resp = self.client().images.generate(**kwargs)
         path = self._save_first(resp, Path(out_path))
-        return GenResult(path=path, backend=self.name, prompt=prompt, model=self.model)
+        usage = usage_dict(resp)
+        return GenResult(path=path, backend=self.name, prompt=prompt, model=self.model, usage=usage,
+                         cost_usd=estimate_cost_usd(usage, self.model))
 
     def edit(self, prompt, images, out_path, *, mask=None, size="auto", quality="high") -> GenResult:
         model = self.edit_model
@@ -314,7 +354,9 @@ class OpenAIBackend(BaseBackend):
             if mask_handle is not None:
                 mask_handle.close()
         path = self._save_first(resp, Path(out_path))
-        return GenResult(path=path, backend=self.name, prompt=prompt, model=model)
+        usage = usage_dict(resp)
+        return GenResult(path=path, backend=self.name, prompt=prompt, model=model, usage=usage,
+                         cost_usd=estimate_cost_usd(usage, model))
 
 
 # ---------------------------------------------------------------------------

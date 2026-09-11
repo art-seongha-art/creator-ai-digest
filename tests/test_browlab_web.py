@@ -220,7 +220,23 @@ class WebServerTest(unittest.TestCase):
         # a failed job leaves no folder behind
         self.assertFalse(any(p.name.endswith("_restyle") for p in (Path(self.tmp.name) / "data" / "jobs").iterdir() if not any(p.iterdir())))
 
-    def test_08_logout(self):
+    def test_08_usage_and_settings(self):
+        self.login()
+        status, usage, _ = self.call("/api/usage")
+        self.assertEqual(status, 200)
+        self.assertEqual(usage["total_usd"], 0)  # manual jobs cost nothing
+        self.assertIsNone(usage["budget_usd"])
+        status, body, _ = self.call("/api/settings", {"budget_usd": "10", "budget_note": "첫 충전"})
+        self.assertEqual(status, 200)
+        self.assertEqual(body["budget_usd"], 10.0)
+        self.assertEqual(body["remaining_usd"], 10.0)
+        self.assertEqual(body["budget_note"], "첫 충전")
+        status, body, _ = self.call("/api/settings", {"budget_usd": "-3"})
+        self.assertEqual(status, 400)
+        status, body, _ = self.call("/api/settings", {"budget_usd": ""})
+        self.assertIsNone(body["budget_usd"])
+
+    def test_09_logout(self):
         self.login()
         status, body, _ = self.call("/api/logout", {})
         self.assertEqual(status, 200)
@@ -250,6 +266,9 @@ class ArgvBuilderTest(unittest.TestCase):
             self.assertEqual(argv[argv.index("-n") + 1], "8")
             self.assertEqual(argv[argv.index("--age") + 1], "random")
             self.assertEqual(argv[argv.index("--gender") + 1], "random")
+            self.assertEqual(argv[argv.index("--ethnicity") + 1], "korean")  # default is Korean, not random
+            self.assertEqual(shown["brow_condition"], "random")
+            self.assertEqual(shown["ethnicity"], "korean")
             self.assertEqual(argv[argv.index("--backend") + 1], "codex")
             self.assertEqual(argv[argv.index("--quality") + 1], "high")
             self.assertEqual(argv[argv.index("--layout") + 1], "both")

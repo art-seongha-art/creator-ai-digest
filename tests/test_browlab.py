@@ -424,6 +424,49 @@ class BackendTests(unittest.TestCase):
             legacy.edit("E", [src], tmp / "e2.png")
             self.assertEqual(calls[-1][1]["input_fidelity"], "high")
 
+    def test_usage_dict_and_cost_estimate(self):
+        class Det:
+            text_tokens = 120
+            image_tokens = 0
+
+        class Usage:
+            input_tokens = 120
+            output_tokens = 2127
+            total_tokens = 2247
+            input_tokens_details = Det()
+
+        class Resp:
+            usage = Usage()
+
+        u = B.usage_dict(Resp())
+        self.assertEqual(u["output_tokens"], 2127)
+        self.assertEqual(u["text_tokens"], 120)
+        # 120 text x $5/M + 2127 image-out x $30/M
+        self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-2.5-flare"), 0.06441, places=5)
+        self.assertAlmostEqual(B.estimate_cost_usd(u, "gpt-image-1"), 0.0857, places=4)
+        self.assertIsNone(B.usage_dict(object()))
+        self.assertIsNone(B.estimate_cost_usd(None, "gpt-image-2"))
+
+        class Item:
+            b64_json = base64.b64encode(b"x").decode()
+            url = None
+
+        class RespWithUsage:
+            data = [Item()]
+            usage = Usage()
+
+        class Images:
+            def generate(self, **kw):
+                return RespWithUsage()
+
+        class Client:
+            images = Images()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            r = B.OpenAIBackend(client=Client()).generate("P", Path(tmp) / "g.png")
+            self.assertEqual(r.usage["output_tokens"], 2127)
+            self.assertAlmostEqual(r.cost_usd, 0.06441, places=5)
+
     def test_openai_backend_needs_key(self):
         old = os.environ.pop("OPENAI_API_KEY", None)
         try:

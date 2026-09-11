@@ -276,11 +276,14 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
             ("gender", "--gender", P.GENDER_CHOICES),
             ("face_shape", "--face-shape", P.FACE_SHAPE_CHOICES),
             ("brow_condition", "--brow-condition", P.BROW_CONDITION_CHOICES),
-            ("ethnicity", "--ethnicity", P.ETHNICITY_CHOICES),
         ):
             v = _choice(p.get(key), choices, "random")
             argv += [flag, v]
             shown[key] = v
+        # 외모 기본값은 한국인 (연구자 지시 2026-09-12). 무작위/다른 외모는 고급 설정에서만.
+        eth = _choice(p.get("ethnicity"), P.ETHNICITY_CHOICES, "korean")
+        argv += ["--ethnicity", eth]
+        shown["ethnicity"] = eth
         notes = _text(p.get("notes"), 600)
         if notes:
             argv.append(f"--notes={notes}")
@@ -569,8 +572,66 @@ class JobStore:
                 return f"files/{job.id}/{hits[0].relative_to(root).as_posix()}"
         return None
 
+    # -- usage / settings -----------------------------------------------------
+    @property
+    def settings_path(self) -> Path:
+        return self.cfg.data_dir / "settings.json"
+
+    def get_settings(self) -> Dict[str, Any]:
+        try:
+            data = json.loads(self.settings_path.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def set_settings(self, patch: Dict[str, Any]) -> Dict[str, Any]:
+        cur = self.get_settings()
+        if "budget_usd" in patch:
+            value = patch["budget_usd"]
+            if value in (None, ""):
+                cur.pop("budget_usd", None)
+                cur.pop("budget_set_at", None)
+            else:
+                cur["budget_usd"] = _float_opt(value, 0, 100000)
+                cur["budget_set_at"] = _now()
+        if "budget_note" in patch:
+            cur["budget_note"] = _text(patch["budget_note"], 80)
+        tmp = self.settings_path.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(cur, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(self.settings_path)
+        return cur
+
+    @staticmethod
+    def job_cost(manifest: Dict[str, Any]) -> Tuple[float, int]:
+        """(estimated USD, number of API images) recorded in a job's manifest."""
+        entries = list(manifest.get("faces", [])) + list(manifest.get("variants", []))
+        cost = sum(float(e.get("cost_usd") or 0.0) for e in entries if isinstance(e, dict))
+        n = sum(1 for e in entries if isinstance(e, dict) and e.get("usage"))
+        return round(cost, 6), n
+
+    def usage_totals(self) -> Dict[str, Any]:
+        total, images, api_jobs, first = 0.0, 0, 0, None
+        with self.lock:
+            jobs = list(self.jobs.values())
+        for j in jobs:
+            cost, n = self.job_cost(self._manifest(j))
+            if n:
+                total += cost
+                images += n
+                api_jobs += 1
+                first = j.created if first is None or j.created < first else first
+        settings = self.get_settings()
+        budget = settings.get("budget_usd")
+        return {
+            "total_usd": round(total, 4), "api_images": images, "api_jobs": api_jobs, "first": first,
+            "budget_usd": budget, "budget_set_at": settings.get("budget_set_at"), "budget_note": settings.get("budget_note", ""),
+            "remaining_usd": round(float(budget) - total, 4) if budget is not None else None,
+            "rates": {"image_out_per_m": 30.0, "image_in_per_m": 8.0, "text_in_per_m": 5.0},
+        }
+
     def summary(self, job: Job) -> Dict[str, Any]:
         manifest = self._manifest(job)
+        cost, api_images = self.job_cost(manifest)
         progress = ""
         if job.kind == "generate" and job.status == "running":
             progress = f"{len(manifest.get('faces', []))}/{job.params.get('count', 1)}"
@@ -580,7 +641,7 @@ class JobStore:
             "id": job.id, "kind": job.kind, "kind_ko": KIND_KO.get(job.kind, job.kind), "created": job.created,
             "status": job.status, "started": job.started, "finished": job.finished, "error": job.error,
             "params": job.params, "rc": job.rc, "title": self.title_ko(job, manifest), "thumb": self.thumb(job),
-            "progress": progress,
+            "progress": progress, "cost_usd": cost, "api_images": api_images,
         }
 
     def detail(self, job: Job) -> Dict[str, Any]:
@@ -662,8 +723,9 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
         "genders": [rnd] + [{"key": k, "ko": v["ko"]} for k, v in P.GENDERS.items()],
         "face_shapes": [rnd] + [{"key": k, "ko": v.ko, "tip": v.brow_tip_ko} for k, v in P.FACE_SHAPES.items()],
         "brow_conditions": [rnd] + [{"key": k, "ko": v.ko, "short": BROW_SHORT_KO.get(k, v.ko)} for k, v in P.BROW_CONDITIONS.items()],
-        "ethnicities": [{"key": "random", "ko": "가중 무작위 (한국인 비중 높음)"}, {"key": "any", "ko": "균등 무작위"}]
-        + [{"key": k, "ko": v.ko} for k, v in P.ETHNICITIES.items()],
+        "ethnicities": [{"key": "korean", "ko": "한국인 (기본)"}]
+        + [{"key": k, "ko": v.ko} for k, v in P.ETHNICITIES.items() if k != "korean"]
+        + [{"key": "random", "ko": "가중 무작위 (한국인 비중 높음)"}, {"key": "any", "ko": "균등 무작위"}],
         "brow_styles": [{"key": k, "ko": v.ko} for k, v in P.BROW_STYLES.items()],
         "brow_colors": [{"key": k, "ko": v["ko"]} for k, v in P.BROW_COLORS.items()],
         "qualities": list(QUALITIES),
@@ -820,6 +882,9 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/presets":
                 self.send_json(presets_json(self.server.cfg))
                 return
+            if path == "/api/usage":
+                self.send_json(self.server.store.usage_totals())
+                return
             if path == "/api/jobs":
                 store = self.server.store
                 with store.lock:
@@ -915,6 +980,11 @@ class Handler(BaseHTTPRequestHandler):
                     raise BadRequest("작업 종류를 고르세요")
                 job = self.server.store.submit(kind, body)
                 self.send_json(self.server.store.summary(job), HTTPStatus.CREATED)
+                return
+            if path == "/api/settings":
+                body = self.read_json()
+                self.server.store.set_settings(body)
+                self.send_json(self.server.store.usage_totals())
                 return
             m = re.match(r"^/api/jobs/([A-Za-z0-9_]+)/cancel$", path)
             if m:
