@@ -569,6 +569,30 @@ class CliTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 self._run(["restyle", str(src), "--dry-run", "--styles", "nope", "--out-dir", str(tmp / "d2"), "--landmarks", "none"])
 
+    def test_edit_alignment_check(self):
+        import argparse
+        from browlab import cli as C
+
+        args = argparse.Namespace(landmarks="auto", codex_bin="codex", landmark_model=None, no_download=True)
+        orig = L.from_pupils(1000, 1500, (400.0, 600.0), (600.0, 600.0))
+        img = Image.new("RGB", (1000, 1500))
+        saved = C.L.detect
+        try:
+            C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (402.0, 603.0), (602.0, 603.0))
+            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
+            self.assertTrue(ok, why)
+            C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (400.0, 520.0), (600.0, 520.0))  # eyes moved up 40% IPD
+            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
+            self.assertFalse(ok, why)
+            C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (380.0, 600.0), (620.0, 600.0))  # zoomed 20%
+            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
+            self.assertFalse(ok, why)
+            C.L.detect = lambda *a, **k: None  # no face found -> do not block compositing
+            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
+            self.assertTrue(ok)
+        finally:
+            C.L.detect = saved
+
     def test_calibrate(self):
         with tempfile.TemporaryDirectory() as tmp:
             rc, out = self._run(["calibrate", "--out-dir", tmp, "--no-pdf"])

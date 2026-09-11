@@ -29,6 +29,7 @@ from . import sheet as S
 from . import web as W
 
 DEFAULT_OUT = Path("output") / "browlab"
+ALIGN_TOLERANCE = 0.05  # pupils may move at most 5% of the inter-pupil distance for compositing
 QUALITY_CHOICES = ["low", "medium", "high", "xhigh", "max", "auto"]
 
 
@@ -77,6 +78,38 @@ def _explain_api_error(exc: BaseException) -> str:
                 "platform.openai.com → Settings → Organization → Limits 에서 결제 반영·조직 인증(Verify organization) 상태를 확인하세요. "
                 "키가 만들어진 조직과 크레딧을 충전한 조직이 같은지도 확인하세요.")
     return ""
+
+
+def _pt(p: Any) -> Tuple[float, float]:
+    return (float(p[0]), float(p[1])) if isinstance(p, (tuple, list)) else (float(p.x), float(p.y))
+
+
+def _edit_aligned(args: argparse.Namespace, edited: Image.Image, lm_orig: L.FaceLandmarks, size: Tuple[int, int]) -> Tuple[bool, str]:
+    """Did the edit keep the face where it was? Compares pupil positions of the edited image with the original.
+
+    Some models regenerate the whole picture instead of inpainting only the mask; pasting the eyebrow
+    region of such an image back onto the original produces doubled eyes, so the caller skips compositing.
+    """
+    provider = "auto" if args.landmarks in ("manual", "auto") else args.landmarks
+    img = edited if edited.size == size else edited.resize(size, Image.LANCZOS)
+    try:
+        lm_new = L.detect(img, None, provider=provider, codex_bin=args.codex_bin,
+                          codex_model=getattr(args, "landmark_model", None),
+                          download_model=not getattr(args, "no_download", False))
+    except L.LandmarkError:
+        lm_new = None
+    if lm_new is None:
+        return True, "편집 결과에서 얼굴을 찾지 못해 정렬 확인 생략"
+    ipd = lm_orig.ipd_px or 1.0
+
+    def dist(a: Any, b: Any) -> float:
+        (ax, ay), (bx, by) = _pt(a), _pt(b)
+        return ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5
+
+    shift = max(dist(lm_new.right_pupil, lm_orig.right_pupil), dist(lm_new.left_pupil, lm_orig.left_pupil)) / ipd
+    ratio = abs(lm_new.ipd_px / ipd - 1.0)
+    ok = shift <= ALIGN_TOLERANCE and ratio <= ALIGN_TOLERANCE
+    return ok, f"눈 위치 이동 {shift * 100:.1f}% · 동공 간 거리 변화 {ratio * 100:.1f}% (허용 {ALIGN_TOLERANCE * 100:.0f}%)"
 
 
 def _backend(args: argparse.Namespace) -> B.BaseBackend:
@@ -364,13 +397,23 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         final_img = Image.open(result.path).convert("RGB")
-        if mask is not None and not args.no_composite:
+        aligned = True
+        if lm is not None and mask is not None and not args.no_composite and args.landmarks != "none":
+            aligned, why = _edit_aligned(args, final_img, lm, prepared.size)
+            entry["aligned"] = aligned
+            entry["align_check"] = why
+            if aligned:
+                _log(f"정렬 확인: {why}")
+            else:
+                _log(f"경고: 편집 결과의 얼굴 위치가 원본과 다릅니다({why}). 눈썹만 합성하면 눈이 겹쳐 보이므로 "
+                     "합성을 생략하고 편집 결과를 그대로 씁니다.")
+        if mask is not None and not args.no_composite and aligned:
             final_img = M.composite_brows(prepared, final_img, mask)
             final_path = out_dir / f"{i:02d}_{style}_{args.color}_composited.png"
             final_img.save(final_path)
             entry["composited"] = str(final_path)
             _log(f"원본 위에 눈썹만 합성: {final_path.name}")
-        results.append((f"{i}. {st.ko} · {colour_ko}", final_img))
+        results.append((f"{i}. {st.ko} · {colour_ko}" + ("" if aligned else " (합성 생략)"), final_img))
         manifest["variants"].append(entry)
         _write_json(manifest_path, manifest)
 
