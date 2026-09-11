@@ -46,3 +46,14 @@ python3 scripts/weekly_ai_digest_v2.py \
 `.github/workflows/daily-digest.yml`가 매일 실행되어 `docs/`를 갱신하고 커밋합니다.
 
 LLM 기반 한국어 큐레이션이나 이미지 생성을 붙이려면 별도 secret을 추가해 확장하세요. 기본 공개 버전은 외부 Python 패키지 없이 표준 라이브러리만 사용합니다.
+
+## 부속 도구: BrowLab (눈썹 디자인 연습 시트)
+
+`browlab/` 에는 눈썹 문신(반영구) 디자인 연습을 위해 눈썹이 부족한 다양한 얼굴을 Codex CLI(`$imagegen`)로
+생성하고 A4 용지에 실물 크기(1:1)로 인쇄되는 시트를 만드는 도구가 있습니다. 실제 사진의 눈썹만 여러 스타일로
+바꿔 보는 기능도 있습니다. 사용법은 [browlab/README.md](browlab/README.md) 를 보세요.
+
+```bash
+pip install -r requirements-browlab.txt
+python -m browlab generate -n 4 --age 30s --gender female --guides
+```
