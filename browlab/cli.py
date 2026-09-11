@@ -403,6 +403,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         guide_path = out_dir / "mask_guide.png"
         M.guide_overlay(edit_img, mask).save(guide_path)
         _log(f"눈썹 마스크 저장: {out_dir / 'mask.png'} (API용 알파 마스크: {mask_api_path.name})")
+        _log("편집 요청 방식 — API: 얼굴 타일 + 알파 마스크를 보내 마스크 안쪽만 다시 그리게 함 / "
+             "Codex: 내장 도구에 마스크 인자가 없어 빨간 영역 가이드 이미지를 함께 첨부")
 
     rng = random.Random(args.seed)
     styles = _parse_styles(args.styles, rng)
@@ -465,6 +467,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         entry["pending"] = result.pending
+        entry["mask_sent"] = bool(api_mask is not None and result.backend == "api")
         _record_backend(entry, result)
         _record_usage(entry, result, manifest)
         if result.pending:
