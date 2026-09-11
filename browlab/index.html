@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BrowLab · 눈썹 디자인 연습 시트</title>
+<style>
+:root{--bg:#f6f3ee;--surface:#ffffff;--ink:#1f1c19;--muted:#6f6861;--faint:#9a938b;--line:#e3ddd4;--line2:#efeae3;--accent:#b3512f;--accent-soft:#f4e5dd;--accent-ink:#7d3519;--ok:#2f7a5e;--ok-soft:#dcefe4;--warn:#a83a2a;--warn-soft:#f8d6d0;--pend:#fbe9c4;--pend-ink:#7a5410}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+svg{flex:0 0 auto}
+[hidden]{display:none!important}
+header{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;background:#fffdfa;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+header .brand{display:flex;flex-direction:column;line-height:1.15}
+header .brand b{font-size:18px;letter-spacing:-.01em}
+header .brand span{font-size:11.5px;color:var(--muted)}
+header .sp{flex:1}
+.status{display:none;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;background:#f3efe9;color:var(--faint)}
+.tag.ok{background:#eef4f1;color:var(--ok)}
+.tag.bad{background:var(--warn-soft);color:var(--warn)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;white-space:nowrap}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;height:48px;border-radius:12px;font-size:15.5px;font-weight:700;flex:1}
+.btn.primary:disabled{opacity:.55;cursor:default}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.pill{border-radius:999px}
+.count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
+.count:empty{display:none}
+main{display:grid;grid-template-columns:1fr;gap:16px;max-width:1440px;margin:0 auto;padding:12px 16px 32px}
+.left,.right{min-width:0}
+.right{display:none}
+body.show-jobs .left{display:none}
+body.show-jobs .right{display:block}
+#login{max-width:420px;margin:24px auto;padding:20px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+#login h2{margin:0 0 10px;font-size:16px}
+#login .row{display:flex;gap:8px}
+#login input{flex:1;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:12px;background:#e9e4dc;margin:2px 0 10px}
+.seg button{height:36px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-size:14px}
+.seg button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(31,28,25,.08)}
+.panel{display:none;flex-direction:column;gap:10px}
+.panel.on{display:flex}
+.card{padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.rules{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:0 2px}
+.row{display:flex;gap:8px;align-items:flex-start}
+.lbl{flex:0 0 44px;width:44px;font-size:12px;color:var(--muted);letter-spacing:.02em;padding-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.chip{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13.5px;line-height:1.1;color:#2b2723;white-space:nowrap;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.chip input{position:absolute;opacity:0;width:0;height:0;margin:0}
+.chip:has(input:checked){background:var(--ink);border-color:var(--ink);color:#fffdfa;font-weight:600}
+.chip.multi:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+.chip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+details.adv{border:1px dashed #d8d1c7;border-radius:10px;background:#fbf9f6}
+details.adv summary{list-style:none;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 14px;font-size:13.5px;cursor:pointer}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary span{color:var(--muted)}
+details.adv summary svg{transition:transform .15s}
+details.adv[open] summary svg{transform:rotate(180deg)}
+details.adv .body{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:0 14px 14px}
+details.adv .body .wide{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:4px}
+.field>span{font-size:12px;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13.5px}
+.field textarea{height:auto;min-height:56px;padding:8px 10px;resize:vertical}
+.chk{display:flex;align-items:center;gap:6px;font-size:13.5px;min-height:36px;cursor:pointer}
+.chk input{width:18px;height:18px;margin:0}
+.engine{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:0 2px;flex-wrap:wrap}
+.bar{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;padding:12px 0 max(12px,env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid #e6e0d8;margin-top:4px}
+.stepper{display:flex;align-items:center;height:48px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.stepper button{width:44px;height:46px;border:0;background:transparent;font-size:20px;color:var(--muted)}
+.stepper output{min-width:44px;text-align:center;font-size:15px;font-weight:700}
+.msg{color:var(--warn);font-size:13px;white-space:pre-wrap;min-height:0}
+.msg:empty{display:none}
+.hint{font-size:12px;color:var(--muted)}
+.photo{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.photo .ph{width:64px;height:80px;border-radius:8px;background:#f3efe9;border:1px solid var(--line);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--faint)}
+.photo .pt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.photo .pt b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo .pt span{font-size:12px;color:var(--muted)}
+.photo input{display:none}
+.consent{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--muted);padding:0 2px}
+.jobs-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.jobs-head h2{margin:0;font-size:17px;flex:1}
+.jobs-head .sub{font-size:12px;color:var(--muted);display:block;font-weight:normal}
+#jobList{display:flex;flex-direction:column;gap:8px}
+.job{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:#fff;border:1px solid var(--line);cursor:pointer;text-align:left;width:100%}
+.job.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(179,81,47,.1)}
+.job img,.job .noimg{width:44px;height:58px;border-radius:6px;border:1px solid var(--line);object-fit:cover;background:#f3efe9;flex:0 0 44px}
+.job .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.job .t b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.job .t span{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.job .meta{display:flex;align-items:center;gap:6px;margin-top:2px}
+.job .meta time{font-size:11.5px;color:var(--faint)}
+.pill{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;background:#e8e8e8;color:#444}
+.pill.running{background:var(--pend);color:var(--pend-ink)}.pill.done{background:var(--ok-soft);color:#1f5c44}.pill.failed{background:var(--warn-soft);color:var(--warn)}
+#jobDetail{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+#jobDetail .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#jobDetail h3{margin:0;font-size:15px}
+#jobDetail .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.pdfs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.pdfs a{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-size:13.5px;font-weight:700}
+.pdfs a.alt{background:var(--ink)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.thumbs a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--muted);font-size:11px;text-align:center}
+.thumbs img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#fffdfa}
+details.log summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:8px 0 0;border-top:1px solid var(--line2);font-size:12.5px;color:var(--muted);cursor:pointer}
+details.log summary::-webkit-details-marker{display:none}
+pre.log{margin:8px 0 0;background:#1f1d1b;color:#e8e2da;padding:12px;border-radius:10px;font-size:11.5px;overflow:auto;max-height:300px;white-space:pre-wrap;word-break:break-all}
+.files a{display:inline-block;margin:2px 10px 2px 0;font-size:12.5px;color:var(--accent)}
+.empty{font-size:13px;color:var(--muted);padding:6px 2px}
+.note{background:#fbf3ea;border:1px solid #f0dcc8;border-radius:10px;padding:10px 12px;font-size:12.5px}
+@media (min-width:1000px){
+  main{grid-template-columns:minmax(0,720px) minmax(360px,1fr);gap:24px;padding:24px 28px}
+  .right{display:block}
+  body.show-jobs .left{display:block}
+  #jobsBtn,#backBtn{display:none}
+  .status{display:flex}
+  .chip{min-height:32px;padding:0 12px;font-size:13px}
+  .lbl{flex-basis:52px;width:52px;padding-top:8px}
+  .bar{position:static;border-top:0;background:transparent;padding:6px 0 0}
+  .btn.primary{flex:0 0 auto;height:44px;padding:0 26px;font-size:14.5px;border-radius:10px}
+  .stepper{height:44px}.stepper button{height:42px;width:40px;font-size:18px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>BrowLab</b><span>눈썹 디자인 연습 · A4 실물 크기 시트</span></div>
+  <span class="sp"></span>
+  <div class="status" id="status"></div>
+  <button id="jobsBtn" class="btn pill" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg>
+    작업 <span class="count" id="jobCount"></span>
+  </button>
+  <button id="logoutBtn" class="btn" hidden>로그아웃</button>
+</header>
+
+<main>
+  <section id="login" hidden>
+    <h2>비밀번호</h2>
+    <div class="row"><input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password"><button id="loginBtn" class="btn dark" style="height:44px;padding:0 18px">들어가기</button></div>
+    <div id="loginMsg" class="msg" style="margin-top:8px"></div>
+  </section>
+
+  <section class="left" id="app" hidden>
+    <nav class="seg" id="modeSeg">
+      <button type="button" data-mode="generate" class="on">얼굴 생성</button>
+      <button type="button" data-mode="restyle">내 사진 눈썹</button>
+      <button type="button" data-mode="sheet">사진 시트 · 보정</button>
+    </nav>
+
+    <!-- 얼굴 생성 -->
+    <form id="fGen" class="panel on" data-mode="generate" autocomplete="off">
+      <div class="rules">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2f7a5e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>항상 고정: 흰 배경 · 정면 · 눈썹 노출 · 안경/모자/앞머리 없음</span>
+      </div>
+      <div class="row"><div class="lbl">나이대</div><div class="chips" data-chips="ages" data-name="age"></div></div>
+      <div class="row"><div class="lbl">성별</div><div class="chips" data-chips="genders" data-name="gender"></div></div>
+      <div class="row"><div class="lbl">얼굴형</div><div class="chips" data-chips="face_shapes" data-name="face_shape"></div></div>
+      <div class="row"><div class="lbl">눈썹</div><div class="chips" data-chips="brow_conditions" data-name="brow_condition"></div></div>
+      <details class="adv">
+        <summary>고급 설정 <span>· 외모 · 시드 · 정확한 나이 · 시트 구성 · 엔진</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6f6861" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="body">
+          <label class="field"><span>외모</span><select name="ethnicity" data-src="ethnicities"></select></label>
+          <label class="field"><span>정확한 나이 (15~79)</span><input name="age_exact" type="number" min="15" max="79" placeholder="비우면 나이대 안에서"></label>
+          <label class="field"><span>시드 (조합 재현)</span><input name="seed" type="number" placeholder="비우면 무작위"></label>
+          <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+          <label class="field"><span>시트 구성</span><select name="layout" data-src="layouts"></select></label>
+          <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
+          <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
+          <label class="field"><span>크기 (API, 16의 배수)</span><input name="size" type="text" value="1536x2304"></label>
+          <label class="chk"><input name="guides" type="checkbox" checked> 눈썹 황금비 가이드선</label>
+          <label class="field wide"><span>추가 지시 (선택)</span><textarea name="notes" placeholder="예: 눈썹은 거의 없이, 이마 넓게, 머리는 뒤로 묶어서"></textarea></label>
+        </div>
+      </details>
+      <div class="engine" data-engine></div>
+      <div class="msg" data-msg></div>
+      <div class="bar">
+        <div class="stepper"><button type="button" data-step="-1" aria-label="줄이기">−</button><output>1명</output><button type="button" data-step="1" aria-label="늘리기">+</button><input type="hidden" name="count" value="1"></div>
+        <button class="btn primary" type="submit">생성 시작
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </form>
+
+    <!-- 내 사진 눈썹 -->
+    <form id="fRestyle" class="panel" data-mode="restyle" autocomplete="off">
+      <label class="photo"><img class="ph" alt="" hidden><div class="ph" data-ph>사진</div><div class="pt"><b>사진 고르기</b><span>정면 · 눈썹이 보이는 사진. 눈썹 부분만 검출해 다시 그립니다.</span></div><input name="photo" type="file" accept="image/*"></label>
+      <div class="consent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b3512f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span>사진은 편집을 위해 OpenAI 로 전송됩니다. 본인 또는 동의한 사람의 사진만 올리세요.</span>
+      </div>
+      <div class="row"><div class="lbl">스타일</div><div class="chips" data-chips="brow_styles" data-name="styles" data-multi="1"></div></div>
+      <div class="row"><div class="lbl">색</div><div class="chips" data-chips="brow_colors" data-name="color"></div></div>
+      <details class="adv">
+        <summary>고급 설정 <span>· 합성 · 비교 시트 · 엔진 · 추가 지시</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6f6861" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="body">
+          <label class="field"><span>비교 시트</span><select name="sheet" data-src="sheets"></select></label>
+          <label class="field"><span>성별 (동공 간 거리 기본값)</span><select name="gender" data-src="genders"></select></label>
+          <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
+          <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
+          <label class="chk wide"><input name="no_composite" type="checkbox"> 합성 없이 편집 결과 그대로 (얼굴이 바뀌면 끄기)</label>
+          <label class="field wide"><span>추가 지시 (선택)</span><textarea name="notes" placeholder="예: 앞머리는 연하게, 꼬리는 조금 길게"></textarea></label>
+        </div>
+      </details>
+      <div class="engine" data-engine></div>
+      <div class="msg" data-msg></div>
+      <div class="bar"><button class="btn primary" type="submit"><span data-restyle-label>눈썹 바꾸기</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></div>
+    </form>
+
+    <!-- 사진 시트 · 보정 -->
+    <div class="panel" data-mode="sheet">
+      <form id="fSheet" class="card" style="display:flex;flex-direction:column;gap:10px" autocomplete="off">
+        <div style="font-size:15px;font-weight:700">가지고 있는 얼굴 사진을 A4 1:1 시트로</div>
+        <label class="photo"><img class="ph" alt="" hidden><div class="ph" data-ph>사진</div><div class="pt"><b>사진 고르기</b><span>동공 간 거리를 기준으로 실물 크기로 배치합니다.</span></div><input name="photo" type="file" accept="image/*"></label>
+        <div class="row"><div class="lbl">구성</div><div class="chips" data-chips="layouts" data-name="layout"></div></div>
+        <div class="row"><div class="lbl">성별</div><div class="chips" data-chips="genders" data-name="gender"></div></div>
+        <details class="adv">
+          <summary>고급 설정 <span>· 얼굴형 문구 · 동공 좌표 · 거리</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6f6861" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="body">
+            <label class="field"><span>얼굴형 (추천 문구)</span><select name="face_shape" data-src="face_shapes" data-none="없음"></select></label>
+            <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+            <label class="field wide"><span>동공 픽셀 좌표 x1,y1,x2,y2 (자동 검출 실패 시)</span><input name="pupils" type="text" placeholder="비우면 자동 검출"></label>
+            <label class="chk wide"><input name="guides" type="checkbox" checked> 가이드선</label>
+          </div>
+        </details>
+        <div class="msg" data-msg></div>
+        <div class="bar"><button class="btn primary" type="submit">시트 만들기</button></div>
+      </form>
+      <form id="fCal" class="card" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:15px;font-weight:700">프린터 배율 확인 시트</div>
+        <div class="hint">100 mm 자 · 20 mm 정사각형 · 평균 동공 간격. "실제 크기(100%)" 로 인쇄한 뒤 자로 재어 배율을 확인하세요. 프린터마다 한 번이면 됩니다.</div>
+        <div class="msg" data-msg></div>
+        <div><button class="btn dark" type="submit" style="height:44px;padding:0 18px">보정 시트 만들기</button></div>
+      </form>
+    </div>
+  </section>
+
+  <aside class="right" id="jobsPane" hidden>
+    <div class="card">
+      <div class="jobs-head">
+        <button id="backBtn" class="btn pill" type="button" aria-label="뒤로" style="width:36px;padding:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h2>작업 <span class="sub" id="jobsSub"></span></h2>
+      </div>
+      <div id="jobList"></div>
+      <div id="jobDetail" hidden></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const el=(tag,cls,text)=>{const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e;};
+const ICON_PRINT='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>';
+let presets=null, jobs=[], current=null, timer=null, mode='generate';
+const STATUS_KO={queued:'대기',running:'진행 중',done:'완료',failed:'실패',cancelled:'취소'};
+
+async function api(path, opts={}){
+  const r=await fetch(path, Object.assign({credentials:'same-origin'}, opts));
+  let data={}; try{ data=await r.json(); }catch(e){}
+  if(r.status===401){ showLogin(); throw new Error(data.error||'로그인이 필요합니다'); }
+  if(!r.ok) throw new Error(data.error||('HTTP '+r.status));
+  return data;
+}
+const post=(path, body)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+
+function showLogin(){ stopPolling(); $('#login').hidden=false; $('#app').hidden=true; $('#jobsPane').hidden=true; $('#logoutBtn').hidden=true; $('#jobsBtn').hidden=true; document.body.classList.remove('show-jobs'); $('#pw').focus(); }
+async function showApp(){
+  $('#login').hidden=true; $('#app').hidden=false; $('#jobsPane').hidden=false; $('#logoutBtn').hidden=false; $('#jobsBtn').hidden=false;
+  presets=await api('api/presets'); buildForms(); await refreshJobs(); startPolling();
+}
+
+function buildForms(){
+  // status tags
+  const st=$('#status'); st.replaceChildren();
+  presets.backends.filter(b=>b.key!=='manual').forEach(b=>{ const t=el('span','tag '+(b.available?'ok':''), (b.key==='codex'?'Codex':'API 키')+(b.available?' 연결됨':(b.key==='codex'?' 없음':' 없음'))); st.appendChild(t); });
+  // chip groups
+  $$('.chips[data-chips]').forEach(box=>{
+    const items=presets[box.dataset.chips]; const name=box.dataset.name; const multi=!!box.dataset.multi; const form=box.closest('form');
+    box.replaceChildren();
+    items.forEach((it,i)=>{
+      const lab=el('label','chip'+(multi?' multi':'')); const inp=document.createElement('input'); inp.type=multi?'checkbox':'radio'; inp.name=name; inp.value=it.key;
+      if(!multi && i===0) inp.checked=true;
+      if(multi && ['korean_natural','straight','soft_arch','feathered'].includes(it.key)) inp.checked=true;
+      if(multi) inp.addEventListener('change', updateRestyleLabel);
+      lab.appendChild(inp); lab.appendChild(el('span','',it.short||it.ko)); box.appendChild(lab);
+    });
+    if(box.dataset.chips==='layouts' && form && form.id==='fSheet'){ /* both first already */ }
+  });
+  // selects
+  $$('select[data-src]').forEach(sel=>{
+    let items=presets[sel.dataset.src];
+    if(sel.dataset.src==='qualities') items=items.map(k=>({key:k,ko:k}));
+    if(sel.dataset.src==='backends') items=items.map(b=>({key:b.key,ko:b.ko+(b.available?'':' — 사용 불가')}));
+    sel.replaceChildren();
+    if(sel.dataset.none) sel.appendChild(new Option(sel.dataset.none,''));
+    items.forEach(it=>{ if(sel.dataset.none && it.key==='random') return; sel.appendChild(new Option(it.ko,it.key)); });
+    if(sel.dataset.src==='backends'){ sel.value=presets.default_backend; sel.addEventListener('change', updateEngineHints); }
+    if(sel.dataset.src==='qualities') sel.value='high';
+  });
+  updateEngineHints(); updateRestyleLabel();
+}
+function updateEngineHints(){
+  $$('form [data-engine]').forEach(box=>{
+    const form=box.closest('form'); const sel=$('select[name=backend]',form); const key=sel?sel.value:presets.default_backend; const b=presets.backends.find(x=>x.key===key)||{};
+    box.replaceChildren();
+    const tag=el('span','tag '+(b.available?'ok':'bad'), key==='codex'?'Codex':key==='api'?'OpenAI API':'프롬프트만'); box.appendChild(tag);
+    const per=form.id==='fRestyle'?'스타일당':'장당';
+    box.appendChild(el('span','', key==='codex'?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`장당 과금(medium ≈ $0.01, high ≈ $0.04~0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
+    if(!b.available) box.appendChild(el('span','',key==='codex'?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
+  });
+}
+function updateRestyleLabel(){ const n=$$('#fRestyle input[name=styles]:checked').length; const l=$('[data-restyle-label]'); if(l) l.textContent=n?`눈썹 ${n}가지로 바꾸기`:'스타일을 고르세요'; }
+
+// mode segments
+$$('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+function setMode(m){ mode=m; $$('#modeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m)); $$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.mode===m)); }
+$('#jobsBtn').onclick=()=>{ document.body.classList.add('show-jobs'); refreshJobs(); };
+$('#backBtn').onclick=()=>document.body.classList.remove('show-jobs');
+
+// stepper
+$$('.stepper').forEach(s=>{ const inp=$('input[name=count]',s), out=$('output',s); $$('button',s).forEach(b=>b.onclick=()=>{ const v=Math.max(1,Math.min(8,(+inp.value||1)+(+b.dataset.step))); inp.value=v; out.textContent=v+'명'; }); });
+
+// photo pickers
+$$('label.photo input[type=file]').forEach(inp=>inp.addEventListener('change',()=>{
+  const lab=inp.closest('label'); const f=inp.files[0]; const img=$('img.ph',lab); const ph=$('[data-ph]',lab); const t=$('.pt',lab);
+  if(!f){ img.hidden=true; ph.hidden=false; return; }
+  const url=URL.createObjectURL(f); img.src=url; img.hidden=false; ph.hidden=true; $('b',t).textContent=f.name; $('span',t).textContent=(f.size/1024/1024).toFixed(1)+' MB · 다른 사진을 고르려면 누르세요';
+}));
+
+function collect(form){
+  const o={}; Array.from(form.elements).forEach(e=>{ if(!e.name) return; if(e.type==='checkbox'){ if(e.closest('.chips')){ (o[e.name]=o[e.name]||[]); if(e.checked) o[e.name].push(e.value); } else o[e.name]=e.checked; } else if(e.type==='radio'){ if(e.checked) o[e.name]=e.value; } else if(e.type!=='file') o[e.name]=e.value; });
+  return o;
+}
+function readFile(file){ return new Promise((res,rej)=>{ if(!file||!file.size) return rej(new Error('사진을 고르세요')); if(file.size>25*1024*1024) return rej(new Error('사진은 25 MB 이하')); const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(new Error('파일을 읽지 못했습니다')); r.readAsDataURL(file); }); }
+async function submit(form, kind){
+  const msg=$('[data-msg]',form); msg.textContent=''; const btn=$('button[type=submit]',form); btn.disabled=true;
+  try{
+    const body=Object.assign({kind}, collect(form));
+    if(body.age_exact) body.age=body.age_exact;
+    const f=$('input[type=file]',form);
+    if(f){ body.photo=await readFile(f.files[0]); body.photo_name=f.files[0].name; }
+    if(kind==='restyle' && !(body.styles||[]).length) throw new Error('스타일을 하나 이상 고르세요');
+    const job=await post('api/jobs', body);
+    await refreshJobs(); openJob(job.id); document.body.classList.add('show-jobs'); $('#jobsPane').scrollIntoView({block:'start'});
+  }catch(e){ msg.textContent=e.message; }
+  finally{ btn.disabled=false; }
+}
+$('#fGen').onsubmit=e=>{ e.preventDefault(); submit(e.target,'generate'); };
+$('#fRestyle').onsubmit=e=>{ e.preventDefault(); submit(e.target,'restyle'); };
+$('#fSheet').onsubmit=e=>{ e.preventDefault(); submit(e.target,'sheet'); };
+$('#fCal').onsubmit=e=>{ e.preventDefault(); submit(e.target,'calibrate'); };
+$('#loginBtn').onclick=async()=>{ $('#loginMsg').textContent=''; try{ await post('api/login',{password:$('#pw').value}); $('#pw').value=''; await showApp(); }catch(e){ $('#loginMsg').textContent=e.message; } };
+$('#pw').onkeydown=e=>{ if(e.key==='Enter') $('#loginBtn').click(); };
+$('#logoutBtn').onclick=async()=>{ try{ await post('api/logout'); }catch(e){} showLogin(); };
+
+// jobs
+function fmtTime(iso){ if(!iso) return ''; const d=new Date(iso); const now=new Date(); const same=d.toDateString()===now.toDateString(); return (same?'':(d.getMonth()+1)+'/'+d.getDate()+' ')+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function dur(j){ if(!j.started||!j.finished) return ''; const s=Math.round((new Date(j.finished)-new Date(j.started))/1000); return s>=60?Math.floor(s/60)+'분 '+(s%60)+'초':s+'초'; }
+async function refreshJobs(){
+  const d=await api('api/jobs'); jobs=d.jobs; const list=$('#jobList'); list.replaceChildren();
+  const active=jobs.filter(j=>j.status==='running'||j.status==='queued').length;
+  $('#jobCount').textContent=active?String(active):''; $('#jobsSub').textContent=active?`${active}개 진행 중`:(jobs.length?`${jobs.length}개`:'');
+  if(!jobs.length){ list.appendChild(el('div','empty','아직 작업이 없습니다. 왼쪽에서 조건을 고르고 생성을 누르세요.')); return; }
+  jobs.forEach(j=>{
+    const row=el('button','job'+(j.id===current?' sel':'')); row.type='button'; row.onclick=()=>openJob(j.id);
+    if(j.thumb){ const im=document.createElement('img'); im.loading='lazy'; im.src=j.thumb+'?w=120'; im.alt=''; row.appendChild(im); } else row.appendChild(el('div','noimg'));
+    const t=el('div','t'); t.appendChild(el('b','',j.title||j.kind_ko)); t.appendChild(el('span','',j.kind_ko+(j.params&&j.params.backend?' · '+j.params.backend:'')));
+    const meta=el('div','meta'); meta.appendChild(el('span','pill '+j.status,(STATUS_KO[j.status]||j.status)+(j.status==='running'&&j.progress?' '+j.progress:''))); const tm=document.createElement('time'); tm.textContent=fmtTime(j.created)+(j.status==='done'?' · '+dur(j):''); meta.appendChild(tm); t.appendChild(meta);
+    row.appendChild(t); list.appendChild(row);
+  });
+}
+async function openJob(id){ current=id; $$('.job').forEach(r=>r.classList.toggle('sel', r===null)); await renderJob(); await refreshJobs(); }
+function pdfLabel(name){ const b=name.split('/').pop(); if(/calibration/.test(b)) return '보정 시트 PDF'; if(/sheet_compare/.test(b)) return '비교표 PDF'; if(/browzone/.test(b)) return '눈썹 구역 1:1 PDF'; if(/_A4/.test(b)) return '얼굴 1:1 PDF'; return b; }
+function imgLabel(name){ const b=name.split('/').pop(); if(/calibration/.test(b)) return '보정 시트'; if(/^face_/.test(b)) return '생성 얼굴'; if(/_A4\.png$/.test(b)) return 'A4 얼굴 1:1'; if(/browzone/.test(b)) return '눈썹 구역'; if(/sheet_compare/.test(b)) return '비교표'; if(/composited/.test(b)) return '합성 결과 · '+b.replace(/^\d+_/,'').replace(/_composited\.png$/,''); if(/^00_original/.test(b)) return '준비된 원본'; if(/^input\./.test(b)) return '업로드 원본'; return b.replace(/\.png$/,''); }
+async function renderJob(){
+  if(!current) return; let j; try{ j=await api('api/jobs/'+current); }catch(e){ return; }
+  const box=$('#jobDetail'); box.hidden=false; box.replaceChildren();
+  const head=el('div','head'); const hl=el('div'); hl.appendChild(el('h3','',j.title||j.kind_ko)); hl.appendChild(el('div','sub',j.kind_ko+' · '+fmtTime(j.created)+(j.status==='done'?' · '+dur(j):'')+(j.error?' · '+j.error:''))); head.appendChild(hl);
+  const right=el('div'); right.style.display='flex'; right.style.gap='6px'; right.style.alignItems='center'; right.appendChild(el('span','pill '+j.status,STATUS_KO[j.status]||j.status));
+  if(j.status==='running'||j.status==='queued'){ const c=el('button','btn','취소'); c.type='button'; c.onclick=async()=>{ await post('api/jobs/'+j.id+'/cancel'); renderJob(); refreshJobs(); }; right.appendChild(c); }
+  head.appendChild(right); box.appendChild(head);
+  const pdfs=j.files.filter(f=>f.kind==='pdf'); const imgs=j.files.filter(f=>f.kind==='image' && !/^(mask|mask_api|mask_guide)\.png$/.test(f.name.split('/').pop())); const others=j.files.filter(f=>f.kind==='other');
+  if(pdfs.length){ const g=el('div','pdfs'); pdfs.forEach((f,i)=>{ const a=el('a',i?'alt':''); a.href=f.url; a.target='_blank'; a.insertAdjacentHTML('afterbegin', ICON_PRINT); a.appendChild(el('span','',pdfLabel(f.name))); g.appendChild(a); }); box.appendChild(g); box.appendChild(el('div','hint','인쇄: A4 · 배율 100% · "페이지에 맞춤" 끄기 · 시트 아래 100 mm 자로 확인')); }
+  if(j.status==='running'||j.status==='queued'){ box.appendChild(el('div','note', j.status==='queued'?'앞 작업이 끝나면 시작합니다.':'생성 중입니다. 이 화면을 닫아도 계속 진행되며 완료되면 목록에 PDF 가 붙습니다.')); }
+  if(imgs.length){ const g=el('div','thumbs'); imgs.forEach(f=>{ const a=el('a'); a.href=f.url; a.target='_blank'; const im=document.createElement('img'); im.loading='lazy'; im.src=f.url+'?w=480'; im.alt=f.name; a.appendChild(im); a.appendChild(el('span','',imgLabel(f.name))); g.appendChild(a); }); box.appendChild(g); }
+  const det=el('details','log'); const sum=el('summary'); sum.appendChild(el('span','','로그 · 프롬프트 · 기타 파일')); sum.insertAdjacentHTML('beforeend','<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6f6861" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'); det.appendChild(sum);
+  if(others.length){ const d=el('div','files'); others.forEach(f=>{ const a=el('a','',f.name); a.href=f.url; a.target='_blank'; d.appendChild(a); }); det.appendChild(d); }
+  const pre=el('pre','log', j.log||'(아직 없음)'); det.appendChild(pre); if(j.status==='failed') det.open=true; box.appendChild(det); pre.scrollTop=pre.scrollHeight;
+}
+function startPolling(){ stopPolling(); timer=setInterval(async()=>{ try{ const active=jobs.some(j=>j.status==='running'||j.status==='queued'); if(active){ await refreshJobs(); const cur=jobs.find(j=>j.id===current); if(cur) await renderJob(); } }catch(e){} }, 4000); }
+function stopPolling(){ if(timer) clearInterval(timer); timer=null; }
+(async()=>{ try{ const me=await api('api/me'); if(me.authed) await showApp(); else showLogin(); }catch(e){ showLogin(); } })();
+</script>
+</body>
+</html>

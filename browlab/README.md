@@ -11,6 +11,9 @@ AI로 만들고, **A4 용지에 실제 사람 얼굴 크기(1:1)로 인쇄되는
 기본으로 사용하고, OpenAI Images API(`gpt-image-2.5-flare` / `gpt-image-2.5-sunburst`)를 직접 호출하는
 백엔드와, 프롬프트만 뽑아 주는 수동 모드도 지원합니다.
 
+명령줄 외에 **웹 UI**(`python -m browlab web`)가 있어 휴대폰/브라우저에서 조건을 고르고 결과 PDF 를 받을 수
+있습니다. 4090 서버에 상시 서비스로 올라가 있습니다 → [8. 웹 UI · 4090 상시 서비스](#8-웹-ui--4090-상시-서비스).
+
 ---
 
 ## 1. 설치
@@ -32,7 +35,7 @@ pip install -r requirements-browlab.txt      # pillow, numpy, mediapipe(권장),
 ```bash
 npm install -g @openai/codex        # 또는 codex update
 codex login                         # ChatGPT 계정 로그인
-codex --version                     # 0.154.0 이상 권장
+codex --version                     # 0.153.2 / 0.153.3 에서 exec 플래그 확인됨, 0.154+ 권장
 ```
 
 `codex` 안에서 `$imagegen` 이 동작하면 준비 끝입니다. BrowLab은 `codex exec` 를 비대화식으로 실행하고,
@@ -200,6 +203,9 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <마지
 | --- | --- |
 | `Codex CLI not found` | `npm install -g @openai/codex` 후 `codex login`. 다른 경로면 `--codex-bin` |
 | `codex exec finished but no image was produced` | `codex` 를 직접 열어 `$imagegen` 이 되는지 확인. 이미지 도구가 막힌 계정/환경이면 `--backend api` |
+| `stderr: Error: No such file or directory (os error 2)` 로 즉시 실패 | 2026-09-12 이전 판의 버그(`-C` 에 상대경로 전달). 현재 판은 절대경로로 고쳤음. 재발하면 `--out-dir` 을 절대경로로 |
+| `ERROR: You've hit your usage limit ... try again at ...` | Codex(ChatGPT 구독) 이미지 한도 소진. 표시된 시각까지 기다리거나 크레딧 구매, 또는 `--backend api` |
+| 웹 UI 작업이 `실패 · 종료 코드 1` | 작업 상세의 로그 마지막 줄을 볼 것. 위 두 메시지 중 하나인 경우가 대부분 |
 | `mediapipe unavailable` | `pip install mediapipe` (리눅스는 `libgl1 libegl1 libgles2` 필요). 또는 `--landmarks codex` / `--pupils` |
 | 얼굴이 A4에 다 안 들어감 | 정상입니다. 눈썹·눈·턱을 우선 살리고 머리 윗부분을 잘라냅니다. `--ipd-mm` 을 줄이면 전체가 작아집니다 |
 | 시트 한글이 네모로 나옴 | `--font /경로/NanumGothic.ttf` 또는 `BROWLAB_FONT` 환경변수 |
@@ -211,3 +217,85 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <마지
 - 실제 고객 사진을 `restyle` 하면 사진이 OpenAI 서버(Codex/API)로 전송됩니다. 동의를 받고 사용하세요.
 - AI 생성 얼굴은 실존 인물이 아니며, 나이·얼굴형 등은 프롬프트 지시일 뿐 항상 정확하지 않습니다.
 - 1:1 배율은 평균 동공 간 거리에 맞춘 근사치입니다. 실제 시술 도안 용도가 아니라 연습용입니다.
+
+---
+
+## 8. 웹 UI · 4090 상시 서비스
+
+### 웹 UI 실행
+
+```bash
+python -m browlab web --host 127.0.0.1 --port 8177 \
+    --data-dir ~/browlab_data --password-file ~/.config/browlab/password.txt \
+    --base-path /browlab --codex-bin /절대경로/codex
+```
+
+| 옵션 | 설명 |
+| --- | --- |
+| `--password-file` / `BROWLAB_PASSWORD` | 로그인 비밀번호(필수). 로컬 전용이면 `--no-auth` |
+| `--data-dir` | 작업 폴더. `jobs/<작업id>/` 아래에 `job.json`, `job.log`, 결과 PNG/PDF, `manifest.json` |
+| `--base-path` | 프록시 경로 접두어. `https://호스트/browlab/` 로 노출할 때 `/browlab` |
+| `--codex-bin` | codex 실행 파일. systemd 처럼 PATH 가 없는 환경에서는 절대경로 |
+| `--default-backend` | 화면 기본 백엔드 (`codex`/`api`/`manual`) |
+
+- 화면 탭: **얼굴 생성**(generate) · **내 사진 눈썹**(restyle, 사진 업로드) · **사진 시트 · 보정**(sheet, calibrate) · **작업 목록**.
+- 작업은 `python -m browlab <명령> ... --out-dir <작업폴더>` 서브프로세스로 **한 번에 하나씩** 실행되고,
+  화면은 4초마다 상태·로그·결과(PDF 링크, 이미지 썸네일)를 갱신합니다.
+- 업로드 사진은 EXIF 회전을 바로잡아 `input.jpg/png` 로 저장합니다. 25 MB 이하, PNG/JPEG/WebP.
+- 로그인 실패 8회면 15분 잠금. 세션 쿠키 30일.
+- 서버 재시작 시 진행 중이던 작업은 `실패 · 서버가 재시작되어 중단됨` 으로 표시됩니다.
+
+### 4090 배포 상태 (2026-09-12)
+
+| 항목 | 값 |
+| --- | --- |
+| 주소 (외부·휴대폰) | `https://seongha-art-4090.tailc4181c.ts.net/browlab/` (Tailscale Funnel, 443 의 `/browlab` 경로) |
+| 주소 (테일넷 직접) | `http://100.74.241.125:8177/browlab/` |
+| 비밀번호 | 미디어아트 허브·강의 덱과 같은 비밀번호. 파일 `~/.config/browlab/password.txt` (0600) |
+| 코드 | `~/project/creator-ai-digest` (브랜치 `claude/eyebrow-tattoo-design-tool-q5twu7`), venv `.venv` (Python 3.12) |
+| 서비스 | `~/.config/systemd/user/browlab.service` (`systemctl --user status/restart browlab`, 로그 `journalctl --user -u browlab -f`) |
+| 작업 폴더 | `~/browlab_data/jobs/` |
+| API 키 | `~/.config/browlab/env` 의 `OPENAI_API_KEY=...` 주석 해제 후 `systemctl --user restart browlab` |
+| codex | `~/.nvm/versions/node/v22.22.3/bin/codex` (ChatGPT 로그인 상태). node 를 올리면 유닛의 경로 두 곳을 바꿀 것 |
+
+코드 갱신: `cd ~/project/creator-ai-digest && git pull && systemctl --user restart browlab`.
+
+**Tailscale 함정**: 경로를 추가할 때 `tailscale serve --https=443 --set-path ...` 를 쓰면 **그 포트의 Funnel 이 꺼집니다**
+(2026-09-12 실제로 꺼져 1~2분간 강의 허브 외부 접속이 끊겼음). 공개 포트에는 반드시
+`sudo tailscale funnel --bg --https=443 --set-path /browlab http://127.0.0.1:8177/browlab` 처럼 **`funnel` 명령**으로 추가한다.
+서브 설정에 파일 경로 핸들러(10003, 10005)가 있어서 변경은 `sudo` 가 필요하다(4090 은 비밀번호 없는 sudo 가능).
+
+---
+
+## 9. 요금과 API 키 (2026-09-12 확인)
+
+### Codex 모드 (기본)
+
+ChatGPT 구독의 Codex 한도를 씁니다. 추가 요금은 없지만 이미지 생성은 한도를 빨리 소모하고,
+한도가 차면 `ERROR: You've hit your usage limit ... try again at <시각>` 으로 실패합니다
+(이 계정은 2026-09-12 기준 9/15 10:22 까지 막혀 있었음). 한도·크레딧 구매: https://chatgpt.com/codex/settings/usage
+
+### API 모드 — 키 발급과 결제
+
+1. https://platform.openai.com 에 ChatGPT 와 같은 계정으로 로그인 (API 계정은 ChatGPT 구독과 **별도 결제**).
+2. **Settings → Billing → Add payment method** 에서 카드 등록 → **Add to credit balance** 로 선결제 크레딧 구매.
+   최소 $5, 기본 $10, 크레딧은 1년 뒤 만료·환불 불가. 자동 충전(Auto recharge)은 켜지 않아도 됨.
+3. **Dashboard → API keys → Create new secret key** 로 키 생성. 키는 만들 때 한 번만 보이므로 바로 복사.
+4. 4090 에서 `~/.config/browlab/env` 의 `OPENAI_API_KEY=` 줄에 붙여넣고 `systemctl --user restart browlab`.
+   (로컬 CLI 는 `export OPENAI_API_KEY=sk-...`)
+5. 사용량·청구는 https://platform.openai.com/usage 에서 확인.
+
+### API 장당 비용 (OpenAI 공식 계산기, GPT Image 2.5 flare/sunburst, 이미지 출력 토큰만)
+
+토큰 단가: 이미지 출력 $30/M, 이미지 입력 $8/M(캐시 $2/M), 텍스트 입력 $5/M(캐시 $1.25/M). 프롬프트 텍스트 몫은 장당 $0.01 미만.
+
+| 크기 | low | medium | high | xhigh | max |
+| --- | --- | --- | --- | --- | --- |
+| 1024×1024 | $0.006 | $0.013 | $0.053 | $0.094 | $0.211 |
+| 1024×1536 (세로) | $0.005 | $0.010 | $0.041 | $0.074 | $0.165 |
+| 1536×2304 (BrowLab 기본) | $0.007 | $0.016 | $0.064 | $0.114 | $0.255 |
+
+- 연습용 얼굴 100장: `medium 1024x1536` ≈ $1, `high 1536x2304` ≈ $6.4 → **$10 크레딧이면 충분**.
+- `restyle` 편집은 입력 사진 토큰(이미지 입력 $8/M)이 더해져 장당 조금 더 듭니다.
+- 계산기: https://developers.openai.com/api/docs/guides/image-generation (Cost and latency 절), 단가표: https://developers.openai.com/api/docs/pricing
+

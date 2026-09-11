@@ -42,6 +42,9 @@ from . import presets as P
 
 KINDS = ("generate", "restyle", "sheet", "calibrate")
 KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기", "sheet": "사진을 1:1 시트로", "calibrate": "프린터 보정 시트"}
+# shorter chip labels for the page (full names stay in presets.py)
+BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
+                 "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음"}
 BACKENDS = ("codex", "api", "manual")
 LAYOUTS = ("face", "browzone", "both")
 SHEETS = ("none", "grid", "browzone", "both")
@@ -520,23 +523,73 @@ class JobStore:
         data = path.read_bytes()
         return data[-limit:].decode("utf-8", errors="replace")
 
+    def _manifest(self, job: Job) -> Dict[str, Any]:
+        path = self.job_dir(job.id) / "manifest.json"
+        if not path.exists():
+            return {}
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+
+    def title_ko(self, job: Job, manifest: Dict[str, Any]) -> str:
+        p = job.params
+        if job.kind == "generate":
+            labels = [f.get("label_ko") for f in manifest.get("faces", []) if f.get("label_ko")]
+            if labels:
+                return labels[0] + (f" 외 {len(labels) - 1}명" if len(labels) > 1 else "")
+            age = p.get("age", "random")
+            age_ko = "무작위 나이" if age == "random" else (P.AGE_GROUP_KO.get(age) or f"{age}세")
+            gender_ko = P.GENDERS.get(p.get("gender", ""), {}).get("ko", "성별 무작위")
+            shape = P.FACE_SHAPES.get(p.get("face_shape", ""))
+            brow = P.BROW_CONDITIONS.get(p.get("brow_condition", ""))
+            parts = [f"{p.get('count', 1)}명", age_ko, gender_ko, shape.ko if shape else "얼굴형 무작위", brow.ko if brow else "눈썹 무작위"]
+            return " · ".join(parts)
+        if job.kind == "restyle":
+            colour = P.BROW_COLORS.get(p.get("color", ""), {}).get("ko", "")
+            return f"{p.get('photo', '사진')} · {len(p.get('styles', []))}개 스타일 · {colour}"
+        if job.kind == "sheet":
+            layout_ko = {"both": "얼굴 + 눈썹 구역", "face": "얼굴 1:1", "browzone": "눈썹 구역"}.get(p.get("layout", ""), "")
+            return f"{p.get('photo', '사진')} · {layout_ko}"
+        return "100 mm 자 · 20 mm 정사각형"
+
+    def thumb(self, job: Job) -> Optional[str]:
+        root = self.job_dir(job.id)
+        if not root.is_dir():
+            return None
+        patterns = {
+            "generate": ["face_*.png", "sheets/*_A4.png"],
+            "restyle": ["*_composited.png", "0[1-9]_*.png", "00_original.png"],
+            "sheet": ["*_A4.png", "input.*"],
+            "calibrate": ["calibration_A4.png"],
+        }.get(job.kind, ["*.png"])
+        for pat in patterns:
+            hits = sorted(root.glob(pat))
+            if hits:
+                return f"files/{job.id}/{hits[0].relative_to(root).as_posix()}"
+        return None
+
     def summary(self, job: Job) -> Dict[str, Any]:
+        manifest = self._manifest(job)
+        progress = ""
+        if job.kind == "generate" and job.status == "running":
+            progress = f"{len(manifest.get('faces', []))}/{job.params.get('count', 1)}"
+        elif job.kind == "restyle" and job.status == "running":
+            progress = f"{len(manifest.get('variants', []))}/{len(job.params.get('styles', []))}"
         return {
             "id": job.id, "kind": job.kind, "kind_ko": KIND_KO.get(job.kind, job.kind), "created": job.created,
             "status": job.status, "started": job.started, "finished": job.finished, "error": job.error,
-            "params": job.params, "rc": job.rc,
+            "params": job.params, "rc": job.rc, "title": self.title_ko(job, manifest), "thumb": self.thumb(job),
+            "progress": progress,
         }
 
     def detail(self, job: Job) -> Dict[str, Any]:
         data = self.summary(job)
         data["files"] = self.list_files(job)
         data["log"] = self.log_tail(job)
-        manifest = self.job_dir(job.id) / "manifest.json"
-        if manifest.exists():
-            try:
-                data["manifest"] = json.loads(manifest.read_text(encoding="utf-8"))
-            except Exception:
-                pass
+        manifest = self._manifest(job)
+        if manifest:
+            data["manifest"] = manifest
         return data
 
 
@@ -601,14 +654,14 @@ class Sessions:
 # ---------------------------------------------------------------------------
 def presets_json(cfg: WebConfig) -> Dict[str, Any]:
     ages = [{"key": "random", "ko": "무작위"}] + [
-        {"key": k, "ko": f"{P.AGE_GROUP_KO[k]} ({lo}~{hi}세)"} for k, (lo, hi) in P.AGE_GROUPS.items()
+        {"key": k, "ko": f"{P.AGE_GROUP_KO[k]} ({lo}~{hi}세)", "short": P.AGE_GROUP_KO[k]} for k, (lo, hi) in P.AGE_GROUPS.items()
     ]
     rnd = {"key": "random", "ko": "무작위"}
     return {
         "ages": ages,
         "genders": [rnd] + [{"key": k, "ko": v["ko"]} for k, v in P.GENDERS.items()],
         "face_shapes": [rnd] + [{"key": k, "ko": v.ko, "tip": v.brow_tip_ko} for k, v in P.FACE_SHAPES.items()],
-        "brow_conditions": [rnd] + [{"key": k, "ko": v.ko} for k, v in P.BROW_CONDITIONS.items()],
+        "brow_conditions": [rnd] + [{"key": k, "ko": v.ko, "short": BROW_SHORT_KO.get(k, v.ko)} for k, v in P.BROW_CONDITIONS.items()],
         "ethnicities": [{"key": "random", "ko": "가중 무작위 (한국인 비중 높음)"}, {"key": "any", "ko": "균등 무작위"}]
         + [{"key": k, "ko": v.ko} for k, v in P.ETHNICITIES.items()],
         "brow_styles": [{"key": k, "ko": v.ko} for k, v in P.BROW_STYLES.items()],
@@ -745,7 +798,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
             if path in ("", "/", "/index.html"):
-                self.send_bytes(INDEX_HTML.encode("utf-8"), "text/html; charset=utf-8")
+                self.send_bytes(index_html(), "text/html; charset=utf-8")
                 return
             if path == "/healthz":
                 self.send_bytes(b"ok", "text/plain")
@@ -877,277 +930,19 @@ class Handler(BaseHTTPRequestHandler):
 
 
 # ---------------------------------------------------------------------------
-# page (all user-provided text is rendered with textContent, never as markup)
+# page
 # ---------------------------------------------------------------------------
-INDEX_HTML = r"""<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BrowLab · 눈썹 디자인 연습 시트</title>
-<style>
-:root{--bg:#f6f4f1;--card:#fff;--ink:#222;--muted:#6b6560;--line:#e2ddd7;--accent:#b5543a;--warn:#a13d2d}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-header h1{font-size:18px;margin:0}
-header small{color:var(--muted);font-weight:normal}
-header .sp{flex:1}
-main{max-width:1100px;margin:0 auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.tabs button{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:999px;cursor:pointer;font-size:14px}
-.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-[data-panel]{display:none}[data-panel].on{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 14px}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
-input[type=text],input[type=number],input[type=password],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
-textarea{min-height:64px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.chk{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--ink);margin:0}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips label{display:flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:13px;color:var(--ink);cursor:pointer;margin:0}
-.chips label.on{background:#f3e7e2;border-color:var(--accent)}
-button.primary{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:15px;cursor:pointer}
-button.primary:disabled{opacity:.5}
-button.ghost{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
-.msg{color:var(--warn);font-size:14px;min-height:20px;margin-top:8px;white-space:pre-wrap}
-.hint{color:var(--muted);font-size:13px}
-.job{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;background:#fff}
-.job:hover,.job.sel{border-color:var(--accent)}
-.badge{font-size:12px;padding:2px 8px;border-radius:999px;background:#eee;white-space:nowrap}
-.badge.running{background:#fff1c9}.badge.done{background:#d9f0e6}.badge.failed{background:#f8d6d0}.badge.queued{background:#e8e8e8}.badge.cancelled{background:#e8e8e8}
-.job .t{flex:1;min-width:0}.job .t b{display:block;font-size:14px}.job .t span{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-pre.log{background:#1f1d1b;color:#e8e2da;padding:12px;border-radius:10px;font-size:12px;overflow:auto;max-height:280px;white-space:pre-wrap}
-.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.thumbs a{display:block;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;text-decoration:none;color:var(--ink)}
-.thumbs img{width:100%;display:block;aspect-ratio:3/4;object-fit:contain;background:#faf8f5}
-.thumbs span{display:block;font-size:11px;padding:4px 6px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.files a{display:inline-block;margin:4px 8px 4px 0;font-size:14px}
-.kv{font-size:13px;color:var(--muted)}
-.split{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:900px){.split{grid-template-columns:340px 1fr}}
-h2{font-size:16px;margin:0 0 10px}
-h3{font-size:14px;margin:14px 0 6px;color:var(--muted)}
-.note{background:#fbf3ea;border:1px solid #f0dcc8;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px}
-</style>
-</head>
-<body>
-<header>
-  <h1>BrowLab <small>눈썹 디자인 연습 시트 · A4 1:1</small></h1>
-  <span class="sp"></span>
-  <span id="who" class="hint"></span>
-  <button id="logoutBtn" class="ghost" hidden>로그아웃</button>
-</header>
-<main>
-  <section id="login" class="card" hidden>
-    <h2>비밀번호</h2>
-    <div class="row">
-      <input id="pw" type="password" placeholder="비밀번호" style="max-width:260px" autocomplete="current-password">
-      <button id="loginBtn" class="primary">들어가기</button>
-    </div>
-    <div id="loginMsg" class="msg"></div>
-  </section>
+_INDEX_PATH = Path(__file__).with_name("index.html")
+_index_cache: Dict[str, Any] = {}
 
-  <div id="app" hidden>
-    <nav class="tabs">
-      <button data-tab="generate" class="on">얼굴 생성</button>
-      <button data-tab="restyle">내 사진 눈썹</button>
-      <button data-tab="sheet">사진 시트 · 보정</button>
-      <button data-tab="jobs">작업 목록 <span id="jobCount" class="badge"></span></button>
-    </nav>
 
-    <section data-panel="generate" class="on card">
-      <h2>눈썹이 부족한 연습용 얼굴 만들기</h2>
-      <p class="hint">조건을 고르면 흰 배경 정면 얼굴을 만들어 A4 실물 크기(동공 간 거리 기준) 시트 PNG·PDF 로 저장합니다. 비우면 무작위.</p>
-      <form id="fGen">
-        <div class="grid">
-          <div><label>인원 수</label><input name="count" type="number" min="1" max="8" value="1"></div>
-          <div><label>나이대</label><select name="age" data-src="ages"></select></div>
-          <div><label>정확한 나이 (선택, 15~79)</label><input name="age_exact" type="number" min="15" max="79" placeholder="비우면 나이대 안에서 무작위"></div>
-          <div><label>성별</label><select name="gender" data-src="genders"></select></div>
-          <div><label>얼굴형</label><select name="face_shape" data-src="face_shapes"></select></div>
-          <div><label>눈썹 상태</label><select name="brow_condition" data-src="brow_conditions"></select></div>
-          <div><label>외모</label><select name="ethnicity" data-src="ethnicities"></select></div>
-          <div><label>시드 (같은 조합 재현)</label><input name="seed" type="number" placeholder="비우면 무작위"></div>
-          <div><label>시트 구성</label><select name="layout" data-src="layouts"></select></div>
-          <div><label>동공 간 거리 mm (비우면 성별 평균)</label><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></div>
-        </div>
-        <div style="margin-top:10px"><label>추가 지시 (선택)</label><textarea name="notes" placeholder="예: 안경 없음, 앞머리 없음, 눈썹은 거의 없이"></textarea></div>
-        <div class="row" style="margin-top:10px">
-          <label class="chk"><input name="guides" type="checkbox" checked> 눈썹 황금비 가이드선</label>
-        </div>
-        <h3>생성 엔진</h3>
-        <div class="grid">
-          <div><label>백엔드</label><select name="backend" data-src="backends"></select></div>
-          <div><label>품질 (API)</label><select name="quality" data-src="qualities"></select></div>
-          <div><label>크기 (API, 16의 배수)</label><input name="size" type="text" value="1536x2304"></div>
-        </div>
-        <div id="genBackendHint" class="hint" style="margin-top:6px"></div>
-        <div class="row" style="margin-top:14px"><button class="primary" type="submit">생성 시작</button><span class="hint">한 장에 1~3분. 작업 목록에서 진행을 볼 수 있습니다.</span></div>
-        <div class="msg" data-msg></div>
-      </form>
-    </section>
-
-    <section data-panel="restyle" class="card">
-      <h2>내 사진의 눈썹만 여러 스타일로</h2>
-      <div class="note">사진은 눈썹 검출 후 편집을 위해 OpenAI 로 전송됩니다. 본인 또는 동의한 사람의 사진만 올리세요. 정면·눈썹이 보이는 사진이 좋습니다.</div>
-      <form id="fRestyle">
-        <div class="grid">
-          <div><label>얼굴 사진</label><input name="photo" type="file" accept="image/*" required></div>
-          <div><label>눈썹 색</label><select name="color" data-src="brow_colors"></select></div>
-          <div><label>비교 시트</label><select name="sheet" data-src="sheets"></select></div>
-          <div><label>성별 (동공 간 거리 기본값)</label><select name="gender" data-src="genders"></select></div>
-        </div>
-        <h3>스타일 (여러 개 선택)</h3>
-        <div class="chips" id="styleChips"></div>
-        <div style="margin-top:10px"><label>추가 지시 (선택)</label><textarea name="notes" placeholder="예: 눈썹 앞머리는 연하게, 꼬리는 조금 길게"></textarea></div>
-        <div class="row" style="margin-top:10px">
-          <label class="chk"><input name="no_composite" type="checkbox"> 합성 없이 편집 결과 그대로 (얼굴이 바뀌면 끄기)</label>
-        </div>
-        <h3>생성 엔진</h3>
-        <div class="grid">
-          <div><label>백엔드</label><select name="backend" data-src="backends"></select></div>
-          <div><label>품질 (API)</label><select name="quality" data-src="qualities"></select></div>
-        </div>
-        <div class="row" style="margin-top:14px"><button class="primary" type="submit">눈썹 바꾸기 시작</button></div>
-        <div class="msg" data-msg></div>
-      </form>
-    </section>
-
-    <section data-panel="sheet">
-      <div class="card">
-        <h2>가지고 있는 얼굴 사진을 A4 1:1 시트로</h2>
-        <form id="fSheet">
-          <div class="grid">
-            <div><label>얼굴 이미지</label><input name="photo" type="file" accept="image/*" required></div>
-            <div><label>시트 구성</label><select name="layout" data-src="layouts"></select></div>
-            <div><label>성별 (동공 간 거리 기본값)</label><select name="gender" data-src="genders"></select></div>
-            <div><label>얼굴형 (추천 문구, 선택)</label><select name="face_shape" data-src="face_shapes"></select></div>
-            <div><label>동공 간 거리 mm (선택)</label><input name="ipd_mm" type="number" step="0.5" min="50" max="75"></div>
-            <div><label>동공 픽셀 좌표 x1,y1,x2,y2 (검출 실패 시)</label><input name="pupils" type="text" placeholder="비우면 자동 검출"></div>
-          </div>
-          <div class="row" style="margin-top:10px"><label class="chk"><input name="guides" type="checkbox" checked> 가이드선</label></div>
-          <div class="row" style="margin-top:14px"><button class="primary" type="submit">시트 만들기</button></div>
-          <div class="msg" data-msg></div>
-        </form>
-      </div>
-      <div class="card">
-        <h2>프린터 배율 확인 시트</h2>
-        <p class="hint">100 mm 자·20 mm 정사각형·평균 동공 간격이 인쇄된 시트입니다. 프린터에서 "실제 크기(100%)" 로 인쇄한 뒤 자로 재어 배율을 확인하세요.</p>
-        <form id="fCal"><button class="primary" type="submit">보정 시트 만들기</button><div class="msg" data-msg></div></form>
-      </div>
-    </section>
-
-    <section data-panel="jobs">
-      <div class="split">
-        <div class="card" style="margin:0">
-          <h2>작업 목록</h2>
-          <div id="jobList"></div>
-        </div>
-        <div class="card" id="jobDetail" style="margin:0"><p class="hint">왼쪽에서 작업을 고르세요.</p></div>
-      </div>
-    </section>
-  </div>
-</main>
-<script>
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let presets=null, jobs=[], current=null, timer=null;
-const el=(tag, cls, text)=>{ const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e; };
-async function api(path, opts={}){
-  const r = await fetch(path, Object.assign({credentials:'same-origin'}, opts));
-  let data={}; try{ data = await r.json(); }catch(e){}
-  if(r.status===401){ showLogin(); throw new Error(data.error||'로그인이 필요합니다'); }
-  if(!r.ok) throw new Error(data.error||('HTTP '+r.status));
-  return data;
-}
-const post=(path, body)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
-function showLogin(){ $('#login').hidden=false; $('#app').hidden=true; $('#logoutBtn').hidden=true; $('#pw').focus(); }
-async function showApp(){
-  $('#login').hidden=true; $('#app').hidden=false; $('#logoutBtn').hidden=false;
-  presets = await api('api/presets');
-  fillSelects(); await refreshJobs(); startPolling();
-}
-function fillSelects(){
-  $$('select[data-src]').forEach(sel=>{
-    const src=sel.dataset.src; let items=presets[src];
-    if(src==='qualities') items=items.map(k=>({key:k,ko:k}));
-    if(src==='backends') items=items.map(b=>({key:b.key,ko:b.ko+(b.available?'':' — 사용 불가')}));
-    sel.replaceChildren();
-    const sheetShape = sel.name==='face_shape' && sel.form && sel.form.id==='fSheet';
-    if(sheetShape) sel.appendChild(new Option('없음',''));
-    items.forEach(it=>{ if(sheetShape && it.key==='random') return; sel.appendChild(new Option(it.ko,it.key)); });
-    if(src==='backends') sel.value=presets.default_backend;
-    if(src==='qualities') sel.value='high';
-  });
-  const chips=$('#styleChips'); chips.replaceChildren();
-  const def=['korean_natural','straight','soft_arch','feathered'];
-  presets.brow_styles.forEach(s=>{
-    const l=el('label'); const c=document.createElement('input'); c.type='checkbox'; c.value=s.key; c.checked=def.includes(s.key);
-    l.className=c.checked?'on':''; c.onchange=()=>l.className=c.checked?'on':'';
-    l.appendChild(c); l.appendChild(document.createTextNode(s.ko)); chips.appendChild(l);
-  });
-  const hint=()=>{ const k=$('#fGen [name=backend]').value; $('#genBackendHint').textContent = k==='codex'?'Codex: ChatGPT 구독 한도를 씁니다. 크기·품질은 프롬프트로만 요청됩니다.': k==='api'?'API: 서버에 OPENAI_API_KEY 가 있어야 하며 장당 과금됩니다. 크기·품질을 정확히 지정할 수 있습니다.':'manual: 프롬프트 파일만 저장합니다. 이미지를 직접 만들어 "사진 시트" 탭에서 시트로 만드세요.'; };
-  $('#fGen [name=backend]').onchange=hint; hint();
-}
-function formData(form){
-  const o={}; new FormData(form).forEach((v,k)=>{ if(!(v instanceof File)) o[k]=v; });
-  form.querySelectorAll('input[type=checkbox]').forEach(c=>{ if(c.name) o[c.name]=c.checked; });
-  return o;
-}
-function readFile(file){ return new Promise((res,rej)=>{ if(!file||!file.size) return rej(new Error('사진을 고르세요')); if(file.size>25*1024*1024) return rej(new Error('사진은 25 MB 이하')); const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(new Error('파일을 읽지 못했습니다')); r.readAsDataURL(file); }); }
-async function submit(form, kind, extra){
-  const msg=form.querySelector('[data-msg]'); msg.textContent=''; const btn=form.querySelector('button[type=submit]'); btn.disabled=true;
-  try{
-    const body=Object.assign({kind}, formData(form), extra||{});
-    const f=form.querySelector('input[type=file]');
-    if(f){ body.photo=await readFile(f.files[0]); body.photo_name=f.files[0].name; }
-    const job=await post('api/jobs', body);
-    await refreshJobs(); openJob(job.id); switchTab('jobs');
-  }catch(e){ msg.textContent=e.message; }
-  finally{ btn.disabled=false; }
-}
-$('#fGen').onsubmit=e=>{ e.preventDefault(); const d=formData(e.target); const extra={}; if(d.age_exact) extra.age=d.age_exact; submit(e.target,'generate',extra); };
-$('#fRestyle').onsubmit=e=>{ e.preventDefault(); const styles=$$('#styleChips input:checked').map(c=>c.value); if(!styles.length){ e.target.querySelector('[data-msg]').textContent='스타일을 하나 이상 고르세요'; return; } submit(e.target,'restyle',{styles}); };
-$('#fSheet').onsubmit=e=>{ e.preventDefault(); submit(e.target,'sheet'); };
-$('#fCal').onsubmit=e=>{ e.preventDefault(); submit(e.target,'calibrate'); };
-$('#loginBtn').onclick=async()=>{ $('#loginMsg').textContent=''; try{ await post('api/login',{password:$('#pw').value}); $('#pw').value=''; await showApp(); }catch(e){ $('#loginMsg').textContent=e.message; } };
-$('#pw').onkeydown=e=>{ if(e.key==='Enter') $('#loginBtn').click(); };
-$('#logoutBtn').onclick=async()=>{ try{ await post('api/logout'); }catch(e){} stopPolling(); showLogin(); };
-$$('.tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-function switchTab(name){ $$('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===name)); $$('[data-panel]').forEach(p=>p.classList.toggle('on',p.dataset.panel===name)); }
-const STATUS_KO={queued:'대기',running:'진행 중',done:'완료',failed:'실패',cancelled:'취소'};
-function describe(j){ const p=j.params||{}; const parts=[]; if(j.kind==='generate'){ parts.push(`${p.count||1}명`, p.age, p.gender, p.face_shape, p.brow_condition, p.backend); } else if(j.kind==='restyle'){ parts.push(p.photo, (p.styles||[]).length+'개 스타일', p.color, p.backend); } else if(j.kind==='sheet'){ parts.push(p.photo, p.layout); } else parts.push('A4 보정'); return parts.filter(Boolean).join(' · '); }
-async function refreshJobs(){
-  const d=await api('api/jobs'); jobs=d.jobs; const list=$('#jobList'); list.replaceChildren();
-  const active=jobs.filter(j=>j.status==='running'||j.status==='queued').length; $('#jobCount').textContent=active?active+' 진행':'';
-  if(!jobs.length){ list.appendChild(el('p','hint','아직 작업이 없습니다.')); return; }
-  jobs.forEach(j=>{ const row=el('div','job'+(j.id===current?' sel':'')); row.onclick=()=>openJob(j.id);
-    const t=el('div','t'); t.appendChild(el('b','',j.kind_ko)); t.appendChild(el('span','',j.created.replace('T',' ')+' · '+describe(j)));
-    row.appendChild(t); row.appendChild(el('span','badge '+j.status, STATUS_KO[j.status]||j.status)); list.appendChild(row); });
-}
-async function openJob(id){ current=id; $$('.job').forEach(r=>r.classList.remove('sel')); await renderJob(); }
-function fileLinks(parent, title, files, icon){ if(!files.length) return; parent.appendChild(el('h3','',title)); const d=el('div','files'); files.forEach(f=>{ const a=el('a','',icon+f.name); a.href=f.url; a.target='_blank'; d.appendChild(a); }); parent.appendChild(d); }
-async function renderJob(){
-  if(!current) return; let j; try{ j=await api('api/jobs/'+current); }catch(e){ $('#jobDetail').replaceChildren(el('p','msg',e.message)); return; }
-  const box=$('#jobDetail'); box.replaceChildren();
-  box.appendChild(el('h2','',j.kind_ko+' · '+(STATUS_KO[j.status]||j.status)));
-  box.appendChild(el('div','kv',j.created.replace('T',' ')+'  ·  '+describe(j)+(j.error?('  ·  '+j.error):'')));
-  if(j.status==='running'||j.status==='queued'){ const c=el('button','ghost','취소'); c.style.marginTop='8px'; c.onclick=async()=>{ await post('api/jobs/'+j.id+'/cancel'); renderJob(); refreshJobs(); }; box.appendChild(c); }
-  const base=f=>f.name.split('/').pop();
-  const imgs=j.files.filter(f=>f.kind==='image' && !/^(mask|mask_api|mask_guide)\.png$/.test(base(f)));
-  fileLinks(box, '인쇄용 PDF (A4, 배율 100% 로 인쇄)', j.files.filter(f=>f.kind==='pdf'), '📄 ');
-  if(imgs.length){ box.appendChild(el('h3','','이미지 (누르면 원본)')); const g=el('div','thumbs'); imgs.forEach(f=>{ const a=el('a'); a.href=f.url; a.target='_blank'; const im=document.createElement('img'); im.loading='lazy'; im.src=f.url+'?w=480'; im.alt=f.name; a.appendChild(im); a.appendChild(el('span','',f.name)); g.appendChild(a); }); box.appendChild(g); }
-  fileLinks(box, '기타 파일', j.files.filter(f=>f.kind==='other'), '');
-  box.appendChild(el('h3','','로그')); const pre=el('pre','log', j.log||'(아직 없음)'); box.appendChild(pre); pre.scrollTop=pre.scrollHeight;
-}
-function startPolling(){ stopPolling(); timer=setInterval(async()=>{ try{ const wasActive=jobs.some(j=>j.status==='running'||j.status==='queued'); if(wasActive) await refreshJobs(); const cur=jobs.find(j=>j.id===current); if(cur && (wasActive || cur.status==='running' || cur.status==='queued')) await renderJob(); }catch(e){} }, 4000); }
-function stopPolling(){ if(timer) clearInterval(timer); timer=null; }
-(async()=>{ try{ const me=await api('api/me'); $('#who').textContent='v'+me.version; if(me.authed) await showApp(); else showLogin(); }catch(e){ showLogin(); } })();
-</script>
-</body>
-</html>
-"""
+def index_html() -> bytes:
+    """The single-page UI (browlab/index.html), re-read when the file changes."""
+    mtime = _INDEX_PATH.stat().st_mtime
+    if _index_cache.get("mtime") != mtime:
+        _index_cache["mtime"] = mtime
+        _index_cache["body"] = _INDEX_PATH.read_bytes()
+    return _index_cache["body"]
 
 
 # ---------------------------------------------------------------------------
