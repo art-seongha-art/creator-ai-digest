@@ -317,10 +317,40 @@ class FaceTileTests(unittest.TestCase):
         mask = Image.new("L", (400, 400), 0)
         ImageDraw.Draw(mask).rectangle((100, 100, 300, 180), fill=255)
         fixed = M.match_tone(edited, original, mask)
-        self.assertEqual(fixed.getpixel((200, 140)), (150, 150, 150))
+        for ch in fixed.getpixel((200, 140)):
+            self.assertAlmostEqual(ch, 150, delta=2)
         # nothing to do when the ring already matches
         same = M.match_tone(original, original, mask)
-        self.assertEqual(same.getpixel((200, 140)), (150, 150, 150))
+        for ch in same.getpixel((200, 140)):
+            self.assertAlmostEqual(ch, 150, delta=1)
+
+    def test_match_tone_follows_uneven_lighting(self):
+        """A cast that varies across the face: one global offset cannot fix it, a local field can."""
+        import numpy as np
+
+        w = h = 400
+        ramp = np.linspace(120, 190, w, dtype=np.float32)[None, :, None].repeat(h, 0).repeat(3, 2)
+        original = Image.fromarray(ramp.astype(np.uint8))
+        edited = Image.fromarray(np.clip(ramp + np.linspace(-30, 30, w, dtype=np.float32)[None, :, None], 0, 255).astype(np.uint8))
+        mask = Image.new("L", (w, h), 0)
+        ImageDraw.Draw(mask).rectangle((60, 150, 340, 230), fill=255)
+        fixed = np.asarray(M.match_tone(edited, original, mask), np.float32)
+        inside = np.asarray(mask) > 128
+        before = float(np.abs(np.asarray(edited, np.float32)[inside] - ramp[inside]).mean())
+        after = float(np.abs(fixed[inside] - ramp[inside]).mean())
+        self.assertGreater(before, 10.0)
+        self.assertLess(after, before / 4.0, f"before {before:.2f} after {after:.2f}")
+        self.assertLess(after, 3.0, f"before {before:.2f} after {after:.2f}")
+
+    def test_feather_scales_with_the_mask(self):
+        thin = Image.new("L", (400, 400), 0)
+        ImageDraw.Draw(thin).rectangle((100, 190, 300, 210), fill=255)
+        thick = Image.new("L", (400, 400), 0)
+        ImageDraw.Draw(thick).rectangle((100, 100, 300, 300), fill=255)
+        self.assertEqual(M._mask_band_px(thin), 21)
+        self.assertLess(M.feather_for(thin), M.feather_for(thick))
+        self.assertGreaterEqual(M.feather_for(thin), 3)          # never a hard edge
+        self.assertEqual(M.feather_for(Image.new("L", (10, 10), 0)), 3)  # empty mask
 
     def test_paste_back_only_changes_masked_area(self):
         full = Image.new("RGB", (800, 1200), (10, 20, 30))

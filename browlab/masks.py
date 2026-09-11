@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
@@ -126,7 +126,7 @@ def composite_brows(original: Image.Image, edited: Image.Image, mask: Image.Imag
     if m.size != base.size:
         m = m.resize(base.size, Image.LANCZOS)
     if feather_px is None:
-        feather_px = max(2, int(min(base.size) * 0.006))
+        feather_px = feather_for(m)
     if feather_px > 0:
         m = m.filter(ImageFilter.GaussianBlur(feather_px))
     return Image.composite(top, base, m)
@@ -286,13 +286,61 @@ def warp_similarity(image: Image.Image, sim: Similarity, size: Tuple[int, int]) 
     return image.convert("RGB").transform(size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
 
 
-def match_tone(edited: Image.Image, original: Image.Image, mask: Image.Image, ring_px: Optional[int] = None, max_offset: int = 40) -> Image.Image:
-    """Shift the edited image's colours so the skin ring around the mask matches the original.
+def _mask_band_px(mask: Image.Image) -> int:
+    """Vertical thickness of the masked band (both brows sit at a similar height)."""
+    bbox = mask.getbbox()
+    return max(1, bbox[3] - bbox[1]) if bbox else 1
 
-    Small models sometimes re-render the masked area with a colour cast; matching
-    the mean colour of a thin band just outside the mask removes most of it.
-    """
+
+def feather_for(mask: Image.Image, frac: float = 0.10, minimum: int = 3) -> int:
+    """Soften the mask edge in proportion to how thick the brow band is."""
+    return max(minimum, int(round(frac * _mask_band_px(mask))))
+
+
+def _box_blur(a: "Any", radius: int, passes: int = 3) -> "Any":
+    """Separable box blur (3 passes ≈ Gaussian), zero-padded, numpy only."""
     import numpy as np
+
+    r = max(1, int(round(radius / passes)))
+    out = a.astype(np.float32)
+    k = 2 * r + 1
+    for _ in range(passes):
+        for axis in (0, 1):
+            pad = [(0, 0)] * out.ndim
+            pad[axis] = (r, r)
+            c = np.cumsum(np.pad(out, pad, mode="constant"), axis=axis)
+            head = list(c.shape)
+            head[axis] = 1
+            c = np.concatenate([np.zeros(head, np.float32), c], axis=axis)
+            n = out.shape[axis]
+            hi = [slice(None)] * out.ndim
+            lo = [slice(None)] * out.ndim
+            hi[axis] = slice(k, k + n)
+            lo[axis] = slice(0, n)
+            out = (c[tuple(hi)] - c[tuple(lo)]) / k
+    return out
+
+
+def match_tone(
+    edited: Image.Image,
+    original: Image.Image,
+    mask: Image.Image,
+    ring_px: Optional[int] = None,
+    max_offset: int = 40,
+) -> Image.Image:
+    """Make the edited brow area sit in the original photo's skin without a seam.
+
+    A single global offset leaves a visible colour step at the mask edge, and the
+    ring around a brow contains hair, lashes and eyes, which skews it. Instead a
+    smooth correction field is measured on the skin just outside the mask and
+    extrapolated inwards (a cheap seamless-cloning approximation): at the border
+    the corrected image equals the original, further in the field varies slowly,
+    so the model's brow detail survives while the colour follows the local skin.
+    """
+    try:
+        import numpy as np
+    except ImportError:  # pragma: no cover - numpy ships with mediapipe
+        return edited.convert("RGB")
 
     base = original.convert("RGB")
     top = edited.convert("RGB")
@@ -300,19 +348,33 @@ def match_tone(edited: Image.Image, original: Image.Image, mask: Image.Image, ri
         top = top.resize(base.size, Image.LANCZOS)
     m = mask.convert("L")
     if m.size != base.size:
-        m = m.resize(base.size)
-    ring_px = ring_px or max(4, int(0.03 * min(base.size)))
-    dilated = m.filter(ImageFilter.GaussianBlur(ring_px)).point(lambda v: 255 if v > 6 else 0)
-    ring = np.asarray(ImageChops.subtract(dilated, m)) > 128
-    if int(ring.sum()) < 50:
+        m = m.resize(base.size, Image.LANCZOS)
+
+    # The radius must span the mask, otherwise the field never reaches its middle.
+    band = int(ring_px or max(12, _mask_band_px(m)))
+    inside = np.asarray(m, np.float32) / 255.0
+    near = np.asarray(m.filter(ImageFilter.GaussianBlur(band * 0.6)), np.float32) / 255.0
+    valid = (near > 0.02) & (inside < 0.02)          # skin close to the mask, not the mask itself
+    if int(valid.sum()) < 64:
         return top
-    o = np.asarray(base).astype(np.float32)
-    e = np.asarray(top).astype(np.float32)
-    offset = o[ring].mean(axis=0) - e[ring].mean(axis=0)
-    if float(np.abs(offset).max()) < 2.0:
-        return top
-    offset = np.clip(offset, -max_offset, max_offset)
-    return Image.fromarray(np.clip(e + offset, 0, 255).astype(np.uint8))
+
+    o = np.asarray(base, np.float32)
+    e = np.asarray(top, np.float32)
+    luma = o @ np.array([0.299, 0.587, 0.114], np.float32)
+    median = float(np.median(luma[valid]))
+    skin = valid & (np.abs(luma - median) <= 40.0)    # drop hair, lashes, background
+    if int(skin.sum()) >= 64:
+        valid = skin
+    w = valid.astype(np.float32)
+
+    diff = (o - e) * w[..., None]
+    den = _box_blur(w, band)
+    field = _box_blur(diff, band) / np.maximum(den, 1e-6)[..., None]
+    weak = den < 0.02                                 # too far from any sample: use the overall shift
+    if bool(weak.any()):
+        field[weak] = (o - e)[valid].mean(axis=0)
+    field = np.clip(field, -max_offset, max_offset)
+    return Image.fromarray(np.clip(e + field, 0, 255).astype(np.uint8))
 
 
 def paste_back(full: Image.Image, tile_result: Image.Image, box: Tuple[int, int, int, int], mask_tile: Image.Image, feather_px: Optional[int] = None) -> Image.Image:
@@ -322,7 +384,7 @@ def paste_back(full: Image.Image, tile_result: Image.Image, box: Tuple[int, int,
     back = tile_result.convert("RGB").resize((w, h), Image.LANCZOS)
     m = mask_tile.convert("L").resize((w, h), Image.LANCZOS)
     if feather_px is None:
-        feather_px = max(2, int(min(w, h) * 0.006))
+        feather_px = feather_for(m)
     if feather_px > 0:
         m = m.filter(ImageFilter.GaussianBlur(feather_px))
     out = full.convert("RGB").copy()
