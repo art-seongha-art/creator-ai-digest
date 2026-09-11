@@ -43,6 +43,14 @@ from . import presets as P
 KINDS = ("generate", "restyle", "sheet", "calibrate")
 KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기", "sheet": "사진을 1:1 시트로", "calibrate": "프린터 보정 시트"}
 # shorter chip labels for the page (full names stay in presets.py)
+# Files the model actually saw, so a result can be judged against its inputs.
+INPUT_FILES = [
+    ("00_original.png", "원본 사진"),
+    ("00_face_tile.png", "모델에 보낸 얼굴 타일"),
+    ("00_prepared.png", "모델에 보낸 사진"),
+    ("mask_guide.png", "마스크 (빨간 부분만 편집)"),
+    ("mask_api.png", "API 알파 마스크"),
+]
 BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
                  "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음",
                  "arch": "아치", "high_arch": "높은 아치", "straight_flat": "일자", "half": "반토막", "thin": "얇음",
@@ -552,12 +560,19 @@ class JobStore:
                         prompt=face.get("prompt", ""), seed=face.get("seed"), face=face.get("label_ko"))
             elif job.kind == "restyle":
                 pdfs = [("sheet_compare.pdf", "비교표 PDF"), ("sheet_browzone.pdf", "눈썹 구역 1:1 PDF")]
+                shared_inputs = [{"label": lab, "url": url(n), "name": n} for n, lab in INPUT_FILES if n in files]
                 for v in manifest.get("variants", []):
                     if v.get("error") or v.get("pending"):
                         continue
                     name = Path(str(v.get("composited") or v.get("image") or "")).name
+                    raw = Path(str(v.get("image") or "")).name
+                    inputs = list(shared_inputs)
+                    if raw and raw != name and raw in files:
+                        inputs.append({"label": "모델 원본 출력 (합성 전)", "url": url(raw), "name": raw})
                     if name in files:
                         add(name, f"{v.get('style_ko', '')} · {P.BROW_COLORS.get(job.params.get('color', ''), {}).get('ko', '')}", pdfs,
+                            inputs=inputs, mask_sent=v.get("mask_sent"), brow_shift_px=v.get("brow_shift_px"),
+                            align=v.get("align"),
                             aligned=v.get("aligned", True), style=v.get("style"))
             elif job.kind == "sheet":
                 inp = next((n for n in files if n.startswith("input.")), None)

@@ -128,6 +128,34 @@ def _align_edit(
     return None, "misaligned", info, lm_new
 
 
+def _brow_height_fix(
+    args: argparse.Namespace, aligned: Image.Image, lm_ref: L.FaceLandmarks,
+) -> Tuple[Image.Image, Dict[str, Any]]:
+    """Slide the edit vertically so the new brow sits at the original brow's height.
+
+    Models lift brows onto the forehead even when the prompt forbids it, and the
+    mask leaves room above for taller designs, so the lift survives compositing.
+    Measuring both brow baselines and shifting the edit fixes it geometrically.
+    """
+    info: Dict[str, Any] = {}
+    ref = M.brow_baseline(lm_ref)
+    lm_new = _detect_plain(args, aligned)
+    new = M.brow_baseline(lm_new) if lm_new is not None else None
+    if ref is None or new is None:
+        info["brow_align"] = "편집 결과에서 눈썹을 찾지 못해 높이 보정 생략"
+        return aligned, info
+    ipd = lm_ref.ipd_px or 1.0
+    dy = ref - new
+    limit = args.brow_align_max * ipd
+    if abs(dy) < 0.02 * ipd:
+        info["brow_shift_px"] = 0.0
+        return aligned, info
+    dy = max(-limit, min(limit, dy))
+    info["brow_shift_px"] = round(dy, 1)
+    info["brow_shift_ipd"] = round(dy / ipd, 3)
+    return M.shift_image(aligned, 0, dy), info
+
+
 def _chain(text: Optional[str]) -> Optional[List[str]]:
     if not text:
         return None
@@ -497,6 +525,16 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                     _log(f"정렬 확인: 이동 {info['shift_pct']}% · 크기 {info['scale_pct']}% (허용 {ALIGN_TOLERANCE * 100:.0f}%)")
                 else:
                     _log(str(info.get("note", "")))
+                if args.height == "keep" and not args.no_brow_align:
+                    aligned_img, hinfo = _brow_height_fix(args, aligned_img, lm_edit)
+                    entry.update(hinfo)
+                    shift = hinfo.get("brow_shift_px")
+                    if shift:
+                        mm = shift / (lm_edit.ipd_px or 1.0) * (args.ipd_mm or P.default_ipd_mm(None, None))
+                        _log(f"눈썹 높이 보정: {'아래로' if shift > 0 else '위로'} {abs(shift):.0f}px "
+                             f"(실물 약 {abs(mm):.1f}mm) — 원래 눈썹 아래선에 맞춤")
+                    elif hinfo.get("brow_align"):
+                        _log(hinfo["brow_align"])
                 tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
                 comp = M.composite_brows(edit_img, tile_result, mask)
                 if box is not None:
@@ -684,13 +722,18 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--tile-margin", type=float, default=1.0, help="얼굴 타일 여유 배수 (1.0 = 머리 위 0.9 IPD, 턱 아래 0.35 IPD)")
     r.add_argument("--no-tile", action="store_true", help="얼굴을 잘라내지 않고 사진 전체를 편집 (이전 방식)")
     r.add_argument("--no-tone-match", action="store_true", help="합성 전 마스크 주변 피부톤 맞춤 생략")
+    r.add_argument("--no-brow-align", action="store_true",
+                   help="눈썹 높이 자동 보정 생략 (기본은 --height keep 일 때 새 눈썹을 원래 눈썹 아래선에 맞춤)")
+    r.add_argument("--brow-align-max", type=float, default=0.35,
+                   help="눈썹 높이 보정 최대 이동량 (동공 간 거리 배수)")
     r.add_argument("--align-max", type=float, default=0.45,
                    help="편집 결과의 눈 위치가 이 비율(동공 간 거리 대비) 이내로 움직였으면 정렬 보정 후 합성, 넘으면 합성 생략")
     r.add_argument("--mask-shape", choices=["brow", "box"], default="brow",
                    help="brow: 검출된 눈썹 윤곽을 따라가는 마스크(기본) / box: 눈썹을 감싸는 둥근 사각형(이전 방식)")
-    r.add_argument("--mask-side", type=float, default=0.10, help="마스크 둘레 여유 (동공 간 거리 배수, 63mm 기준 0.10 ≈ 6mm)")
-    r.add_argument("--mask-up", type=float, default=0.14, help="눈썹 위쪽 추가 여유 (동공 간 거리 배수). 높은 아치 디자인이면 0.25 정도")
-    r.add_argument("--mask-down", type=float, default=0.06, help="눈썹 아래쪽 추가 여유 (동공 간 거리 배수). 윗눈꺼풀 위에서 항상 잘림")
+    r.add_argument("--mask-side", type=float, default=0.035, help="마스크 둘레 여유 (동공 간 거리 배수, 63mm 기준 ≈ 2mm)")
+    r.add_argument("--mask-up", type=float, default=0.03,
+                   help="눈썹 위 추가 여유. 둘레 여유와 합쳐 눈썹 위 약 4mm. 키우면 모델이 눈썹을 이마 쪽으로 올립니다")
+    r.add_argument("--mask-down", type=float, default=0.03, help="눈썹 아래 추가 여유. 윗눈꺼풀 위에서 항상 잘립니다")
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")

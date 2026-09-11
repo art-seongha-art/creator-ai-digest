@@ -43,19 +43,23 @@ def _dilated_polygon(draw: ImageDraw.ImageDraw, pts, radius: float, dy: float = 
 def brow_region_mask(
     lm: FaceLandmarks,
     *,
-    pad_side: float = 0.10,
-    pad_up: float = 0.14,
-    pad_down: float = 0.06,
+    pad_side: float = 0.035,
+    pad_up: float = 0.03,
+    pad_down: float = 0.03,
     protect_eyes: bool = True,
     shape: str = "brow",
 ) -> Image.Image:
     """Return an ``L`` image: 255 where the eyebrows may be redrawn, 0 elsewhere.
 
     ``shape="brow"`` (default) follows the detected eyebrow outline: the brow
-    polygon grown by ``pad_side`` all around, stretched upwards by ``pad_up`` so
-    higher/thicker designs have room, and by ``pad_down`` below, never reaching
-    the upper eyelid. ``shape="box"`` is the older rounded bounding box.
-    All paddings are fractions of the inter-pupillary distance.
+    polygon grown by ``pad_side`` all around, then a little further up and down;
+    the growth is radial, so the margin above the brow is ``pad_side + pad_up``.
+    The defaults stay close to the existing brow (about 4 mm on a 63 mm IPD),
+    because the design corrects the brow the person already has - a taller band
+    only invites the model to move the brow up the forehead. MediaPipe traces
+    the brow ridge slightly thinner than the real hair, which the padding covers.
+    ``shape="box"`` is the older rounded bounding box. All paddings are
+    fractions of the inter-pupillary distance.
     """
     mask = Image.new("L", (lm.width, lm.height), 0)
     ipd = lm.ipd_px
@@ -375,6 +379,23 @@ def match_tone(
         field[weak] = (o - e)[valid].mean(axis=0)
     field = np.clip(field, -max_offset, max_offset)
     return Image.fromarray(np.clip(e + field, 0, 255).astype(np.uint8))
+
+
+def shift_image(image: Image.Image, dx: float, dy: float) -> Image.Image:
+    """Move the picture content by (dx, dy) pixels; the vacated edge stays black."""
+    img = image.convert("RGB")
+    if abs(dx) < 0.5 and abs(dy) < 0.5:
+        return img
+    return img.transform(img.size, Image.AFFINE, (1, 0, -dx, 0, 1, -dy), resample=Image.BICUBIC)
+
+
+def brow_baseline(lm: FaceLandmarks) -> Optional[float]:
+    """Average y of the lower edge of both brow outlines (the eye-to-brow gap reference)."""
+    ys = []
+    for pts in (lm.right_brow, lm.left_brow):
+        if len(pts) >= 2:
+            ys += [p[1] for p in pts[len(pts) // 2:]]
+    return sum(ys) / len(ys) if ys else None
 
 
 def paste_back(full: Image.Image, tile_result: Image.Image, box: Tuple[int, int, int, int], mask_tile: Image.Image, feather_px: Optional[int] = None) -> Image.Image:

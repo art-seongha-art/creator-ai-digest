@@ -245,12 +245,13 @@ class MaskTests(unittest.TestCase):
         self.assertIsNotNone(bbox)
         self.assertLess(bbox[3], lm.eye_top_y)          # never covers the eyes
         self.assertLess(bbox[1], lm.brow_top_y)          # extends above the current brows
-        self.assertGreater(bbox[1], lm.brow_top_y - 0.30 * lm.ipd_px)  # ...but stays close to them, not up the forehead
+        self.assertGreater(bbox[1], lm.brow_top_y - 0.12 * lm.ipd_px)  # ...but hugs them, no forehead band
+        self.assertLess(bbox[1], lm.brow_top_y)
         self.assertEqual(mask.size, (800, 1200))
         # the brow-shaped mask is much smaller than the old bounding box
         box = M.brow_region_mask(lm, shape="box", pad_side=0.16, pad_up=0.40, pad_down=0.12)
         area = lambda im: sum(1 for v in im.getdata() if v)
-        self.assertLess(area(mask), 0.8 * area(box))  # synthetic brows are thick; real faces shrink far more
+        self.assertLess(area(mask), 0.55 * area(box))  # hugging the brow is far smaller than the old forehead box
         self.assertLess(box.getbbox()[3], lm.eye_top_y)
         # the middle of the forehead between the brows stays untouched
         cx, top_y = int(lm.eye_center[0]), int(lm.brow_top_y - 0.05 * lm.ipd_px)
@@ -382,6 +383,25 @@ class FaceTileTests(unittest.TestCase):
         self.assertLess(M.feather_for(thin), M.feather_for(thick))
         self.assertGreaterEqual(M.feather_for(thin), 3)          # never a hard edge
         self.assertEqual(M.feather_for(Image.new("L", (10, 10), 0)), 3)  # empty mask
+
+    def test_brow_baseline_and_shift(self):
+        lm = _pupil_landmarks()
+        base = M.brow_baseline(lm)
+        lower = [p[1] for p in lm.right_brow[len(lm.right_brow) // 2:]]
+        self.assertIsNotNone(base)
+        self.assertGreater(base, lm.brow_top_y)            # the baseline is the lower edge, not the top
+        self.assertLess(base, lm.eye_top_y)
+        self.assertAlmostEqual(base, (sum(lower) * 2) / (len(lower) * 2), delta=1)
+        blank = L.from_pupils(100, 100, (30.0, 50.0), (70.0, 50.0))
+        blank.right_brow = []
+        blank.left_brow = []
+        self.assertIsNone(M.brow_baseline(blank))
+        img = Image.new("RGB", (60, 60), "black")
+        img.putpixel((30, 10), (255, 0, 0))
+        moved = M.shift_image(img, 0, 12)
+        self.assertGreater(moved.getpixel((30, 22))[0], 200)
+        self.assertLess(moved.getpixel((30, 10))[0], 60)
+        self.assertEqual(M.shift_image(img, 0, 0).mode, img.mode)
 
     def test_paste_back_only_changes_masked_area(self):
         full = Image.new("RGB", (800, 1200), (10, 20, 30))
@@ -1107,6 +1127,46 @@ class CliTests(unittest.TestCase):
         self.assertIn("자동", C._explain_api_error(codex))
         self.assertIn("조직", C._explain_api_error(LIMIT0))
         self.assertEqual(C._explain_api_error(RuntimeError("boom")), "")
+
+    def test_brow_height_fix_pulls_a_lifted_brow_back_down(self):
+        """The model lifts the brow onto the forehead; the fix slides the edit back."""
+        import argparse
+        from browlab import cli as C
+
+        args = argparse.Namespace(landmarks="auto", codex_bin="codex", landmark_model=None, no_download=True,
+                                  brow_align_max=0.35)
+        ref = _pupil_landmarks()                                   # brows around y=400, IPD 200
+        lifted = _pupil_landmarks()
+        lifted.right_brow = [(x, y - 60) for x, y in ref.right_brow]
+        lifted.left_brow = [(x, y - 60) for x, y in ref.left_brow]
+        img = Image.new("RGB", (800, 1200), "white")
+        ImageDraw.Draw(img).rectangle((250, 330, 550, 360), fill=(40, 30, 25))
+        saved = C._detect_plain
+        try:
+            C._detect_plain = lambda a, im, path=None: lifted
+            out, info = C._brow_height_fix(args, img, ref)
+            self.assertAlmostEqual(info["brow_shift_px"], 60, delta=1)   # down, by the amount it was lifted
+            self.assertGreater(info["brow_shift_ipd"], 0)
+            self.assertGreater(out.getpixel((400, 345))[0], 200)         # the bar left its lifted place
+            self.assertLess(out.getpixel((400, 405))[0], 120)            # ...and landed 60px lower, on the original line
+            # a huge jump is clamped, not applied blindly
+            far = _pupil_landmarks()
+            far.right_brow = [(x, y - 400) for x, y in ref.right_brow]
+            far.left_brow = [(x, y - 400) for x, y in ref.left_brow]
+            C._detect_plain = lambda a, im, path=None: far
+            _, info = C._brow_height_fix(args, img, ref)
+            self.assertAlmostEqual(info["brow_shift_px"], 0.35 * ref.ipd_px, delta=1)
+            # already in place: no shift at all
+            C._detect_plain = lambda a, im, path=None: ref
+            out, info = C._brow_height_fix(args, img, ref)
+            self.assertEqual(info["brow_shift_px"], 0.0)
+            # no face in the edit: say so instead of guessing
+            C._detect_plain = lambda a, im, path=None: None
+            out, info = C._brow_height_fix(args, img, ref)
+            self.assertIn("찾지 못해", info["brow_align"])
+            self.assertIs(out, img)
+        finally:
+            C._detect_plain = saved
 
     def test_calibrate(self):
         with tempfile.TemporaryDirectory() as tmp:
