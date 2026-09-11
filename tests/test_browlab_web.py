@@ -236,7 +236,58 @@ class WebServerTest(unittest.TestCase):
         status, body, _ = self.call("/api/settings", {"budget_usd": ""})
         self.assertIsNone(body["budget_usd"])
 
-    def test_09_logout(self):
+    def test_09_gallery_photo_from_and_delete(self):
+        self.login()
+        status, gal, _ = self.call("/api/gallery")
+        self.assertEqual(status, 200)
+        cal = [i for i in gal["items"] if i["kind"] == "calibrate"]
+        self.assertTrue(cal and cal[0]["image"] and cal[0]["pdfs"][0]["label"] == "보정 시트 PDF")
+        sheet = [i for i in gal["items"] if i["kind"] == "sheet"]
+        self.assertTrue(sheet and sheet[0]["image_name"] == "input.png" and any(p["label"] == "얼굴 1:1 PDF" for p in sheet[0]["pdfs"]))
+        # reuse the sheet job's input image for a new sheet job
+        status, job, _ = self.call("/api/jobs", {"kind": "sheet", "photo_from": {"job": sheet[0]["id"], "file": "input.png"},
+                                                 "pupils": "220,300,380,300", "layout": "face"})
+        self.assertEqual(status, 201, job)
+        self.assertEqual(job["params"]["photo_from"]["job"], sheet[0]["id"])
+        done = self.wait(job["id"])
+        self.assertEqual(done["status"], "done", done["log"])
+        status, body, _ = self.call("/api/jobs", {"kind": "sheet", "photo_from": {"job": sheet[0]["id"], "file": "../job.json"}})
+        self.assertEqual(status, 400)
+        # delete -> gone from the list, folder moved to trash
+        status, body, _ = self.call(f"/api/jobs/{job['id']}/delete", {})
+        self.assertEqual(status, 200)
+        status, body, _ = self.call(f"/api/jobs/{job['id']}")
+        self.assertEqual(status, 404)
+        self.assertTrue((Path(self.tmp.name) / "data" / "trash" / job["id"] / "job.json").exists())
+        status, body, _ = self.call(f"/api/jobs/{job['id']}/delete", {})
+        self.assertEqual(status, 404)
+
+    def test_10_keepalive_post_without_reading_body(self):
+        # cancel/delete/logout used to leave the JSON body unread; on a keep-alive connection the
+        # next request then started with "{}" and failed with 501.
+        import http.client
+        self.login()
+        cookie = "; ".join(f"{c.name}={c.value}" for c in self.jar)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        try:
+            conn.request("POST", "/browlab/api/jobs/does_not_exist/cancel", body=b"{}",
+                         headers={"Content-Type": "application/json", "Cookie": cookie})
+            self.assertEqual(conn.getresponse().read() and 404, 404)
+            conn.request("GET", "/browlab/api/gallery", headers={"Cookie": cookie})
+            r = conn.getresponse()
+            self.assertEqual(r.status, 200, r.read())
+            r.read()
+            conn.request("POST", "/browlab/api/logout", body=b"{}", headers={"Content-Type": "application/json", "Cookie": cookie})
+            r = conn.getresponse(); r.read()
+            self.assertEqual(r.status, 200)
+            conn.request("GET", "/browlab/api/me", headers={"Cookie": cookie})
+            r = conn.getresponse()
+            self.assertEqual(r.status, 200)
+            self.assertFalse(json.loads(r.read())["authed"])
+        finally:
+            conn.close()
+
+    def test_11_logout(self):
         self.login()
         status, body, _ = self.call("/api/logout", {})
         self.assertEqual(status, 200)

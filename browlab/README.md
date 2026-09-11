@@ -241,7 +241,9 @@ python -m browlab web --host 127.0.0.1 --port 8177 \
 | `--codex-bin` | codex 실행 파일. systemd 처럼 PATH 가 없는 환경에서는 절대경로 |
 | `--default-backend` | 화면 기본 백엔드 (`codex`/`api`/`manual`) |
 
-- 화면 탭: **얼굴 생성**(generate) · **내 사진 눈썹**(restyle, 사진 업로드) · **사진 시트 · 보정**(sheet, calibrate) · **작업 목록**.
+- 화면: 왼쪽 **얼굴 생성 / 내 사진 눈썹 / 사진 시트 · 보정** 폼, 오른쪽 **갤러리**(결과 이미지 격자 → 눌러서 크게 보기 · PDF · 원본 · 삭제 · 로그).
+  생성한 얼굴은 라이트박스의 "이 얼굴로 눈썹 편집"으로 바로 restyle 에 넣을 수 있고(`photo_from`), "같은 조건으로 한 장 더"도 됩니다.
+- 삭제는 작업 폴더를 `<data-dir>/trash/<작업id>/` 로 옮깁니다(복구는 폴더를 `jobs/` 로 되돌리고 서비스 재시작).
 - 작업은 `python -m browlab <명령> ... --out-dir <작업폴더>` 서브프로세스로 **한 번에 하나씩** 실행되고,
   화면은 4초마다 상태·로그·결과(PDF 링크, 이미지 썸네일)를 갱신합니다.
 - 업로드 사진은 EXIF 회전을 바로잡아 `input.jpg/png` 로 저장합니다. 25 MB 이하, PNG/JPEG/WebP.

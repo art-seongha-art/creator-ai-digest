@@ -255,6 +255,22 @@ def _sheet_args(p: Dict[str, Any], cfg: WebConfig) -> Tuple[List[str], Dict[str,
     return argv, shown
 
 
+def copy_from_job(job_dir: Path, jobs_root: Path, ref: Any) -> Path:
+    """Reuse an image of an earlier job: ``photo_from = {"job": id, "file": relative name}``."""
+    if not isinstance(ref, dict):
+        raise BadRequest("photo_from 형식 오류")
+    job_id, rel = ref.get("job"), ref.get("file")
+    if not isinstance(job_id, str) or not re.match(r"^[A-Za-z0-9_]+$", job_id) or not isinstance(rel, str):
+        raise BadRequest("photo_from 형식 오류")
+    root = (jobs_root / job_id).resolve()
+    src = (root / rel).resolve()
+    if root not in src.parents or not src.is_file() or src.suffix.lower() not in IMAGE_EXTS:
+        raise BadRequest("이전 작업의 이미지를 찾지 못했습니다")
+    dst = job_dir / ("input" + src.suffix.lower())
+    shutil.copyfile(src, dst)
+    return dst
+
+
 def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> Tuple[List[str], Dict[str, Any]]:
     """Translate the page's JSON into a whitelisted CLI argument list."""
     if kind not in KINDS:
@@ -262,9 +278,14 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
     argv = [sys.executable, "-m", "browlab", kind]
     shown: Dict[str, Any] = {}
     if kind in ("restyle", "sheet"):
-        photo = save_upload(job_dir, p.get("photo"))
+        if p.get("photo_from"):
+            photo = copy_from_job(job_dir, cfg.jobs_root, p.get("photo_from"))
+            shown["photo"] = _text(p.get("photo_name"), 120) or f"{p['photo_from'].get('job')}/{p['photo_from'].get('file')}"
+            shown["photo_from"] = {"job": p["photo_from"].get("job"), "file": p["photo_from"].get("file")}
+        else:
+            photo = save_upload(job_dir, p.get("photo"))
+            shown["photo"] = _text(p.get("photo_name"), 120) or photo.name
         argv.append(str(photo))
-        shown["photo"] = _text(p.get("photo_name"), 120) or photo.name
     argv += ["--out-dir", str(job_dir)]
 
     if kind == "generate":
@@ -457,6 +478,91 @@ class JobStore:
                 except OSError:
                     pass
         return job
+
+    def delete(self, job_id: str) -> None:
+        """Remove a job from the list; its folder moves to data_dir/trash/<id> (recoverable by hand)."""
+        with self.lock:
+            job = self.jobs.get(job_id)
+            if job is None:
+                raise KeyError(job_id)
+            proc = self.procs.get(job_id)
+            if job.status in ("queued", "running"):
+                job.status = "cancelled"
+                job.error = "삭제됨"
+                if proc is not None:
+                    try:
+                        proc.terminate()
+                    except OSError:
+                        pass
+            self.jobs.pop(job_id, None)
+        if proc is not None:
+            try:
+                proc.wait(timeout=10)
+            except Exception:
+                pass
+        src = self.job_dir(job_id)
+        if src.exists():
+            trash = self.cfg.data_dir / "trash"
+            trash.mkdir(parents=True, exist_ok=True)
+            dst = trash / job_id
+            if dst.exists():
+                shutil.rmtree(dst, ignore_errors=True)
+            shutil.move(str(src), str(dst))
+
+    def gallery(self) -> List[Dict[str, Any]]:
+        """Flat list of result cards (one per image) for the gallery view, newest job first."""
+        with self.lock:
+            jobs = sorted(self.jobs.values(), key=lambda j: j.created, reverse=True)[:300]
+        items: List[Dict[str, Any]] = []
+        for job in jobs:
+            manifest = self._manifest(job)
+            base = self.summary(job)
+            root = self.job_dir(job.id)
+            files = {f["name"]: f for f in self.list_files(job)}
+
+            def url(name: str) -> Optional[str]:
+                return files[name]["url"] if name in files else None
+
+            def add(image: Optional[str], label: str, pdfs: List[Tuple[str, str]], **extra: Any) -> None:
+                item = dict(base)
+                item.update({
+                    "image": url(image) if image else None,
+                    "image_name": image,
+                    "label": label,
+                    "pdfs": [{"label": lab, "url": url(n)} for n, lab in pdfs if n in files],
+                })
+                item.update(extra)
+                items.append(item)
+
+            before = len(items)
+            if job.kind == "generate":
+                for face in manifest.get("faces", []):
+                    if face.get("error") or face.get("pending"):
+                        continue
+                    name = Path(str(face.get("image", ""))).name
+                    if name not in files:
+                        continue
+                    stem = name[:-4]
+                    add(name, face.get("label_ko") or base["title"],
+                        [(f"sheets/{stem}_A4.pdf", "얼굴 1:1 PDF"), (f"sheets/{stem}_browzone.pdf", "눈썹 구역 PDF")],
+                        prompt=face.get("prompt", ""), seed=face.get("seed"), face=face.get("label_ko"))
+            elif job.kind == "restyle":
+                pdfs = [("sheet_compare.pdf", "비교표 PDF"), ("sheet_browzone.pdf", "눈썹 구역 1:1 PDF")]
+                for v in manifest.get("variants", []):
+                    if v.get("error") or v.get("pending"):
+                        continue
+                    name = Path(str(v.get("composited") or v.get("image") or "")).name
+                    if name in files:
+                        add(name, f"{v.get('style_ko', '')} · {P.BROW_COLORS.get(job.params.get('color', ''), {}).get('ko', '')}", pdfs,
+                            aligned=v.get("aligned", True), style=v.get("style"))
+            elif job.kind == "sheet":
+                inp = next((n for n in files if n.startswith("input.")), None)
+                add(inp, base["title"], [(n, "얼굴 1:1 PDF" if n.endswith("_A4.pdf") else "눈썹 구역 PDF") for n in sorted(files) if n.endswith(".pdf")])
+            elif job.kind == "calibrate":
+                add("calibration_A4.png" if "calibration_A4.png" in files else None, "프린터 보정 시트", [("calibration_A4.pdf", "보정 시트 PDF")])
+            if len(items) == before and job.status in ("queued", "running", "failed", "cancelled"):
+                add(None, base["title"], [])
+        return items
 
     def _run_forever(self) -> None:
         while True:
@@ -889,6 +995,9 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/usage":
                 self.send_json(self.server.store.usage_totals())
                 return
+            if path == "/api/gallery":
+                self.send_json({"items": self.server.store.gallery()})
+                return
             if path == "/api/jobs":
                 store = self.server.store
                 with store.lock:
@@ -956,8 +1065,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:  # noqa: N802
         try:
             path, _ = self.route()
+            # Always consume the request body first: with keep-alive, an unread body would be
+            # parsed as the start of the next request on the same connection.
+            body = self.read_json()
             if path == "/api/login":
-                body = self.read_json()
                 sessions = self.server.sessions
                 if not sessions.required:
                     self.send_json({"ok": True, "auth_required": False})
@@ -978,7 +1089,6 @@ class Handler(BaseHTTPRequestHandler):
             if not self.require_auth():
                 return
             if path == "/api/jobs":
-                body = self.read_json()
                 kind = body.get("kind")
                 if kind not in KINDS:
                     raise BadRequest("작업 종류를 고르세요")
@@ -986,7 +1096,6 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(self.server.store.summary(job), HTTPStatus.CREATED)
                 return
             if path == "/api/settings":
-                body = self.read_json()
                 self.server.store.set_settings(body)
                 self.send_json(self.server.store.usage_totals())
                 return
@@ -997,6 +1106,15 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 job = self.server.store.cancel(m.group(1))
                 self.send_json(self.server.store.summary(job))
+                return
+            m = re.match(r"^/api/jobs/([A-Za-z0-9_]+)/delete$", path)
+            if m:
+                try:
+                    self.server.store.delete(m.group(1))
+                except KeyError:
+                    self.send_json({"error": "없는 작업"}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_json({"ok": True})
                 return
             self.send_json({"error": "not found"}, HTTPStatus.NOT_FOUND)
         except BadRequest as exc:
