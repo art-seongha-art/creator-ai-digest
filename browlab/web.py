@@ -709,10 +709,21 @@ class JobStore:
 
     @staticmethod
     def job_cost(manifest: Dict[str, Any]) -> Tuple[float, int]:
-        """(estimated USD, number of API images) recorded in a job's manifest."""
-        entries = list(manifest.get("faces", [])) + list(manifest.get("variants", []))
-        cost = sum(float(e.get("cost_usd") or 0.0) for e in entries if isinstance(e, dict))
-        n = sum(1 for e in entries if isinstance(e, dict) and e.get("usage"))
+        """(estimated USD, number of API images) from the token usage in a job's manifest.
+
+        Re-priced with the current rate table on every read, so a corrected rate applies to old jobs too.
+        """
+        from . import backends as B
+
+        entries = [e for e in list(manifest.get("faces", [])) + list(manifest.get("variants", [])) if isinstance(e, dict)]
+        cost = 0.0
+        n = 0
+        for e in entries:
+            if not e.get("usage"):
+                continue
+            n += 1
+            model = e.get("model") or manifest.get("model")
+            cost += B.estimate_cost_usd(e["usage"], model) or float(e.get("cost_usd") or 0.0)
         return round(cost, 6), n
 
     def usage_totals(self) -> Dict[str, Any]:

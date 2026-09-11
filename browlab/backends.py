@@ -43,6 +43,8 @@ class GenResult:
 # gpt-image-1.5 / gpt-image-2 / gpt-image-2.5-* share the "default" row.
 IMAGE_RATES: Dict[str, Dict[str, float]] = {
     "gpt-image-1": {"text_in": 5.0, "image_in": 10.0, "image_out": 40.0},
+    # gpt-image-1-mini: calibrated 2026-09-12 against the dashboard (10 requests, 11,212 tokens -> $0.48)
+    "gpt-image-1-mini": {"text_in": 2.0, "image_in": 2.5, "image_out": 8.0},
     "default": {"text_in": 5.0, "image_in": 8.0, "image_out": 30.0},
 }
 
@@ -68,7 +70,8 @@ def usage_dict(resp: Any) -> Optional[Dict[str, int]]:
 def estimate_cost_usd(usage: Optional[Dict[str, int]], model: Optional[str]) -> Optional[float]:
     if not usage:
         return None
-    key = "gpt-image-1" if (model or "").startswith("gpt-image-1") and not (model or "").startswith("gpt-image-1.5") else "default"
+    m = model or ""
+    key = "gpt-image-1-mini" if m.startswith("gpt-image-1-mini") else "gpt-image-1" if (m.startswith("gpt-image-1") and not m.startswith("gpt-image-1.5")) else "default"
     r = IMAGE_RATES[key]
     cost = (usage.get("text_tokens", 0) * r["text_in"] + usage.get("image_tokens", 0) * r["image_in"]
             + usage.get("output_tokens", 0) * r["image_out"]) / 1_000_000

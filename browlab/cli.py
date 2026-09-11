@@ -66,6 +66,7 @@ def _record_usage(entry: Dict[str, Any], result: B.GenResult, manifest: Dict[str
         return
     entry["usage"] = result.usage
     entry["cost_usd"] = result.cost_usd
+    entry["model"] = result.model
     manifest["cost_usd"] = round(float(manifest.get("cost_usd") or 0.0) + float(result.cost_usd or 0.0), 6)
     _log(f"토큰: 입력 {result.usage['input_tokens']} (텍스트 {result.usage['text_tokens']} · 이미지 {result.usage['image_tokens']})"
          f" · 출력 {result.usage['output_tokens']} · 추정 ${result.cost_usd:.4f} (누적 ${manifest['cost_usd']:.4f})")
