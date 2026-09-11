@@ -756,14 +756,19 @@ class JobStore:
         elif job.kind == "restyle" and job.status == "running":
             progress = f"{len(manifest.get('variants', []))}/{len(job.params.get('styles', []))}"
         used: List[str] = []  # backend/model that actually produced each image (auto backend may vary)
+        hint = ""
         for e in list(manifest.get("faces", [])) + list(manifest.get("variants", [])):
-            if isinstance(e, dict) and e.get("backend"):
+            if not isinstance(e, dict):
+                continue
+            if e.get("backend"):
                 tag = f"{e['backend']} {e.get('model') or ''}".strip()
                 if tag not in used:
                     used.append(tag)
+            if e.get("hint") and not hint:
+                hint = str(e["hint"])
         return {
             "id": job.id, "kind": job.kind, "kind_ko": KIND_KO.get(job.kind, job.kind), "created": job.created,
-            "status": job.status, "started": job.started, "finished": job.finished, "error": job.error, "used": used,
+            "status": job.status, "started": job.started, "finished": job.finished, "error": job.error, "used": used, "hint": hint,
             "params": job.params, "rc": job.rc, "title": self.title_ko(job, manifest), "thumb": self.thumb(job),
             "progress": progress, "cost_usd": cost, "api_images": api_images,
         }

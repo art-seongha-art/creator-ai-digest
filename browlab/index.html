@@ -488,6 +488,7 @@ async function renderLb(){
   const side=$('#lbSide'); side.replaceChildren();
   side.appendChild(el('h3','',it.label||it.title));
   side.appendChild(el('div','sub',[it.kind_ko, fmtTime(it.created), it.status==='done'?dur(it):STATUS_KO[it.status], it.cost_usd?'API 추정 '+usd(it.cost_usd):'', (it.used&&it.used.length)?('사용: '+it.used.join(', ')):(it.params&&it.params.backend?it.params.backend:''), it.aligned===false?'합성 생략(얼굴 위치 변경)':''].filter(Boolean).join(' · ')+(it.error?' · '+it.error:'')));
+  if(it.hint) side.appendChild(el('div','hint',it.hint));
   if(it.pdfs&&it.pdfs.length){ const g=el('div','pdfs'); it.pdfs.forEach((p,i)=>{ const a=el('a',i?'alt':''); a.href=p.url; a.target='_blank'; a.insertAdjacentHTML('afterbegin', ICON_PRINT); a.appendChild(el('span','',p.label)); g.appendChild(a); }); side.appendChild(g); side.appendChild(el('div','hint','인쇄: A4 · 배율 100% · "페이지에 맞춤" 끄기 · 시트 아래 100 mm 자로 확인')); }
   const acts=el('div','acts');
   if(it.image){ const a=el('a','btn','원본 열기'); a.href=it.image; a.target='_blank'; acts.appendChild(a); }

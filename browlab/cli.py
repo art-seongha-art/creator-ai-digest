@@ -76,6 +76,9 @@ def _record_usage(entry: Dict[str, Any], result: B.GenResult, manifest: Dict[str
 
 def _explain_api_error(exc: BaseException) -> str:
     text = str(exc)
+    if "usage limit" in text and "codex" in text.lower():
+        return ("Codex(ChatGPT 구독) 이미지 생성 한도가 소진되었습니다. 엔진을 '자동'(Codex 실패 시 API로 넘어감) 또는 "
+                "'OpenAI API'로 바꾸거나, https://chatgpt.com/codex/settings/usage 에서 크레딧을 구매하거나 안내된 시각 이후 다시 시도하세요.")
     if "rate_limit_exceeded" in text and "Limit 0" in text:
         return ("이 OpenAI 조직에서는 아직 gpt-image 계열 모델이 열리지 않았습니다(분당 한도 0). "
                 "platform.openai.com → Settings → Organization → Limits 에서 결제 반영·조직 인증(Verify organization) 상태를 확인하세요. "

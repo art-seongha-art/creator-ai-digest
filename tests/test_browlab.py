@@ -955,6 +955,13 @@ class CliTests(unittest.TestCase):
         finally:
             C.L.detect = saved
 
+    def test_explain_errors(self):
+        from browlab import cli as C
+        codex = B.GenerationError("codex exec finished but no image was produced.\nrc=1\nstderr: ERROR: You've hit your usage limit. try again at Sep 15th")
+        self.assertIn("자동", C._explain_api_error(codex))
+        self.assertIn("조직", C._explain_api_error(LIMIT0))
+        self.assertEqual(C._explain_api_error(RuntimeError("boom")), "")
+
     def test_calibrate(self):
         with tempfile.TemporaryDirectory() as tmp:
             rc, out = self._run(["calibrate", "--out-dir", tmp, "--no-pdf"])
