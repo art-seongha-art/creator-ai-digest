@@ -420,9 +420,17 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(kw["model"], "gpt-image-2.5-sunburst")
             self.assertIn("mask", kw)
             self.assertNotIn("input_fidelity", kw)
-            legacy = B.OpenAIBackend(client=Client(), model="gpt-image-1.5")
-            legacy.edit("E", [src], tmp / "e2.png")
+            legacy = B.OpenAIBackend(client=Client(), model="gpt-image-1")
+            legacy.edit("E", [src], tmp / "e2.png", size="16x16")
             self.assertEqual(calls[-1][1]["input_fidelity"], "high")
+            self.assertEqual(calls[-1][1]["size"], "auto")  # gpt-image-1 family: no custom sizes
+            mini = B.OpenAIBackend(client=Client(), model="gpt-image-1-mini")
+            mini.generate("P", tmp / "g2.png", size="1536x2304", quality="low")
+            self.assertEqual(calls[-1][1]["size"], "1024x1536")  # snapped to the nearest fixed portrait size
+            self.assertNotIn("input_fidelity", calls[-1][1])
+            mini.edit("E", [src], tmp / "e3.png", size="1360x2048")
+            self.assertEqual(calls[-1][1]["size"], "auto")
+            self.assertNotIn("input_fidelity", calls[-1][1])
 
     def test_usage_dict_and_cost_estimate(self):
         class Det:

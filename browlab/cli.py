@@ -70,6 +70,15 @@ def _record_usage(entry: Dict[str, Any], result: B.GenResult, manifest: Dict[str
          f" · 출력 {result.usage['output_tokens']} · 추정 ${result.cost_usd:.4f} (누적 ${manifest['cost_usd']:.4f})")
 
 
+def _explain_api_error(exc: BaseException) -> str:
+    text = str(exc)
+    if "rate_limit_exceeded" in text and "Limit 0" in text:
+        return ("이 OpenAI 조직에서는 아직 gpt-image 계열 모델이 열리지 않았습니다(분당 한도 0). "
+                "platform.openai.com → Settings → Organization → Limits 에서 결제/조직 인증(Verify) 상태를 확인하거나, "
+                "그동안은 --model gpt-image-1-mini 로 생성하세요.")
+    return ""
+
+
 def _backend(args: argparse.Namespace) -> B.BaseBackend:
     return B.make_backend(
         args.backend,
@@ -196,10 +205,14 @@ def cmd_generate(args: argparse.Namespace) -> int:
         _log(f"[{i}/{len(specs)}] {spec.label_ko()} -> {out_path.name}")
         try:
             result = backend.generate(prompt, out_path, size=args.size, quality=args.quality)
-        except B.GenerationError as exc:
+        except Exception as exc:  # GenerationError or an API/SDK error
             failures += 1
             entry["error"] = str(exc)
             _log(f"생성 실패: {exc}")
+            hint = _explain_api_error(exc)
+            if hint:
+                _log(hint)
+                entry["hint"] = hint
             manifest["faces"].append(entry)
             _write_json(manifest_path, manifest)
             continue
@@ -334,9 +347,13 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                 mask=(mask_api_path if backend.name == "api" and mask_api_path is not None and not args.no_mask else None),
                 size=size, quality=args.quality,
             )
-        except B.GenerationError as exc:
+        except Exception as exc:  # GenerationError or an API/SDK error
             entry["error"] = str(exc)
             _log(f"편집 실패: {exc}")
+            hint = _explain_api_error(exc)
+            if hint:
+                _log(hint)
+                entry["hint"] = hint
             manifest["variants"].append(entry)
             _write_json(manifest_path, manifest)
             continue

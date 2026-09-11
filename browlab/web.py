@@ -737,6 +737,13 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
             {"key": "manual", "ko": "프롬프트만 저장 (직접 생성)", "available": True},
         ],
         "default_backend": cfg.default_backend,
+        "models": [
+            {"key": "", "ko": "기본 (생성 gpt-image-2.5-flare · 편집 gpt-image-2.5-sunburst)"},
+            {"key": "gpt-image-2.5-sunburst", "ko": "gpt-image-2.5-sunburst (정밀 편집, 느림)"},
+            {"key": "gpt-image-2", "ko": "gpt-image-2"},
+            {"key": "gpt-image-1.5", "ko": "gpt-image-1.5 (고정 크기 1024x1536)"},
+            {"key": "gpt-image-1-mini", "ko": "gpt-image-1-mini (저가·고정 크기, 조직 인증 전 임시용)"},
+        ],
     }
 
 

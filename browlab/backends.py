@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
+FIXED_SIZES = {"1024x1024", "1536x1024", "1024x1536"}
 
 
 class GenerationError(RuntimeError):
@@ -321,7 +322,23 @@ class OpenAIBackend(BaseBackend):
             return out_path
         raise GenerationError("Images API item had neither b64_json nor url")
 
+    @staticmethod
+    def _fixed_size_model(model: Optional[str]) -> bool:
+        """gpt-image-1 / 1-mini / 1.5 only accept 1024x1024, 1536x1024, 1024x1536 or auto."""
+        return (model or "").startswith("gpt-image-1")
+
+    @classmethod
+    def _snap_size(cls, model: Optional[str], size: str) -> str:
+        if not cls._fixed_size_model(model) or size == "auto" or size in FIXED_SIZES:
+            return size
+        try:
+            w, h = (int(v) for v in size.lower().split("x"))
+        except ValueError:
+            return size
+        return "1024x1536" if h > w else "1536x1024" if w > h else "1024x1024"
+
     def generate(self, prompt: str, out_path: Path, *, size: str = "1536x2304", quality: str = "high") -> GenResult:
+        size = self._snap_size(self.model, size)
         kwargs: Dict[str, Any] = dict(model=self.model, prompt=prompt, n=1, size=size, quality=quality, output_format="png")
         resp = self.client().images.generate(**kwargs)
         path = self._save_first(resp, Path(out_path))
@@ -339,13 +356,13 @@ class OpenAIBackend(BaseBackend):
                 prompt=prompt,
                 image=handles if len(handles) > 1 else handles[0],
                 n=1,
-                size=size,
+                size="auto" if self._fixed_size_model(model) else size,  # gpt-image-1 family: no custom sizes
                 quality=quality,
                 output_format="png",
             )
             if mask_handle is not None:
                 kwargs["mask"] = mask_handle
-            if model.startswith("gpt-image-1"):
+            if model == "gpt-image-1":  # only the original model takes input_fidelity
                 kwargs["input_fidelity"] = "high"
             resp = self.client().images.edit(**kwargs)
         finally:
