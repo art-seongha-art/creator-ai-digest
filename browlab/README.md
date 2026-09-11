@@ -239,6 +239,7 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <마지
 | `ERROR: You've hit your usage limit ... try again at ...` | Codex(ChatGPT 구독) 이미지 한도 소진. 표시된 시각까지 기다리거나 크레딧 구매, 또는 `--backend api` |
 | 웹 UI 작업이 `실패 · 종료 코드 1` | 작업 상세의 로그 마지막 줄을 볼 것. 위 두 메시지 중 하나인 경우가 대부분 |
 | API: `429 rate_limit_exceeded ... Limit 0, Requested N` | 이 OpenAI 조직에서 gpt-image-1/1.5/2/2.5 가 아직 안 열림(분당 한도 0). platform.openai.com → Settings → Organization → Limits 에서 결제 반영·조직 인증(Verify organization)을 확인하고, 키를 만든 조직과 충전한 조직이 같은지 확인. 2026-09-12 이 계정에서 실측: 2.5-flare/sunburst/2 모두 한도 0, gpt-image-1-mini 만 열려 있었음 |
+| 랜드마크가 제대로 잡히는지 보고 싶다 | `python browlab/tools/landmark_check.py <이미지 또는 작업폴더> --out <폴더>` — 랜드마크·눈썹 마스크 오버레이(`*_lm.png`)와 눈썹 구역 2배 확대(`*_zoom.png`), 검출률·IPD·기울기·눈썹 폭 지표를 출력. 2026-09-12 생성 얼굴 23/24 검출(미검출 1건은 얼굴이 아닌 눈썹구역 시트), 160~200 ms/장 |
 | `mediapipe unavailable` | `pip install mediapipe` (리눅스는 `libgl1 libegl1 libgles2` 필요). 또는 `--landmarks codex` / `--pupils` |
 | 얼굴이 A4에 다 안 들어감 | 정상입니다. 눈썹·눈·턱을 우선 살리고 머리 윗부분을 잘라냅니다. `--ipd-mm` 을 줄이면 전체가 작아집니다 |
 | 시트 한글이 네모로 나옴 | `--font /경로/NanumGothic.ttf` 또는 `BROWLAB_FONT` 환경변수 |
