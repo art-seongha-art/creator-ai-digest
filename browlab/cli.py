@@ -221,6 +221,8 @@ def _sheet_options(args: argparse.Namespace, ipd_mm: float, caption: str, note: 
         extra_lines=list(extra),
         font_path=args.font,
         fallback_image_height_mm=getattr(args, "image_height_mm", 320.0),
+        print_scale=(getattr(args, "print_scale", 100.0) or 100.0) / 100.0,
+        grow_mm=getattr(args, "grow_mm", 0.0) or 0.0,
     )
 
 
@@ -646,6 +648,8 @@ def _add_sheet_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("A4 시트")
     g.add_argument("--dpi", type=int, default=S.DEFAULT_DPI, help="출력 해상도 (기본 300)")
     g.add_argument("--ipd-mm", type=float, help="동공 간 거리(mm). 생략 시 성별/나이 평균(여 62, 남 64, 10대 60)")
+    g.add_argument("--print-scale", type=float, default=100.0, help="출력 배율 %%. 100 = 실물 1:1, 110 = 10%% 크게")
+    g.add_argument("--grow-mm", type=float, default=0.0, help="얼굴을 상하좌우로 각각 몇 mm 키울지. 10 이면 좌우·위아래 1cm씩 (--print-scale 과 곱해짐)")
     g.add_argument("--layout", choices=["face", "browzone", "both"], default="face", help="face: 얼굴 전체 1:1 / browzone: 눈썹 구역만 1:1 여러 장 / both")
     g.add_argument("--copies", type=int, default=3, help="browzone 레이아웃에서 한 장에 반복할 수")
     g.add_argument("--guides", action="store_true", help="눈썹 황금비 가이드선(콧방울-눈앞머리/홍채/눈꼬리) 표시")

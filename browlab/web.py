@@ -249,6 +249,14 @@ def _sheet_args(p: Dict[str, Any], cfg: WebConfig) -> Tuple[List[str], Dict[str,
     if ipd is not None:
         argv += ["--ipd-mm", str(ipd)]
         shown["ipd_mm"] = ipd
+    scale = _float_opt(p.get("print_scale"), 70, 200)
+    if scale is not None and abs(scale - 100.0) > 0.01:
+        argv += ["--print-scale", str(scale)]
+        shown["print_scale"] = scale
+    grow = _float_opt(p.get("grow_mm"), -20, 40)
+    if grow:
+        argv += ["--grow-mm", str(grow)]
+        shown["grow_mm"] = grow
     landmarks = _choice(p.get("landmarks"), LANDMARKS, "auto")
     pupils = _pupils(p.get("pupils"))
     if landmarks == "manual" and not pupils:

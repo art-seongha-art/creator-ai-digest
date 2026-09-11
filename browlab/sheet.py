@@ -45,6 +45,8 @@ class SheetOptions:
     fallback_image_height_mm: float = 320.0
     hair_allowance: float = 0.95   # in IPD units above the hairline
     neck_allowance: float = 0.35   # in IPD units below the chin
+    print_scale: float = 1.0       # 1.0 = life size; 1.1 prints the face 10% larger
+    grow_mm: float = 0.0           # extra mm of face on every side (left, right, top, bottom)
 
     @property
     def page_px(self) -> Tuple[int, int]:
@@ -109,12 +111,50 @@ def _draw_square(draw: ImageDraw.ImageDraw, x: int, y: int, size_mm: float, dpi:
 # ---------------------------------------------------------------------------
 # scaling / placement
 # ---------------------------------------------------------------------------
+def face_width_mm(lm: FaceLandmarks, ipd_mm: float) -> float:
+    """Cheekbone-to-cheekbone width at the print scale (adult average: 137 mm / 146 mm)."""
+    return abs(lm.left_cheek[0] - lm.right_cheek[0]) / lm.ipd_px * ipd_mm
+
+
+def face_height_mm(lm: FaceLandmarks, ipd_mm: float) -> float:
+    """Hairline-to-chin height at the print scale (adult average: 180 mm / 190 mm)."""
+    return abs(lm.chin[1] - lm.forehead_top[1]) / lm.ipd_px * ipd_mm
+
+
+def enlargement(lm: Optional[FaceLandmarks], opts: SheetOptions) -> float:
+    """How much bigger than life size the face is printed.
+
+    ``print_scale`` is the multiplier itself; ``grow_mm`` is the friendlier way
+    to ask for it - "another centimetre on each side" - and is turned into a
+    multiplier from the face's own measured width.
+    """
+    factor = opts.print_scale if opts.print_scale > 0 else 1.0
+    if opts.grow_mm and lm is not None and lm.ipd_px > 0:
+        width = face_width_mm(lm, opts.ipd_mm)
+        if width > 0:
+            factor *= (width + 2.0 * opts.grow_mm) / width
+    return factor
+
+
+def size_note(lm: Optional[FaceLandmarks], opts: SheetOptions, ko: bool = True) -> str:
+    """The printed size in millimetres, so a ruler can confirm the sheet is right."""
+    factor = enlargement(lm, opts)
+    pct = "" if abs(factor - 1.0) < 0.005 else (f" · 배율 {factor * 100:.0f}%" if ko else f" · {factor * 100:.0f}% of life size")
+    if lm is None or lm.ipd_px <= 0:
+        return ("동공간 거리 기준 없음" + pct) if ko else ("no IPD reference" + pct)
+    w = face_width_mm(lm, opts.ipd_mm) * factor
+    h = face_height_mm(lm, opts.ipd_mm) * factor
+    if ko:
+        return f"동공간 {opts.ipd_mm * factor:.0f} mm · 얼굴 너비 {w:.0f} × 헤어라인~턱 {h:.0f} mm{pct}"
+    return f"IPD {opts.ipd_mm * factor:.0f} mm · face {w:.0f} x {h:.0f} mm{pct}"
+
+
 def life_size_scale(lm: Optional[FaceLandmarks], image_height_px: int, opts: SheetOptions) -> float:
     """Pixels-on-sheet per pixel-in-image so the face prints at real size."""
     ppm = px_per_mm(opts.dpi)
     if lm is not None and lm.ipd_px > 0:
-        return (opts.ipd_mm * ppm) / lm.ipd_px
-    return (opts.fallback_image_height_mm * ppm) / float(image_height_px)
+        return (opts.ipd_mm * ppm) / lm.ipd_px * enlargement(lm, opts)
+    return (opts.fallback_image_height_mm * ppm) / float(image_height_px) * enlargement(lm, opts)
 
 
 def _scaled_face(image: Image.Image, lm: Optional[FaceLandmarks], scale: float) -> Tuple[Image.Image, Optional[FaceLandmarks]]:
@@ -193,7 +233,7 @@ def _draw_guides(draw: ImageDraw.ImageDraw, lm: FaceLandmarks, dpi: int) -> None
 # ---------------------------------------------------------------------------
 # sheets
 # ---------------------------------------------------------------------------
-def _header_footer(canvas: Image.Image, opts: SheetOptions, fonts: SheetFont, subtitle_right: str) -> Tuple[int, int]:
+def _header_footer(canvas: Image.Image, opts: SheetOptions, fonts: SheetFont, subtitle_right: str, factor: float = 1.0) -> Tuple[int, int]:
     """Draw the header/footer chrome. Returns (content_top, content_bottom) in px."""
     draw = ImageDraw.Draw(canvas)
     W, H = canvas.size
@@ -203,7 +243,12 @@ def _header_footer(canvas: Image.Image, opts: SheetOptions, fonts: SheetFont, su
     f_body = fonts.get(mm2px(2.8, dpi))
     f_small = fonts.get(mm2px(2.2, dpi))
 
-    title = opts.title or fonts.t("눈썹 디자인 연습 시트 · 실물 크기 1:1", "Brow design practice sheet · life size 1:1")
+    if abs(factor - 1.0) < 0.005:
+        default_title = fonts.t("눈썹 디자인 연습 시트 · 실물 크기 1:1", "Brow design practice sheet · life size 1:1")
+    else:
+        default_title = fonts.t(f"눈썹 디자인 연습 시트 · 실물의 {factor * 100:.0f}%",
+                                f"Brow design practice sheet · {factor * 100:.0f}% of life size")
+    title = opts.title or default_title
     draw.text((m, m), title, font=f_title, fill=DARK)
     if subtitle_right:
         tw, th = _text_size(draw, subtitle_right, f_small)
@@ -252,12 +297,12 @@ def compose_face_sheet(
     canvas = Image.new("RGB", (W, H), "white")
     scale = life_size_scale(lm, image.size[1], opts)
     if lm is not None:
-        right = fonts.t(f"A4 {opts.dpi}dpi · 동공간 거리 {opts.ipd_mm:.0f} mm 기준 · 랜드마크 {lm.source}",
-                        f"A4 {opts.dpi}dpi · IPD {opts.ipd_mm:.0f} mm · landmarks: {lm.source}")
+        right = fonts.t(f"A4 {opts.dpi}dpi · {size_note(lm, opts, ko=True)} · 랜드마크 {lm.source}",
+                        f"A4 {opts.dpi}dpi · {size_note(lm, opts, ko=False)} · landmarks: {lm.source}")
     else:
         right = fonts.t(f"A4 {opts.dpi}dpi · 이미지 높이 {opts.fallback_image_height_mm:.0f} mm 가정 (랜드마크 없음)",
                         f"A4 {opts.dpi}dpi · assumes image height {opts.fallback_image_height_mm:.0f} mm (no landmarks)")
-    top, bottom = _header_footer(canvas, opts, fonts, right)
+    top, bottom = _header_footer(canvas, opts, fonts, right, enlargement(lm, opts))
     m = mm2px(opts.margin_mm, opts.dpi)
     area = (m, top, W - m, bottom - mm2px(2, opts.dpi))
     scaled, lm_s = _scaled_face(image, lm, scale)
@@ -297,6 +342,7 @@ def compose_browzone_sheet(
     label_h = mm2px(4, dpi)
     f_label = fonts.get(mm2px(2.6, dpi))
 
+    factor = enlargement(items[0][2], opts) if items else 1.0
     strips: List[Tuple[str, Image.Image]] = []
     for label, image, lm in items:
         scale = life_size_scale(lm, image.size[1], opts)
@@ -322,8 +368,11 @@ def compose_browzone_sheet(
         need = crop.size[1] + label_h + gap
         if canvas is None or y + need > bottom:
             canvas = Image.new("RGB", (W, H), "white")
-            right = fonts.t(f"눈썹 구역 1:1 · A4 {dpi}dpi · IPD {opts.ipd_mm:.0f} mm", f"Brow zone 1:1 · A4 {dpi}dpi · IPD {opts.ipd_mm:.0f} mm")
-            top, bottom = _header_footer(canvas, opts, fonts, right)
+            scale_ko = "1:1" if abs(factor - 1.0) < 0.005 else f"실물의 {factor * 100:.0f}%"
+            scale_en = "1:1" if abs(factor - 1.0) < 0.005 else f"{factor * 100:.0f}% of life size"
+            right = fonts.t(f"눈썹 구역 {scale_ko} · A4 {dpi}dpi · 동공간 {opts.ipd_mm * factor:.0f} mm",
+                            f"Brow zone {scale_en} · A4 {dpi}dpi · IPD {opts.ipd_mm * factor:.0f} mm")
+            top, bottom = _header_footer(canvas, opts, fonts, right, factor)
             y = top
             pages.append(canvas)
         draw = ImageDraw.Draw(canvas)

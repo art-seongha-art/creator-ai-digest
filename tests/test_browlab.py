@@ -424,6 +424,33 @@ class SheetTests(unittest.TestCase):
         self.assertAlmostEqual(page_lm.ipd_px, 63.0 * 300 / 25.4, places=0)
         self.assertAlmostEqual(page_lm.eye_center[0], 2480 / 2, delta=2)
 
+    def test_grow_mm_adds_exactly_that_much_face_on_every_side(self):
+        """The practitioner asks for "a centimetre more each way"; that is what prints."""
+        lm, img = _pupil_landmarks(), _face_image()
+        plain = S.SheetOptions(ipd_mm=63.0)
+        base_w = S.face_width_mm(lm, plain.ipd_mm)
+        base_h = S.face_height_mm(lm, plain.ipd_mm)
+        for grow in (5.0, 10.0):
+            opts = S.SheetOptions(ipd_mm=63.0, grow_mm=grow)
+            canvas, page = S.compose_face_sheet(img, lm, opts)
+            ppm = S.px_per_mm(opts.dpi)
+            width = abs(page.left_cheek[0] - page.right_cheek[0]) / ppm
+            height = abs(page.chin[1] - page.forehead_top[1]) / ppm
+            self.assertAlmostEqual(width, base_w + 2 * grow, delta=0.6)   # grow mm on the left AND the right
+            self.assertAlmostEqual(height / base_h, width / base_w, places=2)  # proportions untouched
+            self.assertEqual(canvas.size, (2480, 3508))
+            self.assertLess(page.chin[1], canvas.size[1])                 # the chin is still on the paper
+            self.assertGreater(page.brow_top_y, 0)                        # ...and so is the working area
+            self.assertIn("배율", S.size_note(lm, opts))
+        # life size stays the default, and says nothing about a scale
+        self.assertAlmostEqual(S.enlargement(lm, plain), 1.0)
+        self.assertNotIn("배율", S.size_note(lm, plain))
+        self.assertIn(f"{base_w:.0f}", S.size_note(lm, plain))   # the header states the size a ruler will find
+        # print_scale is the raw multiplier and multiplies with grow_mm
+        both = S.SheetOptions(ipd_mm=63.0, grow_mm=10.0, print_scale=1.1)
+        self.assertAlmostEqual(S.enlargement(lm, both), 1.1 * (base_w + 20) / base_w, places=4)
+        self.assertAlmostEqual(S.enlargement(None, S.SheetOptions(print_scale=1.2, grow_mm=10)), 1.2)
+
     def test_face_sheet_without_landmarks(self):
         opts = S.SheetOptions(fallback_image_height_mm=320.0)
         canvas, page_lm = S.compose_face_sheet(_face_image(), None, opts)

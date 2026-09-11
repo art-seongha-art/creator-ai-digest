@@ -185,6 +185,7 @@ details.adv .body{display:grid;grid-template-columns:repeat(auto-fill,minmax(158
 details.adv .body .wide{grid-column:1/-1}
 .field{display:flex;flex-direction:column;gap:5px;min-width:0}
 .field>span{font-size:12.5px;color:var(--muted);font-weight:500}
+.hint-inline{font-style:normal;font-weight:400;opacity:.72}
 .field input,.field select,.field textarea{width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r1);
   background:var(--panel);font-size:16px;transition:border-color .12s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:color-mix(in srgb,var(--brand) 50%,var(--line));outline:none}
@@ -418,6 +419,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
           <label class="field"><span>정확한 나이 (15~79)</span><input name="age_exact" type="number" min="15" max="79" placeholder="비우면 나이대 안에서"></label>
           <label class="field"><span>시드 (조합 재현)</span><input name="seed" type="number" placeholder="비우면 무작위"></label>
           <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+          <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
           <label class="field"><span>시트 구성</span><select name="layout" data-src="layouts"></select></label>
           <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
           <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
@@ -459,6 +461,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <div class="body">
           <label class="field"><span>비교 시트</span><select name="sheet" data-src="sheets"></select></label>
           <label class="field"><span>성별 (동공 간 거리 기본값)</span><select name="gender" data-src="genders"></select></label>
+          <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
           <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
           <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
           <label class="field"><span>모델 (API)</span><select name="model" data-src="models"></select></label>
@@ -492,6 +495,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
           <div class="body">
             <label class="field"><span>얼굴형 (추천 문구)</span><select name="face_shape" data-src="face_shapes" data-none="없음"></select></label>
             <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+            <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
             <label class="field wide"><span>동공 픽셀 좌표 x1,y1,x2,y2 (자동 검출 실패 시)</span><input name="pupils" type="text" placeholder="비우면 자동 검출"></label>
             <label class="chk wide"><input name="guides" type="checkbox" checked> 가이드선</label>
           </div>
