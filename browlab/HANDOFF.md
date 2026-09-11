@@ -15,9 +15,10 @@
 | --- | --- |
 | 환경 | 맥 Python 3.11.15 / codex 0.153.2 · 4090 Python 3.12.3 / codex 0.153.3 (둘 다 ChatGPT 로그인). 테스트 59개 통과(웹 10개 포함) |
 | 6.2 Codex 실제 생성 | **미완.** (a) `codex exec -C` 에 상대경로를 넘기던 버그로 즉시 실패(`No such file or directory (os error 2)`) → 절대경로로 수정, 회귀 테스트 추가. (b) 계정의 Codex 이미지 한도 소진: `ERROR: You've hit your usage limit ... try again at Sep 15th, 2026 10:22 AM` (맥·4090 동일 계정). 4090 systemd 서비스 안에서 codex 실행·인증·프롬프트 전달까지는 확인(같은 오류로 실패). **9/15 이후 또는 크레딧 구매 후 6.2 의 1~5 항목 재검증** |
-| 6.3 API | 키 없음 → 미검증. 키 위치: 4090 `~/.config/browlab/env` (README 9장, `browlab/API_설정_안내.md`) |
+| 6.3 API | 키 입력·$10 충전 완료(9/12 02시). **gpt-image-2.5-flare/sunburst·gpt-image-2 는 `429 ... (for limit gpt-image) ... Limit 0`** — OpenAI 조직 한도 0(결제 반영/조직 인증 확인 필요, platform.openai.com → Settings → Organization → Limits). `gpt-image-1-mini` 만 열려 있어 그 모델로 파이프라인 전 단계 실측 통과: 생성(50초, 1024x1536)→시트(mediapipe IPD 300px)→restyle 2스타일(마스크 편집·합성·비교/눈썹구역 시트, 110초)→보정→사용량 집계. 산출물 `~/browlab_data/_tests_20260912/jobs/`. 4090 감시기 `/tmp/watch_and_test.sh` 가 2.5 가 열리면 `/tmp/browlab_api_test_25.py` 로 자동 재시험(로그 `~/browlab_data/_tests_20260912/watch.log`). 기본 모델은 2.5 그대로(연구자 지시: 하위 모델 사용 금지) |
+| 관찰(품질) | 생성 얼굴: 정면·흰 배경·안경 없음은 지켜지나 **눈썹이 프롬프트만큼 듬성듬성하지 않음**(mini 기준, 2.5 로 재확인 후 prompts.py Eyebrows/Constraints 강화). mini 편집은 마스크 영역 피부톤이 주황빛으로 변함(합성 뒤에도 보임) → 2.5 sunburst 결과로 판단, 필요 시 합성 전 색 맞춤 검토 |
 | 6.4 restyle / 6.5 codex 랜드마크 | 실제 사진 없음 → 미검증(웹 테스트는 합성 이미지 + manual/none 랜드마크만) |
-| 웹 UI | `python -m browlab web` + `browlab/index.html`(컴팩트 UI: 칩 4줄 + 고급 설정 접기, 작업 목록/PDF, 사진 업로드). 설계 캔버스: https://claude.ai/code/artifact/15a0bc8f-b5d1-4985-9c96-af6e28ee16de |
+| 웹 UI | `python -m browlab web` + `browlab/index.html`(컴팩트 UI: 칩 4줄 + 고급 설정 접기, 작업 목록/PDF, 사진 업로드, 상단 `$지출/$충전` 사용량·설정 창, 외모 기본 한국인). 설계 캔버스: https://claude.ai/code/artifact/15a0bc8f-b5d1-4985-9c96-af6e28ee16de |
 | 4090 상시 서비스 | `~/.config/systemd/user/browlab.service` (0.0.0.0:8177, `--base-path /browlab`), 데이터 `~/browlab_data`, 비밀번호 = 허브 비밀번호(`~/.config/browlab/password.txt`) |
 | 외부 접근 | `https://seongha-art-4090.tailc4181c.ts.net/browlab/` (Funnel 443 `/browlab`, 공개 DNS 경로로 200 확인). **주의**: `tailscale serve` 로 경로를 추가하면 그 포트 Funnel 이 꺼짐 — 반드시 `sudo tailscale funnel --bg --https=443 --set-path ...` (README 8장) |
 | 남은 일 | 6.2(9/15 이후) → 6.3(키) → 6.4 실제 사진(본인 동의) → 6.5 → 눈썹 희소성 프롬프트 튜닝 → 인쇄 배율 실측 |
