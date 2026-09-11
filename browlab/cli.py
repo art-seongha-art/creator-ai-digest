@@ -113,15 +113,37 @@ def _edit_aligned(args: argparse.Namespace, edited: Image.Image, lm_orig: L.Face
     return ok, f"눈 위치 이동 {shift * 100:.1f}% · 동공 간 거리 변화 {ratio * 100:.1f}% (허용 {ALIGN_TOLERANCE * 100:.0f}%)"
 
 
+def _chain(text: Optional[str]) -> Optional[List[str]]:
+    if not text:
+        return None
+    return [m.strip() for m in text.split(",") if m.strip()]
+
+
 def _backend(args: argparse.Namespace) -> B.BaseBackend:
-    return B.make_backend(
+    backend = B.make_backend(
         args.backend,
         model=args.model,
         edit_model=getattr(args, "edit_model", None),
+        model_chain=_chain(getattr(args, "model_chain", None)),
+        edit_model_chain=_chain(getattr(args, "edit_model_chain", None)),
         timeout=args.timeout,
         codex_bin=args.codex_bin,
         extra_args=args.codex_arg or (),
     )
+    for note in getattr(backend, "notes", []):
+        _log(note)
+    if backend.name == "auto":
+        _log("자동 순서: " + " → ".join(label for label, _ in backend.attempts))
+    return backend
+
+
+def _record_backend(entry: Dict[str, Any], result: B.GenResult) -> None:
+    """Which backend/model actually produced this image (matters for the auto backend)."""
+    entry["backend"] = result.backend
+    if result.model:
+        entry["model"] = result.model
+    if result.fallback:
+        entry["fallback"] = list(result.fallback)
 
 
 def _detect(args: argparse.Namespace, image: Image.Image, path: Optional[Path]) -> Optional[L.FaceLandmarks]:
@@ -251,6 +273,7 @@ def cmd_generate(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         entry["pending"] = result.pending
+        _record_backend(entry, result)
         _record_usage(entry, result, manifest)
         if result.pending:
             _log(f"수동 모드: 프롬프트를 저장했습니다 -> {result.log}")
@@ -345,7 +368,10 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     rng = random.Random(args.seed)
     styles = _parse_styles(args.styles, rng)
     backend = _backend(args)
-    use_guide = backend.name == "codex" and guide_path is not None and not args.no_guide_image
+    guide_ok = guide_path is not None and not args.no_guide_image
+    use_guide = backend.name in ("codex", "auto") and guide_ok
+    api_mask = mask_api_path if mask_api_path is not None and not args.no_mask else None
+    api_size = f"{prepared.size[0]}x{prepared.size[1]}"
     manifest: Dict[str, Any] = {
         "tool": f"browlab {__version__}",
         "created": _dt.datetime.now().isoformat(timespec="seconds"),
@@ -362,7 +388,9 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     colour_ko = P.BROW_COLORS[args.color]["ko"]
     for i, style in enumerate(styles, 1):
         st = P.BROW_STYLES[style]
-        prompt = PR.build_restyle_prompt(style, args.color, with_guide_image=use_guide, notes=args.notes or "")
+        prompt_codex = PR.build_restyle_prompt(style, args.color, with_guide_image=use_guide, notes=args.notes or "")
+        prompt_api = PR.build_restyle_prompt(style, args.color, with_guide_image=False, notes=args.notes or "")
+        prompt = prompt_codex if backend.name == "codex" else prompt_api
         out_path = out_dir / f"{i:02d}_{style}_{args.color}.png"
         entry: Dict[str, Any] = {"style": style, "style_ko": st.ko, "prompt": prompt, "image": str(out_path)}
         if args.dry_run:
@@ -371,16 +399,21 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             print()
             continue
         _log(f"[{i}/{len(styles)}] {st.ko} ({colour_ko}) -> {out_path.name}")
-        images: List[Path] = [prepared_path]
-        if use_guide and guide_path is not None:
-            images.append(guide_path)
-        size = f"{prepared.size[0]}x{prepared.size[1]}" if backend.name == "api" else "auto"
+        codex_images: List[Path] = [prepared_path] + ([guide_path] if use_guide and guide_path is not None else [])
+        api_images: List[Path] = [prepared_path]
         try:
-            result = backend.edit(
-                prompt, images, out_path,
-                mask=(mask_api_path if backend.name == "api" and mask_api_path is not None and not args.no_mask else None),
-                size=size, quality=args.quality,
-            )
+            if backend.name == "auto":
+                # Codex gets the red region guide and no mask; the API gets the alpha mask and the exact size.
+                result = backend.edit(  # type: ignore[call-arg]
+                    prompt_api, api_images, out_path, mask=api_mask, size=api_size, quality=args.quality,
+                    variants={"codex": {"prompt": prompt_codex, "images": codex_images, "mask": None, "size": "auto"}},
+                )
+            elif backend.name == "codex":
+                result = backend.edit(prompt_codex, codex_images, out_path, mask=None, size="auto", quality=args.quality)
+            elif backend.name == "api":
+                result = backend.edit(prompt_api, api_images, out_path, mask=api_mask, size=api_size, quality=args.quality)
+            else:  # manual
+                result = backend.edit(prompt_api, api_images, out_path, mask=None, size="auto", quality=args.quality)
         except Exception as exc:  # GenerationError or an API/SDK error
             entry["error"] = str(exc)
             _log(f"편집 실패: {exc}")
@@ -392,6 +425,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             _write_json(manifest_path, manifest)
             continue
         entry["pending"] = result.pending
+        _record_backend(entry, result)
         _record_usage(entry, result, manifest)
         if result.pending:
             manifest["variants"].append(entry)
@@ -478,9 +512,12 @@ def cmd_presets(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 def _add_backend_args(p: argparse.ArgumentParser, *, with_size: bool) -> None:
     g = p.add_argument_group("생성 백엔드")
-    g.add_argument("--backend", choices=["codex", "api", "manual"], default="codex",
-                   help="codex: Codex CLI 내장 이미지 생성(ChatGPT 로그인, 기본값) / api: OpenAI Images API(OPENAI_API_KEY) / manual: 프롬프트만 저장")
-    g.add_argument("--model", help="api: 이미지 모델(기본 생성 gpt-image-2.5-flare, 편집 gpt-image-2.5-sunburst) / codex: 에이전트 모델(-m)")
+    g.add_argument("--backend", choices=["auto", "codex", "api", "manual"], default="auto",
+                   help="auto: Codex 먼저, 안 되면 API를 2.5 → 2 → 1.5 → 1 → 1-mini 순으로(기본값) / codex: Codex CLI 내장 이미지 생성(ChatGPT 로그인) / "
+                        "api: OpenAI Images API(OPENAI_API_KEY) / manual: 프롬프트만 저장")
+    g.add_argument("--model", help="api·auto: 이미지 모델 고정(기본 생성 gpt-image-2.5-flare, 편집 gpt-image-2.5-sunburst) / codex: 에이전트 모델(-m)")
+    g.add_argument("--model-chain", help="auto: API 생성 모델 순서(쉼표 구분). 기본 " + ",".join(B.GENERATE_MODEL_CHAIN))
+    g.add_argument("--edit-model-chain", help="auto: API 편집 모델 순서(쉼표 구분). 기본 " + ",".join(B.EDIT_MODEL_CHAIN))
     g.add_argument("--quality", choices=QUALITY_CHOICES, default="high", help="api 백엔드 품질 (기본 high)")
     if with_size:
         g.add_argument("--size", default="1536x2304", type=M.validate_gpt_image_size,

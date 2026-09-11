@@ -129,8 +129,8 @@ class WebServerTest(unittest.TestCase):
         status, presets, _ = self.call("/api/presets")
         self.assertEqual(status, 200)
         self.assertEqual(len(presets["brow_styles"]), 12)
-        self.assertEqual([b["key"] for b in presets["backends"]], ["codex", "api", "manual"])
-        self.assertFalse(presets["backends"][0]["available"])  # fake codex binary
+        self.assertEqual([b["key"] for b in presets["backends"]], ["auto", "codex", "api", "manual"])
+        self.assertFalse(next(b for b in presets["backends"] if b["key"] == "codex")["available"])  # fake codex binary
         self.assertEqual(presets["default_backend"], "manual")
 
     def test_03_calibrate_job_files_and_traversal(self):

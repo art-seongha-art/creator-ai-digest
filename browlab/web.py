@@ -45,7 +45,7 @@ KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기"
 # shorter chip labels for the page (full names stay in presets.py)
 BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
                  "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음"}
-BACKENDS = ("codex", "api", "manual")
+BACKENDS = ("auto", "codex", "api", "manual")
 LAYOUTS = ("face", "browzone", "both")
 SHEETS = ("none", "grid", "browzone", "both")
 LANDMARKS = ("auto", "mediapipe", "codex", "manual", "none")
@@ -75,7 +75,7 @@ class WebConfig:
     password: Optional[str]
     base_path: str = ""
     codex_bin: str = "codex"
-    default_backend: str = "codex"
+    default_backend: str = "auto"
     timeout: int = 900
     font: Optional[str] = None
 
@@ -755,9 +755,15 @@ class JobStore:
             progress = f"{len(manifest.get('faces', []))}/{job.params.get('count', 1)}"
         elif job.kind == "restyle" and job.status == "running":
             progress = f"{len(manifest.get('variants', []))}/{len(job.params.get('styles', []))}"
+        used: List[str] = []  # backend/model that actually produced each image (auto backend may vary)
+        for e in list(manifest.get("faces", [])) + list(manifest.get("variants", [])):
+            if isinstance(e, dict) and e.get("backend"):
+                tag = f"{e['backend']} {e.get('model') or ''}".strip()
+                if tag not in used:
+                    used.append(tag)
         return {
             "id": job.id, "kind": job.kind, "kind_ko": KIND_KO.get(job.kind, job.kind), "created": job.created,
-            "status": job.status, "started": job.started, "finished": job.finished, "error": job.error,
+            "status": job.status, "started": job.started, "finished": job.finished, "error": job.error, "used": used,
             "params": job.params, "rc": job.rc, "title": self.title_ko(job, manifest), "thumb": self.thumb(job),
             "progress": progress, "cost_usd": cost, "api_images": api_images,
         }
@@ -850,6 +856,8 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
         "layouts": [{"key": "both", "ko": "얼굴 전체 + 눈썹 구역"}, {"key": "face", "ko": "얼굴 전체 1:1"}, {"key": "browzone", "ko": "눈썹 구역만 1:1"}],
         "sheets": [{"key": "both", "ko": "비교표 + 눈썹 구역 1:1"}, {"key": "grid", "ko": "비교표만"}, {"key": "browzone", "ko": "눈썹 구역 1:1만"}, {"key": "none", "ko": "시트 없음"}],
         "backends": [
+            {"key": "auto", "ko": "자동 (Codex 먼저 → 안 되면 API 2.5→2→1.5→1→1-mini)",
+             "available": shutil.which(cfg.codex_bin) is not None or bool(os.environ.get("OPENAI_API_KEY"))},
             {"key": "codex", "ko": "Codex (ChatGPT 구독, 추가 요금 없음)", "available": shutil.which(cfg.codex_bin) is not None},
             {"key": "api", "ko": "OpenAI API (키 필요, 장당 과금)", "available": bool(os.environ.get("OPENAI_API_KEY"))},
             {"key": "manual", "ko": "프롬프트만 저장 (직접 생성)", "available": True},
@@ -1163,7 +1171,8 @@ def add_web_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--no-auth", action="store_true", help="비밀번호 없이 열기 (로컬 전용)")
     p.add_argument("--base-path", default="", help="프록시 경로 접두어 (예: /browlab)")
     p.add_argument("--codex-bin", default="codex", help="codex 실행 파일 (절대경로 권장)")
-    p.add_argument("--default-backend", choices=BACKENDS, default="codex")
+    p.add_argument("--default-backend", choices=BACKENDS, default="auto",
+                   help="auto: Codex 먼저, 안 되면 API(2.5→2→1.5→1→1-mini)")
     p.add_argument("--timeout", type=int, default=900, help="생성 1건당 제한 시간(초)")
     p.add_argument("--font", default=None, help="시트 한글 글꼴 파일")
 

@@ -86,6 +86,15 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 | `browlab/cli.py` | argparse, 명령 구현, manifest 기록(얼굴마다 즉시 저장), 한국어 로그 `[browlab] ...` |
 | `tests/test_browlab.py` | 48개: 프리셋/프롬프트 결정성/크기 검증/랜드마크 기하·JSON 변환/마스크·합성/시트 크기·dpi·PDF/가짜 `codex` 실행 파일/가짜 OpenAI 클라이언트/CLI(dry-run, sheet --pupils, manual generate, restyle manual, calibrate)/`BROWLAB_TEST_FACE` 실사진 mediapipe(옵션) |
 
+### 3.2.1 자동 백엔드 (2026-09-12 추가, 원격 세션)
+
+- `--backend auto` 가 CLI·웹 기본값. `backends.FallbackBackend` 가 `[("codex", CodexBackend), ("api:gpt-image-2.5-flare|gpt-image-2.5-sunburst", OpenAIBackend), ("api:gpt-image-2", ...), ("api:gpt-image-1.5", ...), ("api:gpt-image-1", ...), ("api:gpt-image-1-mini", ...)]` 순으로 시도.
+- `backends.UNAVAILABLE_PATTERNS` 에 맞는 실패(사용 한도, 로그인, 키 없음, `Limit 0`, 조직 인증, 모델 없음, 쿼터)는 그 실행 동안 sticky skip. 그 외(타임아웃, 5xx, 모더레이션)는 장마다 재시도.
+- `make_auto_backend()` 는 codex 실행 파일이 없으면 Codex 단계를, `OPENAI_API_KEY` 가 없으면 API 단계를 빼고 `notes` 로 알림. `--model` 은 API 모델 고정, `--model-chain` / `--edit-model-chain` 으로 순서 변경.
+- restyle 은 백엔드별 변형: Codex 에는 빨간 가이드 이미지 + 가이드 프롬프트, 마스크 없음, size auto; API 에는 알파 마스크 + 준비 이미지 크기. `FallbackBackend.edit(..., variants={"codex": {...}})`.
+- 결과 기록: `GenResult.fallback`(실패한 시도 목록) → manifest 항목 `backend`/`model`/`fallback`; 웹 `summary()` 의 `used` 목록 → 작업 상세 "사용: api gpt-image-1-mini".
+- 로컬 확인 필요: 실제 계정에서 Codex 한도 오류 문구가 `usage limit` 를 포함하는지(HANDOFF 0장 기록상 포함), API `Limit 0` 문구가 그대로인지. 다르면 `UNAVAILABLE_PATTERNS` 에 추가.
+
 ### 3.3 Codex 백엔드가 실제로 실행하는 것
 
 ```bash

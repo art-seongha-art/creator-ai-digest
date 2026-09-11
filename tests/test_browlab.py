@@ -9,6 +9,7 @@ import sys
 import tempfile
 import textwrap
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -493,6 +494,132 @@ class BackendTests(unittest.TestCase):
             B.make_backend("nope")
 
 
+class _StubBackend(B.BaseBackend):
+    """Scripted backend: each call pops the next outcome (an Exception to raise, or "ok")."""
+
+    def __init__(self, name: str, model, outcomes):
+        self.name = name
+        self.model = model
+        self.outcomes = list(outcomes)
+        self.calls = 0
+        self.last_edit = None
+
+    def _next(self, out_path):
+        self.calls += 1
+        outcome = self.outcomes.pop(0) if self.outcomes else "ok"
+        if isinstance(outcome, Exception):
+            raise outcome
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(out_path).write_bytes(b"x")
+        return B.GenResult(path=Path(out_path), backend=self.name, prompt="p", model=self.model)
+
+    def generate(self, prompt, out_path, *, size="1536x2304", quality="high"):
+        return self._next(out_path)
+
+    def edit(self, prompt, images, out_path, *, mask=None, size="auto", quality="high"):
+        self.last_edit = {"prompt": prompt, "images": list(images), "mask": mask, "size": size}
+        return self._next(out_path)
+
+
+LIMIT0 = RuntimeError("Error code: 429 - {'error': {'code': 'rate_limit_exceeded', 'message': 'Rate limit reached for gpt-image-2 "
+                      "(for limit gpt-image) in organization org-x: Limit 0, Used 0, Requested 1.'}}")
+
+
+class FallbackBackendTests(unittest.TestCase):
+    def test_unavailable_backends_are_skipped_for_the_rest_of_the_run(self):
+        codex = _StubBackend("codex", None, [B.GenerationError("codex exec finished but no image was produced.\nstderr: ERROR: You've hit your usage limit")])
+        flare = _StubBackend("api", "gpt-image-2.5-flare", [LIMIT0])
+        mini = _StubBackend("api", "gpt-image-1-mini", [])
+        fb = B.FallbackBackend([("codex", codex), ("api:gpt-image-2.5-flare", flare), ("api:gpt-image-1-mini", mini)])
+        fb.log = lambda m: None
+        with tempfile.TemporaryDirectory() as tmp:
+            r1 = fb.generate("p", Path(tmp) / "a.png")
+            self.assertEqual((r1.backend, r1.model), ("api", "gpt-image-1-mini"))
+            self.assertEqual(r1.fallback, ["codex: Codex 사용 한도 소진", "api:gpt-image-2.5-flare: 모델 미개방(Limit 0)"])
+            r2 = fb.generate("p", Path(tmp) / "b.png")
+            self.assertEqual(r2.fallback, [])
+        self.assertEqual((codex.calls, flare.calls, mini.calls), (1, 1, 2))
+        self.assertEqual(set(fb.skipped), {"codex", "api:gpt-image-2.5-flare"})
+        self.assertEqual(fb.model, "gpt-image-1-mini")
+
+    def test_transient_failure_is_retried_on_the_next_image(self):
+        codex = _StubBackend("codex", None, [B.GenerationError("codex exec timed out after 900s"), "ok"])
+        api = _StubBackend("api", "gpt-image-2", [])
+        fb = B.FallbackBackend([("codex", codex), ("api:gpt-image-2", api)])
+        fb.log = lambda m: None
+        with tempfile.TemporaryDirectory() as tmp:
+            r1 = fb.generate("p", Path(tmp) / "a.png")
+            r2 = fb.generate("p", Path(tmp) / "b.png")
+        self.assertEqual((r1.backend, r2.backend), ("api", "codex"))
+        self.assertEqual(fb.skipped, {})
+
+    def test_all_failed_raises_combined_error(self):
+        codex = _StubBackend("codex", None, [B.GenerationError("Codex CLI not found (codex)")])
+        api = _StubBackend("api", "gpt-image-2", [RuntimeError("boom 500"), LIMIT0])
+        fb = B.FallbackBackend([("codex", codex), ("api:gpt-image-2", api)])
+        fb.log = lambda m: None
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(B.GenerationError) as ctx:
+                fb.generate("p", Path(tmp) / "a.png")
+            self.assertIn("codex: Codex 없음", str(ctx.exception))
+            self.assertIn("boom 500", str(ctx.exception))
+            with self.assertRaises(B.GenerationError) as ctx2:  # codex now sticky-skipped, api hits Limit 0
+                fb.generate("p", Path(tmp) / "b.png")
+            self.assertIn("앞서 사용 불가 판정", str(ctx2.exception))
+            self.assertIn("Limit 0", str(ctx2.exception))
+        with self.assertRaises(B.GenerationError):
+            B.FallbackBackend([]).generate("p", Path("x.png"))
+
+    def test_edit_uses_per_backend_variants(self):
+        codex = _StubBackend("codex", None, [B.GenerationError("stderr: You've hit your usage limit")])
+        api = _StubBackend("api", "gpt-image-2.5-sunburst", [])
+        fb = B.FallbackBackend([("codex", codex), ("api:gpt-image-2.5-sunburst", api)])
+        fb.log = lambda m: None
+        with tempfile.TemporaryDirectory() as tmp:
+            img, guide, mask = Path(tmp) / "i.png", Path(tmp) / "g.png", Path(tmp) / "m.png"
+            r = fb.edit("api prompt", [img], Path(tmp) / "o.png", mask=mask, size="512x512",
+                        variants={"codex": {"prompt": "codex prompt", "images": [img, guide], "mask": None, "size": "auto"}})
+        self.assertEqual(r.backend, "api")
+        self.assertEqual(codex.last_edit, {"prompt": "codex prompt", "images": [img, guide], "mask": None, "size": "auto"})
+        self.assertEqual(api.last_edit, {"prompt": "api prompt", "images": [img], "mask": mask, "size": "512x512"})
+
+    def test_coerce_quality_and_reasons(self):
+        self.assertEqual(B.coerce_quality("gpt-image-2", "xhigh"), "high")
+        self.assertEqual(B.coerce_quality("gpt-image-1-mini", "max"), "high")
+        self.assertEqual(B.coerce_quality("gpt-image-2.5-flare", "max"), "max")
+        self.assertEqual(B.coerce_quality("gpt-image-2", "medium"), "medium")
+        self.assertEqual(B.unavailable_reason(LIMIT0), "모델 미개방(Limit 0)")
+        self.assertEqual(B.unavailable_reason(RuntimeError("Your organization must be verified to use the model")), "조직 인증 필요")
+        self.assertIsNone(B.unavailable_reason(RuntimeError("Error code: 429 - too many requests, retry after 3s")))
+        self.assertIsNone(B.unavailable_reason(B.GenerationError("codex exec timed out after 900s")))
+
+    def test_make_auto_backend_composition(self):
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}):
+            fb = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary")
+            self.assertEqual([l for l, _ in fb.attempts], [
+                "api:gpt-image-2.5-flare|gpt-image-2.5-sunburst", "api:gpt-image-2", "api:gpt-image-1.5", "api:gpt-image-1", "api:gpt-image-1-mini",
+            ])
+            self.assertTrue(any("codex" in n for n in fb.notes))
+            pinned = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model="gpt-image-2")
+            self.assertEqual([l for l, _ in pinned.attempts], ["api:gpt-image-2"])
+            custom = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model_chain=["gpt-image-2", "gpt-image-1-mini"])
+            self.assertEqual([l for l, _ in custom.attempts], ["api:gpt-image-2", "api:gpt-image-1-mini"])
+            both = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary", model_chain=["gpt-image-2"], edit_model_chain=["gpt-image-2.5-sunburst"])
+            self.assertEqual([l for l, _ in both.attempts], ["api:gpt-image-2|gpt-image-2.5-sunburst"])
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with mock.patch.dict(os.environ, env, clear=True):
+            fb = B.make_backend("auto", codex_bin="definitely-not-a-codex-binary")
+            self.assertEqual(fb.attempts, [])
+            self.assertEqual(len(fb.notes), 2)
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = Path(tmp) / "codex"
+            fake.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            with mock.patch.dict(os.environ, env, clear=True):
+                fb = B.make_backend("auto", codex_bin=str(fake))
+                self.assertEqual([l for l, _ in fb.attempts], ["codex"])
+
+
 class CliTests(unittest.TestCase):
     def _run(self, argv):
         buf = io.StringIO()
@@ -558,6 +685,96 @@ class CliTests(unittest.TestCase):
             self.assertIsNotNone(manifest["landmarks"])
             with Image.open(tmp / "r" / "00_original.png") as im:
                 self.assertEqual(im.size[0] % 16, 0)
+
+    @unittest.skipIf(os.name == "nt", "fake executable needs a POSIX shell")
+    def test_generate_auto_backend_falls_back_to_api(self):
+        png = io.BytesIO()
+        Image.new("RGB", (16, 24), (9, 9, 9)).save(png, format="PNG")
+        b64 = base64.b64encode(png.getvalue()).decode()
+
+        class Item:
+            b64_json = b64
+            url = None
+
+        class Resp:
+            data = [Item()]
+            usage = None
+
+        class Images:
+            def generate(self, **kw):
+                if kw["model"] != "gpt-image-1-mini":
+                    raise LIMIT0
+                return Resp()
+
+        class Client:
+            images = Images()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            fake = tmp / "codex"
+            fake.write_text("#!/bin/sh\ncat >/dev/null\necho \"ERROR: You've hit your usage limit. Try again at Sep 15th\" >&2\nexit 1\n", encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}), \
+                 mock.patch.object(B.OpenAIBackend, "client", lambda self: Client()):
+                rc, out = self._run(["generate", "-n", "2", "--seed", "1", "--backend", "auto", "--codex-bin", str(fake),
+                                     "--out-dir", str(tmp / "o"), "--landmarks", "none", "--no-sheet"])
+            self.assertEqual(rc, 0, out)
+            manifest = json.loads((tmp / "o" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["backend"], "auto")
+            faces = manifest["faces"]
+            self.assertEqual([(f["backend"], f["model"]) for f in faces], [("api", "gpt-image-1-mini")] * 2)
+            self.assertEqual(len(faces[0]["fallback"]), 5)  # codex + 2.5 + 2 + 1.5 + 1
+            self.assertTrue(faces[0]["fallback"][0].startswith("codex: Codex 사용 한도 소진"))
+            self.assertNotIn("fallback", faces[1])  # unavailable attempts are not retried
+            self.assertIn("사용 불가", out)
+            self.assertTrue((tmp / "o" / faces[1]["image"].split("/")[-1]).exists())
+
+    def test_generate_auto_backend_without_anything_fails_cleanly(self):
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, env, clear=True):
+            rc, out = self._run(["generate", "-n", "1", "--seed", "1", "--backend", "auto", "--codex-bin", "definitely-not-a-codex-binary",
+                                 "--out-dir", tmp, "--landmarks", "none", "--no-sheet"])
+            self.assertEqual(rc, 1)
+            manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
+            self.assertIn("사용할 수 있는 백엔드가 없습니다", manifest["faces"][0]["error"])
+
+    def test_restyle_auto_backend_uses_codex_variant(self):
+        # codex succeeds -> it must receive the guide image and the guide prompt, no mask.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            home = tmp / "home"
+            (home / "generated_images").mkdir(parents=True)
+            fake = tmp / "codex"
+            fake.write_text(textwrap.dedent(f"""\
+                #!/usr/bin/env python3
+                import sys, pathlib
+                from PIL import Image
+                args = sys.argv[1:]
+                prompt = sys.stdin.read()
+                home = pathlib.Path({str(home)!r})
+                with open(home / "args.txt", "a") as fh:
+                    fh.write(" ".join(args) + "\\n")
+                with open(home / "prompt.txt", "a") as fh:
+                    fh.write(prompt + "\\n=====\\n")
+                src = pathlib.Path(args[args.index("-i") + 1])
+                with Image.open(src) as im:
+                    im.convert("RGB").save(home / "generated_images" / "edit.png")
+                """), encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            src = tmp / "photo.png"
+            _face_image(1000, 1000).save(src)
+            env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+            env["CODEX_HOME"] = str(home)
+            with mock.patch.dict(os.environ, env, clear=True):
+                rc, out = self._run(["restyle", str(src), "--backend", "auto", "--codex-bin", str(fake), "--styles", "straight",
+                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none",
+                                     "--no-composite"])
+            self.assertEqual(rc, 0, out)
+            first_call = (home / "args.txt").read_text().splitlines()[0]
+            self.assertEqual(first_call.count("-i "), 2)  # prepared image + red region guide
+            self.assertIn("Image 2: region guide", (home / "prompt.txt").read_text())
+            manifest = json.loads((tmp / "r" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["variants"][0]["backend"], "codex")
 
     def test_restyle_dry_run_and_bad_style(self):
         with tempfile.TemporaryDirectory() as tmp:

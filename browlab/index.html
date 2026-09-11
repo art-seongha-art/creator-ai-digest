@@ -374,10 +374,10 @@ function updateEngineHints(){
   $$('form [data-engine]').forEach(box=>{
     const form=box.closest('form'); const sel=$('select[name=backend]',form); const key=sel?sel.value:presets.default_backend; const b=presets.backends.find(x=>x.key===key)||{};
     box.replaceChildren();
-    box.appendChild(el('span','tag '+(b.available?'ok':'bad'), key==='codex'?'Codex':key==='api'?'OpenAI API':'프롬프트만'));
+    box.appendChild(el('span','tag '+(b.available?'ok':'bad'), key==='auto'?'자동':key==='codex'?'Codex':key==='api'?'OpenAI API':'프롬프트만'));
     const per=form.id==='fRestyle'?'스타일당':'장당';
-    box.appendChild(el('span','', key==='codex'?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`GPT Image 2.5 · 장당 과금(high 1536×2304 ≈ $0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
-    if(!b.available) box.appendChild(el('span','',key==='codex'?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
+    box.appendChild(el('span','', key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진·모델은 작업 상세에 표시`: key==='codex'?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`: key==='api'?`GPT Image 2.5 · 장당 과금(high 1536×2304 ≈ $0.06) · 크기·품질 정확히 지정`: '이미지를 직접 만들어 "사진 시트" 탭에서 시트로'));
+    if(!b.available) box.appendChild(el('span','',key==='auto'?'· codex 실행 파일도 OPENAI_API_KEY 도 없습니다':key==='codex'?'· codex 실행 파일을 찾지 못했습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
   });
 }
 function updateRestyleLabel(){ const n=$$('#fRestyle input[name=styles]:checked').length; const l=$('[data-restyle-label]'); if(l) l.textContent=n?`눈썹 ${n}가지로 바꾸기`:'스타일을 고르세요'; }
@@ -487,7 +487,7 @@ async function renderLb(){
   if(it.image){ img.src=it.image; img.hidden=false; ph.hidden=true; } else { img.hidden=true; ph.hidden=false; ph.textContent=it.status==='failed'?'실패한 작업입니다. 아래 로그를 보세요.':it.status==='queued'?'앞 작업이 끝나면 시작합니다.':'생성 중입니다. 완료되면 여기에 나타납니다.'; }
   const side=$('#lbSide'); side.replaceChildren();
   side.appendChild(el('h3','',it.label||it.title));
-  side.appendChild(el('div','sub',[it.kind_ko, fmtTime(it.created), it.status==='done'?dur(it):STATUS_KO[it.status], it.cost_usd?'API 추정 '+usd(it.cost_usd):'', it.params&&it.params.backend?it.params.backend:'', it.aligned===false?'합성 생략(얼굴 위치 변경)':''].filter(Boolean).join(' · ')+(it.error?' · '+it.error:'')));
+  side.appendChild(el('div','sub',[it.kind_ko, fmtTime(it.created), it.status==='done'?dur(it):STATUS_KO[it.status], it.cost_usd?'API 추정 '+usd(it.cost_usd):'', (it.used&&it.used.length)?('사용: '+it.used.join(', ')):(it.params&&it.params.backend?it.params.backend:''), it.aligned===false?'합성 생략(얼굴 위치 변경)':''].filter(Boolean).join(' · ')+(it.error?' · '+it.error:'')));
   if(it.pdfs&&it.pdfs.length){ const g=el('div','pdfs'); it.pdfs.forEach((p,i)=>{ const a=el('a',i?'alt':''); a.href=p.url; a.target='_blank'; a.insertAdjacentHTML('afterbegin', ICON_PRINT); a.appendChild(el('span','',p.label)); g.appendChild(a); }); side.appendChild(g); side.appendChild(el('div','hint','인쇄: A4 · 배율 100% · "페이지에 맞춤" 끄기 · 시트 아래 100 mm 자로 확인')); }
   const acts=el('div','acts');
   if(it.image){ const a=el('a','btn','원본 열기'); a.href=it.image; a.target='_blank'; acts.appendChild(a); }

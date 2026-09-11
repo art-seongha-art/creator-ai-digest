@@ -7,6 +7,8 @@
                Needs ``OPENAI_API_KEY``. Supports exact sizes and alpha masks.
 * ``manual`` - writes the prompt next to the target path so the image can be
                made by hand (ChatGPT, Codex app, any generator) and dropped in.
+* ``auto``   - (default) Codex first; if that fails, the Images API walking down
+               gpt-image-2.5 -> 2 -> 1.5 -> 1 -> 1-mini. See ``FallbackBackend``.
 """
 from __future__ import annotations
 
@@ -15,7 +17,7 @@ import os
 import shutil
 import subprocess
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
@@ -37,6 +39,7 @@ class GenResult:
     pending: bool = False
     usage: Optional[Dict[str, int]] = None   # token usage reported by the Images API
     cost_usd: Optional[float] = None         # estimate from usage x official per-token rates
+    fallback: List[str] = field(default_factory=list)  # attempts that failed before this result (auto backend)
 
 
 # Official per-1M-token rates in USD (developers.openai.com/api/docs/pricing, read 2026-09-12).
@@ -342,6 +345,7 @@ class OpenAIBackend(BaseBackend):
 
     def generate(self, prompt: str, out_path: Path, *, size: str = "1536x2304", quality: str = "high") -> GenResult:
         size = self._snap_size(self.model, size)
+        quality = coerce_quality(self.model, quality)
         kwargs: Dict[str, Any] = dict(model=self.model, prompt=prompt, n=1, size=size, quality=quality, output_format="png")
         resp = self.client().images.generate(**kwargs)
         path = self._save_first(resp, Path(out_path))
@@ -351,6 +355,7 @@ class OpenAIBackend(BaseBackend):
 
     def edit(self, prompt, images, out_path, *, mask=None, size="auto", quality="high") -> GenResult:
         model = self.edit_model
+        quality = coerce_quality(model, quality)
         handles = [open(Path(p), "rb") for p in images]
         mask_handle = open(Path(mask), "rb") if mask else None
         try:
@@ -380,8 +385,160 @@ class OpenAIBackend(BaseBackend):
 
 
 # ---------------------------------------------------------------------------
+# Automatic fallback: Codex first, then the Images API down the model ladder
+# ---------------------------------------------------------------------------
+GENERATE_MODEL_CHAIN: List[str] = ["gpt-image-2.5-flare", "gpt-image-2", "gpt-image-1.5", "gpt-image-1", "gpt-image-1-mini"]
+EDIT_MODEL_CHAIN: List[str] = ["gpt-image-2.5-sunburst", "gpt-image-2", "gpt-image-1.5", "gpt-image-1", "gpt-image-1-mini"]
+
+# quality values only the 2.5 family accepts; older models get the nearest supported value
+_EXTENDED_QUALITY = {"xhigh", "max"}
+
+
+def coerce_quality(model: Optional[str], quality: str) -> str:
+    if quality in _EXTENDED_QUALITY and not (model or "").startswith("gpt-image-2.5"):
+        return "high"
+    return quality
+
+
+# (reason, patterns): an error containing one of the patterns means the backend/model is
+# unavailable for the rest of the run (not just for this one image), so it is skipped afterwards.
+UNAVAILABLE_PATTERNS: List[Tuple[str, Tuple[str, ...]]] = [
+    ("Codex 사용 한도 소진", ("usage limit", "usage_limit")),
+    ("Codex 없음", ("Codex CLI not found",)),
+    ("Codex 로그인 필요", ("Not logged in", "not logged in", "codex login", "No Codex credentials", "no Codex credentials")),
+    ("API 키 없음", ("OPENAI_API_KEY is not set", "package is missing")),
+    ("API 키 오류", ("invalid_api_key", "Incorrect API key", "Error code: 401")),
+    ("모델 미개방(Limit 0)", ("Limit 0",)),
+    ("조직 인증 필요", ("must be verified",)),
+    ("모델 없음/권한 없음", ("model_not_found", "does not exist", "Error code: 403", "Error code: 404")),
+    ("API 결제/쿼터", ("insufficient_quota", "exceeded your current quota", "billing_hard_limit")),
+]
+
+
+def unavailable_reason(exc: BaseException) -> Optional[str]:
+    text = str(exc)
+    for reason, patterns in UNAVAILABLE_PATTERNS:
+        if any(p in text for p in patterns):
+            return reason
+    return None
+
+
+def _first_line(exc: BaseException) -> str:
+    text = str(exc).strip()
+    return (text.splitlines()[0][:200] if text else exc.__class__.__name__)
+
+
+class FallbackBackend(BaseBackend):
+    """Try several backends in order and remember which ones are unavailable.
+
+    ``attempts`` is an ordered list of ``(label, backend)``. A failure whose message
+    matches ``UNAVAILABLE_PATTERNS`` (usage limit, missing key, model not opened for
+    the organisation, ...) disables that attempt for the rest of the run; any other
+    failure (timeout, moderation, 5xx) only moves on to the next attempt for this
+    one image and is retried on the next one.
+    """
+
+    name = "auto"
+
+    def __init__(self, attempts: Sequence[Tuple[str, BaseBackend]], notes: Sequence[str] = ()) -> None:
+        self.attempts: List[Tuple[str, BaseBackend]] = list(attempts)
+        self.skipped: Dict[str, str] = {}
+        self.notes: List[str] = list(notes)
+        self.model: Optional[str] = None       # model of the last successful attempt
+        self.last_backend: Optional[str] = None
+        self.log = lambda msg: print(f"[browlab] {msg}", flush=True)
+
+    def _try_all(self, op: str, call: Any) -> GenResult:
+        if not self.attempts:
+            raise GenerationError("사용할 수 있는 백엔드가 없습니다 (codex 실행 파일도 OPENAI_API_KEY 도 없음).")
+        failed: List[str] = []
+        tried: List[str] = []
+        for label, backend in self.attempts:
+            if label in self.skipped:
+                continue
+            tried.append(label)
+            try:
+                result = call(backend)
+            except Exception as exc:  # GenerationError or an SDK error
+                reason = unavailable_reason(exc)
+                short = _first_line(exc)
+                if reason:
+                    self.skipped[label] = reason
+                    self.log(f"{label} 사용 불가({reason}) → 다음 백엔드로. {short}")
+                else:
+                    self.log(f"{label} 실패 → 다음 백엔드로. {short}")
+                failed.append(f"{label}: {reason or short}")
+                continue
+            result.fallback = failed
+            self.model = result.model or label
+            self.last_backend = result.backend
+            if failed:
+                self.log(f"{label} 성공 (앞선 시도 실패: {' / '.join(failed)})")
+            return result
+        earlier = [f"{k}: {v} (앞서 사용 불가 판정)" for k, v in self.skipped.items() if k not in tried]
+        raise GenerationError(f"모든 백엔드가 실패했습니다 ({op}).\n" + "\n".join(f"- {f}" for f in failed + earlier))
+
+    def generate(self, prompt: str, out_path: Path, *, size: str = "1536x2304", quality: str = "high") -> GenResult:
+        return self._try_all("generate", lambda b: b.generate(prompt, out_path, size=size, quality=quality))
+
+    def edit(self, prompt, images, out_path, *, mask=None, size="auto", quality="high", variants=None) -> GenResult:
+        """``variants`` maps a backend name (``codex``/``api``) to overrides for prompt/images/mask/size."""
+        variants = variants or {}
+
+        def call(b: BaseBackend) -> GenResult:
+            v = variants.get(b.name, {})
+            return b.edit(v.get("prompt", prompt), v.get("images", images), out_path,
+                          mask=v.get("mask", mask), size=v.get("size", size), quality=quality)
+
+        return self._try_all("edit", call)
+
+
+def make_auto_backend(
+    *,
+    codex_bin: str = "codex",
+    timeout: int = 900,
+    extra_args: Sequence[str] = (),
+    model: Optional[str] = None,
+    edit_model: Optional[str] = None,
+    model_chain: Optional[Sequence[str]] = None,
+    edit_model_chain: Optional[Sequence[str]] = None,
+    api_key: Optional[str] = None,
+) -> FallbackBackend:
+    """Codex first, then the Images API with 2.5 -> 2 -> 1.5 -> 1 -> 1-mini (or a pinned model)."""
+    notes: List[str] = []
+    attempts: List[Tuple[str, BaseBackend]] = []
+    if shutil.which(codex_bin) is not None:
+        attempts.append(("codex", CodexBackend(codex_bin=codex_bin, timeout=timeout, extra_args=extra_args)))
+    else:
+        notes.append(f"codex 실행 파일({codex_bin})이 없어 Codex 단계는 건너뜁니다.")
+    gen_chain = [m for m in (model_chain or ([model] if model else GENERATE_MODEL_CHAIN)) if m]
+    # a custom generate chain also drives edits unless an edit chain / edit model is given explicitly
+    edit_default = list(model_chain) if model_chain else ([model] if model else EDIT_MODEL_CHAIN)
+    edit_chain = [m for m in (edit_model_chain or ([edit_model] if edit_model else edit_default)) if m]
+    if api_key or os.environ.get("OPENAI_API_KEY"):
+        for i in range(max(len(gen_chain), len(edit_chain))):
+            g = gen_chain[min(i, len(gen_chain) - 1)]
+            e = edit_chain[min(i, len(edit_chain) - 1)]
+            label = f"api:{g}" if g == e else f"api:{g}|{e}"
+            attempts.append((label, OpenAIBackend(model=g, edit_model=e, api_key=api_key, timeout=timeout)))
+    else:
+        notes.append("OPENAI_API_KEY 가 없어 API 단계는 건너뜁니다 (Codex만 시도).")
+    return FallbackBackend(attempts, notes)
+
+
+# ---------------------------------------------------------------------------
 def make_backend(name: str, **kwargs: Any) -> BaseBackend:
-    name = (name or "codex").lower()
+    name = (name or "auto").lower()
+    if name == "auto":
+        return make_auto_backend(
+            codex_bin=kwargs.get("codex_bin", "codex"),
+            timeout=kwargs.get("timeout", 900),
+            extra_args=kwargs.get("extra_args", ()),
+            model=kwargs.get("model"),
+            edit_model=kwargs.get("edit_model"),
+            model_chain=kwargs.get("model_chain"),
+            edit_model_chain=kwargs.get("edit_model_chain"),
+        )
     if name == "codex":
         return CodexBackend(
             codex_bin=kwargs.get("codex_bin", "codex"),

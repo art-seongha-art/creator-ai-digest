@@ -87,6 +87,22 @@ python -m browlab presets
 
 ---
 
+## 2.5 자동 백엔드 (기본값): Codex 먼저, 안 되면 API
+
+`--backend auto`(기본값, 웹 UI 엔진 "자동")는 한 장마다 아래 순서로 시도하고, 처음 성공한 결과를 씁니다.
+
+1. **Codex** (`codex exec` + `$imagegen`, ChatGPT 구독 한도)
+2. **API gpt-image-2.5** (생성 flare / 편집 sunburst)
+3. **API gpt-image-2**
+4. **API gpt-image-1.5**
+5. **API gpt-image-1**
+6. **API gpt-image-1-mini**
+
+- 사용 한도 소진, 로그인 필요, 키 없음, `Limit 0`(조직 미개방), 조직 인증 필요, 모델 없음 같은 실패는 **그 실행 동안 해당 단계를 건너뜁니다**(매 장마다 다시 실패하지 않음). 시간 초과·일시 오류는 다음 장에서 다시 시도합니다.
+- 실제로 쓰인 엔진·모델은 로그(`... 성공 (앞선 시도 실패: ...)`), `manifest.json` 의 각 항목 `backend` / `model` / `fallback`, 웹 작업 상세의 "사용:" 표시에 남습니다.
+- 순서를 바꾸려면 `--model-chain gpt-image-2,gpt-image-1-mini` 처럼 지정하고, `--model X` 를 주면 API 단계는 그 모델 하나만 시도합니다. 편집 순서는 `--edit-model-chain`.
+- 1-mini 까지 내려가는 것이 싫으면 `--model-chain gpt-image-2.5-flare,gpt-image-2` 로 끊으세요. `xhigh`/`max` 품질은 2.5 이외 모델에서 자동으로 `high` 로 낮춥니다.
+
 ## 3. 명령별 설명
 
 ### `generate` — 연습용 얼굴 생성 + A4 시트
@@ -101,7 +117,7 @@ python -m browlab presets
 | `--ethnicity` | `korean`(기본), `japanese`, `chinese`, `southeast_asian`, `south_asian`, `middle_eastern`, `european`, `mediterranean`, `african`, `latino`, `mixed`, `random`, `any` | 외모. 기본은 한국인 100%. `random` 은 한국인 비중을 높게 둔 가중 무작위, `any` 는 균등 |
 | `--seed` | 정수 | 같은 시드면 같은 조합(나이·성별·얼굴형…)이 나옵니다. 이미지 자체는 매번 달라집니다 |
 | `--notes` | 문장 | 프롬프트 끝에 덧붙일 지시문 |
-| `--backend` | `codex`(기본), `api`, `manual` | 이미지 생성 방법 |
+| `--backend` | `auto`(기본), `codex`, `api`, `manual` | 이미지 생성 방법 (auto: 2.5절 참고) |
 | `--size`, `--quality` | | API 백엔드용 (기본 `1536x2304`, `high`) |
 | `--layout` | `face`(기본), `browzone`, `both` | 얼굴 전체 1:1 / 눈썹·눈 구역만 1:1로 여러 번 / 둘 다 |
 | `--guides` | | 눈썹 황금비 가이드선 표시 |
