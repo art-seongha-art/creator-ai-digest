@@ -29,36 +29,64 @@ def _brow_box(points, ipd: float, pad_side: float, pad_up: float, pad_down: floa
     )
 
 
+def _dilated_polygon(draw: ImageDraw.ImageDraw, pts, radius: float, dy: float = 0.0) -> None:
+    """Fill a polygon grown by ``radius`` (rounded), optionally shifted vertically by ``dy``."""
+    shifted = [(x, y + dy) for x, y in pts]
+    draw.polygon(shifted, fill=255)
+    if radius <= 0:
+        return
+    draw.line(shifted + [shifted[0]], fill=255, width=max(1, int(round(2 * radius))), joint="curve")
+    for x, y in shifted:
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=255)
+
+
 def brow_region_mask(
     lm: FaceLandmarks,
     *,
-    pad_side: float = 0.16,
-    pad_up: float = 0.40,
-    pad_down: float = 0.12,
+    pad_side: float = 0.10,
+    pad_up: float = 0.14,
+    pad_down: float = 0.06,
     protect_eyes: bool = True,
+    shape: str = "brow",
 ) -> Image.Image:
     """Return an ``L`` image: 255 where the eyebrows may be redrawn, 0 elsewhere.
 
-    Padding values are fractions of the inter-pupillary distance so the mask
-    scales with the face. ``pad_up`` is generous on purpose: new designs are
-    often taller or higher than the existing brows.
+    ``shape="brow"`` (default) follows the detected eyebrow outline: the brow
+    polygon grown by ``pad_side`` all around, stretched upwards by ``pad_up`` so
+    higher/thicker designs have room, and by ``pad_down`` below, never reaching
+    the upper eyelid. ``shape="box"`` is the older rounded bounding box.
+    All paddings are fractions of the inter-pupillary distance.
     """
     mask = Image.new("L", (lm.width, lm.height), 0)
-    draw = ImageDraw.Draw(mask)
     ipd = lm.ipd_px
-    eye_limit = lm.eye_top_y - 0.06 * ipd if protect_eyes else None
-    for pts in (lm.right_brow, lm.left_brow):
+    brows = ((lm.right_brow, lm.right_upper_lid[1]), (lm.left_brow, lm.left_upper_lid[1]))
+    for pts, lid_y in brows:
         if not pts:
             continue
-        x0, y0, x1, y1 = _brow_box(pts, ipd, pad_side, pad_up, pad_down)
-        if eye_limit is not None:
-            y1 = min(y1, eye_limit)
-        x0, y0 = max(0.0, x0), max(0.0, y0)
-        x1, y1 = min(float(lm.width - 1), x1), min(float(lm.height - 1), y1)
-        if x1 <= x0 or y1 <= y0:
-            continue
-        radius = max(2, int(0.35 * (y1 - y0)))
-        draw.rounded_rectangle((x0, y0, x1, y1), radius=radius, fill=255)
+        layer = Image.new("L", mask.size, 0)
+        draw = ImageDraw.Draw(layer)
+        if shape == "box":
+            x0, y0, x1, y1 = _brow_box(pts, ipd, pad_side, pad_up, pad_down)
+            if protect_eyes:
+                y1 = min(y1, lid_y - 0.06 * ipd)
+            x0, y0 = max(0.0, x0), max(0.0, y0)
+            x1, y1 = min(float(lm.width - 1), x1), min(float(lm.height - 1), y1)
+            if x1 <= x0 or y1 <= y0:
+                continue
+            draw.rounded_rectangle((x0, y0, x1, y1), radius=max(2, int(0.35 * (y1 - y0))), fill=255)
+        else:
+            radius = max(1.0, pad_side * ipd)
+            up = max(0.0, pad_up * ipd)
+            down = max(0.0, pad_down * ipd)
+            steps = max(1, int(round((up + down) / max(radius, 1.0))) * 2)
+            for i in range(steps + 1):
+                dy = -up + (up + down) * i / steps
+                _dilated_polygon(draw, pts, radius, dy)
+        if protect_eyes:
+            limit = int(lid_y - 0.05 * ipd)
+            if limit < lm.height:
+                draw.rectangle((0, max(0, limit), lm.width, lm.height), fill=0)
+        mask = ImageChops.lighter(mask, layer)
     return mask
 
 

@@ -214,7 +214,19 @@ class MaskTests(unittest.TestCase):
         self.assertIsNotNone(bbox)
         self.assertLess(bbox[3], lm.eye_top_y)          # never covers the eyes
         self.assertLess(bbox[1], lm.brow_top_y)          # extends above the current brows
+        self.assertGreater(bbox[1], lm.brow_top_y - 0.30 * lm.ipd_px)  # ...but stays close to them, not up the forehead
         self.assertEqual(mask.size, (800, 1200))
+        # the brow-shaped mask is much smaller than the old bounding box
+        box = M.brow_region_mask(lm, shape="box", pad_side=0.16, pad_up=0.40, pad_down=0.12)
+        area = lambda im: sum(1 for v in im.getdata() if v)
+        self.assertLess(area(mask), 0.8 * area(box))  # synthetic brows are thick; real faces shrink far more
+        self.assertLess(box.getbbox()[3], lm.eye_top_y)
+        # the middle of the forehead between the brows stays untouched
+        cx, top_y = int(lm.eye_center[0]), int(lm.brow_top_y - 0.05 * lm.ipd_px)
+        self.assertEqual(mask.getpixel((cx, top_y)), 0)
+        # every brow polygon point is inside the mask
+        for x, y in lm.right_brow + lm.left_brow:
+            self.assertEqual(mask.getpixel((int(x), int(y))), 255)
 
     def test_api_mask_alpha(self):
         lm = _pupil_landmarks()

@@ -396,7 +396,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     mask_api_path: Optional[Path] = None
     guide_path: Optional[Path] = None
     if lm_edit is not None:
-        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down)
+        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down, shape=args.mask_shape)
         mask.save(out_dir / "mask.png")
         mask_api_path = out_dir / "mask_api.png"
         M.api_mask_image(mask).save(mask_api_path, optimize=True)  # black RGB + alpha: tiny file, alpha is all the API reads
@@ -665,9 +665,11 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-tone-match", action="store_true", help="합성 전 마스크 주변 피부톤 맞춤 생략")
     r.add_argument("--align-max", type=float, default=0.45,
                    help="편집 결과의 눈 위치가 이 비율(동공 간 거리 대비) 이내로 움직였으면 정렬 보정 후 합성, 넘으면 합성 생략")
-    r.add_argument("--mask-side", type=float, default=0.16, help="마스크 좌우 여유 (동공간 거리 배수)")
-    r.add_argument("--mask-up", type=float, default=0.40, help="마스크 위쪽 여유 (동공간 거리 배수)")
-    r.add_argument("--mask-down", type=float, default=0.12, help="마스크 아래쪽 여유 (동공간 거리 배수)")
+    r.add_argument("--mask-shape", choices=["brow", "box"], default="brow",
+                   help="brow: 검출된 눈썹 윤곽을 따라가는 마스크(기본) / box: 눈썹을 감싸는 둥근 사각형(이전 방식)")
+    r.add_argument("--mask-side", type=float, default=0.10, help="마스크 둘레 여유 (동공 간 거리 배수, 63mm 기준 0.10 ≈ 6mm)")
+    r.add_argument("--mask-up", type=float, default=0.14, help="눈썹 위쪽 추가 여유 (동공 간 거리 배수). 높은 아치 디자인이면 0.25 정도")
+    r.add_argument("--mask-down", type=float, default=0.06, help="눈썹 아래쪽 추가 여유 (동공 간 거리 배수). 윗눈꺼풀 위에서 항상 잘림")
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")

@@ -140,7 +140,7 @@ python -m browlab sheet face.png --landmarks manual --pupils 412,590,688,592   #
 
 1. 사진(EXIF 회전 보정, 긴 변 2048px 이하로 축소)에서 얼굴 랜드마크를 찾습니다 → `00_original.png`
 2. 얼굴만 잘라 **얼굴 타일**(기본 1024×1536, 머리 위~턱 아래)을 만듭니다 → `00_face_tile.png`. 모델은 사진 전체가 아니라 이 타일만 봅니다.
-3. 타일 위에 **눈썹 영역 마스크**를 만듭니다 → `mask.png`, `mask_api.png`(알파), `mask_guide.png`(빨간 표시)
+3. 타일 위에 **눈썹 윤곽을 따라가는 마스크**(둘레 약 6 mm, 위로 약 9 mm 여유, 윗눈꺼풀 위에서 잘림)를 만듭니다 → `mask.png`, `mask_api.png`(알파), `mask_guide.png`(빨간 표시)
 4. 스타일마다 편집 프롬프트로 생성합니다.
    - `api` 백엔드: 알파 마스크 인페인팅(마스크 밖은 모델이 건드리지 않음)
    - `codex` 백엔드: 타일 + 빨간 영역 가이드 이미지를 첨부해 "눈썹만 바꿔라"로 편집
@@ -154,7 +154,8 @@ python -m browlab sheet face.png --landmarks manual --pupils 412,590,688,592   #
 | --- | --- |
 | `--styles` | `korean_natural` 자연, `straight` 일자, `soft_arch` 부드러운 아치, `angled_arch` 각진 아치, `rounded` 둥근, `high_arch` 하이 아치, `puppy` 처진(강아지상), `bold_thick` 볼드, `feathered` 결눈썹(엠보), `ombre_powder` 옴브레 파우더, `combo` 콤보, `s_curve` S자. `all`, `random:3` 가능 |
 | `--color` | `match_hair`(기본), `natural_black`, `dark_brown`, `medium_brown`, `ash_brown`, `light_brown`, `gray_brown` |
-| `--mask-up/--mask-side/--mask-down` | 마스크 여유(동공 간 거리 배수). 더 높거나 두꺼운 디자인을 허용하려면 `--mask-up` 을 키우세요 |
+| `--mask-shape` | `brow`(기본): 검출된 눈썹 윤곽을 따라가는 마스크 / `box`: 눈썹을 감싸는 둥근 사각형 |
+| `--mask-side/--mask-up/--mask-down` | 마스크 여유(동공 간 거리 배수, 기본 0.10 / 0.14 / 0.06 ≈ 6 / 9 / 4 mm). 높은 아치나 두꺼운 디자인이면 `--mask-up 0.25` |
 | `--tile-size` | 얼굴 타일 크기(기본 `1024x1536`, 모든 gpt-image 모델 호환). 2.x 전용이면 `1536x2304` 가능 |
 | `--tile-margin` | 타일 여유 배수(기본 1.0) |
 | `--no-tile` | 얼굴을 잘라내지 않고 사진 전체를 편집(이전 방식) |
