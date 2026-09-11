@@ -74,8 +74,8 @@ def _explain_api_error(exc: BaseException) -> str:
     text = str(exc)
     if "rate_limit_exceeded" in text and "Limit 0" in text:
         return ("이 OpenAI 조직에서는 아직 gpt-image 계열 모델이 열리지 않았습니다(분당 한도 0). "
-                "platform.openai.com → Settings → Organization → Limits 에서 결제/조직 인증(Verify) 상태를 확인하거나, "
-                "그동안은 --model gpt-image-1-mini 로 생성하세요.")
+                "platform.openai.com → Settings → Organization → Limits 에서 결제 반영·조직 인증(Verify organization) 상태를 확인하세요. "
+                "키가 만들어진 조직과 크레딧을 충전한 조직이 같은지도 확인하세요.")
     return ""
 
 

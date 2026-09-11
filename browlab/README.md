@@ -206,6 +206,7 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <마지
 | `stderr: Error: No such file or directory (os error 2)` 로 즉시 실패 | 2026-09-12 이전 판의 버그(`-C` 에 상대경로 전달). 현재 판은 절대경로로 고쳤음. 재발하면 `--out-dir` 을 절대경로로 |
 | `ERROR: You've hit your usage limit ... try again at ...` | Codex(ChatGPT 구독) 이미지 한도 소진. 표시된 시각까지 기다리거나 크레딧 구매, 또는 `--backend api` |
 | 웹 UI 작업이 `실패 · 종료 코드 1` | 작업 상세의 로그 마지막 줄을 볼 것. 위 두 메시지 중 하나인 경우가 대부분 |
+| API: `429 rate_limit_exceeded ... Limit 0, Requested N` | 이 OpenAI 조직에서 gpt-image-1/1.5/2/2.5 가 아직 안 열림(분당 한도 0). platform.openai.com → Settings → Organization → Limits 에서 결제 반영·조직 인증(Verify organization)을 확인하고, 키를 만든 조직과 충전한 조직이 같은지 확인. 2026-09-12 이 계정에서 실측: 2.5-flare/sunburst/2 모두 한도 0, gpt-image-1-mini 만 열려 있었음 |
 | `mediapipe unavailable` | `pip install mediapipe` (리눅스는 `libgl1 libegl1 libgles2` 필요). 또는 `--landmarks codex` / `--pupils` |
 | 얼굴이 A4에 다 안 들어감 | 정상입니다. 눈썹·눈·턱을 우선 살리고 머리 윗부분을 잘라냅니다. `--ipd-mm` 을 줄이면 전체가 작아집니다 |
 | 시트 한글이 네모로 나옴 | `--font /경로/NanumGothic.ttf` 또는 `BROWLAB_FONT` 환경변수 |
@@ -297,5 +298,6 @@ ChatGPT 구독의 Codex 한도를 씁니다. 추가 요금은 없지만 이미�
 
 - 연습용 얼굴 100장: `medium 1024x1536` ≈ $1, `high 1536x2304` ≈ $6.4 → **$10 크레딧이면 충분**.
 - `restyle` 편집은 입력 사진 토큰(이미지 입력 $8/M)이 더해져 장당 조금 더 듭니다.
+- 화면 상단 `$지출 / $충전` 버튼 → 설정 · API 사용량: 각 API 응답의 토큰 × 공식 단가로 누적 지출을 추정하고, 충전 누계를 적어 두면 남은 금액을 보여 줍니다(`~/browlab_data/settings.json`).
 - 계산기: https://developers.openai.com/api/docs/guides/image-generation (Cost and latency 절), 단가표: https://developers.openai.com/api/docs/pricing
 
