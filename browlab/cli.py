@@ -396,7 +396,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down)
         mask.save(out_dir / "mask.png")
         mask_api_path = out_dir / "mask_api.png"
-        M.api_mask_image(mask, edit_img).save(mask_api_path)
+        M.api_mask_image(mask).save(mask_api_path, optimize=True)  # black RGB + alpha: tiny file, alpha is all the API reads
         guide_path = out_dir / "mask_guide.png"
         M.guide_overlay(edit_img, mask).save(guide_path)
         _log(f"눈썹 마스크 저장: {out_dir / 'mask.png'} (API용 알파 마스크: {mask_api_path.name})")

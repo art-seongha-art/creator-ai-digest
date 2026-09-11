@@ -63,7 +63,11 @@ def brow_region_mask(
 
 
 def api_mask_image(mask: Image.Image, base: Optional[Image.Image] = None) -> Image.Image:
-    """Build the RGBA mask the Images API expects (alpha 0 = editable)."""
+    """Build the RGBA mask the Images API expects (alpha 0 = editable).
+
+    Only the alpha channel matters to the API, so the colour channels stay black by
+    default: a photo-based RGBA PNG of a 1024x1536 tile can exceed the 4 MB mask limit.
+    """
     size = mask.size
     rgb = base.convert("RGB").resize(size) if base is not None else Image.new("RGB", size, (0, 0, 0))
     alpha = ImageChops.invert(mask.convert("L"))

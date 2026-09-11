@@ -219,8 +219,9 @@ class MaskTests(unittest.TestCase):
     def test_api_mask_alpha(self):
         lm = _pupil_landmarks()
         mask = M.brow_region_mask(lm)
-        api = M.api_mask_image(mask, _face_image())
+        api = M.api_mask_image(mask)
         self.assertEqual(api.mode, "RGBA")
+        self.assertEqual(api.getpixel((5, 5))[:3], (0, 0, 0))  # colour channels are irrelevant to the API: keep them black (small file)
         alpha = api.split()[-1]
         cx, cy = _brow_center(lm)
         self.assertEqual(alpha.getpixel((cx, cy)), 0)      # editable
