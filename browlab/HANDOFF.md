@@ -95,6 +95,14 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 - 결과 기록: `GenResult.fallback`(실패한 시도 목록) → manifest 항목 `backend`/`model`/`fallback`; 웹 `summary()` 의 `used` 목록 → 작업 상세 "사용: api gpt-image-1-mini".
 - 로컬 확인 필요: 실제 계정에서 Codex 한도 오류 문구가 `usage limit` 를 포함하는지(HANDOFF 0장 기록상 포함), API `Limit 0` 문구가 그대로인지. 다르면 `UNAVAILABLE_PATTERNS` 에 추가.
 
+### 3.2.2 restyle 얼굴 타일 워크플로 (2026-09-12 추가, 원격 세션)
+
+- 흐름: 원본(EXIF 보정, `downscale_to` 긴 변 ≤ `--max-edge`) → `lm_full` 검출 → `masks.face_tile_box`(눈 중심, 2:3, 머리 위 0.9 IPD·턱 아래 0.35 IPD, 사진 밖으로 나가면 축소·이동) → `crop_tile` → `00_face_tile.png`(기본 1024×1536) → 타일에서 랜드마크 재검출(manual 이면 `landmarks_to_tile` 변환) → 마스크/가이드는 타일 기준 → 편집 → `_align_edit`: 편집 결과 랜드마크 → `similarity_from_pupils`(동공 2점으로 이동·배율·회전) → 5% 이내 그대로 / `--align-max`(0.45) 이내 `warp_similarity` 보정 / 초과 시 합성 생략(`align.status = misaligned`) → `match_tone`(마스크 둘레 링의 평균색 차이만큼 보정, ±40) → `composite_brows` → `paste_back`(마스크 영역만 원본 사진에 되붙임) → `NN_..._composited.png` 는 원본 사진 크기.
+- manifest 항목: `align: {status: aligned|warped|unchecked|misaligned, shift_pct, scale_pct, angle_deg}`, `aligned`(bool, 웹 호환), `composited`. manifest 최상위 `tile: {box, size}`, `prepared` 는 타일 경로.
+- `--no-tile` 이면 이전 방식(사진 전체 `00_prepared.png`). 랜드마크가 없으면 타일·마스크 없이 프롬프트만.
+- OpenAIBackend.edit 은 gpt-image-1 계열에도 `FIXED_SIZES` 에 있는 크기(1024x1536)는 그대로 전달.
+- 로컬 확인 필요: 실제 사진으로 (1) 타일이 머리~턱을 잘 담는지, (2) mini 결과가 warped 로 잡혀 합성되는지, (3) 피부톤 보정이 과하지 않은지(과하면 `--no-tone-match`), (4) 눈썹 구역 1:1 시트가 원본 좌표계(lm_full)로 맞는지.
+
 ### 3.3 Codex 백엔드가 실제로 실행하는 것
 
 ```bash

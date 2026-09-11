@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageDraw
 except ImportError:  # pragma: no cover - CI without Pillow
     raise unittest.SkipTest("Pillow is not installed; skipping browlab tests")
 
@@ -245,6 +245,81 @@ class MaskTests(unittest.TestCase):
         over = M.guide_overlay(img, M.brow_region_mask(lm))
         self.assertEqual(over.size, img.size)
         self.assertEqual(over.getpixel((5, 5)), (225, 195, 175))
+
+
+class FaceTileTests(unittest.TestCase):
+    def test_tile_box_geometry(self):
+        lm = _pupil_landmarks()  # 800x1200 image, pupils at (300,480) / (500,480)
+        box = M.face_tile_box(lm, (800, 1200))
+        x0, y0, x1, y1 = box
+        self.assertAlmostEqual((x1 - x0) / (y1 - y0), 2 / 3, places=2)
+        self.assertTrue(0 <= x0 < x1 <= 800 and 0 <= y0 < y1 <= 1200)
+        self.assertLess(y0, lm.brow_top_y - lm.ipd_px)      # room above the brows
+        self.assertGreater(y1, lm.chin[1])                   # chin inside
+        self.assertLess(x0, lm.right_cheek[0])
+        self.assertGreater(x1, lm.left_cheek[0])
+        # a face that fills the photo: the box shrinks to the photo instead of padding
+        big = L.from_pupils(800, 900, (200.0, 400.0), (600.0, 400.0))
+        bx = M.face_tile_box(big, (800, 900))
+        self.assertTrue(0 <= bx[0] < bx[2] <= 800 and 0 <= bx[1] < bx[3] <= 900)
+        self.assertAlmostEqual((bx[2] - bx[0]) / (bx[3] - bx[1]), 2 / 3, places=2)
+
+    def test_crop_and_landmark_transfer(self):
+        lm = _pupil_landmarks()
+        box = M.face_tile_box(lm, (800, 1200))
+        tile = M.crop_tile(_face_image(), box, (1024, 1536))
+        self.assertEqual(tile.size, (1024, 1536))
+        lt = M.landmarks_to_tile(lm, box, (1024, 1536))
+        sx = 1024 / (box[2] - box[0])
+        self.assertAlmostEqual(lt.ipd_px, lm.ipd_px * sx, places=3)
+        self.assertAlmostEqual(lt.right_pupil[0], (300 - box[0]) * sx, places=3)
+        self.assertTrue(0 < lt.right_pupil[0] < lt.left_pupil[0] < 1024)
+        self.assertEqual(M.parse_size("1024x1536"), (1024, 1536))
+        small, sc = M.downscale_to(Image.new("RGB", (4000, 3000)), max_edge=2000)
+        self.assertEqual(small.size, (2000, 1500))
+        self.assertAlmostEqual(sc, 0.5)
+        same, sc = M.downscale_to(Image.new("RGB", (640, 480)), max_edge=2000)
+        self.assertEqual((same.size, sc), ((640, 480), 1.0))
+
+    def test_similarity_warp_moves_pupils_back(self):
+        ref = _pupil_landmarks()
+        # the "edited" picture has the face shifted, slightly enlarged and rotated
+        moved = L.from_pupils(800, 1200, (330.0, 470.0), (545.0, 486.0))
+        sim = M.similarity_from_pupils(moved, ref)
+        self.assertGreater(sim.shift_frac, 0.1)
+        self.assertGreater(sim.scale, 0.85)
+        edited = Image.new("RGB", (800, 1200), "white")
+        d = ImageDraw.Draw(edited)
+        for (x, y) in (moved.right_pupil, moved.left_pupil):
+            d.ellipse((x - 7, y - 7, x + 7, y + 7), fill="black")
+        warped = M.warp_similarity(edited, sim, (800, 1200))
+        for (x, y) in (ref.right_pupil, ref.left_pupil):
+            window = [warped.getpixel((int(x) + dx, int(y) + dy))[0] for dx in (-2, 0, 2) for dy in (-2, 0, 2)]
+            self.assertLess(min(window), 80, (x, y, window))
+        self.assertGreater(warped.getpixel((400, 300))[0], 200)  # background stays white where the source exists
+
+    def test_match_tone_removes_colour_cast(self):
+        original = Image.new("RGB", (400, 400), (150, 150, 150))
+        edited = Image.new("RGB", (400, 400), (190, 150, 130))
+        mask = Image.new("L", (400, 400), 0)
+        ImageDraw.Draw(mask).rectangle((100, 100, 300, 180), fill=255)
+        fixed = M.match_tone(edited, original, mask)
+        self.assertEqual(fixed.getpixel((200, 140)), (150, 150, 150))
+        # nothing to do when the ring already matches
+        same = M.match_tone(original, original, mask)
+        self.assertEqual(same.getpixel((200, 140)), (150, 150, 150))
+
+    def test_paste_back_only_changes_masked_area(self):
+        full = Image.new("RGB", (800, 1200), (10, 20, 30))
+        box = (100, 150, 500, 750)  # 400x600 -> tile 1024x1536
+        tile = Image.new("RGB", (1024, 1536), (200, 100, 50))
+        mask = Image.new("L", (1024, 1536), 0)
+        ImageDraw.Draw(mask).rectangle((200, 300, 800, 500), fill=255)
+        out = M.paste_back(full, tile, box, mask, feather_px=0)
+        self.assertEqual(out.size, full.size)
+        self.assertEqual(out.getpixel((5, 5)), (10, 20, 30))
+        self.assertEqual(out.getpixel((150, 200)), (10, 20, 30))      # inside box, outside mask
+        self.assertEqual(out.getpixel((100 + 195, 150 + 156)), (200, 100, 50))  # inside mask (tile 500,400 -> 195,156)
 
 
 class SheetTests(unittest.TestCase):
@@ -684,7 +759,9 @@ class CliTests(unittest.TestCase):
             self.assertEqual(manifest["styles"], ["straight", "feathered"])
             self.assertIsNotNone(manifest["landmarks"])
             with Image.open(tmp / "r" / "00_original.png") as im:
-                self.assertEqual(im.size[0] % 16, 0)
+                self.assertEqual(im.size, (1000, 1000))  # the photo itself is kept as is
+            with Image.open(tmp / "r" / "00_face_tile.png") as im:
+                self.assertEqual(im.size, (1024, 1536))  # the model edits the face tile
 
     @unittest.skipIf(os.name == "nt", "fake executable needs a POSIX shell")
     def test_generate_auto_backend_falls_back_to_api(self):
@@ -776,6 +853,62 @@ class CliTests(unittest.TestCase):
             manifest = json.loads((tmp / "r" / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["variants"][0]["backend"], "codex")
 
+
+    @unittest.skipIf(os.name == "nt", "fake executable needs a POSIX shell")
+    def test_restyle_tile_flow_aligns_and_pastes_back(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            home = tmp / "home"
+            (home / "generated_images").mkdir(parents=True)
+            fake = tmp / "codex"
+            fake.write_text(textwrap.dedent(f"""\
+                #!/usr/bin/env python3
+                import sys, pathlib
+                from PIL import Image, ImageChops
+                args = sys.argv[1:]
+                sys.stdin.read()
+                home = pathlib.Path({str(home)!r})
+                with open(home / "args.txt", "a") as fh:
+                    fh.write(" ".join(args) + "\\n")
+                src = pathlib.Path(args[args.index("-i") + 1])
+                with Image.open(src) as im:
+                    ImageChops.offset(im.convert("RGB"), 30, 20).save(home / "generated_images" / "edit.png")
+                """), encoding="utf-8")
+            fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+            src = tmp / "photo.jpg"
+            photo = Image.new("RGB", (1000, 1000), (225, 195, 175))
+            ImageDraw.Draw(photo).rectangle((0, 900, 1000, 1000), fill=(20, 40, 60))  # a stripe far from the face
+            photo.save(src, quality=95)
+            lm_full = L.from_pupils(1000, 1000, (400.0, 450.0), (600.0, 450.0))
+            lm_tile = M.landmarks_to_tile(lm_full, M.face_tile_box(lm_full, (1000, 1000)), (1024, 1536))
+
+            def fake_detect(args_, image, path=None):
+                # the fake codex shifts the tile by (30, 20): report the tile landmarks moved by the same amount
+                return lm_tile.translated(30, 20)
+
+            env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+            env["CODEX_HOME"] = str(home)
+            from browlab import cli as C
+            with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(C, "_detect_plain", fake_detect):
+                rc, out = self._run(["restyle", str(src), "--backend", "auto", "--codex-bin", str(fake), "--styles", "straight",
+                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none"])
+            self.assertEqual(rc, 0, out)
+            with Image.open(tmp / "r" / "00_face_tile.png") as tile:
+                self.assertEqual(tile.size, (1024, 1536))
+            first_call = (home / "args.txt").read_text().splitlines()[0]
+            self.assertIn("00_face_tile.png", first_call)
+            self.assertIn("mask_guide.png", first_call)
+            manifest = json.loads((tmp / "r" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["tile"]["size"], [1024, 1536])
+            v = manifest["variants"][0]
+            self.assertEqual(v["align"]["status"], "warped", v["align"])
+            self.assertTrue(v["aligned"])
+            self.assertIn("정렬 보정", out)
+            with Image.open(v["composited"]) as comp, Image.open(tmp / "r" / "00_original.png") as base:
+                self.assertEqual(comp.size, (1000, 1000))
+                for xy in ((500, 950), (5, 5), (990, 500)):  # untouched outside the brow mask (JPEG-decoded values)
+                    self.assertEqual(comp.getpixel(xy), base.getpixel(xy), xy)
+
     def test_restyle_dry_run_and_bad_style(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
@@ -791,23 +924,33 @@ class CliTests(unittest.TestCase):
         import argparse
         from browlab import cli as C
 
-        args = argparse.Namespace(landmarks="auto", codex_bin="codex", landmark_model=None, no_download=True)
+        args = argparse.Namespace(landmarks="auto", codex_bin="codex", landmark_model=None, no_download=True, align_max=0.45)
         orig = L.from_pupils(1000, 1500, (400.0, 600.0), (600.0, 600.0))
         img = Image.new("RGB", (1000, 1500))
         saved = C.L.detect
         try:
             C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (402.0, 603.0), (602.0, 603.0))
-            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
-            self.assertTrue(ok, why)
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "aligned", info)
+            self.assertIs(out, img)
             C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (400.0, 520.0), (600.0, 520.0))  # eyes moved up 40% IPD
-            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
-            self.assertFalse(ok, why)
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "warped", info)  # within --align-max: corrected instead of skipped
+            self.assertIsNotNone(out)
+            C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (400.0, 480.0), (600.0, 480.0))  # moved up 60% IPD
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "misaligned", info)
+            self.assertIsNone(out)
             C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (380.0, 600.0), (620.0, 600.0))  # zoomed 20%
-            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
-            self.assertFalse(ok, why)
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "warped", info)
+            C.L.detect = lambda *a, **k: L.from_pupils(1000, 1500, (350.0, 600.0), (650.0, 600.0))  # zoomed 50%
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "misaligned", info)
             C.L.detect = lambda *a, **k: None  # no face found -> do not block compositing
-            ok, why = C._edit_aligned(args, img, orig, (1000, 1500))
-            self.assertTrue(ok)
+            out, status, info, lm = C._align_edit(args, img, orig, (1000, 1500))
+            self.assertEqual(status, "unchecked")
+            self.assertIsNotNone(out)
         finally:
             C.L.detect = saved
 

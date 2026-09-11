@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from . import __version__
 from . import backends as B
@@ -29,7 +29,9 @@ from . import sheet as S
 from . import web as W
 
 DEFAULT_OUT = Path("output") / "browlab"
-ALIGN_TOLERANCE = 0.05  # pupils may move at most 5% of the inter-pupil distance for compositing
+ALIGN_TOLERANCE = 0.05   # pupils moved at most 5% of the inter-pupil distance: composite as is
+ALIGN_SCALE_MAX = 0.30   # beyond these the edit is treated as a different picture (no compositing)
+ALIGN_ANGLE_MAX = 12.0
 QUALITY_CHOICES = ["low", "medium", "high", "xhigh", "max", "auto"]
 
 
@@ -85,32 +87,42 @@ def _pt(p: Any) -> Tuple[float, float]:
     return (float(p[0]), float(p[1])) if isinstance(p, (tuple, list)) else (float(p.x), float(p.y))
 
 
-def _edit_aligned(args: argparse.Namespace, edited: Image.Image, lm_orig: L.FaceLandmarks, size: Tuple[int, int]) -> Tuple[bool, str]:
-    """Did the edit keep the face where it was? Compares pupil positions of the edited image with the original.
-
-    Some models regenerate the whole picture instead of inpainting only the mask; pasting the eyebrow
-    region of such an image back onto the original produces doubled eyes, so the caller skips compositing.
-    """
+def _detect_plain(args: argparse.Namespace, image: Image.Image, path: Optional[Path] = None) -> Optional[L.FaceLandmarks]:
+    """Landmark detection without manual pupils (used for the face tile and for edited images)."""
     provider = "auto" if args.landmarks in ("manual", "auto") else args.landmarks
-    img = edited if edited.size == size else edited.resize(size, Image.LANCZOS)
     try:
-        lm_new = L.detect(img, None, provider=provider, codex_bin=args.codex_bin,
-                          codex_model=getattr(args, "landmark_model", None),
-                          download_model=not getattr(args, "no_download", False))
+        return L.detect(image, path, provider=provider, codex_bin=args.codex_bin,
+                        codex_model=getattr(args, "landmark_model", None),
+                        download_model=not getattr(args, "no_download", False))
     except L.LandmarkError:
-        lm_new = None
+        return None
+
+
+def _align_edit(
+    args: argparse.Namespace, edited: Image.Image, lm_ref: L.FaceLandmarks, size: Tuple[int, int],
+) -> Tuple[Optional[Image.Image], str, Dict[str, Any], Optional[L.FaceLandmarks]]:
+    """Bring an edited image back onto the reference face geometry.
+
+    Some models regenerate the whole picture instead of inpainting only the mask.
+    Small moves are corrected with a similarity transform fitted on the pupils;
+    large ones mean a different picture, so compositing is skipped (image None).
+    Returns (image or None, status, info, landmarks of the edited image).
+    """
+    img = edited if edited.size == size else edited.resize(size, Image.LANCZOS)
+    lm_new = _detect_plain(args, img)
     if lm_new is None:
-        return True, "편집 결과에서 얼굴을 찾지 못해 정렬 확인 생략"
-    ipd = lm_orig.ipd_px or 1.0
-
-    def dist(a: Any, b: Any) -> float:
-        (ax, ay), (bx, by) = _pt(a), _pt(b)
-        return ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5
-
-    shift = max(dist(lm_new.right_pupil, lm_orig.right_pupil), dist(lm_new.left_pupil, lm_orig.left_pupil)) / ipd
-    ratio = abs(lm_new.ipd_px / ipd - 1.0)
-    ok = shift <= ALIGN_TOLERANCE and ratio <= ALIGN_TOLERANCE
-    return ok, f"눈 위치 이동 {shift * 100:.1f}% · 동공 간 거리 변화 {ratio * 100:.1f}% (허용 {ALIGN_TOLERANCE * 100:.0f}%)"
+        return img, "unchecked", {"note": "편집 결과에서 얼굴을 찾지 못해 정렬 확인 생략"}, None
+    try:
+        sim = M.similarity_from_pupils(lm_new, lm_ref)
+    except ValueError:
+        return img, "unchecked", {"note": "동공 좌표가 이상해 정렬 확인 생략"}, lm_new
+    info: Dict[str, Any] = {"shift_pct": round(sim.shift_frac * 100, 1), "scale_pct": round(sim.scale_ratio * 100, 1),
+                            "angle_deg": round(sim.angle_deg, 1)}
+    if sim.shift_frac <= ALIGN_TOLERANCE and sim.scale_ratio <= ALIGN_TOLERANCE:
+        return img, "aligned", info, lm_new
+    if sim.shift_frac <= args.align_max and sim.scale_ratio <= ALIGN_SCALE_MAX and abs(sim.angle_deg) <= ALIGN_ANGLE_MAX:
+        return M.warp_similarity(img, sim, size), "warped", info, lm_new
+    return None, "misaligned", info, lm_new
 
 
 def _chain(text: Optional[str]) -> Optional[List[str]]:
@@ -343,27 +355,51 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         _log(f"파일 없음: {src}")
         return 1
     out_dir = _out_dir(args.out_dir, f"restyle_{src.stem}")
-    original = Image.open(src)
-    original.load()
-    prepared, scale = M.prepare_for_edit(original, max_edge=args.max_edge)
-    prepared_path = out_dir / "00_original.png"
-    prepared.save(prepared_path)
-    _log(f"입력 이미지 준비: {prepared.size[0]}x{prepared.size[1]} (배율 {scale:.3f}) -> {prepared_path}")
+    with Image.open(src) as im:
+        original = ImageOps.exif_transpose(im).convert("RGB")
+    full, scale = M.downscale_to(original, max_edge=args.max_edge)
+    full_path = out_dir / "00_original.png"
+    full.save(full_path)
+    _log(f"입력 사진 준비: {full.size[0]}x{full.size[1]} (배율 {scale:.3f}) -> {full_path}")
 
-    lm = _detect(args, prepared, prepared_path)
+    # 1) landmarks on the whole photo -> 2) face tile (what the model actually edits)
+    lm_full = _detect(args, full, full_path)
+    tile_size = M.parse_size(args.tile_size)
+    tile_mode = lm_full is not None and not args.no_tile
+    box: Optional[Tuple[int, int, int, int]] = None
+    lm_edit: Optional[L.FaceLandmarks] = None
+    if tile_mode:
+        assert lm_full is not None
+        box = M.face_tile_box(lm_full, full.size, margin=args.tile_margin)
+        edit_img = M.crop_tile(full, box, tile_size)
+        edit_path = out_dir / "00_face_tile.png"
+        edit_img.save(edit_path)
+        if args.landmarks != "manual":
+            lm_edit = _detect_plain(args, edit_img, edit_path)
+        if lm_edit is None:
+            lm_edit = M.landmarks_to_tile(lm_full, box, tile_size)
+        _log(f"얼굴 타일: 원본 좌표 {box} -> {edit_img.size[0]}x{edit_img.size[1]} (동공 간 {lm_edit.ipd_px:.0f}px)")
+    else:
+        edit_img, _ = M.prepare_for_edit(full, max_edge=args.max_edge)
+        edit_path = out_dir / "00_prepared.png"
+        edit_img.save(edit_path)
+        if lm_full is not None:
+            lm_edit = lm_full if edit_img.size == full.size else (_detect_plain(args, edit_img, edit_path) or lm_full)
+            _log("타일 모드 해제(--no-tile): 사진 전체를 편집합니다.")
+        else:
+            _log("랜드마크가 없어 얼굴 타일·마스크 없이 프롬프트만으로 편집합니다 (합성 단계 생략).")
+
     mask: Optional[Image.Image] = None
     mask_api_path: Optional[Path] = None
     guide_path: Optional[Path] = None
-    if lm is not None:
-        mask = M.brow_region_mask(lm, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down)
+    if lm_edit is not None:
+        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down)
         mask.save(out_dir / "mask.png")
         mask_api_path = out_dir / "mask_api.png"
-        M.api_mask_image(mask, prepared).save(mask_api_path)
+        M.api_mask_image(mask, edit_img).save(mask_api_path)
         guide_path = out_dir / "mask_guide.png"
-        M.guide_overlay(prepared, mask).save(guide_path)
+        M.guide_overlay(edit_img, mask).save(guide_path)
         _log(f"눈썹 마스크 저장: {out_dir / 'mask.png'} (API용 알파 마스크: {mask_api_path.name})")
-    else:
-        _log("랜드마크가 없어 마스크 없이 프롬프트만으로 편집합니다 (합성 단계 생략).")
 
     rng = random.Random(args.seed)
     styles = _parse_styles(args.styles, rng)
@@ -371,20 +407,21 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     guide_ok = guide_path is not None and not args.no_guide_image
     use_guide = backend.name in ("codex", "auto") and guide_ok
     api_mask = mask_api_path if mask_api_path is not None and not args.no_mask else None
-    api_size = f"{prepared.size[0]}x{prepared.size[1]}"
+    api_size = f"{edit_img.size[0]}x{edit_img.size[1]}"
     manifest: Dict[str, Any] = {
         "tool": f"browlab {__version__}",
         "created": _dt.datetime.now().isoformat(timespec="seconds"),
         "source": str(src),
-        "prepared": str(prepared_path),
+        "prepared": str(edit_path),
+        "tile": {"box": list(box), "size": list(tile_size)} if box is not None else None,
         "backend": backend.name,
         "color": args.color,
         "styles": styles,
-        "landmarks": lm.to_dict() if lm else None,
+        "landmarks": lm_full.to_dict() if lm_full else None,
         "variants": [],
     }
     manifest_path = out_dir / "manifest.json"
-    results: List[Tuple[str, Image.Image]] = []
+    results: List[Tuple[str, Image.Image, Optional[L.FaceLandmarks]]] = []
     colour_ko = P.BROW_COLORS[args.color]["ko"]
     for i, style in enumerate(styles, 1):
         st = P.BROW_STYLES[style]
@@ -399,8 +436,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             print()
             continue
         _log(f"[{i}/{len(styles)}] {st.ko} ({colour_ko}) -> {out_path.name}")
-        codex_images: List[Path] = [prepared_path] + ([guide_path] if use_guide and guide_path is not None else [])
-        api_images: List[Path] = [prepared_path]
+        codex_images: List[Path] = [edit_path] + ([guide_path] if use_guide and guide_path is not None else [])
+        api_images: List[Path] = [edit_path]
         try:
             if backend.name == "auto":
                 # Codex gets the red region guide and no mask; the API gets the alpha mask and the exact size.
@@ -431,24 +468,41 @@ def cmd_restyle(args: argparse.Namespace) -> int:
             manifest["variants"].append(entry)
             _write_json(manifest_path, manifest)
             continue
-        final_img = Image.open(result.path).convert("RGB")
-        aligned = True
-        if lm is not None and mask is not None and not args.no_composite and args.landmarks != "none":
-            aligned, why = _edit_aligned(args, final_img, lm, prepared.size)
-            entry["aligned"] = aligned
-            entry["align_check"] = why
-            if aligned:
-                _log(f"정렬 확인: {why}")
+        edited = Image.open(result.path).convert("RGB")
+        if edited.size != edit_img.size:
+            edited = edited.resize(edit_img.size, Image.LANCZOS)
+        final_img: Image.Image = edited
+        final_lm: Optional[L.FaceLandmarks] = None
+        suffix = ""
+        if mask is not None and lm_edit is not None and not args.no_composite and args.landmarks != "none":
+            aligned_img, status, info, lm_new = _align_edit(args, edited, lm_edit, edit_img.size)
+            entry["align"] = {"status": status, **info}
+            entry["aligned"] = status != "misaligned"
+            if aligned_img is None:
+                _log(f"경고: 편집 결과의 얼굴 위치가 원본과 많이 달라 합성을 생략합니다 (이동 {info.get('shift_pct')}% · "
+                     f"크기 {info.get('scale_pct')}% · 회전 {info.get('angle_deg')}°). 편집 결과를 그대로 씁니다.")
+                final_lm = lm_new
+                suffix = " (합성 생략)"
             else:
-                _log(f"경고: 편집 결과의 얼굴 위치가 원본과 다릅니다({why}). 눈썹만 합성하면 눈이 겹쳐 보이므로 "
-                     "합성을 생략하고 편집 결과를 그대로 씁니다.")
-        if mask is not None and not args.no_composite and aligned:
-            final_img = M.composite_brows(prepared, final_img, mask)
-            final_path = out_dir / f"{i:02d}_{style}_{args.color}_composited.png"
-            final_img.save(final_path)
-            entry["composited"] = str(final_path)
-            _log(f"원본 위에 눈썹만 합성: {final_path.name}")
-        results.append((f"{i}. {st.ko} · {colour_ko}" + ("" if aligned else " (합성 생략)"), final_img))
+                if status == "warped":
+                    _log(f"정렬 보정: 이동 {info['shift_pct']}% · 크기 {info['scale_pct']}% · 회전 {info['angle_deg']}° -> 원본 눈 위치에 맞춤")
+                elif status == "aligned":
+                    _log(f"정렬 확인: 이동 {info['shift_pct']}% · 크기 {info['scale_pct']}% (허용 {ALIGN_TOLERANCE * 100:.0f}%)")
+                else:
+                    _log(str(info.get("note", "")))
+                tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
+                comp = M.composite_brows(edit_img, tile_result, mask)
+                if box is not None:
+                    final_img = M.paste_back(full, comp, box, mask)
+                    final_lm = lm_full
+                else:
+                    final_img = comp
+                    final_lm = lm_edit
+                final_path = out_dir / f"{i:02d}_{style}_{args.color}_composited.png"
+                final_img.save(final_path)
+                entry["composited"] = str(final_path)
+                _log(f"원본 사진에 눈썹만 합성: {final_path.name}")
+        results.append((f"{i}. {st.ko} · {colour_ko}{suffix}", final_img, final_lm))
         manifest["variants"].append(entry)
         _write_json(manifest_path, manifest)
 
@@ -457,16 +511,16 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     if results and args.sheet != "none":
         ipd = args.ipd_mm or P.default_ipd_mm(args.gender if args.gender != "random" else None, None)
         opts = _sheet_options(args, ipd, f"{src.name}  ·  {colour_ko}  ·  {_dt.date.today().isoformat()}", args.note or "")
-        items = [("원본", prepared)] + results
         written: List[Path] = []
         if args.sheet in ("grid", "both"):
-            pages = S.compose_grid_sheet(items, opts)
+            pages = S.compose_grid_sheet([("원본", full)] + [(label, img) for label, img, _ in results], opts)
             written += S.save_pages(pages, out_dir / "sheet_compare", args.dpi, pdf=not args.no_pdf)
         if args.sheet in ("browzone", "both"):
-            if lm is None:
+            if lm_full is None:
                 _log("눈썹 구역 1:1 시트는 랜드마크가 필요해 건너뜁니다.")
             else:
-                pages = S.compose_browzone_sheet([(label, img, lm) for label, img in items], opts, copies=1)
+                items = [("원본", full, lm_full)] + [(label, img, lm) for label, img, lm in results if lm is not None]
+                pages = S.compose_browzone_sheet(items, opts, copies=1)
                 written += S.save_pages(pages, out_dir / "sheet_browzone", args.dpi, pdf=not args.no_pdf)
         for p in written:
             _log(f"저장: {p}")
@@ -600,7 +654,14 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--seed", type=int, help="random:N 스타일 선택 시드")
     r.add_argument("--out-dir", help="출력 폴더 (기본 output/browlab/restyle_<파일명>_<시각>)")
     r.add_argument("--edit-model", help="api 백엔드 편집 모델 (기본 gpt-image-2.5-sunburst)")
-    r.add_argument("--max-edge", type=int, default=2048, help="편집 전 긴 변 최대 픽셀")
+    r.add_argument("--max-edge", type=int, default=2048, help="작업용 원본 사진의 긴 변 최대 픽셀(더 크면 축소)")
+    r.add_argument("--tile-size", default="1024x1536", type=M.validate_gpt_image_size,
+                   help="얼굴 타일(모델이 실제로 편집하는 이미지) 크기. 1024x1536 은 모든 gpt-image 모델이 받음")
+    r.add_argument("--tile-margin", type=float, default=1.0, help="얼굴 타일 여유 배수 (1.0 = 머리 위 0.9 IPD, 턱 아래 0.35 IPD)")
+    r.add_argument("--no-tile", action="store_true", help="얼굴을 잘라내지 않고 사진 전체를 편집 (이전 방식)")
+    r.add_argument("--no-tone-match", action="store_true", help="합성 전 마스크 주변 피부톤 맞춤 생략")
+    r.add_argument("--align-max", type=float, default=0.45,
+                   help="편집 결과의 눈 위치가 이 비율(동공 간 거리 대비) 이내로 움직였으면 정렬 보정 후 합성, 넘으면 합성 생략")
     r.add_argument("--mask-side", type=float, default=0.16, help="마스크 좌우 여유 (동공간 거리 배수)")
     r.add_argument("--mask-up", type=float, default=0.40, help="마스크 위쪽 여유 (동공간 거리 배수)")
     r.add_argument("--mask-down", type=float, default=0.12, help="마스크 아래쪽 여유 (동공간 거리 배수)")
@@ -608,7 +669,7 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
     r.add_argument("--sheet", choices=["none", "grid", "browzone", "both"], default="both", help="비교 시트 종류")
-    r.add_argument("--pupils", help="수동 랜드마크: 동공 픽셀 좌표 x1,y1,x2,y2 (준비된 이미지 기준)")
+    r.add_argument("--pupils", help="수동 랜드마크: 동공 픽셀 좌표 x1,y1,x2,y2 (00_original.png 기준)")
     r.add_argument("--gender", choices=P.GENDER_CHOICES, default="random", help="IPD 기본값 선택용")
     r.add_argument("--note", help="시트 하단 메모")
     _add_backend_args(r, with_size=False)

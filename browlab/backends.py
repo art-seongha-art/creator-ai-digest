@@ -364,7 +364,7 @@ class OpenAIBackend(BaseBackend):
                 prompt=prompt,
                 image=handles if len(handles) > 1 else handles[0],
                 n=1,
-                size="auto" if self._fixed_size_model(model) else size,  # gpt-image-1 family: no custom sizes
+                size=size if (not self._fixed_size_model(model) or size == "auto" or size in FIXED_SIZES) else "auto",  # gpt-image-1 family: fixed sizes only
                 quality=quality,
                 output_format="png",
             )
