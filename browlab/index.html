@@ -227,6 +227,7 @@ details.adv .body .wide{grid-column:1/-1}
   text-align:left;position:relative;box-shadow:var(--sh1);transition:transform .13s,box-shadow .13s,border-color .13s}
 .gcard:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--hair)}
 .gcard .thumb{aspect-ratio:3/4;background:var(--panel-3);position:relative;overflow:hidden}
+.gcard .thumb img.under{position:absolute;inset:0}
 .gcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .gcard .thumb .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
   padding:12px;text-align:center;color:var(--muted);font-size:12px}
@@ -917,7 +918,14 @@ function renderGallery(){
   list.forEach(it=>{
     const c=el('button','gcard'); c.type='button'; c.onclick=()=>openLb(items.indexOf(it));
     const th=el('div','thumb');
-    if(it.image){ const im=document.createElement('img'); im.loading='lazy'; im.src=it.image+'?w=480'; im.alt=it.label||''; th.appendChild(im); }
+    if(it.image){
+      // stack the original under the result at the same strength the viewer opens with,
+      // so a card already shows what the treatment actually changes
+      if(it.compare&&!it.saved){ const under=document.createElement('img'); under.loading='lazy';
+        under.src=it.compare.before+'?w=480'; under.alt=''; under.className='under'; th.appendChild(under); }
+      const im=document.createElement('img'); im.loading='lazy'; im.src=it.image+'?w=480'; im.alt=it.label||'';
+      if(it.compare&&!it.saved) im.style.opacity=(EDIT0.overlay/100).toFixed(2);
+      th.appendChild(im); }
     else {
       const ph=el('div','ph');
       if(it.status==='running'||it.status==='queued'){ ph.appendChild(el('div','spinner')); th.appendChild(el('div','shimmer')); }
