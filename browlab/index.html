@@ -264,6 +264,22 @@ details.adv .body .wide{grid-column:1/-1}
 .lb-img{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:14px}
 .lb-img img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r2);background:#fff;box-shadow:0 20px 60px -20px rgba(0,0,0,.7)}
 .lb-img .ph{color:#cdc6bd;font-size:13.5px;text-align:center;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.lb-cmp{position:relative;display:flex;max-width:100%;max-height:100%;touch-action:none;--x:50%}
+.lb-cmp img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r2);background:#fff;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.7);-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.lb-cmp .before{position:absolute;inset:0;width:100%;height:100%;clip-path:inset(0 calc(100% - var(--x)) 0 0)}
+.lb-cmp.held .before{clip-path:none}
+.lb-cmp.held .lb-div,.lb-cmp.held .tag-a{opacity:0}
+.lb-div{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:rgba(255,255,255,.95);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;touch-action:none;transition:opacity .12s}
+.lb-div i{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:999px;
+  background:rgba(255,255,255,.96);box-shadow:var(--sh2);display:flex;align-items:center;justify-content:center;color:#15120f}
+.lb-cmp .tag{position:absolute;top:10px;height:24px;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;
+  font-size:11.5px;font-weight:600;display:flex;align-items:center;pointer-events:none;transition:opacity .12s}
+.lb-cmp .tag-b{left:10px}.lb-cmp .tag-a{right:10px}
+.lb-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:5px 12px;border-radius:999px;
+  background:rgba(0,0,0,.55);color:#e8e2da;font-size:11.5px;pointer-events:none;white-space:nowrap}
+.lb-nav,.lb-close,.lb-count{z-index:3}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:999px;background:rgba(255,255,255,.9);
   color:#15120f;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh2)}
 .lb-nav:hover{background:#fff}
@@ -588,6 +604,12 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
   <div class="lb-box">
     <div class="lb-img">
       <img id="lbImg" alt="" hidden><div class="ph" id="lbPh" hidden></div>
+      <div class="lb-cmp" id="lbCmp" hidden>
+        <img class="after" id="lbAfter" alt=""><img class="before" id="lbBefore" alt="">
+        <span class="tag tag-b" id="lbTagB">원본</span><span class="tag tag-a" id="lbTagA">생성</span>
+        <div class="lb-div" id="lbDiv"><i><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6"/><path d="M15 6l5 6-5 6"/></svg></i></div>
+        <span class="lb-hint">손잡이를 좌우로 끌어 비교 · 이미지를 누르고 있으면 원본</span>
+      </div>
       <span class="lb-count num" id="lbCount"></span>
       <button class="lb-nav prev" id="lbPrev" type="button" aria-label="이전"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       <button class="lb-nav next" id="lbNext" type="button" aria-label="다음"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -686,7 +708,7 @@ function buildForms(){
       const lab=el('label','chip'+(multi?' multi':'')); const inp=document.createElement('input');
       inp.type=multi?'checkbox':'radio'; inp.name=name; inp.value=it.key;
       if(!multi && (it.default || (i===0 && !list.some(x=>x.default)))) inp.checked=true;
-      if(multi && ['korean_natural','straight','soft_arch','feathered'].includes(it.key)) inp.checked=true;
+      if(multi && it.key==='korean_natural') inp.checked=true;
       if(multi) inp.addEventListener('change', updateRestyleLabel);
       if(it.tip) lab.title=it.tip;
       lab.appendChild(inp); lab.appendChild(el('span','',it.short||it.ko)); box.appendChild(lab);
@@ -885,6 +907,35 @@ function renderGallery(){
   });
 }
 
+/* ── lightbox: A/B compare ───────────────────────────────────────────── */
+const cmpEl=()=>$('#lbCmp');
+function setCmpX(pct){ const c=cmpEl(); c.style.setProperty('--x', Math.max(0,Math.min(100,pct))+'%'); }
+function showCompare(it){
+  const c=cmpEl();
+  const before=$('#lbBefore');
+  before.onerror=()=>{ c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };  // no pair: just show the result
+  $('#lbAfter').src=it.image; before.src=it.compare.before;
+  $('#lbTagB').textContent=it.compare.before_label||'원본';
+  $('#lbTagA').textContent=it.compare.after_label||'생성';
+  c.classList.remove('held'); setCmpX(50); c.hidden=false;
+}
+(function wireCompare(){
+  const c=cmpEl(), div=$('#lbDiv');
+  let dragging=false;
+  const pct=e=>{ const r=c.getBoundingClientRect(); return (e.clientX-r.left)/Math.max(1,r.width)*100; };
+  div.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); dragging=true;
+    div.setPointerCapture(e.pointerId); setCmpX(pct(e)); });
+  div.addEventListener('pointermove',e=>{ if(dragging) setCmpX(pct(e)); });
+  const stop=e=>{ if(!dragging) return; dragging=false; try{ div.releasePointerCapture(e.pointerId); }catch(_){} };
+  div.addEventListener('pointerup',stop); div.addEventListener('pointercancel',stop);
+  // press and hold anywhere else on the picture to see the original underneath
+  c.addEventListener('pointerdown',e=>{ if(dragging||e.target===div||div.contains(e.target)) return;
+    c.classList.add('held'); c.setPointerCapture(e.pointerId); });
+  const release=e=>{ c.classList.remove('held'); try{ c.releasePointerCapture(e.pointerId); }catch(_){} };
+  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release);
+  c.addEventListener('pointerleave',release);
+})();
+
 /* ── lightbox ────────────────────────────────────────────────────────── */
 function openLb(i){ lbIndex=i; $('#lb').hidden=false; renderLb(); }
 function closeLb(){ $('#lb').hidden=true; lbIndex=-1; }
@@ -896,9 +947,10 @@ function spec(dl,k,v){ if(!v) return; dl.appendChild(el('dt','',k)); dl.appendCh
 async function renderLb(){
   const it=items[lbIndex]; if(!it){ closeLb(); return; }
   const list=visible(); $('#lbCount').textContent=(list.indexOf(it)+1)+' / '+list.length;
-  const img=$('#lbImg'), ph=$('#lbPh');
-  if(it.image){ img.src=it.image; img.hidden=false; ph.hidden=true; }
-  else { img.hidden=true; ph.hidden=false; ph.replaceChildren();
+  const img=$('#lbImg'), ph=$('#lbPh'), cmp=$('#lbCmp');
+  if(it.image && it.compare){ showCompare(it); img.hidden=true; ph.hidden=true; }
+  else if(it.image){ cmp.hidden=true; img.src=it.image; img.hidden=false; ph.hidden=true; }
+  else { cmp.hidden=true; img.hidden=true; ph.hidden=false; ph.replaceChildren();
     if(it.status==='running'||it.status==='queued') ph.appendChild(el('div','spinner'));
     ph.appendChild(el('div','', it.status==='failed'?'실패한 작업입니다. 아래 로그를 보세요.':it.status==='queued'?'앞 작업이 끝나면 시작합니다.':'생성 중입니다. 완료되면 여기에 나타납니다.')); }
   const side=$('#lbSide'); side.replaceChildren();

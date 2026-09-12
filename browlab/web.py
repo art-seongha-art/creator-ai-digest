@@ -345,7 +345,7 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         shown.update(s)
 
     elif kind == "restyle":
-        styles = _styles(p.get("styles")) or ["korean_natural", "straight", "soft_arch", "feathered"]
+        styles = _styles(p.get("styles")) or ["korean_natural"]
         color = _choice(p.get("color"), P.BROW_COLOR_CHOICES, "match_hair")
         height = _choice(p.get("height"), tuple(P.BROW_HEIGHTS), "keep")
         intensity = _choice(p.get("intensity"), tuple(P.BROW_INTENSITIES), "natural")
@@ -598,9 +598,13 @@ class JobStore:
                     if raw and raw != name and raw in files:
                         inputs.append({"label": "모델 원본 출력 (합성 전)", "url": url(raw), "name": raw})
                     if name in files:
+                        # the "before" that lines up pixel-for-pixel with what is shown
+                        pool = ["00_original.png"] if name.endswith("_composited.png") else ["00_face_tile.png", "00_prepared.png", "00_original.png"]
+                        before = next((n for n in pool if n in files), None)
                         add(name, f"{v.get('style_ko', '')} · {P.BROW_COLORS.get(job.params.get('color', ''), {}).get('ko', '')}", pdfs,
                             inputs=inputs, mask_sent=v.get("mask_sent"), brow_shift_px=v.get("brow_shift_px"),
                             align=v.get("align"),
+                            compare={"before": url(before), "before_label": "원본", "after_label": "생성"} if before else None,
                             aligned=v.get("aligned", True), style=v.get("style"))
             elif job.kind == "sheet":
                 inp = next((n for n in files if n.startswith("input.")), None)
