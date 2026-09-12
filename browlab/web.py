@@ -614,6 +614,9 @@ class JobStore:
                 add(inp, base["title"], [(n, "얼굴 1:1 PDF" if n.endswith("_A4.pdf") else "눈썹 구역 PDF") for n in sorted(files) if n.endswith(".pdf")])
             elif job.kind == "calibrate":
                 add("calibration_A4.png" if "calibration_A4.png" in files else None, "프린터 보정 시트", [("calibration_A4.pdf", "보정 시트 PDF")])
+            for saved in self.saved_edits(job, files):
+                add(saved["image"], saved["name"], [], kind_ko="저장한 보정", saved=True,
+                    edit=saved["settings"], saved_at=saved.get("created"))
             if len(items) == before and job.status in ("queued", "running", "failed", "cancelled"):
                 add(None, base["title"], [])
         return items
@@ -754,12 +757,71 @@ class JobStore:
             else:
                 cur["budget_usd"] = _float_opt(value, 0, 100000)
                 cur["budget_set_at"] = _now()
+        if "save_seq" in patch:
+            cur["save_seq"] = max(0, _int(patch["save_seq"], 0, 10 ** 9, 0))
         if "budget_note" in patch:
             cur["budget_note"] = _text(patch["budget_note"], 80)
         tmp = self.settings_path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(cur, ensure_ascii=False, indent=2), encoding="utf-8")
         tmp.replace(self.settings_path)
         return cur
+
+    # -- saved edits ----------------------------------------------------------
+    def save_edit(self, job_id: str, name: str, image_b64: Any, settings: Any) -> Dict[str, Any]:
+        """Write an edited picture into the job's ``saves/`` folder under a client name."""
+        from PIL import Image
+
+        with self.lock:
+            job = self.jobs.get(job_id)
+        if job is None:
+            raise BadRequest("작업을 찾을 수 없습니다")
+        if not isinstance(image_b64, str) or not image_b64:
+            raise BadRequest("저장할 이미지가 없습니다")
+        if image_b64.startswith("data:") and "," in image_b64[:64]:
+            image_b64 = image_b64.split(",", 1)[1]
+        try:
+            raw = base64.b64decode(image_b64, validate=True)
+        except Exception as exc:
+            raise BadRequest("이미지 인코딩 오류") from exc
+        if len(raw) > MAX_UPLOAD:
+            raise BadRequest("저장 이미지는 25 MB 이하")
+        try:
+            with Image.open(io.BytesIO(raw)) as im:
+                im.verify()
+            with Image.open(io.BytesIO(raw)) as im:
+                picture = im.convert("RGB")
+        except Exception as exc:
+            raise BadRequest("이미지 파일이 아닙니다") from exc
+
+        with self.lock:
+            index = int(self.get_settings().get("save_seq", 0)) + 1
+            self.set_settings({"save_seq": index})
+        label = _text(name, 60) or f"회원_{index}"
+        folder = self.job_dir(job_id) / "saves"
+        folder.mkdir(parents=True, exist_ok=True)
+        stem = f"{index:03d}"
+        picture.save(folder / f"{stem}.png")
+        meta = {"index": index, "name": label, "created": _now(),
+                "settings": settings if isinstance(settings, dict) else {}}
+        (folder / f"{stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        return {"name": label, "index": index, "url": f"files/{job_id}/saves/{stem}.png"}
+
+    def saved_edits(self, job: Job, files: Dict[str, Any]) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        folder = self.job_dir(job.id) / "saves"
+        if not folder.is_dir():
+            return out
+        for meta_path in sorted(folder.glob("*.json")):
+            png = f"saves/{meta_path.stem}.png"
+            if png not in files:
+                continue
+            try:
+                meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            except Exception:
+                meta = {}
+            out.append({"image": png, "name": meta.get("name") or meta_path.stem,
+                        "created": meta.get("created"), "settings": meta.get("settings") or {}})
+        return out
 
     @staticmethod
     def job_cost(manifest: Dict[str, Any], params: Optional[Dict[str, Any]] = None) -> Tuple[float, int]:
@@ -1216,6 +1278,12 @@ class Handler(BaseHTTPRequestHandler):
                     raise BadRequest("작업 종류를 고르세요")
                 job = self.server.store.submit(kind, body)
                 self.send_json(self.server.store.summary(job), HTTPStatus.CREATED)
+                return
+            if path == "/api/saves":
+                store = self.server.store
+                out = store.save_edit(str(body.get("job") or ""), str(body.get("name") or ""),
+                                      body.get("image"), body.get("settings"))
+                self.send_json(out)
                 return
             if path == "/api/settings":
                 self.server.store.set_settings(body)

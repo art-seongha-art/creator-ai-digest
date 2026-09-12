@@ -267,9 +267,10 @@ details.adv .body .wide{grid-column:1/-1}
 .lb-cmp{position:relative;display:flex;max-width:100%;max-height:100%;touch-action:none;--x:50%}
 .lb-cmp img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r2);background:#fff;
   box-shadow:0 20px 60px -20px rgba(0,0,0,.7);-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
-.lb-cmp .before{position:absolute;inset:0;width:100%;height:100%;clip-path:inset(0 calc(100% - var(--x)) 0 0)}
-.lb-cmp.held .before{clip-path:none}
+.lb-cmp canvas{display:block;max-width:100%;max-height:100%;border-radius:var(--r2);background:#fff;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.7)}
 .lb-cmp.held .lb-div,.lb-cmp.held .tag-a{opacity:0}
+.lb-cmp.overlay .lb-div,.lb-cmp.overlay .tag-a,.lb-cmp.overlay .tag-b{opacity:0}
 .lb-div{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:rgba(255,255,255,.95);
   box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;touch-action:none;transition:opacity .12s}
 .lb-div i{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:999px;
@@ -288,6 +289,16 @@ details.adv .body .wide{grid-column:1/-1}
   display:flex;align-items:center;justify-content:center}
 .lb-count{position:absolute;top:12px;left:12px;height:26px;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.5);color:#fff;
   font-size:11.5px;font-weight:600;display:flex;align-items:center;font-variant-numeric:tabular-nums}
+.edit{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:var(--r3);background:var(--card)}
+.edit .seg{display:flex;gap:6px}
+.edit .seg button{flex:1;height:34px;border-radius:var(--r2);border:1px solid var(--line);background:transparent;
+  font-size:12.5px;font-weight:600;color:var(--muted)}
+.edit .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.edit .sl{display:grid;grid-template-columns:64px 1fr 46px;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.edit .sl input{width:100%;accent-color:var(--brand);height:22px}
+.edit .sl b{font-variant-numeric:tabular-nums;text-align:right;font-weight:600;color:var(--ink)}
+.edit .row{display:flex;gap:8px;align-items:center}
+.edit .row input[type=text]{flex:1;height:36px}
 .lb-side{background:var(--panel);padding:16px 16px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;
   max-height:54dvh;overflow:auto;border-radius:var(--r4) var(--r4) 0 0}
 .lb-side h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em}
@@ -605,7 +616,8 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
     <div class="lb-img">
       <img id="lbImg" alt="" hidden><div class="ph" id="lbPh" hidden></div>
       <div class="lb-cmp" id="lbCmp" hidden>
-        <img class="after" id="lbAfter" alt=""><img class="before" id="lbBefore" alt="">
+        <canvas id="lbCanvas"></canvas>
+        <img class="after" id="lbAfter" alt="" hidden><img class="before" id="lbBefore" alt="" hidden>
         <span class="tag tag-b" id="lbTagB">원본</span><span class="tag tag-a" id="lbTagA">생성</span>
         <div class="lb-div" id="lbDiv"><i><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6"/><path d="M15 6l5 6-5 6"/></svg></i></div>
         <span class="lb-hint">손잡이를 좌우로 끌어 비교 · 이미지를 누르고 있으면 원본</span>
@@ -907,22 +919,81 @@ function renderGallery(){
   });
 }
 
-/* ── lightbox: A/B compare ───────────────────────────────────────────── */
+/* ── lightbox: compare + adjust ──────────────────────────────────────── */
+const EDIT0={mode:'wipe', x:50, overlay:70, brightness:0, contrast:0, saturate:0, temp:0};
+let edit={...EDIT0}, editItem=null;
+const imgA=new Image(), imgB=new Image();   // after (result) / before (original)
+imgA.crossOrigin=imgB.crossOrigin='anonymous';
 const cmpEl=()=>$('#lbCmp');
-function setCmpX(pct){ const c=cmpEl(); c.style.setProperty('--x', Math.max(0,Math.min(100,pct))+'%'); }
+
+function paint(ctx,w,h,opts){
+  const o=opts||edit;
+  ctx.save(); ctx.filter='none'; ctx.globalAlpha=1;
+  ctx.clearRect(0,0,w,h);
+  if(imgB.complete&&imgB.naturalWidth) ctx.drawImage(imgB,0,0,w,h);
+  if(imgA.complete&&imgA.naturalWidth){
+    if(o.hold){ /* holding: show the original only */ }
+    else if(o.mode==='overlay'){ ctx.globalAlpha=o.overlay/100; ctx.drawImage(imgA,0,0,w,h); }
+    else { const cut=Math.round(w*o.x/100);
+      ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); ctx.drawImage(imgA,0,0,w,h); ctx.restore(); }
+  }
+  ctx.restore();
+}
+function adjust(ctx,w,h,opts){
+  const o=opts||edit;
+  const b=1+o.brightness/100, c=1+o.contrast/100, sat=1+o.saturate/100;
+  if(b!==1||c!==1||sat!==1){
+    const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
+    tmp.getContext('2d').drawImage(ctx.canvas,0,0);
+    ctx.save(); ctx.filter=`brightness(${b}) contrast(${c}) saturate(${sat})`;
+    ctx.clearRect(0,0,w,h); ctx.drawImage(tmp,0,0); ctx.restore();
+  }
+  if(o.temp){ // warm / cool wash, soft-light so it tints rather than paints
+    ctx.save(); ctx.globalCompositeOperation='soft-light';
+    ctx.globalAlpha=Math.min(.5,Math.abs(o.temp)/100*.55);
+    ctx.fillStyle=o.temp>0?'#ff9a3c':'#3ca0ff'; ctx.fillRect(0,0,w,h); ctx.restore();
+  }
+}
+function renderCmp(opts){
+  const cv=$('#lbCanvas'); if(!imgA.naturalWidth) return;
+  const box=$('.lb-img').getBoundingClientRect();
+  const fit=Math.min((box.width-28)/imgA.naturalWidth,(box.height-28)/imgA.naturalHeight,1);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const w=Math.max(1,Math.round(imgA.naturalWidth*fit*dpr)), h=Math.max(1,Math.round(imgA.naturalHeight*fit*dpr));
+  cv.width=w; cv.height=h;
+  cv.style.width=Math.round(w/dpr)+'px'; cv.style.height=Math.round(h/dpr)+'px';
+  const ctx=cv.getContext('2d'); paint(ctx,w,h,opts); adjust(ctx,w,h,opts);
+}
+function fullCanvas(){
+  const cv=document.createElement('canvas');
+  cv.width=imgA.naturalWidth; cv.height=imgA.naturalHeight;
+  const ctx=cv.getContext('2d');
+  paint(ctx,cv.width,cv.height); adjust(ctx,cv.width,cv.height);
+  return cv;
+}
+function setCmpX(pct){ edit.x=Math.max(0,Math.min(100,pct));
+  cmpEl().style.setProperty('--x',edit.x+'%'); renderCmp(); }
+
 function showCompare(it){
   const c=cmpEl();
-  const before=$('#lbBefore');
-  before.onerror=()=>{ c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };  // no pair: just show the result
-  $('#lbAfter').src=it.image; before.src=it.compare.before;
+  editItem=it; edit={...EDIT0, ...(it.edit||{})};
+  c.classList.remove('held'); c.classList.toggle('overlay', edit.mode==='overlay');
+  c.style.setProperty('--x',edit.x+'%');
   $('#lbTagB').textContent=it.compare.before_label||'원본';
   $('#lbTagA').textContent=it.compare.after_label||'생성';
-  c.classList.remove('held'); setCmpX(50); c.hidden=false;
+  let left=2;
+  const ready=()=>{ if(--left===0) renderCmp(); };
+  imgB.onerror=()=>{ c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };
+  imgA.onload=ready; imgB.onload=ready;
+  imgA.src=it.image; imgB.src=it.compare.before;
+  if(imgA.complete&&imgA.naturalWidth) ready();
+  if(imgB.complete&&imgB.naturalWidth) ready();
+  c.hidden=false;
 }
 (function wireCompare(){
   const c=cmpEl(), div=$('#lbDiv');
   let dragging=false;
-  const pct=e=>{ const r=c.getBoundingClientRect(); return (e.clientX-r.left)/Math.max(1,r.width)*100; };
+  const pct=e=>{ const r=$('#lbCanvas').getBoundingClientRect(); return (e.clientX-r.left)/Math.max(1,r.width)*100; };
   div.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); dragging=true;
     div.setPointerCapture(e.pointerId); setCmpX(pct(e)); });
   div.addEventListener('pointermove',e=>{ if(dragging) setCmpX(pct(e)); });
@@ -930,11 +1001,49 @@ function showCompare(it){
   div.addEventListener('pointerup',stop); div.addEventListener('pointercancel',stop);
   // press and hold anywhere else on the picture to see the original underneath
   c.addEventListener('pointerdown',e=>{ if(dragging||e.target===div||div.contains(e.target)) return;
-    c.classList.add('held'); c.setPointerCapture(e.pointerId); });
-  const release=e=>{ c.classList.remove('held'); try{ c.releasePointerCapture(e.pointerId); }catch(_){} };
-  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release);
-  c.addEventListener('pointerleave',release);
+    c.classList.add('held'); c.setPointerCapture(e.pointerId); renderCmp({...edit,hold:true}); });
+  const release=e=>{ if(!c.classList.contains('held')) return; c.classList.remove('held');
+    try{ c.releasePointerCapture(e.pointerId); }catch(_){} renderCmp(); };
+  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release); c.addEventListener('pointerleave',release);
+  addEventListener('resize',()=>{ if(!c.hidden) renderCmp(); });
 })();
+
+const SLIDERS=[['overlay','겹치기',0,100,1],['brightness','밝기',-60,60,1],['contrast','대비',-60,60,1],
+               ['saturate','채도',-80,80,1],['temp','색온도',-60,60,1]];
+function editPanel(it){
+  const wrap=el('div','edit');
+  const seg=el('div','seg');
+  [['wipe','좌우 비교'],['overlay','겹치기']].forEach(([k,ko])=>{
+    const b=el('button','',ko); b.type='button'; if(edit.mode===k) b.classList.add('on');
+    b.onclick=()=>{ edit.mode=k; cmpEl().classList.toggle('overlay',k==='overlay');
+      $$('.edit .seg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+      wrap.querySelector('[data-sl=overlay]').hidden = k!=='overlay'; renderCmp(); };
+    seg.appendChild(b); });
+  wrap.appendChild(seg);
+  SLIDERS.forEach(([key,ko,lo,hi])=>{
+    const row=el('label','sl'); row.dataset.sl=key; if(key==='overlay') row.hidden = edit.mode!=='overlay';
+    row.appendChild(el('span','',ko));
+    const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=edit[key];
+    const out=el('b','',String(edit[key]));
+    r.addEventListener('input',()=>{ edit[key]=+r.value; out.textContent=r.value; renderCmp(); });
+    row.appendChild(r); row.appendChild(out); wrap.appendChild(row); });
+  const reset=el('button','btn','조정 초기화'); reset.type='button';
+  reset.onclick=()=>{ const m=edit.mode, x=edit.x; edit={...EDIT0, mode:m, x};
+    cmpEl().style.setProperty('--x',x+'%'); renderLb(); };
+  const row=el('div','row');
+  const name=document.createElement('input'); name.type='text'; name.placeholder='회원명 (비우면 자동)'; name.id='saveName';
+  const save=el('button','btn dark','갤러리에 저장'); save.type='button';
+  save.onclick=async()=>{ save.disabled=true; const old=save.textContent; save.textContent='저장 중…';
+    try{
+      const data=fullCanvas().toDataURL('image/png');
+      const out=await post('api/saves',{job:it.id, name:name.value, image:data, settings:edit});
+      toast(out.name+' (으)로 저장했습니다','good'); await refreshGallery();
+    }catch(e){ toast(e.message,'bad'); }
+    save.textContent=old; save.disabled=false; };
+  row.appendChild(name); row.appendChild(save);
+  wrap.appendChild(reset); wrap.appendChild(row);
+  return wrap;
+}
 
 /* ── lightbox ────────────────────────────────────────────────────────── */
 function openLb(i){ lbIndex=i; $('#lb').hidden=false; renderLb(); }
@@ -948,7 +1057,7 @@ async function renderLb(){
   const it=items[lbIndex]; if(!it){ closeLb(); return; }
   const list=visible(); $('#lbCount').textContent=(list.indexOf(it)+1)+' / '+list.length;
   const img=$('#lbImg'), ph=$('#lbPh'), cmp=$('#lbCmp');
-  if(it.image && it.compare){ showCompare(it); img.hidden=true; ph.hidden=true; }
+  if(it.image && it.compare && !it.saved){ showCompare(it); img.hidden=true; ph.hidden=true; }
   else if(it.image){ cmp.hidden=true; img.src=it.image; img.hidden=false; ph.hidden=true; }
   else { cmp.hidden=true; img.hidden=true; ph.hidden=false; ph.replaceChildren();
     if(it.status==='running'||it.status==='queued') ph.appendChild(el('div','spinner'));
@@ -962,6 +1071,7 @@ async function renderLb(){
   spec(dl,'API 비용',it.cost_usd?usd(it.cost_usd):'');
   if(it.aligned===false) spec(dl,'합성','생략 (얼굴 위치가 바뀜)');
   side.appendChild(dl);
+  if(it.image&&it.compare&&!it.saved) side.appendChild(editPanel(it));
   if(it.inputs&&it.inputs.length){
     const d=el('details','fold'); d.open=true; const s2=el('summary'); s2.appendChild(el('span','','모델에 들어간 입력 · 마스크')); d.appendChild(s2);
     const g=el('div','inputs');

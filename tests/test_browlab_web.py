@@ -274,6 +274,41 @@ class WebServerTest(unittest.TestCase):
         status, body, _ = self.call("/api/settings", {"budget_usd": ""})
         self.assertIsNone(body["budget_usd"])
 
+    def test_08b_saving_an_edit_names_it_and_lists_it(self):
+        """An edited picture goes back into the gallery under a client name."""
+        import base64, io
+        from PIL import Image
+
+        self.login()
+        status, gal, _ = self.call("/api/gallery")
+        job_id = next(i["id"] for i in gal["items"] if i["kind"] == "calibrate")
+        buf = io.BytesIO(); Image.new("RGB", (40, 30), (200, 150, 120)).save(buf, "PNG")
+        png = base64.b64encode(buf.getvalue()).decode()
+
+        status, out, _ = self.call("/api/saves", {"job": job_id, "name": "  김하늘 ", "image": "data:image/png;base64," + png,
+                                                  "settings": {"overlay": 0.7, "brightness": 6}})
+        self.assertEqual(status, 200, out)
+        self.assertEqual(out["name"], "김하늘")                       # trimmed, kept as given
+
+        status, out2, _ = self.call("/api/saves", {"job": job_id, "name": "", "image": png, "settings": {}})
+        self.assertEqual(status, 200, out2)
+        self.assertEqual(out2["name"], f"회원_{out['index'] + 1}")    # blank names auto-number, and keep counting
+
+        status, gal, _ = self.call("/api/gallery")
+        saves = [i for i in gal["items"] if i.get("saved")]
+        self.assertEqual({i["label"] for i in saves}, {"김하늘", out2["name"]})
+        one = next(i for i in saves if i["label"] == "김하늘")
+        self.assertEqual(one["kind_ko"], "저장한 보정")
+        self.assertEqual(one["edit"], {"overlay": 0.7, "brightness": 6})   # the settings come back
+        status, raw, _ = self.call("/" + one["image"], raw=True)
+        self.assertEqual(status, 200)
+        with Image.open(io.BytesIO(raw)) as im:
+            self.assertEqual(im.size, (40, 30))                       # and the picture is really there
+
+        for bad in ({"job": "nope", "image": png}, {"job": job_id, "image": "not-base64!!"}, {"job": job_id, "image": ""}):
+            status, _, _ = self.call("/api/saves", bad)
+            self.assertEqual(status, 400, bad)
+
     def test_09_gallery_photo_from_and_delete(self):
         self.login()
         status, gal, _ = self.call("/api/gallery")
