@@ -348,8 +348,10 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         styles = _styles(p.get("styles")) or ["korean_natural", "straight", "soft_arch", "feathered"]
         color = _choice(p.get("color"), P.BROW_COLOR_CHOICES, "match_hair")
         height = _choice(p.get("height"), tuple(P.BROW_HEIGHTS), "keep")
-        argv += ["--styles", ",".join(styles), "--color", color, "--height", height]
+        intensity = _choice(p.get("intensity"), tuple(P.BROW_INTENSITIES), "natural")
+        argv += ["--styles", ",".join(styles), "--color", color, "--height", height, "--intensity", intensity]
         shown["height"] = height
+        shown["intensity"] = intensity
         shown.update(styles=styles, color=color)
         notes = _text(p.get("notes"), 600)
         if notes:
@@ -885,6 +887,7 @@ def presets_json(cfg: WebConfig) -> Dict[str, Any]:
         "brow_styles": [{"key": k, "ko": v.ko} for k, v in P.BROW_STYLES.items()],
         "brow_colors": [{"key": k, "ko": v["ko"]} for k, v in P.BROW_COLORS.items()],
         "brow_heights": [{"key": k, "ko": v["ko"]} for k, v in P.BROW_HEIGHTS.items()],
+        "brow_intensities": [{"key": k, "ko": v["ko"], "default": k == "natural"} for k, v in P.BROW_INTENSITIES.items()],
         "qualities": list(QUALITIES),
         "layouts": [{"key": "both", "ko": "얼굴 전체 + 눈썹 구역"}, {"key": "face", "ko": "얼굴 전체 1:1"}, {"key": "browzone", "ko": "눈썹 구역만 1:1"}],
         "sheets": [{"key": "both", "ko": "비교표 + 눈썹 구역 1:1"}, {"key": "grid", "ko": "비교표만"}, {"key": "browzone", "ko": "눈썹 구역 1:1만"}, {"key": "none", "ko": "시트 없음"}],

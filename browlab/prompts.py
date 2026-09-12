@@ -226,18 +226,21 @@ def build_restyle_prompt(
     color_key: str = "match_hair",
     *,
     height_key: str = "keep",
+    intensity_key: str = "natural",
     with_guide_image: bool = False,
     notes: str = "",
 ) -> str:
     style = P.BROW_STYLES[style_key]
     colour = P.BROW_COLORS[color_key]["prompt"]
     height = P.BROW_HEIGHTS[height_key]["prompt"]
+    intensity = P.BROW_INTENSITIES[intensity_key]["prompt"]
     inputs = "Input images: Image 1: edit target (the client's photo)"
     if with_guide_image:
         inputs += "; Image 2: region guide - the translucent red area marks the only region that may change"
     lines = [
         "Use case: identity-preserve",
-        "Asset type: eyebrow design preview for a brow tattoo / semi-permanent makeup consultation",
+        "Asset type: a candid photo of the same person a few months later, after their eyebrows were tidied up - "
+        "fully healed and settled, not a salon before/after photo and not a beauty advertisement",
         inputs,
         (
             f"Primary request: redraw ONLY the two eyebrows of the person in Image 1 in this style: {style.prompt}. "
@@ -248,6 +251,16 @@ def build_restyle_prompt(
             "in place. The lower edge of each new brow must follow the lower edge of the existing brow, and the gap "
             "between the upper eyelid and the brow must stay exactly as it is in the photo. Never move the brows up "
             "onto the forehead and never widen the eye-to-brow distance; the face must not look surprised or lifted."
+        ),
+        (
+            f"Density and opacity (most important after height): {intensity}. The eyebrow must read as hair growing "
+            "out of skin, never as a filled shape laid on top of it: draw separate individual hairs and leave bare "
+            "skin visible between them everywhere, most of all at the head, where the brow should fade out softly "
+            "rather than start at an edge. No outline, no stencil edge, no uniform block of colour, no flat silhouette. "
+            "The head is the lightest and sparsest part; density builds gradually through the arch and thins again at "
+            "the tail. Match the thickness, colour and softness of the hairs the person already has - if their own brow "
+            "hairs are fine and greying, the new ones are fine and greying too. Keep the skin, pores and stray hairs "
+            "of the brow area visible underneath."
         ),
         (
             "Eyebrow placement (horizontal only): the brow head starts on the vertical line rising from the outer edge "
@@ -262,9 +275,12 @@ def build_restyle_prompt(
             "retouching or smoothing; the result must look like the same photograph with new eyebrows"
         ),
         (
-            "Avoid: raising the brows higher on the forehead, widening the gap between the eye and the brow, a lifted "
-            "or surprised expression, changing eye shape or eyelids, adding makeup, smoothing or brightening skin, "
-            "cropping or re-framing, adding text or watermark"
+            "Avoid: a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
+            "skin showing through, brows darker than the person's own hair, a glossy freshly-tattooed look, a beauty "
+            "advertisement or filtered-selfie look, perfectly symmetrical machine-drawn edges, raising the brows higher "
+            "on the forehead, widening the gap between the eye and the brow, a lifted or surprised expression, changing "
+            "eye shape or eyelids, adding makeup, smoothing or brightening skin, cropping or re-framing, adding text "
+            "or watermark"
         ),
     ]
     if notes:

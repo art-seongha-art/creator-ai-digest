@@ -145,6 +145,35 @@ class PromptTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="sky")
 
+    def test_restyle_prompt_keeps_the_brows_from_going_opaque(self):
+        """Shape and hue alone leave the model free to paint a solid dark block."""
+        text = PR.build_restyle_prompt("korean_natural", "match_hair")
+        self.assertIn("Density and opacity", text)
+        self.assertIn("no darker than the person's own brow hair", text)     # the "natural" default
+        self.assertIn("leave bare skin visible between them", text)
+        self.assertIn("No outline, no stencil edge, no uniform block of colour", text)
+        for phrase in ("a solid opaque block of colour", "a hard painted or stencilled outline",
+                       "brows darker than the person's own hair", "a glossy freshly-tattooed look"):
+            self.assertIn(phrase, text)                                       # all in Avoid
+        self.assertNotIn("semi-permanent makeup consultation", text)          # invited the salon look
+        self.assertIn("fully healed and settled", text)
+        soft = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="soft")
+        bold = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="bold")
+        self.assertIn("barely noticeable", soft)
+        self.assertIn("one shade deeper", bold)
+        self.assertIn("never a solid shape", bold)                            # even "bold" stays hair, not fill
+        self.assertNotIn("barely noticeable", bold)
+        # the intensity block never displaces the height block
+        for t in (text, soft, bold):
+            self.assertIn("Eyebrow height (most important)", t)
+        with self.assertRaises(KeyError):
+            PR.build_restyle_prompt("korean_natural", intensity_key="very_dark")
+
+    def test_dense_style_prompts_do_not_ask_for_a_filled_shape(self):
+        self.assertIn("rather than a filled block", P.BROW_STYLES["bold_thick"].prompt)
+        self.assertIn("bare skin left between the strokes", P.BROW_STYLES["feathered"].prompt)
+        self.assertNotIn("dense", P.BROW_STYLES["bold_thick"].prompt)
+
     def test_spec_roundtrip(self):
         spec = PR.make_specs(1, seed=9)[0]
         d = spec.to_dict()

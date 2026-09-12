@@ -308,11 +308,11 @@ BROW_STYLES: Dict[str, BrowStyle] = {
     ),
     "bold_thick": BrowStyle(
         "bold_thick", "볼드/두꺼운 눈썹",
-        "thick, full, dense brows with well-defined edges and a strong natural shape",
+        "thicker and fuller than average, with a clear shape, but still drawn as separate hairs rather than a filled block",
     ),
     "feathered": BrowStyle(
         "feathered", "결눈썹(엠보/마이크로블레이딩)",
-        "feathered hair-stroke (microblading) brows: crisp individual fine hair strokes following natural growth direction, slightly fuller than natural, soft natural outline",
+        "feathered hair-stroke (microblading) brows: fine separate hair strokes following the natural growth direction, with bare skin left between the strokes and no outline at all",
     ),
     "ombre_powder": BrowStyle(
         "ombre_powder", "옴브레 파우더",
@@ -361,6 +361,35 @@ GENDER_CHOICES: List[str] = list(GENDERS) + ["random"]
 FACE_SHAPE_CHOICES: List[str] = list(FACE_SHAPES) + ["random"]
 BROW_CONDITION_CHOICES: List[str] = list(BROW_CONDITIONS) + ["random"]
 ETHNICITY_CHOICES: List[str] = list(ETHNICITIES) + ["random", "any"]
+# How strong the result looks. Image models default to a saturated "freshly
+# tattooed salon photo" look - a solid dark shape with a hard outline - because
+# nothing in a shape-and-colour prompt tells them how much skin should show
+# through. "natural" is the default and deliberately understated.
+BROW_INTENSITIES: Dict[str, Dict[str, str]] = {
+    "soft": {
+        "ko": "연하게",
+        "prompt": (
+            "very soft and sheer, clearly lighter than the person's own brow hair; skin shows through the whole brow, "
+            "head to tail; the result should be barely noticeable, as if the brows were just lightly tidied"
+        ),
+    },
+    "natural": {
+        "ko": "자연스럽게 (기본)",
+        "prompt": (
+            "soft and understated, no darker than the person's own brow hair and only slightly fuller; a stranger "
+            "should read it as this person's real eyebrows, not as a treatment"
+        ),
+    },
+    "bold": {
+        "ko": "진하게",
+        "prompt": (
+            "noticeably fuller and one shade deeper than the person's own brow hair, but still built from separate "
+            "hairs with skin visible between them, never a solid shape"
+        ),
+    },
+}
+
 BROW_STYLE_CHOICES: List[str] = list(BROW_STYLES)
 BROW_COLOR_CHOICES: List[str] = list(BROW_COLORS)
 BROW_HEIGHT_CHOICES: List[str] = list(BROW_HEIGHTS)
+BROW_INTENSITY_CHOICES: List[str] = list(BROW_INTENSITIES)

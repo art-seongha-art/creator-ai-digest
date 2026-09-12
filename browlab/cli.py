@@ -461,8 +461,10 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     colour_ko = P.BROW_COLORS[args.color]["ko"]
     for i, style in enumerate(styles, 1):
         st = P.BROW_STYLES[style]
-        prompt_codex = PR.build_restyle_prompt(style, args.color, height_key=args.height, with_guide_image=use_guide, notes=args.notes or "")
-        prompt_api = PR.build_restyle_prompt(style, args.color, height_key=args.height, with_guide_image=False, notes=args.notes or "")
+        prompt_codex = PR.build_restyle_prompt(style, args.color, height_key=args.height, intensity_key=args.intensity,
+                                               with_guide_image=use_guide, notes=args.notes or "")
+        prompt_api = PR.build_restyle_prompt(style, args.color, height_key=args.height, intensity_key=args.intensity,
+                                             with_guide_image=False, notes=args.notes or "")
         prompt = prompt_codex if backend.name == "codex" else prompt_api
         out_path = out_dir / f"{i:02d}_{style}_{args.color}.png"
         entry: Dict[str, Any] = {"style": style, "style_ko": st.ko, "prompt": prompt, "image": str(out_path)}
@@ -619,6 +621,7 @@ def cmd_presets(args: argparse.Namespace) -> int:
     table("눈썹 스타일 (restyle --styles)", [(k, v.ko) for k, v in P.BROW_STYLES.items()] + [("all", "전체"), ("random:N", "N개 무작위")])
     table("눈썹 색 (restyle --color)", [(k, v["ko"]) for k, v in P.BROW_COLORS.items()])
     table("눈썹 높이 (restyle --height)", [(k, v["ko"]) for k, v in P.BROW_HEIGHTS.items()])
+    table("눈썹 농도 (restyle --intensity)", [(k, v["ko"]) for k, v in P.BROW_INTENSITIES.items()])
     print()
     return 0
 
@@ -716,6 +719,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--color", choices=P.BROW_COLOR_CHOICES, default="match_hair")
     r.add_argument("--height", choices=P.BROW_HEIGHT_CHOICES, default="keep",
                    help="새 눈썹의 높이. keep: 원래 눈썹 높이 그대로(기본) / slight_up·slight_down: 2~3mm 만 올리거나 내림")
+    r.add_argument("--intensity", choices=P.BROW_INTENSITY_CHOICES, default="natural",
+                   help="눈썹 농도. natural: 자연스럽게(기본) / soft: 연하게 / bold: 진하게")
     r.add_argument("--notes", help="편집 프롬프트에 덧붙일 지시문")
     r.add_argument("--seed", type=int, help="random:N 스타일 선택 시드")
     r.add_argument("--out-dir", help="출력 폴더 (기본 output/browlab/restyle_<파일명>_<시각>)")
