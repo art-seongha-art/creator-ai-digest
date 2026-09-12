@@ -443,6 +443,23 @@ class FaceTileTests(unittest.TestCase):
         self.assertLess(moved.getpixel((30, 10))[0], 60)
         self.assertEqual(M.shift_image(img, 0, 0).mode, img.mode)
 
+    def test_by_default_the_model_brow_is_used_as_drawn(self):
+        """Overlaying the original brow stacks two brows wherever the new one is thinner."""
+        base = Image.new("RGB", (120, 120), (200, 170, 150))
+        ImageDraw.Draw(base).rectangle((20, 60, 100, 90), fill=(40, 30, 25))     # a tall original brow
+        edited = Image.new("RGB", (120, 120), (200, 170, 150))
+        ImageDraw.Draw(edited).rectangle((20, 60, 100, 74), fill=(40, 30, 25))   # the model drew it thinner
+        mask = Image.new("L", (120, 120), 0)
+        ImageDraw.Draw(mask).rectangle((10, 50, 110, 100), fill=255)
+
+        plain = M.composite_brows(base, edited, mask, feather_px=0)
+        self.assertGreater(plain.getpixel((60, 85))[0], 170)      # below the new brow: skin, as the model drew it
+        self.assertLess(plain.getpixel((60, 66))[0], 100)         # the new brow itself is there
+
+        overlaid = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True)
+        self.assertLess(overlaid.getpixel((60, 85))[0], 100)      # the old brow hangs on below: two brows
+        self.assertEqual(plain.getpixel((60, 20)), base.getpixel((60, 20)))   # outside the mask: untouched either way
+
     def test_keep_hair_never_loses_an_existing_brow_hair(self):
         """The real procedure adds pigment into the gaps; it cannot remove a hair."""
         base = Image.new("RGB", (80, 80), (200, 170, 150))       # skin

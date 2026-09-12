@@ -545,10 +545,10 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                         _log(hinfo["brow_align"])
                 tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
                 per_mm = (lm_edit.ipd_px or 1.0) / 63.0
-                near = None if args.no_keep_hair else args.near_mm * per_mm
-                tidy = None if (args.no_keep_hair or args.no_tidy) else args.tidy_mm * per_mm
+                near = args.near_mm * per_mm if args.keep_hair else None
+                tidy = args.tidy_mm * per_mm if (args.keep_hair and not args.no_tidy) else None
                 comp = M.composite_brows(edit_img, tile_result, mask, strength=args.blend,
-                                         keep_hair=not args.no_keep_hair, near_px=near, tidy_px=tidy)
+                                         keep_hair=args.keep_hair, near_px=near, tidy_px=tidy)
                 if box is not None:
                     final_img = M.paste_back(full, comp, box, mask)
                     final_lm = lm_full
@@ -757,8 +757,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
-    r.add_argument("--no-keep-hair", action="store_true",
-                   help="기존 눈썹 털을 살리지 않고 마스크 안을 통째로 교체 (기본은 살림: 털은 지워지지 않고 빈 곳에만 추가)")
+    r.add_argument("--keep-hair", action="store_true",
+                   help="기존 눈썹 털을 결과 위에 겹쳐서 보존. 모델이 더 얇게 그린 쪽에서 원본 눈썹이 삐져나와 두 줄로 보일 수 있음")
     r.add_argument("--no-tidy", action="store_true",
                    help="퍼진 잔털 정리를 하지 않고 기존 털을 전부 보존 (눈썹이 두꺼워질 수 있음)")
     r.add_argument("--tidy-mm", type=float, default=1.5,

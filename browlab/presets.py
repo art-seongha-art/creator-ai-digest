@@ -346,8 +346,11 @@ BROW_HEIGHTS: Dict[str, Dict[str, str]] = {
 }
 
 BROW_COLORS: Dict[str, Dict[str, str]] = {
-    "match_hair": {"ko": "머리색에 맞춤", "prompt": "a colour that naturally matches the person's hair and skin tone"},
-    "natural_black": {"ko": "내추럴 블랙", "prompt": "soft natural black-brown"},
+    "match_hair": {"ko": "머리색에 맞춤", "prompt": (
+            "a shade or two softer than the person's own hair, the way a real brow reads next to it - "
+            "never as dark as black hair, and never darker than the brow hairs already there"
+        )},
+    "natural_black": {"ko": "내추럴 블랙", "prompt": "soft natural black-brown, still lighter than black hair"},
     "dark_brown": {"ko": "다크 브라운", "prompt": "dark brown"},
     "medium_brown": {"ko": "미디엄 브라운", "prompt": "medium warm brown"},
     "ash_brown": {"ko": "애쉬 브라운", "prompt": "cool ash brown"},

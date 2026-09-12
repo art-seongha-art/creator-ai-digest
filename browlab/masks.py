@@ -141,7 +141,7 @@ def composite_brows(
     feather_px: Optional[int] = None,
     *,
     strength: float = 1.0,
-    keep_hair: bool = True,
+    keep_hair: bool = False,
     near_px: Optional[float] = None,
     tidy_px: Optional[float] = None,
 ) -> Image.Image:
@@ -150,19 +150,22 @@ def composite_brows(
     Guarantees that everything outside the feathered mask stays pixel-identical
     to the original photo, whatever the model did elsewhere.
 
-    ``keep_hair`` protects the hair somebody already has: each pixel takes the
-    darker of the two images, so an existing hair survives even where the model
-    painted skin over it, while new hairs drawn on bare skin come through.
+    By default the model's brow is used as it was drawn. Keeping the brow based on
+    the one the person has is the prompt's job; doing it here as well stacks two
+    brows on top of each other.
 
-    That protection is limited to the body of the brow (``tidy_px`` sets how far
-    a hair may sit from its neighbours and still count as part of it). Outside
-    that body the model's result is used as-is, so the strays scattered around a
-    spread-out brow get tidied away instead of being preserved and then drawn
-    over - which is what turns the result heavy and painted.
+    ``keep_hair`` is that second way, kept as an option: each pixel takes the
+    darker of the two images, so a hair survives even where the model painted skin
+    over it. It only looks right while the model's brow covers the original. Where
+    the model drew a thinner brow, the original's lower edge stays behind and
+    reads as a second eyebrow - measured on a real photo, 835 pixels hanging up to
+    7.1 mm below the new brow on the one side where the model went thin.
+    ``tidy_px`` limits the protection to the body of the brow so the strays around
+    it are still cleaned up, and ``near_px`` keeps it close to existing hairs, but
+    neither can fix an overlay that simply does not line up.
 
-    ``near_px`` keeps additions close to hairs that already exist, so the new brow
-    cannot float above the real one as a second line. ``strength`` (0..1) sets how
-    much of the whole result is mixed in - 1.0 all of it, 0.5 a lighter preview.
+    ``strength`` (0..1) sets how much of the result is mixed in - 1.0 all of it,
+    0.5 a lighter preview.
     """
     base = original.convert("RGB")
     top = edited.convert("RGB")

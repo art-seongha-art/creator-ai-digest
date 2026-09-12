@@ -367,9 +367,9 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         if near_mm is not None and abs(near_mm - 2.5) > 1e-6:
             argv += ["--near-mm", str(near_mm)]
             shown["near_mm"] = near_mm
-        if _bool(p.get("no_keep_hair")):
-            argv.append("--no-keep-hair")
-            shown["no_keep_hair"] = True
+        if _bool(p.get("keep_hair")):
+            argv.append("--keep-hair")
+            shown["keep_hair"] = True
         shown.update(styles=styles, color=color)
         notes = _text(p.get("notes"), 600)
         if notes:
