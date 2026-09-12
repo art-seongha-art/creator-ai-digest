@@ -48,6 +48,7 @@ def brow_region_mask(
     pad_down: float = 0.03,
     pad_tail: float = 0.13,
     pad_head: float = 0.04,
+    eye_gap: float = 0.05,
     protect_eyes: bool = True,
     shape: str = "brow",
 ) -> Image.Image:
@@ -65,6 +66,10 @@ def brow_region_mask(
     where a real adult brow is 50-55 mm, and a design usually lengthens the tail,
     so 2 mm of headroom there simply cut the tail off. Going wide sideways is
     safe - the brow cannot drift up the forehead along its own axis.
+
+    ``eye_gap`` is how much clear skin is left above the upper lid. It, not
+    ``pad_down``, is what actually limits the mask below the brow: the guard is a
+    horizontal line, so raising ``pad_down`` alone gains nothing.
 
     ``shape="box"`` is the older rounded bounding box. All paddings are
     fractions of the inter-pupillary distance.
@@ -105,7 +110,7 @@ def brow_region_mask(
                 layer = Image.fromarray((_dilate_x(a, left, right) * 255).astype(np.uint8))
                 draw = ImageDraw.Draw(layer)
         if protect_eyes:
-            limit = int(lid_y - 0.05 * ipd)
+            limit = int(lid_y - max(0.0, eye_gap) * ipd)
             if limit < lm.height:
                 draw.rectangle((0, max(0, limit), lm.width, lm.height), fill=0)
         mask = ImageChops.lighter(mask, layer)

@@ -426,27 +426,43 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         else:
             _log("랜드마크가 없어 얼굴 타일·마스크 없이 프롬프트만으로 편집합니다 (합성 단계 생략).")
 
-    mask: Optional[Image.Image] = None
-    mask_api_path: Optional[Path] = None
-    guide_path: Optional[Path] = None
+    # Two masks, because the mask is a hard boundary: the API can only change what is
+    # inside it. Keeping the person's own shape wants it tight against the brow, but
+    # asking for a different shape needs somewhere for that shape to go - measured on a
+    # real face the tight mask offers about 4 mm up and down, and a puppy tail or a high
+    # arch needs 4-6 mm of travel on its own.
+    masks: Dict[bool, Tuple[Image.Image, Path, Path]] = {}
+
+    def mask_for(roomy: bool) -> Optional[Tuple[Image.Image, Path, Path]]:
+        if lm_edit is None:
+            return None
+        if roomy not in masks:
+            tag = "shape" if roomy else "keep"
+            m = M.brow_region_mask(
+                lm_edit, pad_side=args.mask_side,
+                pad_up=args.shape_up if roomy else args.mask_up,
+                pad_down=args.shape_down if roomy else args.mask_down,
+                eye_gap=args.shape_eye_gap if roomy else 0.05,
+                pad_tail=args.mask_tail, pad_head=args.mask_head, shape=args.mask_shape)
+            m.save(out_dir / f"mask_{tag}.png")
+            api_path = out_dir / f"mask_api_{tag}.png"
+            M.api_mask_image(m).save(api_path, optimize=True)  # black RGB + alpha: alpha is all the API reads
+            guide = out_dir / f"mask_guide_{tag}.png"
+            M.guide_overlay(edit_img, m).save(guide)
+            masks[roomy] = (m, api_path, guide)
+            _log(f"눈썹 마스크({'모양 변경용, 위아래로 더 넓게' if roomy else '본인 모양 유지용, 눈썹에 밀착'}) "
+                 f"저장: mask_{tag}.png")
+        return masks[roomy]
+
     if lm_edit is not None:
-        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down,
-                                  pad_tail=args.mask_tail, pad_head=args.mask_head, shape=args.mask_shape)
-        mask.save(out_dir / "mask.png")
-        mask_api_path = out_dir / "mask_api.png"
-        M.api_mask_image(mask).save(mask_api_path, optimize=True)  # black RGB + alpha: tiny file, alpha is all the API reads
-        guide_path = out_dir / "mask_guide.png"
-        M.guide_overlay(edit_img, mask).save(guide_path)
-        _log(f"눈썹 마스크 저장: {out_dir / 'mask.png'} (API용 알파 마스크: {mask_api_path.name})")
+        mask_for(False)
         _log("편집 요청 방식 — API: 얼굴 타일 + 알파 마스크를 보내 마스크 안쪽만 다시 그리게 함 / "
              "Codex: 내장 도구에 마스크 인자가 없어 빨간 영역 가이드 이미지를 함께 첨부")
 
     rng = random.Random(args.seed)
     styles = _parse_styles(args.styles, rng)
     backend = _backend(args)
-    guide_ok = guide_path is not None and not args.no_guide_image
-    use_guide = backend.name in ("codex", "auto") and guide_ok
-    api_mask = mask_api_path if mask_api_path is not None and not args.no_mask else None
+    use_guide = backend.name in ("codex", "auto") and lm_edit is not None and not args.no_guide_image
     api_size = f"{edit_img.size[0]}x{edit_img.size[1]}"
     manifest: Dict[str, Any] = {
         "tool": f"browlab {__version__}",
@@ -466,6 +482,10 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     colour_ko = P.BROW_COLORS[args.color]["ko"]
     for i, style in enumerate(styles, 1):
         st = P.BROW_STYLES[style]
+        chosen = mask_for(style != "as_is")
+        mask = chosen[0] if chosen else None
+        api_mask = chosen[1] if (chosen and not args.no_mask) else None
+        guide_path = chosen[2] if chosen else None
         prompt_codex = PR.build_restyle_prompt(style, args.color, height_key=args.height, intensity_key=args.intensity,
                                                with_guide_image=use_guide, notes=args.notes or "")
         prompt_api = PR.build_restyle_prompt(style, args.color, height_key=args.height, intensity_key=args.intensity,
@@ -752,6 +772,12 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--mask-up", type=float, default=0.03,
                    help="눈썹 위 추가 여유. 둘레 여유와 합쳐 눈썹 위 약 4mm. 키우면 모델이 눈썹을 이마 쪽으로 올립니다")
     r.add_argument("--mask-down", type=float, default=0.03, help="눈썹 아래 추가 여유. 윗눈꺼풀 위에서 항상 잘립니다")
+    r.add_argument("--shape-up", type=float, default=0.10,
+                   help="모양을 바꾸는 스타일에서 눈썹 위 여유 (63mm 기준 ≈ 8mm). 아치를 올릴 자리")
+    r.add_argument("--shape-down", type=float, default=0.075,
+                   help="모양을 바꾸는 스타일에서 눈썹 아래 여유 (63mm 기준 ≈ 7mm). 꼬리를 내릴 자리")
+    r.add_argument("--shape-eye-gap", type=float, default=0.02,
+                   help="모양 변경 시 윗눈꺼풀 위로 남길 여백 (63mm 기준 ≈ 1.3mm). 눈썹 아래 여유를 실제로 정하는 값")
     r.add_argument("--mask-tail", type=float, default=0.13,
                    help="눈썹 꼬리 바깥 여유 (63mm 기준 ≈ 8mm). 꼬리를 늘리는 디자인이 잘리지 않게 함")
     r.add_argument("--mask-head", type=float, default=0.04, help="눈썹 앞머리 안쪽 여유 (63mm 기준 ≈ 2.5mm)")

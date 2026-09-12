@@ -48,8 +48,10 @@ INPUT_FILES = [
     ("00_original.png", "원본 사진"),
     ("00_face_tile.png", "모델에 보낸 얼굴 타일"),
     ("00_prepared.png", "모델에 보낸 사진"),
-    ("mask_guide.png", "마스크 (빨간 부분만 편집)"),
-    ("mask_api.png", "API 알파 마스크"),
+    ("mask_guide_keep.png", "마스크 · 본인 모양 유지 (빨간 부분만 편집)"),
+    ("mask_guide_shape.png", "마스크 · 모양 변경 (빨간 부분만 편집)"),
+    ("mask_api_keep.png", "API 알파 마스크 · 유지"),
+    ("mask_api_shape.png", "API 알파 마스크 · 모양 변경"),
 ]
 BROW_SHORT_KO = {"sparse": "모량 부족", "faint": "연함", "patchy": "군데군데 빔", "missing_tail": "꼬리 없음", "asymmetric": "비대칭",
                  "overplucked": "과도하게 뽑음", "undefined": "형태 불분명", "scar_gap": "흉터", "almost_none": "거의 없음",

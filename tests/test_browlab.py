@@ -640,6 +640,25 @@ class FaceTileTests(unittest.TestCase):
         self.assertLess(tidied.getpixel((123, 78))[0], 100)         # ...and the extended tail came through
         self.assertEqual(tidied.getpixel((70, 10)), base.getpixel((70, 10)))    # outside the mask: untouched
 
+    def test_a_shape_change_gets_room_the_tight_mask_does_not_give(self):
+        """The mask is a hard boundary: the model can only change what is inside it."""
+        lm = _pupil_landmarks()
+        keep = M.brow_region_mask(lm)
+        room = M.brow_region_mask(lm, pad_up=0.10, pad_down=0.075, eye_gap=0.02)
+        kb, rb = keep.getbbox(), room.getbbox()
+        self.assertLess(rb[1], kb[1])                       # opened upward, for an arch
+        self.assertGreater(rb[3], kb[3])                    # and downward, for a dropped tail
+        self.assertGreater(sum(1 for v in room.getdata() if v), sum(1 for v in keep.getdata() if v))
+        # the eyelid guard caps the bottom, so on a low-set brow pad_down alone buys
+        # nothing - measured on a real face, raising it moved the tail room 3.4 -> 3.5mm
+        wide = dict(pad_down=0.30)
+        tight_guard = M.brow_region_mask(lm, eye_gap=0.12, **wide).getbbox()[3]
+        loose_guard = M.brow_region_mask(lm, eye_gap=0.02, **wide).getbbox()[3]
+        self.assertLess(tight_guard, loose_guard)           # the guard, not pad_down, sets the floor
+        self.assertLess(loose_guard, lm.eye_top_y)
+        # the guard still never reaches the eye
+        self.assertLess(rb[3], lm.eye_top_y)
+
     def test_mask_opens_outward_for_the_tail_not_upward(self):
         """MediaPipe traces ~46mm where a brow is 50-55mm, and designs lengthen the tail."""
         lm = _pupil_landmarks()
@@ -1251,8 +1270,8 @@ class CliTests(unittest.TestCase):
             ])
             self.assertEqual(rc, 0, out)
             self.assertTrue((tmp / "r" / "00_original.png").exists())
-            self.assertTrue((tmp / "r" / "mask.png").exists())
-            self.assertTrue((tmp / "r" / "mask_api.png").exists())
+            self.assertTrue((tmp / "r" / "mask_keep.png").exists())
+            self.assertTrue((tmp / "r" / "mask_api_keep.png").exists())
             self.assertTrue((tmp / "r" / "01_straight_match_hair.prompt.txt").exists())
             manifest = json.loads((tmp / "r" / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["styles"], ["straight", "feathered"])
@@ -1396,7 +1415,7 @@ class CliTests(unittest.TestCase):
                 self.assertEqual(tile.size, (1024, 1536))
             first_call = (home / "args.txt").read_text().splitlines()[0]
             self.assertIn("00_face_tile.png", first_call)
-            self.assertIn("mask_guide.png", first_call)
+            self.assertIn("mask_guide_", first_call)
             manifest = json.loads((tmp / "r" / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["tile"]["size"], [1024, 1536])
             v = manifest["variants"][0]
