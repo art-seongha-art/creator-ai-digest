@@ -129,23 +129,26 @@ def _align_edit(
 
 
 def _brow_height_fix(
-    args: argparse.Namespace, aligned: Image.Image, lm_ref: L.FaceLandmarks,
+    args: argparse.Namespace, aligned: Image.Image, lm_ref: L.FaceLandmarks, reference: Image.Image,
 ) -> Tuple[Image.Image, Dict[str, Any]]:
     """Slide the edit vertically so the new brow sits at the original brow's height.
 
     Models lift brows onto the forehead even when the prompt forbids it, and the
     mask leaves room above for taller designs, so the lift survives compositing.
-    Measuring both brow baselines and shifting the edit fixes it geometrically.
+    The measurement is photometric - where the dark hair actually is in each
+    image - because MediaPipe's brow points fit a face model and hardly move when
+    the brow is redrawn somewhere else.
     """
     info: Dict[str, Any] = {}
-    ref = M.brow_baseline(lm_ref)
-    lm_new = _detect_plain(args, aligned)
-    new = M.brow_baseline(lm_new) if lm_new is not None else None
-    if ref is None or new is None:
-        info["brow_align"] = "편집 결과에서 눈썹을 찾지 못해 높이 보정 생략"
+    mask = M.brow_region_mask(lm_ref)
+    ref_span = M.hair_span(reference, mask)
+    new_span = M.hair_span(aligned, mask)
+    if ref_span is None or new_span is None:
+        info["brow_align"] = "눈썹 털을 찾지 못해 높이 보정 생략"
         return aligned, info
     ipd = lm_ref.ipd_px or 1.0
-    dy = ref - new
+    # line up the lower edges: that is the eye-to-brow gap the client actually sees
+    dy = ref_span[1] - new_span[1]
     limit = args.brow_align_max * ipd
     if abs(dy) < 0.02 * ipd:
         info["brow_shift_px"] = 0.0
@@ -530,7 +533,7 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                 else:
                     _log(str(info.get("note", "")))
                 if args.height == "keep" and not args.no_brow_align:
-                    aligned_img, hinfo = _brow_height_fix(args, aligned_img, lm_edit)
+                    aligned_img, hinfo = _brow_height_fix(args, aligned_img, lm_edit, edit_img)
                     entry.update(hinfo)
                     shift = hinfo.get("brow_shift_px")
                     if shift:
@@ -540,8 +543,9 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                     elif hinfo.get("brow_align"):
                         _log(hinfo["brow_align"])
                 tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
-                comp = M.composite_brows(edit_img, tile_result, mask,
-                                         strength=args.blend, keep_hair=not args.no_keep_hair)
+                near = None if args.no_keep_hair else args.near_mm / 63.0 * (lm_edit.ipd_px or 1.0)
+                comp = M.composite_brows(edit_img, tile_result, mask, strength=args.blend,
+                                         keep_hair=not args.no_keep_hair, near_px=near)
                 if box is not None:
                     final_img = M.paste_back(full, comp, box, mask)
                     final_lm = lm_full
@@ -749,6 +753,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
     r.add_argument("--no-keep-hair", action="store_true",
                    help="기존 눈썹 털을 살리지 않고 마스크 안을 통째로 교체 (기본은 살림: 털은 지워지지 않고 빈 곳에만 추가)")
+    r.add_argument("--near-mm", type=float, default=2.5,
+                   help="기존 눈썹 털에서 몇 mm 안쪽까지만 새 털을 허용할지 (0 이면 제한 없음). 눈썹이 두 개로 보이는 것을 막음")
     r.add_argument("--blend", type=float, default=1.0, metavar="0~1",
                    help="새로 추가되는 눈썹의 세기. 1.0=그대로(기본), 0.6=60%%만 얹어 더 연하게")
     r.add_argument("--sheet", choices=["none", "grid", "browzone", "both"], default="both", help="비교 시트 종류")

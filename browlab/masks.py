@@ -124,6 +124,7 @@ def composite_brows(
     *,
     strength: float = 1.0,
     keep_hair: bool = True,
+    near_px: Optional[float] = None,
 ) -> Image.Image:
     """Paste only the masked (eyebrow) region of ``edited`` onto ``original``.
 
@@ -150,6 +151,10 @@ def composite_brows(
         m = m.filter(ImageFilter.GaussianBlur(feather_px))
     if keep_hair:
         top = ImageChops.darker(top, base)
+        if near_px:
+            # additions only next to hairs that already exist, or the kept original
+            # brow and the model's higher one read as two eyebrows stacked up
+            m = hair_proximity(base, m, near_px)
     strength = max(0.0, min(1.0, strength))
     if strength < 1.0:
         m = m.point(lambda v: int(round(v * strength)))
@@ -399,6 +404,64 @@ def match_tone(
         field[weak] = (o - e)[valid].mean(axis=0)
     field = np.clip(field, -max_offset, max_offset)
     return Image.fromarray(np.clip(e + field, 0, 255).astype(np.uint8))
+
+
+def hair_weight(image: Image.Image, mask: Image.Image):
+    """Per-pixel 0..1 of how much darker than the surrounding skin a pixel is.
+
+    This is what the eyebrow actually *is* in the photo. MediaPipe's brow points
+    are an anatomical fit to a face model, not a trace of the visible hair, so
+    they barely move when a model redraws the brow somewhere else - measuring the
+    pigment is the only way to see where the new brow really landed.
+    """
+    import numpy as np
+
+    lum = np.asarray(image.convert("L"), np.float32)
+    m = np.asarray(mask.convert("L").resize(image.size) if mask.size != image.size else mask.convert("L"), np.float32) / 255.0
+    inside = m > 0.5
+    if not inside.any():
+        return np.zeros_like(lum)
+    skin = float(np.percentile(lum[inside], 75))
+    contrast = max(8.0, skin - float(np.percentile(lum[inside], 5)))
+    return np.clip((skin - lum) / contrast, 0.0, 1.0) * m
+
+
+def hair_span(image: Image.Image, mask: Image.Image, frac: float = 0.25) -> Optional[Tuple[float, float, float]]:
+    """``(top_row, bottom_row, weighted_centre)`` of the brow hair drawn inside ``mask``."""
+    import numpy as np
+
+    rows = hair_weight(image, mask).sum(axis=1)
+    total = float(rows.sum())
+    if total <= 0 or float(rows.max()) <= 0:
+        return None
+    keep = np.nonzero(rows >= rows.max() * frac)[0]
+    ys = np.arange(len(rows), dtype=np.float32)
+    return float(keep.min()), float(keep.max()), float((rows * ys).sum() / total)
+
+
+def hair_proximity(image: Image.Image, mask: Image.Image, grow_px: float, min_cover: float = 0.08) -> Image.Image:
+    """Mask of the brow hair in ``image``, grown by ``grow_px`` and feathered.
+
+    New pigment is only believable next to hairs that are already there; anything
+    further away reads as a second eyebrow floating above the real one. Returns
+    ``mask`` unchanged when there is almost no hair to anchor to (sparse brows),
+    since there is then nothing to sit beside.
+    """
+    import numpy as np
+
+    w = hair_weight(image, mask)
+    m = np.asarray(mask.convert("L"), np.float32) / 255.0
+    inside = m > 0.5
+    if not inside.any():
+        return mask
+    hair = w > 0.35
+    if float(hair[inside].mean()) < min_cover:
+        return mask
+    grow_px = max(1.0, grow_px)
+    solid = Image.fromarray((hair * 255).astype(np.uint8))
+    grown = solid.filter(ImageFilter.GaussianBlur(grow_px * 0.5)).point(lambda v: 255 if v > 20 else 0)
+    soft = grown.filter(ImageFilter.GaussianBlur(max(1.0, grow_px / 3.0)))
+    return ImageChops.darker(soft, mask.convert("L"))
 
 
 def shift_image(image: Image.Image, dx: float, dy: float) -> Image.Image:

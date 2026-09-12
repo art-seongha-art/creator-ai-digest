@@ -465,6 +465,38 @@ class FaceTileTests(unittest.TestCase):
         self.assertEqual(M.composite_brows(base, edited, mask, feather_px=0, strength=9).tobytes(),
                          M.composite_brows(base, edited, mask, feather_px=0, strength=1.0).tobytes())
 
+    def test_near_px_blocks_a_second_eyebrow_floating_above_the_real_one(self):
+        """Keeping the original hair only works if the addition lands on it, not above it."""
+        base = Image.new("RGB", (120, 120), (200, 170, 150))
+        ImageDraw.Draw(base).rectangle((20, 70, 100, 82), fill=(40, 30, 25))     # the real brow
+        edited = base.copy()
+        ImageDraw.Draw(edited).rectangle((20, 30, 100, 42), fill=(40, 30, 25))   # a second brow, 28px higher
+        ImageDraw.Draw(edited).rectangle((20, 64, 100, 70), fill=(40, 30, 25))   # ...and a little fill on the real one
+        mask = Image.new("L", (120, 120), 0)
+        ImageDraw.Draw(mask).rectangle((10, 20, 110, 95), fill=255)
+
+        loose = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True)
+        self.assertLess(loose.getpixel((60, 36))[0], 100)        # the floating brow comes through
+
+        tight = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True, near_px=6)
+        self.assertGreater(tight.getpixel((60, 36))[0], 170)     # ...and is rejected: too far from any real hair
+        self.assertLess(tight.getpixel((60, 66))[0], 110)        # the fill touching the real brow is kept
+        self.assertLess(tight.getpixel((60, 76))[0], 100)        # the real brow itself is untouched
+
+    def test_hair_proximity_gives_up_when_there_is_no_hair_to_sit_beside(self):
+        """Sparse brows have nothing to anchor to, so the limit must not block everything."""
+        mask = Image.new("L", (120, 120), 0)
+        ImageDraw.Draw(mask).rectangle((10, 20, 110, 95), fill=255)
+        bare = Image.new("RGB", (120, 120), (200, 170, 150))
+        self.assertIs(M.hair_proximity(bare, mask, 6), mask)                     # nothing there: mask unchanged
+        full = bare.copy()
+        ImageDraw.Draw(full).rectangle((20, 60, 100, 85), fill=(40, 30, 25))
+        limited = M.hair_proximity(full, mask, 6)
+        self.assertIsNot(limited, mask)
+        import numpy as np
+        self.assertLess(float(np.asarray(limited).sum()), float(np.asarray(mask).sum()))  # a real brow narrows it
+        self.assertEqual(limited.size, mask.size)
+
     def test_paste_back_only_changes_masked_area(self):
         full = Image.new("RGB", (800, 1200), (10, 20, 30))
         box = (100, 150, 500, 750)  # 400x600 -> tile 1024x1536
@@ -1222,40 +1254,53 @@ class CliTests(unittest.TestCase):
         import argparse
         from browlab import cli as C
 
-        args = argparse.Namespace(landmarks="auto", codex_bin="codex", landmark_model=None, no_download=True,
-                                  brow_align_max=0.35)
-        ref = _pupil_landmarks()                                   # brows around y=400, IPD 200
-        lifted = _pupil_landmarks()
-        lifted.right_brow = [(x, y - 60) for x, y in ref.right_brow]
-        lifted.left_brow = [(x, y - 60) for x, y in ref.left_brow]
-        img = Image.new("RGB", (800, 1200), "white")
-        ImageDraw.Draw(img).rectangle((250, 330, 550, 360), fill=(40, 30, 25))
-        saved = C._detect_plain
-        try:
-            C._detect_plain = lambda a, im, path=None: lifted
-            out, info = C._brow_height_fix(args, img, ref)
-            self.assertAlmostEqual(info["brow_shift_px"], 60, delta=1)   # down, by the amount it was lifted
-            self.assertGreater(info["brow_shift_ipd"], 0)
-            self.assertGreater(out.getpixel((400, 345))[0], 200)         # the bar left its lifted place
-            self.assertLess(out.getpixel((400, 405))[0], 120)            # ...and landed 60px lower, on the original line
-            # a huge jump is clamped, not applied blindly
-            far = _pupil_landmarks()
-            far.right_brow = [(x, y - 400) for x, y in ref.right_brow]
-            far.left_brow = [(x, y - 400) for x, y in ref.left_brow]
-            C._detect_plain = lambda a, im, path=None: far
-            _, info = C._brow_height_fix(args, img, ref)
-            self.assertAlmostEqual(info["brow_shift_px"], 0.35 * ref.ipd_px, delta=1)
-            # already in place: no shift at all
-            C._detect_plain = lambda a, im, path=None: ref
-            out, info = C._brow_height_fix(args, img, ref)
-            self.assertEqual(info["brow_shift_px"], 0.0)
-            # no face in the edit: say so instead of guessing
-            C._detect_plain = lambda a, im, path=None: None
-            out, info = C._brow_height_fix(args, img, ref)
-            self.assertIn("찾지 못해", info["brow_align"])
-            self.assertIs(out, img)
-        finally:
-            C._detect_plain = saved
+        lm = _pupil_landmarks()                                    # IPD 200; brow mask spans y 363..438
+        args = argparse.Namespace(brow_align_max=0.35)             # limit 70px
+
+        def face(brow_bottom):
+            """A pale face with a dark brow bar whose LOWER edge sits at ``brow_bottom``."""
+            im = Image.new("RGB", (800, 1200), (210, 180, 160))
+            ImageDraw.Draw(im).rectangle((250, brow_bottom - 25, 550, brow_bottom), fill=(40, 30, 25))
+            return im
+
+        ref_img = face(430)
+        out, info = C._brow_height_fix(args, face(390), lm, ref_img)   # drawn 40px too high
+        self.assertAlmostEqual(info["brow_shift_px"], 40, delta=3)     # down, by the amount it was lifted
+        self.assertGreater(info["brow_shift_ipd"], 0)
+        self.assertGreater(out.getpixel((400, 375))[0], 150)           # the bar left its lifted place
+        self.assertLess(out.getpixel((400, 420))[0], 120)              # ...and landed on the original line
+
+        # the shift is capped, so a bad measurement cannot drag the face around
+        tight = argparse.Namespace(brow_align_max=0.1)                 # limit 20px
+        _, info = C._brow_height_fix(tight, face(390), lm, ref_img)
+        self.assertAlmostEqual(info["brow_shift_px"], 20, delta=0.5)
+
+        # already in place: no shift at all
+        out, info = C._brow_height_fix(args, face(430), lm, ref_img)
+        self.assertEqual(info["brow_shift_px"], 0.0)
+
+        # nothing drawn in the brow band: say so instead of guessing
+        blank = Image.new("RGB", (800, 1200), (210, 180, 160))
+        out, info = C._brow_height_fix(args, blank, lm, blank)
+        self.assertIn("찾지 못해", info["brow_align"])
+        self.assertIs(out, blank)
+
+    def test_height_fix_follows_the_pigment_not_the_landmarks(self):
+        """MediaPipe's brow points fit a face model, so they hardly move when a brow is redrawn."""
+        lm = _pupil_landmarks()
+        mask = M.brow_region_mask(lm)
+        def bar(bottom):
+            im = Image.new("RGB", (800, 1200), (210, 180, 160))
+            ImageDraw.Draw(im).rectangle((250, bottom - 20, 550, bottom), fill=(40, 30, 25))
+            return im
+        top_h, bot_h, mid_h = M.hair_span(bar(390), mask)
+        top_l, bot_l, mid_l = M.hair_span(bar(430), mask)
+        self.assertAlmostEqual(bot_l - bot_h, 40, delta=3)          # the measurement follows the drawn bar
+        self.assertAlmostEqual(top_l - top_h, 40, delta=3)
+        # the weighted centre drifts (the brow-shaped mask is narrower at the bottom),
+        # which is why the height fix lines up lower edges rather than centres
+        self.assertAlmostEqual(mid_l - mid_h, 40, delta=6)
+        self.assertIsNone(M.hair_span(Image.new("RGB", (800, 1200), (210, 180, 160)), mask))
 
     def test_calibrate(self):
         with tempfile.TemporaryDirectory() as tmp:

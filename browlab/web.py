@@ -356,6 +356,10 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         if blend is not None and abs(blend - 1.0) > 1e-6:
             argv += ["--blend", str(blend)]
             shown["blend"] = blend
+        near_mm = _float_opt(p.get("near_mm"), 0, 12)
+        if near_mm is not None and abs(near_mm - 2.5) > 1e-6:
+            argv += ["--near-mm", str(near_mm)]
+            shown["near_mm"] = near_mm
         if _bool(p.get("no_keep_hair")):
             argv.append("--no-keep-hair")
             shown["no_keep_hair"] = True
