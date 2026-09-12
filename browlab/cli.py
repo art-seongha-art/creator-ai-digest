@@ -543,9 +543,11 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                     elif hinfo.get("brow_align"):
                         _log(hinfo["brow_align"])
                 tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
-                near = None if args.no_keep_hair else args.near_mm / 63.0 * (lm_edit.ipd_px or 1.0)
+                per_mm = (lm_edit.ipd_px or 1.0) / 63.0
+                near = None if args.no_keep_hair else args.near_mm * per_mm
+                tidy = None if (args.no_keep_hair or args.no_tidy) else args.tidy_mm * per_mm
                 comp = M.composite_brows(edit_img, tile_result, mask, strength=args.blend,
-                                         keep_hair=not args.no_keep_hair, near_px=near)
+                                         keep_hair=not args.no_keep_hair, near_px=near, tidy_px=tidy)
                 if box is not None:
                     final_img = M.paste_back(full, comp, box, mask)
                     final_lm = lm_full
@@ -753,6 +755,10 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
     r.add_argument("--no-keep-hair", action="store_true",
                    help="기존 눈썹 털을 살리지 않고 마스크 안을 통째로 교체 (기본은 살림: 털은 지워지지 않고 빈 곳에만 추가)")
+    r.add_argument("--no-tidy", action="store_true",
+                   help="퍼진 잔털 정리를 하지 않고 기존 털을 전부 보존 (눈썹이 두꺼워질 수 있음)")
+    r.add_argument("--tidy-mm", type=float, default=1.5,
+                   help="눈썹 몸통으로 볼 범위(mm). 이 안쪽 털은 보존, 바깥의 흩어진 잔털은 정리 대상")
     r.add_argument("--near-mm", type=float, default=2.5,
                    help="기존 눈썹 털에서 몇 mm 안쪽까지만 새 털을 허용할지 (0 이면 제한 없음). 눈썹이 두 개로 보이는 것을 막음")
     r.add_argument("--blend", type=float, default=1.0, metavar="0~1",

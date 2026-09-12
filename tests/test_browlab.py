@@ -133,7 +133,7 @@ class PromptTests(unittest.TestCase):
         text = PR.build_restyle_prompt("soft_arch", "dark_brown")
         self.assertIn("Eyebrow height (most important)", text)
         self.assertIn("keep the new brows at exactly the height of the existing ones", text)
-        self.assertIn("lower edge of each new brow must follow the lower edge of the existing brow", text)
+        self.assertIn("lower edge of each brow must stay on the lower edge of the existing brow", text)
         self.assertIn("gap between the upper eyelid and the brow must stay exactly as it is", text)
         self.assertIn("Never move the brows up", text)
         self.assertIn("raising the brows higher on the forehead", text)      # in Avoid
@@ -158,10 +158,15 @@ class PromptTests(unittest.TestCase):
         self.assertNotIn("semi-permanent makeup consultation", text)          # invited the salon look
         # the brow is corrected, not replaced: "redraw" told the model to start over
         self.assertNotIn("redraw ONLY the two eyebrows", text)
-        self.assertIn("KEEPS the eyebrows they already have", text)
-        self.assertIn("leave every existing hair exactly where it is", text)
-        self.assertIn("only add new hairs into the bare gaps", text)
-        self.assertIn("erasing, shaving, bleaching or covering the existing brow hairs", text)
+        self.assertIn("groom the eyebrows the person in Image 1 already has", text)
+        self.assertIn("keep the hairs that form the brow exactly where they are", text)
+        self.assertNotIn("redraw them", text)                      # nothing tells it to start over any more
+        self.assertIn("shaving off or covering the body of the brow", text)
+        # grooming, not pure addition: the strays get tidied away too
+        self.assertIn("stray hairs sitting above, below and beyond the brow line are plucked away", text)
+        self.assertIn("fill the thin and bare patches", text)
+        self.assertIn("extend the brow only where it is genuinely missing", text)
+        self.assertIn("thicker or heavier than the one in the photo", text)     # the "heavy makeup" failure
         self.assertIn("fully healed and settled", text)
         soft = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="soft")
         bold = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="bold")
@@ -482,6 +487,43 @@ class FaceTileTests(unittest.TestCase):
         self.assertGreater(tight.getpixel((60, 36))[0], 170)     # ...and is rejected: too far from any real hair
         self.assertLess(tight.getpixel((60, 66))[0], 110)        # the fill touching the real brow is kept
         self.assertLess(tight.getpixel((60, 76))[0], 100)        # the real brow itself is untouched
+
+    def test_tidy_removes_the_strays_but_keeps_the_brow_body(self):
+        """Grooming is not only additive: the scattered hairs get plucked away too."""
+        base = Image.new("RGB", (140, 140), (200, 170, 150))
+        d = ImageDraw.Draw(base)
+        d.rectangle((20, 70, 120, 86), fill=(40, 30, 25))          # the brow body
+        d.line((30, 40, 38, 46), fill=(40, 30, 25), width=2)       # a stray hair, 24px above it
+        d.line((95, 104, 103, 110), fill=(40, 30, 25), width=2)    # another below it
+        edited = Image.new("RGB", (140, 140), (200, 170, 150))     # the model: clean skin...
+        ImageDraw.Draw(edited).rectangle((20, 68, 125, 86), fill=(40, 30, 25))   # ...and a tidy brow
+        mask = Image.new("L", (140, 140), 0)
+        ImageDraw.Draw(mask).rectangle((10, 30, 130, 120), fill=255)
+
+        keep_all = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True)
+        self.assertLess(keep_all.getpixel((34, 43))[0], 110)        # every stray survives
+        self.assertLess(keep_all.getpixel((99, 107))[0], 110)
+
+        tidied = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True, tidy_px=4)
+        self.assertGreater(tidied.getpixel((34, 43))[0], 165)       # the strays are plucked
+        self.assertGreater(tidied.getpixel((99, 107))[0], 165)
+        self.assertLess(tidied.getpixel((70, 78))[0], 100)          # the brow body is still there
+        self.assertLess(tidied.getpixel((123, 78))[0], 100)         # ...and the extended tail came through
+        self.assertEqual(tidied.getpixel((70, 10)), base.getpixel((70, 10)))    # outside the mask: untouched
+
+    def test_brow_core_mask_separates_the_body_from_the_strays(self):
+        base = Image.new("RGB", (140, 140), (200, 170, 150))
+        d = ImageDraw.Draw(base)
+        d.rectangle((20, 70, 120, 86), fill=(40, 30, 25))
+        d.line((30, 40, 38, 46), fill=(40, 30, 25), width=2)
+        mask = Image.new("L", (140, 140), 0)
+        ImageDraw.Draw(mask).rectangle((10, 30, 130, 120), fill=255)
+        core = M.brow_core_mask(base, mask, 4)
+        self.assertGreater(core.getpixel((70, 78)), 200)            # the body is core
+        self.assertLess(core.getpixel((34, 43)), 60)                # an isolated stray is not
+        self.assertEqual(core.getpixel((70, 10)), 0)                # never outside the mask
+        bare = Image.new("RGB", (140, 140), (200, 170, 150))
+        self.assertIs(M.brow_core_mask(bare, mask, 4), mask)        # no hair at all: nothing to separate
 
     def test_hair_proximity_gives_up_when_there_is_no_hair_to_sit_beside(self):
         """Sparse brows have nothing to anchor to, so the limit must not block everything."""

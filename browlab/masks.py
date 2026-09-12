@@ -125,18 +125,26 @@ def composite_brows(
     strength: float = 1.0,
     keep_hair: bool = True,
     near_px: Optional[float] = None,
+    tidy_px: Optional[float] = None,
 ) -> Image.Image:
     """Paste only the masked (eyebrow) region of ``edited`` onto ``original``.
 
     Guarantees that everything outside the feathered mask stays pixel-identical
     to the original photo, whatever the model did elsewhere.
 
-    ``keep_hair`` makes the paste additive, which is what the real procedure is:
-    pigment goes into the gaps between the hairs somebody already has, it never
-    removes one. Each pixel takes the darker of the two images, so an existing
-    hair survives even where the model painted skin over it, while new hairs the
-    model drew on bare skin come through. ``strength`` (0..1) then sets how much
-    of that result is mixed in - 1.0 all of it, 0.5 a half-strength preview.
+    ``keep_hair`` protects the hair somebody already has: each pixel takes the
+    darker of the two images, so an existing hair survives even where the model
+    painted skin over it, while new hairs drawn on bare skin come through.
+
+    That protection is limited to the body of the brow (``tidy_px`` sets how far
+    a hair may sit from its neighbours and still count as part of it). Outside
+    that body the model's result is used as-is, so the strays scattered around a
+    spread-out brow get tidied away instead of being preserved and then drawn
+    over - which is what turns the result heavy and painted.
+
+    ``near_px`` keeps additions close to hairs that already exist, so the new brow
+    cannot float above the real one as a second line. ``strength`` (0..1) sets how
+    much of the whole result is mixed in - 1.0 all of it, 0.5 a lighter preview.
     """
     base = original.convert("RGB")
     top = edited.convert("RGB")
@@ -150,7 +158,13 @@ def composite_brows(
     if feather_px > 0:
         m = m.filter(ImageFilter.GaussianBlur(feather_px))
     if keep_hair:
-        top = ImageChops.darker(top, base)
+        kept = ImageChops.darker(top, base)
+        if tidy_px:
+            # protect the real hair only where the brow actually is; around it the
+            # model's cleaner skin wins, which is how strays get tidied away
+            top = Image.composite(kept, top, brow_core_mask(base, m, tidy_px))
+        else:
+            top = kept
         if near_px:
             # additions only next to hairs that already exist, or the kept original
             # brow and the model's higher one read as two eyebrows stacked up
@@ -462,6 +476,33 @@ def hair_proximity(image: Image.Image, mask: Image.Image, grow_px: float, min_co
     grown = solid.filter(ImageFilter.GaussianBlur(grow_px * 0.5)).point(lambda v: 255 if v > 20 else 0)
     soft = grown.filter(ImageFilter.GaussianBlur(max(1.0, grow_px / 3.0)))
     return ImageChops.darker(soft, mask.convert("L"))
+
+
+def brow_core_mask(image: Image.Image, mask: Image.Image, spread_px: float, frac: float = 0.35) -> Image.Image:
+    """The body of the brow, separated from the stray hairs scattered around it.
+
+    Brow work is not only additive: gaps get filled and the strays outside the
+    shape get tidied away. Keeping every hair makes that impossible and the brow
+    just grows thicker and heavier. Blurring the hair weight turns the dense brow
+    body into a high plateau while isolated strays stay low, so a threshold on
+    that density separates "the brow" from "hairs around the brow". Inside the
+    result the original hair is protected; outside it the model may clean up.
+    """
+    import numpy as np
+
+    w = hair_weight(image, mask)
+    if w.max() <= 0:
+        return mask
+    blurred = Image.fromarray((np.clip(w, 0, 1) * 255).astype(np.uint8)).filter(
+        ImageFilter.GaussianBlur(max(1.0, spread_px))
+    )
+    d = np.asarray(blurred, np.float32)
+    peak = float(d.max())
+    if peak <= 0:
+        return mask
+    core = Image.fromarray(((d >= peak * frac) * 255).astype(np.uint8))
+    core = core.filter(ImageFilter.GaussianBlur(max(1.0, spread_px * 0.5)))
+    return ImageChops.darker(core, mask.convert("L"))
 
 
 def shift_image(image: Image.Image, dx: float, dy: float) -> Image.Image:

@@ -469,6 +469,8 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
           <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
           <label class="field"><span>모델 (API)</span><select name="model" data-src="models"></select></label>
           <label class="field"><span>추가 세기 <em class="hint-inline">1 = 그대로, 낮출수록 연하게</em></span><input name="blend" type="number" step="0.1" min="0.2" max="1" placeholder="1.0"></label>
+          <label class="field"><span>잔털 정리 범위 mm <em class="hint-inline">눈썹 몸통으로 볼 폭</em></span><input name="tidy_mm" type="number" step="0.5" min="0.5" max="8" placeholder="1.5"></label>
+          <label class="chk wide"><input name="no_tidy" type="checkbox"> 퍼진 잔털을 정리하지 않고 전부 보존</label>
           <label class="field"><span>기존 털 근접 제한 mm <em class="hint-inline">0 = 제한 없음</em></span><input name="near_mm" type="number" step="0.5" min="0" max="12" placeholder="2.5"></label>
           <label class="chk wide"><input name="no_keep_hair" type="checkbox"> 기존 눈썹 털을 살리지 않고 통째로 교체</label>
           <label class="chk wide"><input name="no_composite" type="checkbox"> 합성 없이 편집 결과 그대로 (얼굴이 바뀌면 끄기)</label>

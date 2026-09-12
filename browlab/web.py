@@ -356,6 +356,13 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         if blend is not None and abs(blend - 1.0) > 1e-6:
             argv += ["--blend", str(blend)]
             shown["blend"] = blend
+        tidy_mm = _float_opt(p.get("tidy_mm"), 0.5, 8)
+        if tidy_mm is not None and abs(tidy_mm - 1.5) > 1e-6:
+            argv += ["--tidy-mm", str(tidy_mm)]
+            shown["tidy_mm"] = tidy_mm
+        if _bool(p.get("no_tidy")):
+            argv.append("--no-tidy")
+            shown["no_tidy"] = True
         near_mm = _float_opt(p.get("near_mm"), 0, 12)
         if near_mm is not None and abs(near_mm - 2.5) > 1e-6:
             argv += ["--near-mm", str(near_mm)]

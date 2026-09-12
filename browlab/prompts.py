@@ -243,16 +243,18 @@ def build_restyle_prompt(
         "fully healed and settled, not a salon before/after photo and not a beauty advertisement",
         inputs,
         (
-            "Primary request: the person in Image 1 KEEPS the eyebrows they already have. Do not erase, shave, cover "
-            "or replace them, and do not start a new brow shape on clean skin. Work on top of the brow that is there: "
-            "leave every existing hair exactly where it is, at its own length, direction and colour, and only add new "
-            f"hairs into the bare gaps and along the edges needed to bring that same brow towards this shape: "
-            f"{style.prompt}. Added hairs use this colour: {colour}. This is a correction of an existing eyebrow, not "
-            "a new eyebrow: if the original brow were removed from the result, what is left should look unfinished."
+            "Primary request: groom the eyebrows the person in Image 1 already has. This is a tidy-up of an existing "
+            "brow, not a new brow drawn on clean skin: keep the hairs that form the brow exactly where they are, at "
+            "their own length, direction and colour, fill the thin and bare patches between them, and extend the brow "
+            "only where it is genuinely missing (most often a short or absent tail). At the same time clean the brow "
+            "up: the scattered stray hairs sitting above, below and beyond the brow line are plucked away, leaving "
+            f"plain skin there. The result is that same brow, groomed towards this shape: {style.prompt}. Hairs that "
+            f"are filled in use this colour: {colour}. Someone who knows this person should not be able to say what "
+            "was done - only that the brows look tidy."
         ),
         (
-            f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - redraw them "
-            "in place. The lower edge of each new brow must follow the lower edge of the existing brow, and the gap "
+            f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - groom them "
+            "where they are. The lower edge of each brow must stay on the lower edge of the existing brow, and the gap "
             "between the upper eyelid and the brow must stay exactly as it is in the photo. Never move the brows up "
             "onto the forehead and never widen the eye-to-brow distance; the face must not look surprised or lifted."
         ),
@@ -263,8 +265,8 @@ def build_restyle_prompt(
             "rather than start at an edge. No outline, no stencil edge, no uniform block of colour, no flat silhouette. "
             "The head is the lightest and sparsest part; density builds gradually through the arch and thins again at "
             "the tail. Match the thickness, colour and softness of the hairs the person already has - if their own brow "
-            "hairs are fine and greying, the new ones are fine and greying too. Keep the skin, pores and stray hairs "
-            "of the brow area visible underneath."
+            "hairs are fine and greying, the new ones are fine and greying too. The skin and pores of the brow area "
+            "stay visible underneath."
         ),
         (
             "Eyebrow placement (horizontal only): the brow head starts on the vertical line rising from the outer edge "
@@ -276,11 +278,12 @@ def build_restyle_prompt(
         (
             "Constraints: change only the eyebrows; keep the face identity, skin texture, eyes, eyelids, nose, mouth, "
             "hair, pose, expression, lighting, background, framing and image size exactly unchanged; no other "
-            "retouching or smoothing; the result must look like the same photograph with new eyebrows"
+            "retouching or smoothing; the result must look like the same photograph on a day the brows happened to be tidy"
         ),
         (
-            "Avoid: erasing, shaving, bleaching or covering the existing brow hairs, replacing the brow with a new "
-            "shape that ignores where the hairs already grow, a brow that no longer overlaps the original one, "
+            "Avoid: shaving off or covering the body of the brow, replacing it with a new shape that ignores where "
+            "the hairs already grow, a brow that no longer overlaps the original one, a brow that is thicker or "
+            "heavier than the one in the photo, anything that reads as eyebrow makeup or pencil, "
             "a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
             "skin showing through, brows darker than the person's own hair, a glossy freshly-tattooed look, a beauty "
             "advertisement or filtered-selfie look, perfectly symmetrical machine-drawn edges, raising the brows higher "
