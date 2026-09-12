@@ -149,6 +149,45 @@ class PromptTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="sky")
 
+    # Every failure in this prompt so far has been the same one: a rule was added and the
+    # older sentence that contradicts it was left behind. The model then follows whichever
+    # is more concrete, and the new rule looks like it "does not work". This walks every
+    # style and fails if any prompt both demands and forbids the same thing.
+    CONTRADICTIONS = [
+        ("reshape vs freeze",
+         ["reshape the brows to", "The change must be clearly visible"],
+         ["Do not move it towards any other eyebrow shape", "changing the angle the brow runs at",
+          "moving the arch to a different place", "keep the hairs that form the brow exactly where they are",
+          "straightening a curved brow or curving a straight one"]),
+        ("visible vs unnoticeable",
+         ["The change must be clearly visible", "should see the new shape at once"],
+         ["should not be able to say what was done"]),
+        ("fuller vs never fuller",
+         ["thicken, lengthen and fill", "thicker and fuller than average"],
+         ["thicker or heavier than the one in the photo"]),
+        ("drop the tail vs never drop it",
+         ["tail clearly ends", "tail that drops"],
+         ["a tail that lifts above the head when the person's own tail does not"]),
+        ("use the design lines vs ignore them",
+         ["Place the new shape using the classic design lines"],
+         ["not a target to move it to", "the brow wins"]),
+        ("redraw vs keep",
+         ["redraw", "draw a new brow"],
+         ["keep the hairs that form the brow"]),
+        ("tidy the strays vs keep the strays",
+         ["stray hairs sitting above, below and beyond the brow line are plucked away"],
+         ["Keep the skin, pores and stray hairs"]),
+    ]
+
+    def test_no_style_prompt_argues_with_itself(self):
+        for key in P.BROW_STYLES:
+            text = PR.build_restyle_prompt(key, "match_hair")
+            for name, demands, forbids in self.CONTRADICTIONS:
+                asked = [d for d in demands if d in text]
+                banned = [f for f in forbids if f in text]
+                self.assertFalse(asked and banned,
+                                 f"{key}: {name} - asks for {asked[:1]} and forbids {banned[:1]}")
+
     def test_nothing_prescribes_a_v_shape_or_a_ruled_edge(self):
         """A design template told the model exactly where to put the arch and the tail."""
         keep = PR.build_restyle_prompt("as_is", "match_hair")
@@ -158,15 +197,17 @@ class PromptTests(unittest.TestCase):
         self.assertNotIn("outer corner of the eye", keep)
         # a named style may see them, but only as a check it is allowed to lose
         self.assertIn("outer edge of the iris", arch)
-        self.assertIn("not a target to move it to", arch)
-        self.assertIn("the brow wins", arch)
+        self.assertIn("Place the new shape using the classic design lines", arch)
+        self.assertIn("the shape wins", arch)          # even the design map yields to the chosen shape
         for t in (keep, arch):
             self.assertIn("Hair, not a drawn line", t)
             self.assertIn("never a clean curve or a straight ruled line", t)
             self.assertIn("Do not comb them all into one direction", t)
-            self.assertIn("a tail that lifts above the head when the person's own tail does not", t)
             self.assertIn("a sharp V or a peaked corner in place of a soft turn", t)
             self.assertIn("a stiff ruled or stencilled edge", t)
+        # a lifted tail is only wrong when the person did not ask for a new shape
+        self.assertIn("a tail that lifts above the head when the person's own tail does not", keep)
+        self.assertNotIn("a tail that lifts above the head", arch)
 
     def test_prompt_protects_the_shape_the_person_already_has(self):
         """A catalogue shape must not overrule the brow somebody grew."""
@@ -179,17 +220,22 @@ class PromptTests(unittest.TestCase):
         self.assertNotIn("nudge it gently towards", keep)
         self.assertNotIn(P.BROW_STYLES["soft_arch"].prompt, keep)     # no shape is named at all
 
+        # picking a style is a request to change the shape, so the freeze must lift
         arch = PR.build_restyle_prompt("soft_arch", "match_hair")
-        self.assertIn("nudge it gently towards this shape", arch)
+        self.assertIn("Shape (this is the request)", arch)
         self.assertIn(P.BROW_STYLES["soft_arch"].prompt, arch)
-        self.assertIn("only as far as the existing brow allows", arch)
-        self.assertIn("Holding the person's own shape beats reaching the target shape", arch)
-        self.assertIn("Shape (do not redesign)", arch)                # the guard applies to every style
+        self.assertIn("The change must be clearly visible", arch)
+        self.assertNotIn("Shape (do not redesign)", arch)
+        self.assertNotIn("keep the hairs that form the brow exactly where they are", arch)
         for phrase in ("moving the arch to a different place along the brow",
                        "changing the angle the brow runs at",
                        "straightening a curved brow or curving a straight one"):
-            self.assertIn(phrase, keep)
-            self.assertIn(phrase, arch)
+            self.assertIn(phrase, keep)                               # as_is freezes the shape
+            self.assertNotIn(phrase, arch)                            # a named style must not be frozen
+        # what holds either way: the brow stays on the same spot of the face
+        for t in (keep, arch):
+            self.assertIn("Eyebrow height (most important)", t)
+            self.assertIn("a brow that no longer overlaps the original one", t)
         self.assertEqual(list(P.BROW_STYLES)[0], "as_is")             # and it is the first, default choice
 
     def test_restyle_prompt_keeps_the_brows_from_going_opaque(self):
@@ -199,21 +245,23 @@ class PromptTests(unittest.TestCase):
         self.assertIn("no darker than the person's own brow hair", text)     # the "natural" default
         self.assertIn("leave bare skin visible between them", text)
         self.assertIn("No outline, no stencil edge, no uniform block of colour", text)
+        self.assertIn("thicker or heavier than the one in the photo",
+                      PR.build_restyle_prompt("as_is"))   # only as_is forbids going fuller
+        self.assertNotIn("thicker or heavier than the one in the photo", text)
         for phrase in ("a solid opaque block of colour", "a hard painted or stencilled outline",
                        "brows darker than the person's own hair", "a glossy freshly-tattooed look"):
             self.assertIn(phrase, text)                                       # all in Avoid
         self.assertNotIn("semi-permanent makeup consultation", text)          # invited the salon look
         # the brow is corrected, not replaced: "redraw" told the model to start over
         self.assertNotIn("redraw ONLY the two eyebrows", text)
-        self.assertIn("groom the eyebrows the person in Image 1 already has", text)
-        self.assertIn("keep the hairs that form the brow exactly where they are", text)
+        self.assertIn("groom and reshape the eyebrows the person in Image 1 already has", text)
         self.assertNotIn("redraw them", text)                      # nothing tells it to start over any more
         self.assertIn("shaving off or covering the body of the brow", text)
         # grooming, not pure addition: the strays get tidied away too
         self.assertIn("stray hairs sitting above, below and beyond the brow line are plucked away", text)
-        self.assertIn("fill the thin and bare patches", text)
-        self.assertIn("extend the brow only where it is genuinely missing", text)
-        self.assertIn("thicker or heavier than the one in the photo", text)     # the "heavy makeup" failure
+        keep_shape = PR.build_restyle_prompt("as_is", "match_hair")
+        self.assertIn("fill the thin and bare patches", keep_shape)
+        self.assertIn("extend the brow only where it is genuinely missing", keep_shape)
         self.assertIn("fully healed and settled", text)
         soft = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="soft")
         bold = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="bold")

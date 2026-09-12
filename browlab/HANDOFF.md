@@ -308,6 +308,22 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 - **검증 한계**: 이 헤드리스 크로미움은 다운로드 이벤트를 아예 발생시키지 않음(빈 페이지의 사소한 blob 다운로드도 NONE). 그래서 최종 클릭→다운로드는 여기서 확인 불가. 대신 **내려받을 바이트 자체**를 검증함.
 - 참고: 폰에서는 라이트박스가 full 모드라 **조정 패널이 "정보" 버튼 뒤에 있음**.
 
+### 3.2.25 스타일이 전혀 안 먹히던 이유 + 프롬프트 전수조사 (2026-09-12)
+
+- 연구자: "강아지상으로 해도 차이가 없다. 스타일 프롬프팅이 전혀 안 되는 것 같다."
+- **3.2.19~3.2.21 에서 과잉 교정함.** `as_is` 를 위해 만든 "모양 고정" 규칙을 **모든 스타일에 적용**해버림. 그래서 강아지상을 고르면 프롬프트가 이렇게 말하고 있었음:
+  - 요구: "tail that drops slightly below the head" (강아지상의 정의)
+  - 금지: "changing the angle the brow runs at", "moving the arch to a different place", "Holding the person's own shape beats reaching the target shape"
+  - → 모델이 아무것도 안 하는 게 **지시를 정확히 따른 결과**였음.
+- **조건부로 분리**: `as_is` 는 모양 고정 전체 유지. 이름 있는 스타일은 "Shape (**this is the request**): reshape the brows to {style}. 변화가 **분명히 보여야** 한다" 로 바뀌고, 고정 문구·Avoid 항목(아치 이동/각도 변경/굽음 펴기/꼬리 올림/두꺼워짐 금지)이 **전부 빠짐**. 두 경우 모두 유지되는 것: 눈썹 높이, 얼굴에서의 위치, 원본과 겹칠 것, 진짜 털일 것, 화장처럼 보이지 않을 것.
+- 전수조사에서 **추가로 3건 더** 발견(이름 있는 스타일 기준):
+  1. `Primary request` 가 여전히 "keep the hairs ... exactly where they are ... extend only where genuinely missing" → 조건부로 분리.
+  2. 내가 방금 넣은 "The change must be clearly visible" 과 기존 "Someone ... should not be able to say what was done" 이 **정면 충돌** → 후자를 as_is 전용으로.
+  3. `Hair, not a drawn line` 의 "설계선은 목표가 아니고 눈썹이 이긴다" → 이름 있는 스타일에서는 "설계선으로 새 모양을 배치하되, 고른 모양이 우선".
+  4. Avoid 의 "thicker or heavier than the one in the photo" 가 `bold_thick` 과 모든 리셰이프를 막고 있었음 → as_is 전용.
+- 모양 설명도 기하학적으로 **측정 가능하게** 다시 씀(일자: 위아래 가장자리가 수평 / 강아지상: 꼬리가 앞머리보다 **낮게** 끝나는 것이 핵심 / 하이아치: 정점이 앞머리보다 확연히 높음 / 각진아치: 직선 상승 → 꺾임 → 직선 하강 등).
+- **근본 원인과 재발 방지**: 지금까지의 프롬프트 실패가 전부 같은 종류였음 — **규칙을 추가하면서 그와 모순되는 옛 문장을 안 지움.** 모델은 둘 중 더 구체적인 쪽을 따르므로 새 규칙이 "안 먹히는" 것처럼 보임. `test_no_style_prompt_argues_with_itself` 추가: 스타일 13개 × 모순 쌍 7종을 돌며 **같은 프롬프트가 어떤 것을 요구하면서 동시에 금지하면 실패**시킴. 현재 13개 전부 충돌 0건.
+
 ### 3.3 Codex 백엔드가 실제로 실행하는 것
 
 ```bash

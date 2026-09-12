@@ -292,27 +292,33 @@ BROW_STYLES: Dict[str, BrowStyle] = {
     ),
     "straight": BrowStyle(
         "straight", "일자눈썹",
-        "straight flat brows with almost no arch, even thickness, softly squared head and a gently tapered tail",
+        "straight flat brows: the upper and lower edges run level from head to tail with no rise at all, even thickness "
+        "the whole way, a softly squared head and a gently tapered tail",
     ),
     "soft_arch": BrowStyle(
         "soft_arch", "부드러운 아치형",
-        "softly arched brows with a gentle, natural curve and a medium-thickness body",
+        "softly arched brows: one gentle continuous curve rising a little past the middle and easing down again, "
+        "medium-thickness body, no corner anywhere",
     ),
     "angled_arch": BrowStyle(
         "angled_arch", "각진 아치형",
-        "angled brows with a clearly defined arch peak about two-thirds along the brow and a straight tapered tail",
+        "angled brows: the upper edge climbs in a straight run to a clearly marked peak about two-thirds along, then "
+        "turns and falls in another straight run to a tapered tail",
     ),
     "rounded": BrowStyle(
         "rounded", "둥근형",
-        "softly rounded, curved brows with no sharp peak, following a smooth semicircular line",
+        "rounded brows: a smooth even semicircle from head to tail, the highest point right in the middle, no straight "
+        "sections and no corner",
     ),
     "high_arch": BrowStyle(
         "high_arch", "하이 아치",
-        "dramatic high-arched brows with a lifted peak and a slim tapered tail",
+        "high-arched brows: the peak sits noticeably higher than the head, clearly the tallest point of the brow, with a "
+        "short slim tail dropping away from it",
     ),
     "puppy": BrowStyle(
         "puppy", "처진 눈썹(강아지상)",
-        "gently downward-sloping brows with a soft rounded body and a tail that drops slightly below the head, youthful and friendly",
+        "puppy brows: the brow runs gently downhill from head to tail with no arch at all, and the tail clearly ends "
+        "LOWER than the head - that drop is the whole point of the shape - with a soft rounded body, youthful and friendly",
     ),
     "bold_thick": BrowStyle(
         "bold_thick", "볼드/두꺼운 눈썹",
@@ -332,7 +338,8 @@ BROW_STYLES: Dict[str, BrowStyle] = {
     ),
     "s_curve": BrowStyle(
         "s_curve", "S자형",
-        "S-curve brows with a subtle dip at the head, a soft rise to the arch and a gently descending tail",
+        "S-curve brows: the line dips slightly at the head, rises to a soft arch past the middle, then descends again, "
+        "so the edge reads as a shallow S rather than a single curve",
     ),
 }
 

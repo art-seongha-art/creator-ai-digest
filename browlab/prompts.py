@@ -243,28 +243,40 @@ def build_restyle_prompt(
         "fully healed and settled, not a salon before/after photo and not a beauty advertisement",
         inputs,
         (
-            "Primary request: groom the eyebrows the person in Image 1 already has. This is a tidy-up of an existing "
-            "brow, not a new brow drawn on clean skin: keep the hairs that form the brow exactly where they are, at "
-            "their own length, direction and colour, fill the thin and bare patches between them, and extend the brow "
-            "only where it is genuinely missing (most often a short or absent tail). At the same time clean the brow "
+            "Primary request: "
+            + (
+                "groom the eyebrows the person in Image 1 already has. This is a tidy-up of an existing brow, not a "
+                "new brow drawn on clean skin: keep the hairs that form the brow exactly where they are, at their own "
+                "length, direction and colour, fill the thin and bare patches between them, and extend the brow only "
+                "where it is genuinely missing (most often a short or absent tail). "
+                if style.key == "as_is"
+                else "groom and reshape the eyebrows the person in Image 1 already has. Build the new shape out of "
+                     "the brow that is there rather than on bare skin: fill, thicken and lengthen the existing hair "
+                     "to reach it. "
+            )
+            + "At the same time clean the brow "
             "up: the scattered stray hairs sitting above, below and beyond the brow line are plucked away, leaving "
             f"plain skin there. Hairs that are filled in use this colour: {colour}. Someone who knows this person "
-            "should not be able to say what was done - only that the brows look tidy."
+            + ("should not be able to say what was done - only that the brows look tidy."
+               if style.key == "as_is"
+               else "should see the new shape at once, and still see this person's own brow hair in it - groomed, "
+                    "not painted on.")
         ),
         (
             "Shape (do not redesign): the brow this person grew is the design. Keep where it begins and ends, where "
             "its arch sits and how high it rises, the angle it runs at, its length, how its thickness changes from "
             "head to tail, and the direction each hair grows. Nobody is plucking the brow out to draw a new one on "
             "bare skin, so the outline you finish with must be the outline that is already there, only evened out. "
-            + (
-                "Do not move it towards any other eyebrow shape at all."
-                if style.key == "as_is"
-                else f"Within that, nudge it gently towards this shape: {style.prompt} - only as far as the existing "
-                     "brow allows, and stop short whenever going further would mean moving the brow line, the arch or "
-                     "the angle rather than filling and tidying. Holding the person's own shape beats reaching the "
-                     "target shape."
-            )
-            + " Side by side it has to read as the same eyebrow, better kept, not a different one."
+            "Do not move it towards any other eyebrow shape at all. Side by side it has to read as the same eyebrow, "
+            "better kept, not a different one."
+            if style.key == "as_is"
+            else
+            f"Shape (this is the request): reshape the brows to {style.prompt}. The change must be clearly visible - "
+            "someone holding the two pictures side by side should be able to say what is different about the shape. "
+            "Work with the hair that is there: thicken, lengthen and fill to build the new outline, and take away only "
+            "the hairs that fall outside it. What does not change is where the brow sits on the face - the same inner "
+            "end above the same point, the same distance from the eye, the new brow still covering the old one - and "
+            "that it is built from real hair rather than pigment laid on skin."
         ),
         (
             f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - groom them "
@@ -291,10 +303,10 @@ def build_restyle_prompt(
             + (
                 ""
                 if style.key == "as_is"
-                else " The classic design lines - a head above the nostril, the arch on the line from the nostril past "
-                     "the outer edge of the iris, the tail on the line from the nostril past the outer corner of the "
-                     "eye - are a sanity check on the brow that is already there, not a target to move it to; where "
-                     "this person's brow does not match them, the brow wins."
+                else " Place the new shape using the classic design lines: a head above the outer edge of the "
+                     "nostril, the arch on the line from the nostril past the outer edge of the iris, the tail on the "
+                     "line from the nostril past the outer corner of the eye - unless the shape asked for says "
+                     "otherwise, in which case the shape wins."
             )
         ),
         (
@@ -303,13 +315,19 @@ def build_restyle_prompt(
             "retouching or smoothing; the result must look like the same photograph on a day the brows happened to be tidy"
         ),
         (
-            "Avoid: shaving off or covering the body of the brow, replacing it with a new shape that ignores where "
-            "the hairs already grow, moving the arch to a different place along the brow, changing the angle the "
-            "brow runs at, straightening a curved brow or curving a straight one, a tail that lifts above the head "
-            "when the person's own tail does not, a sharp V or a peaked corner in place of a soft turn, a stiff "
+            "Avoid: shaving off or covering the body of the brow, "
+            + (
+                "replacing it with a new shape that ignores where the hairs already grow, moving the arch to a "
+                "different place along the brow, changing the angle the brow runs at, straightening a curved brow "
+                "or curving a straight one, a tail that lifts above the head when the person's own tail does not, "
+                if style.key == "as_is"
+                else ""
+            )
+            + "a sharp V or a peaked corner in place of a soft turn, a stiff "
             "ruled or stencilled edge, making the two brows match each "
-            "other more than they already do, a brow that no longer overlaps the original one, a brow that is thicker or "
-            "heavier than the one in the photo, anything that reads as eyebrow makeup or pencil, "
+            "other more than they already do, a brow that no longer overlaps the original one, "
+            + ("a brow that is thicker or heavier than the one in the photo, " if style.key == "as_is" else "")
+            + "anything that reads as eyebrow makeup or pencil, "
             "a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
             "skin showing through, brows darker than the person's own hair, a glossy freshly-tattooed look, a beauty "
             "advertisement or filtered-selfie look, perfectly symmetrical machine-drawn edges, raising the brows higher "
