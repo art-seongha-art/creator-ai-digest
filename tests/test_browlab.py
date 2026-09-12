@@ -156,6 +156,12 @@ class PromptTests(unittest.TestCase):
                        "brows darker than the person's own hair", "a glossy freshly-tattooed look"):
             self.assertIn(phrase, text)                                       # all in Avoid
         self.assertNotIn("semi-permanent makeup consultation", text)          # invited the salon look
+        # the brow is corrected, not replaced: "redraw" told the model to start over
+        self.assertNotIn("redraw ONLY the two eyebrows", text)
+        self.assertIn("KEEPS the eyebrows they already have", text)
+        self.assertIn("leave every existing hair exactly where it is", text)
+        self.assertIn("only add new hairs into the bare gaps", text)
+        self.assertIn("erasing, shaving, bleaching or covering the existing brow hairs", text)
         self.assertIn("fully healed and settled", text)
         soft = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="soft")
         bold = PR.build_restyle_prompt("korean_natural", "match_hair", intensity_key="bold")
@@ -431,6 +437,33 @@ class FaceTileTests(unittest.TestCase):
         self.assertGreater(moved.getpixel((30, 22))[0], 200)
         self.assertLess(moved.getpixel((30, 10))[0], 60)
         self.assertEqual(M.shift_image(img, 0, 0).mode, img.mode)
+
+    def test_keep_hair_never_loses_an_existing_brow_hair(self):
+        """The real procedure adds pigment into the gaps; it cannot remove a hair."""
+        base = Image.new("RGB", (80, 80), (200, 170, 150))       # skin
+        ImageDraw.Draw(base).line([(10, 40), (70, 40)], fill=(40, 30, 25), width=5)   # an existing brow hair
+        edited = Image.new("RGB", (80, 80), (200, 170, 150))     # the model erased it...
+        ImageDraw.Draw(edited).line([(10, 55), (70, 55)], fill=(40, 30, 25), width=5)  # ...and drew its own lower down
+        mask = Image.new("L", (80, 80), 0)
+        ImageDraw.Draw(mask).rectangle((5, 25, 75, 70), fill=255)
+
+        replaced = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=False)
+        self.assertGreater(replaced.getpixel((40, 40))[0], 150)   # the original hair is gone
+        self.assertLess(replaced.getpixel((40, 55))[0], 90)       # the new one is there
+
+        kept = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True)
+        self.assertLess(kept.getpixel((40, 40))[0], 90)           # the original hair survived
+        self.assertLess(kept.getpixel((40, 55))[0], 90)           # ...and the new one still came through
+        self.assertEqual(kept.getpixel((40, 10)), base.getpixel((40, 10)))  # outside the mask: untouched
+
+        # strength dials the addition down without ever touching the original hair
+        half = M.composite_brows(base, edited, mask, feather_px=0, keep_hair=True, strength=0.5)
+        self.assertLess(half.getpixel((40, 40))[0], 90)           # existing hair stays fully dark
+        self.assertGreater(half.getpixel((40, 55))[0], kept.getpixel((40, 55))[0])   # the addition is lighter
+        self.assertLess(half.getpixel((40, 55))[0], base.getpixel((40, 55))[0])      # ...but still visible
+        # strength is clamped, not trusted
+        self.assertEqual(M.composite_brows(base, edited, mask, feather_px=0, strength=9).tobytes(),
+                         M.composite_brows(base, edited, mask, feather_px=0, strength=1.0).tobytes())
 
     def test_paste_back_only_changes_masked_area(self):
         full = Image.new("RGB", (800, 1200), (10, 20, 30))

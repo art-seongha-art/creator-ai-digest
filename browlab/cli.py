@@ -540,7 +540,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
                     elif hinfo.get("brow_align"):
                         _log(hinfo["brow_align"])
                 tile_result = aligned_img if args.no_tone_match else M.match_tone(aligned_img, edit_img, mask)
-                comp = M.composite_brows(edit_img, tile_result, mask)
+                comp = M.composite_brows(edit_img, tile_result, mask,
+                                         strength=args.blend, keep_hair=not args.no_keep_hair)
                 if box is not None:
                     final_img = M.paste_back(full, comp, box, mask)
                     final_lm = lm_full
@@ -746,6 +747,10 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
+    r.add_argument("--no-keep-hair", action="store_true",
+                   help="기존 눈썹 털을 살리지 않고 마스크 안을 통째로 교체 (기본은 살림: 털은 지워지지 않고 빈 곳에만 추가)")
+    r.add_argument("--blend", type=float, default=1.0, metavar="0~1",
+                   help="새로 추가되는 눈썹의 세기. 1.0=그대로(기본), 0.6=60%%만 얹어 더 연하게")
     r.add_argument("--sheet", choices=["none", "grid", "browzone", "both"], default="both", help="비교 시트 종류")
     r.add_argument("--pupils", help="수동 랜드마크: 동공 픽셀 좌표 x1,y1,x2,y2 (00_original.png 기준)")
     r.add_argument("--gender", choices=P.GENDER_CHOICES, default="random", help="IPD 기본값 선택용")

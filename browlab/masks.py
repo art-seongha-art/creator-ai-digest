@@ -116,11 +116,26 @@ def guide_overlay(image: Image.Image, mask: Image.Image, color=(255, 0, 0), alph
     return Image.composite(tint, base, m)
 
 
-def composite_brows(original: Image.Image, edited: Image.Image, mask: Image.Image, feather_px: Optional[int] = None) -> Image.Image:
+def composite_brows(
+    original: Image.Image,
+    edited: Image.Image,
+    mask: Image.Image,
+    feather_px: Optional[int] = None,
+    *,
+    strength: float = 1.0,
+    keep_hair: bool = True,
+) -> Image.Image:
     """Paste only the masked (eyebrow) region of ``edited`` onto ``original``.
 
     Guarantees that everything outside the feathered mask stays pixel-identical
     to the original photo, whatever the model did elsewhere.
+
+    ``keep_hair`` makes the paste additive, which is what the real procedure is:
+    pigment goes into the gaps between the hairs somebody already has, it never
+    removes one. Each pixel takes the darker of the two images, so an existing
+    hair survives even where the model painted skin over it, while new hairs the
+    model drew on bare skin come through. ``strength`` (0..1) then sets how much
+    of that result is mixed in - 1.0 all of it, 0.5 a half-strength preview.
     """
     base = original.convert("RGB")
     top = edited.convert("RGB")
@@ -133,6 +148,11 @@ def composite_brows(original: Image.Image, edited: Image.Image, mask: Image.Imag
         feather_px = feather_for(m)
     if feather_px > 0:
         m = m.filter(ImageFilter.GaussianBlur(feather_px))
+    if keep_hair:
+        top = ImageChops.darker(top, base)
+    strength = max(0.0, min(1.0, strength))
+    if strength < 1.0:
+        m = m.point(lambda v: int(round(v * strength)))
     return Image.composite(top, base, m)
 
 

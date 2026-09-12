@@ -352,6 +352,13 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         argv += ["--styles", ",".join(styles), "--color", color, "--height", height, "--intensity", intensity]
         shown["height"] = height
         shown["intensity"] = intensity
+        blend = _float_opt(p.get("blend"), 0.2, 1.0)
+        if blend is not None and abs(blend - 1.0) > 1e-6:
+            argv += ["--blend", str(blend)]
+            shown["blend"] = blend
+        if _bool(p.get("no_keep_hair")):
+            argv.append("--no-keep-hair")
+            shown["no_keep_hair"] = True
         shown.update(styles=styles, color=color)
         notes = _text(p.get("notes"), 600)
         if notes:

@@ -243,8 +243,12 @@ def build_restyle_prompt(
         "fully healed and settled, not a salon before/after photo and not a beauty advertisement",
         inputs,
         (
-            f"Primary request: redraw ONLY the two eyebrows of the person in Image 1 in this style: {style.prompt}. "
-            f"Eyebrow colour: {colour}."
+            "Primary request: the person in Image 1 KEEPS the eyebrows they already have. Do not erase, shave, cover "
+            "or replace them, and do not start a new brow shape on clean skin. Work on top of the brow that is there: "
+            "leave every existing hair exactly where it is, at its own length, direction and colour, and only add new "
+            f"hairs into the bare gaps and along the edges needed to bring that same brow towards this shape: "
+            f"{style.prompt}. Added hairs use this colour: {colour}. This is a correction of an existing eyebrow, not "
+            "a new eyebrow: if the original brow were removed from the result, what is left should look unfinished."
         ),
         (
             f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - redraw them "
@@ -275,7 +279,9 @@ def build_restyle_prompt(
             "retouching or smoothing; the result must look like the same photograph with new eyebrows"
         ),
         (
-            "Avoid: a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
+            "Avoid: erasing, shaving, bleaching or covering the existing brow hairs, replacing the brow with a new "
+            "shape that ignores where the hairs already grow, a brow that no longer overlaps the original one, "
+            "a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
             "skin showing through, brows darker than the person's own hair, a glossy freshly-tattooed look, a beauty "
             "advertisement or filtered-selfie look, perfectly symmetrical machine-drawn edges, raising the brows higher "
             "on the forehead, widening the gap between the eye and the brow, a lifted or surprised expression, changing "
