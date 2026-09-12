@@ -129,7 +129,8 @@ class WebServerTest(unittest.TestCase):
         self.assertTrue(me["authed"])
         status, presets, _ = self.call("/api/presets")
         self.assertEqual(status, 200)
-        self.assertEqual(len(presets["brow_styles"]), 12)
+        self.assertEqual(len(presets["brow_styles"]), 13)
+        self.assertEqual(presets["brow_styles"][0]["key"], "as_is")   # the default imposes no shape
         self.assertEqual([b["key"] for b in presets["backends"]], ["auto", "codex-only", "api", "manual"])
         self.assertFalse(next(b for b in presets["backends"] if b["key"] == "codex-only")["available"])  # fake codex binary
         self.assertEqual(presets["server"]["version"], W.__version__)

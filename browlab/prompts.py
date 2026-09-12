@@ -248,9 +248,23 @@ def build_restyle_prompt(
             "their own length, direction and colour, fill the thin and bare patches between them, and extend the brow "
             "only where it is genuinely missing (most often a short or absent tail). At the same time clean the brow "
             "up: the scattered stray hairs sitting above, below and beyond the brow line are plucked away, leaving "
-            f"plain skin there. The result is that same brow, groomed towards this shape: {style.prompt}. Hairs that "
-            f"are filled in use this colour: {colour}. Someone who knows this person should not be able to say what "
-            "was done - only that the brows look tidy."
+            f"plain skin there. Hairs that are filled in use this colour: {colour}. Someone who knows this person "
+            "should not be able to say what was done - only that the brows look tidy."
+        ),
+        (
+            "Shape (do not redesign): the brow this person grew is the design. Keep where it begins and ends, where "
+            "its arch sits and how high it rises, the angle it runs at, its length, how its thickness changes from "
+            "head to tail, and the direction each hair grows. Nobody is plucking the brow out to draw a new one on "
+            "bare skin, so the outline you finish with must be the outline that is already there, only evened out. "
+            + (
+                "Do not move it towards any other eyebrow shape at all."
+                if style.key == "as_is"
+                else f"Within that, nudge it gently towards this shape: {style.prompt} - only as far as the existing "
+                     "brow allows, and stop short whenever going further would mean moving the brow line, the arch or "
+                     "the angle rather than filling and tidying. Holding the person's own shape beats reaching the "
+                     "target shape."
+            )
+            + " Side by side it has to read as the same eyebrow, better kept, not a different one."
         ),
         (
             f"Eyebrow height (most important): {height}. The person's own eyebrows are visible in Image 1 - groom them "
@@ -282,7 +296,9 @@ def build_restyle_prompt(
         ),
         (
             "Avoid: shaving off or covering the body of the brow, replacing it with a new shape that ignores where "
-            "the hairs already grow, a brow that no longer overlaps the original one, a brow that is thicker or "
+            "the hairs already grow, moving the arch to a different place along the brow, changing the angle the "
+            "brow runs at, straightening a curved brow or curving a straight one, making the two brows match each "
+            "other more than they already do, a brow that no longer overlaps the original one, a brow that is thicker or "
             "heavier than the one in the photo, anything that reads as eyebrow makeup or pencil, "
             "a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "
             "skin showing through, brows darker than the person's own hair, a glossy freshly-tattooed look, a beauty "

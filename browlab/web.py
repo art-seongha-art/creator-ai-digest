@@ -345,7 +345,7 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         shown.update(s)
 
     elif kind == "restyle":
-        styles = _styles(p.get("styles")) or ["korean_natural"]
+        styles = _styles(p.get("styles")) or ["as_is"]
         color = _choice(p.get("color"), P.BROW_COLOR_CHOICES, "match_hair")
         height = _choice(p.get("height"), tuple(P.BROW_HEIGHTS), "keep")
         intensity = _choice(p.get("intensity"), tuple(P.BROW_INTENSITIES), "natural")

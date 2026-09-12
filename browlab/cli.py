@@ -723,7 +723,7 @@ def build_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("restyle", help="사진의 눈썹 부분만 검출해 여러 스타일로 다시 생성합니다",
                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     r.add_argument("image", help="얼굴 사진")
-    r.add_argument("--styles", default="korean_natural,straight,soft_arch,feathered",
+    r.add_argument("--styles", default="as_is",
                    help="쉼표로 구분한 스타일 키, all, random:N")
     r.add_argument("--color", choices=P.BROW_COLOR_CHOICES, default="match_hair")
     r.add_argument("--height", choices=P.BROW_HEIGHT_CHOICES, default="keep",

@@ -145,6 +145,30 @@ class PromptTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="sky")
 
+    def test_prompt_protects_the_shape_the_person_already_has(self):
+        """A catalogue shape must not overrule the brow somebody grew."""
+        keep = PR.build_restyle_prompt("as_is", "match_hair")
+        self.assertIn("Shape (do not redesign)", keep)
+        self.assertIn("the brow this person grew is the design", keep)
+        self.assertIn("where its arch sits", keep)
+        self.assertIn("the angle it runs at", keep)
+        self.assertIn("Do not move it towards any other eyebrow shape at all", keep)
+        self.assertNotIn("nudge it gently towards", keep)
+        self.assertNotIn(P.BROW_STYLES["soft_arch"].prompt, keep)     # no shape is named at all
+
+        arch = PR.build_restyle_prompt("soft_arch", "match_hair")
+        self.assertIn("nudge it gently towards this shape", arch)
+        self.assertIn(P.BROW_STYLES["soft_arch"].prompt, arch)
+        self.assertIn("only as far as the existing brow allows", arch)
+        self.assertIn("Holding the person's own shape beats reaching the target shape", arch)
+        self.assertIn("Shape (do not redesign)", arch)                # the guard applies to every style
+        for phrase in ("moving the arch to a different place along the brow",
+                       "changing the angle the brow runs at",
+                       "straightening a curved brow or curving a straight one"):
+            self.assertIn(phrase, keep)
+            self.assertIn(phrase, arch)
+        self.assertEqual(list(P.BROW_STYLES)[0], "as_is")             # and it is the first, default choice
+
     def test_restyle_prompt_keeps_the_brows_from_going_opaque(self):
         """Shape and hue alone leave the model free to paint a solid dark block."""
         text = PR.build_restyle_prompt("korean_natural", "match_hair")

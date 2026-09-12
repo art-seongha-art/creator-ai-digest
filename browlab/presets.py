@@ -278,6 +278,14 @@ class BrowStyle:
 
 
 BROW_STYLES: Dict[str, BrowStyle] = {
+    # The default imposes nothing: the brow the person grew is the design, and the
+    # work is filling and tidying it. Every other entry is a shape to move toward,
+    # and only as far as the existing brow allows.
+    "as_is": BrowStyle(
+        "as_is", "본인 눈썹 그대로 (기본)",
+        "this person's own eyebrow shape, kept exactly as it grows - its own line, arch position, angle, "
+        "length and the way its thickness changes from head to tail are the design, and none of them change",
+    ),
     "korean_natural": BrowStyle(
         "korean_natural", "자연 눈썹(기본형)",
         "natural Korean semi-permanent style: nearly straight with a very soft arch, medium thickness, tapered tail, natural hair density",
