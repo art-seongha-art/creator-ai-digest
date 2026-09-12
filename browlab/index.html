@@ -270,7 +270,6 @@ details.adv .body .wide{grid-column:1/-1}
 .lb-cmp canvas{display:block;max-width:100%;max-height:100%;border-radius:var(--r2);background:#fff;
   box-shadow:0 20px 60px -20px rgba(0,0,0,.7)}
 .lb-cmp.held .lb-div,.lb-cmp.held .tag-a{opacity:0}
-.lb-cmp.overlay .lb-div,.lb-cmp.overlay .tag-a,.lb-cmp.overlay .tag-b{opacity:0}
 .lb-div{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:rgba(255,255,255,.95);
   box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;touch-action:none;transition:opacity .12s}
 .lb-div i{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:999px;
@@ -305,10 +304,6 @@ details.adv .body .wide{grid-column:1/-1}
 .lb-count{position:absolute;top:12px;left:12px;height:26px;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.5);color:#fff;
   font-size:11.5px;font-weight:600;display:flex;align-items:center;font-variant-numeric:tabular-nums}
 .edit{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:var(--r3);background:var(--card)}
-.edit .seg{display:flex;gap:6px}
-.edit .seg button{flex:1;height:34px;border-radius:var(--r2);border:1px solid var(--line);background:transparent;
-  font-size:12.5px;font-weight:600;color:var(--muted)}
-.edit .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .edit .sl{display:grid;grid-template-columns:64px 1fr 46px;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
 .edit .sl input{width:100%;accent-color:var(--brand);height:22px}
 .edit .sl b{font-variant-numeric:tabular-nums;text-align:right;font-weight:600;color:var(--ink)}
@@ -635,7 +630,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <img class="after" id="lbAfter" alt="" hidden><img class="before" id="lbBefore" alt="" hidden>
         <span class="tag tag-b" id="lbTagB">원본</span><span class="tag tag-a" id="lbTagA">생성</span>
         <div class="lb-div" id="lbDiv"><i><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6"/><path d="M15 6l5 6-5 6"/></svg></i></div>
-        <span class="lb-hint">손잡이를 좌우로 끌어 비교 · 이미지를 누르고 있으면 원본</span>
+        <span class="lb-hint">손잡이를 끌어 비교 · 겹치기로 세기 조절 · 누르고 있으면 원본</span>
       </div>
       <span class="lb-count num" id="lbCount"></span>
       <button class="lb-nav prev" id="lbPrev" type="button" aria-label="이전"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -938,7 +933,7 @@ function renderGallery(){
 }
 
 /* ── lightbox: compare + adjust ──────────────────────────────────────── */
-const EDIT0={mode:'wipe', x:50, overlay:70, brightness:0, contrast:0, saturate:0, temp:0, fit:'contain'};
+const EDIT0={x:50, overlay:75, brightness:0, contrast:0, saturate:0, temp:0, fit:'contain'};
 let edit={...EDIT0}, editItem=null;
 const imgA=new Image(), imgB=new Image();   // after (result) / before (original)
 imgA.crossOrigin=imgB.crossOrigin='anonymous';
@@ -951,11 +946,10 @@ function paint(ctx,w,h,opts){
   ctx.save(); ctx.filter='none'; ctx.globalAlpha=1;
   ctx.clearRect(0,0,w,h);
   if(imgB.complete&&imgB.naturalWidth) put(imgB);
-  if(imgA.complete&&imgA.naturalWidth){
-    if(o.hold){ /* holding: show the original only */ }
-    else if(o.mode==='overlay'){ ctx.globalAlpha=o.overlay/100; put(imgA); }
-    else { const cut=Math.round(w*o.x/100);
-      ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(imgA); ctx.restore(); }
+  if(imgA.complete&&imgA.naturalWidth&&!o.hold){
+    const cut=Math.round(w*o.x/100);
+    ctx.globalAlpha=Math.max(0,Math.min(1,o.overlay/100));
+    ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(imgA); ctx.restore();
   }
   ctx.restore();
 }
@@ -1014,7 +1008,7 @@ function showCompare(it){
   $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기';
   const hint=c.querySelector('.lb-hint');
   hint.style.animation='none'; void hint.offsetWidth; hint.style.animation='';   // replay the fade
-  c.classList.remove('held'); c.classList.toggle('overlay', edit.mode==='overlay');
+  c.classList.remove('held');
   c.style.setProperty('--x',edit.x+'%');
   $('#lbTagB').textContent=it.compare.before_label||'원본';
   $('#lbTagA').textContent=it.compare.after_label||'생성';
@@ -1063,23 +1057,15 @@ const SLIDERS=[['overlay','겹치기',0,100,1],['brightness','밝기',-60,60,1],
                ['saturate','채도',-80,80,1],['temp','색온도',-60,60,1]];
 function editPanel(it){
   const wrap=el('div','edit');
-  const seg=el('div','seg');
-  [['wipe','좌우 비교'],['overlay','겹치기']].forEach(([k,ko])=>{
-    const b=el('button','',ko); b.type='button'; if(edit.mode===k) b.classList.add('on');
-    b.onclick=()=>{ edit.mode=k; cmpEl().classList.toggle('overlay',k==='overlay');
-      $$('.edit .seg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-      wrap.querySelector('[data-sl=overlay]').hidden = k!=='overlay'; renderCmp(); };
-    seg.appendChild(b); });
-  wrap.appendChild(seg);
   SLIDERS.forEach(([key,ko,lo,hi])=>{
-    const row=el('label','sl'); row.dataset.sl=key; if(key==='overlay') row.hidden = edit.mode!=='overlay';
+    const row=el('label','sl'); row.dataset.sl=key;
     row.appendChild(el('span','',ko));
     const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=edit[key];
     const out=el('b','',String(edit[key]));
     r.addEventListener('input',()=>{ edit[key]=+r.value; out.textContent=r.value; renderCmp(); });
     row.appendChild(r); row.appendChild(out); wrap.appendChild(row); });
   const reset=el('button','btn','조정 초기화'); reset.type='button';
-  reset.onclick=()=>{ const m=edit.mode, x=edit.x; edit={...EDIT0, mode:m, x};
+  reset.onclick=()=>{ const x=edit.x; edit={...EDIT0, x};
     cmpEl().style.setProperty('--x',x+'%'); renderLb(); };
   const row=el('div','row');
   const name=document.createElement('input'); name.type='text'; name.placeholder='회원명 (비우면 자동)'; name.id='saveName';
