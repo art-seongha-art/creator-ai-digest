@@ -227,7 +227,9 @@ details.adv .body .wide{grid-column:1/-1}
   text-align:left;position:relative;box-shadow:var(--sh1);transition:transform .13s,box-shadow .13s,border-color .13s}
 .gcard:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--hair)}
 .gcard .thumb{aspect-ratio:3/4;background:var(--panel-3);position:relative;overflow:hidden}
-.gcard .thumb img.under{position:absolute;inset:0}
+.gcard .thumb .blend{position:absolute;inset:0}
+.gcard .thumb .blend img{position:absolute;inset:0}
+.gcard .thumb .blend .warm{position:absolute;inset:0;mix-blend-mode:soft-light;pointer-events:none}
 .gcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .gcard .thumb .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
   padding:12px;text-align:center;color:var(--muted);font-size:12px}
@@ -919,13 +921,21 @@ function renderGallery(){
     const c=el('button','gcard'); c.type='button'; c.onclick=()=>openLb(items.indexOf(it));
     const th=el('div','thumb');
     if(it.image){
-      // stack the original under the result at the same strength the viewer opens with,
-      // so a card already shows what the treatment actually changes
-      if(it.compare&&!it.saved){ const under=document.createElement('img'); under.loading='lazy';
-        under.src=it.compare.before+'?w=480'; under.alt=''; under.className='under'; th.appendChild(under); }
+      // the card shows exactly what the viewer would: the original underneath, the
+      // result over it at this item's own 겹치기 strength, with its adjustments applied
+      const e={...EDIT0, ...(it.edit||{})}, pair=it.compare&&!it.saved;
+      const blend=el('div','blend');
+      if(pair){ const under=document.createElement('img'); under.loading='lazy';
+        under.src=it.compare.before+'?w=480'; under.alt=''; blend.appendChild(under); }
       const im=document.createElement('img'); im.loading='lazy'; im.src=it.image+'?w=480'; im.alt=it.label||'';
-      if(it.compare&&!it.saved) im.style.opacity=(EDIT0.overlay/100).toFixed(2);
-      th.appendChild(im); }
+      if(pair) im.style.opacity=(Math.max(0,Math.min(100,e.overlay))/100).toFixed(2);
+      blend.appendChild(im);
+      if(pair){
+        blend.style.filter=cssFilter(e);
+        if(e.temp){ const wash=el('i','warm'); wash.style.background=e.temp>0?'#ff9a3c':'#3ca0ff';
+          wash.style.opacity=Math.min(.5,Math.abs(e.temp)/100*.55).toFixed(3); blend.appendChild(wash); }
+      }
+      th.appendChild(blend); }
     else {
       const ph=el('div','ph');
       if(it.status==='running'||it.status==='queued'){ ph.appendChild(el('div','spinner')); th.appendChild(el('div','shimmer')); }
@@ -960,6 +970,10 @@ function paint(ctx,w,h,opts){
     ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(imgA); ctx.restore();
   }
   ctx.restore();
+}
+function cssFilter(o){
+  const b=1+o.brightness/100, c=1+o.contrast/100, sat=1+o.saturate/100;
+  return (b===1&&c===1&&sat===1) ? 'none' : `brightness(${b}) contrast(${c}) saturate(${sat})`;
 }
 function adjust(ctx,w,h,opts){
   const o=opts||edit;
@@ -1003,7 +1017,8 @@ function fullCanvas(){
   cv.width=imgA.naturalWidth; cv.height=imgA.naturalHeight;
   const keep=drawRect; drawRect={x:0,y:0,w:cv.width,h:cv.height};   // saves are never cropped
   const ctx=cv.getContext('2d');
-  paint(ctx,cv.width,cv.height); adjust(ctx,cv.width,cv.height);
+  const out={...edit, x:0, hold:false};   // ...and never split: the handle is a way to look, not part of the picture
+  paint(ctx,cv.width,cv.height,out); adjust(ctx,cv.width,cv.height,out);
   drawRect=keep;
   return cv;
 }
@@ -1061,6 +1076,37 @@ function showCompare(it){
   addEventListener('resize',()=>{ if(!c.hidden) renderCmp(); });
 })();
 
+let saveTimer=null;
+function rememberEdit(it){
+  if(!it||!it.image_name||it.saved) return;
+  const note=$('#editNote'); if(note) note.textContent='저장 중…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const {x, hold, ...keepable}=edit;              // the handle position is a way to look, not a setting
+    try{ await post('api/edits',{job:it.id, image:it.image_name, settings:keepable});
+      it.edit={...keepable};                        // so the card redraws with them
+      if(note) note.textContent='자동 저장됨';
+      renderGallery();
+    }catch(e){ if(note) note.textContent='저장 실패: '+e.message; }
+  }, 500);
+}
+function downloadCanvas(it){
+  // toDataURL is synchronous on purpose: a download started from toBlob's callback
+  // has lost the click's user activation and the browser drops it silently
+  const stamp=new Date().toISOString().slice(0,10);
+  const safe=(it.label||'browlab').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,40)||'browlab';
+  const data=fullCanvas().toDataURL('image/png');
+  const bin=atob(data.slice(data.indexOf(',')+1));
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/png'}));
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`${safe}_${stamp}.png`;
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('이미지를 내려받았습니다','good');
+}
 const SLIDERS=[['overlay','겹치기',0,100,1],['brightness','밝기',-60,60,1],['contrast','대비',-60,60,1],
                ['saturate','채도',-80,80,1],['temp','색온도',-60,60,1]];
 function editPanel(it){
@@ -1070,11 +1116,15 @@ function editPanel(it){
     row.appendChild(el('span','',ko));
     const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=edit[key];
     const out=el('b','',String(edit[key]));
-    r.addEventListener('input',()=>{ edit[key]=+r.value; out.textContent=r.value; renderCmp(); });
+    r.addEventListener('input',()=>{ edit[key]=+r.value; out.textContent=r.value; renderCmp(); rememberEdit(it); });
     row.appendChild(r); row.appendChild(out); wrap.appendChild(row); });
   const reset=el('button','btn','조정 초기화'); reset.type='button';
-  reset.onclick=()=>{ const x=edit.x; edit={...EDIT0, x};
+  reset.onclick=()=>{ const x=edit.x; edit={...EDIT0, x}; rememberEdit(it);
     cmpEl().style.setProperty('--x',x+'%'); renderLb(); };
+  const acts2=el('div','row');
+  const dl=el('button','btn','이미지 내려받기'); dl.type='button'; dl.onclick=()=>downloadCanvas(it);
+  const note=el('span','msg'); note.id='editNote'; note.textContent=it.edit?'자동 저장됨':'';
+  acts2.appendChild(dl); acts2.appendChild(note);
   const row=el('div','row');
   const name=document.createElement('input'); name.type='text'; name.placeholder='회원명 (비우면 자동)'; name.id='saveName';
   const save=el('button','btn dark','갤러리에 저장'); save.type='button';
@@ -1086,7 +1136,7 @@ function editPanel(it){
     }catch(e){ toast(e.message,'bad'); }
     save.textContent=old; save.disabled=false; };
   row.appendChild(name); row.appendChild(save);
-  wrap.appendChild(reset); wrap.appendChild(row);
+  wrap.appendChild(reset); wrap.appendChild(acts2); wrap.appendChild(row);
   return wrap;
 }
 

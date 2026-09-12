@@ -310,6 +310,35 @@ class WebServerTest(unittest.TestCase):
             status, _, _ = self.call("/api/saves", bad)
             self.assertEqual(status, 400, bad)
 
+    def test_08c_adjustments_are_remembered_per_image(self):
+        """Moving a slider must survive closing the viewer, without making a gallery entry."""
+        self.login()
+        status, gal, _ = self.call("/api/gallery")
+        cal = next(i for i in gal["items"] if i["kind"] == "calibrate" and i["image_name"])
+        job_id, name = cal["id"], cal["image_name"]
+        self.assertIsNone(cal.get("edit"))
+
+        status, out, _ = self.call("/api/edits", {"job": job_id, "image": name,
+                                                  "settings": {"overlay": 40, "brightness": 25, "bad": {"x": 1}}})
+        self.assertEqual(status, 200, out)
+        self.assertEqual(out, {"overlay": 40, "brightness": 25})       # nested junk is dropped
+
+        status, gal, _ = self.call("/api/gallery")
+        again = next(i for i in gal["items"] if i["id"] == job_id and i["image_name"] == name)
+        self.assertEqual(again["edit"], {"overlay": 40, "brightness": 25})
+        self.assertFalse(again.get("saved"))          # remembering is not the same as saving a copy
+
+        # a second image in the same job keeps its own settings
+        self.call("/api/edits", {"job": job_id, "image": "other.png", "settings": {"overlay": 90}})
+        status, gal, _ = self.call("/api/gallery")
+        again = next(i for i in gal["items"] if i["id"] == job_id and i["image_name"] == name)
+        self.assertEqual(again["edit"]["overlay"], 40)                 # untouched by the other image
+
+        for bad in ({"job": "nope", "image": name, "settings": {}}, {"job": job_id, "image": "", "settings": {}},
+                    {"job": job_id, "image": name, "settings": "no"}):
+            status, _, _ = self.call("/api/edits", bad)
+            self.assertEqual(status, 400, bad)
+
     def test_09_gallery_photo_from_and_delete(self):
         self.login()
         status, gal, _ = self.call("/api/gallery")

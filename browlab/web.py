@@ -575,8 +575,11 @@ class JobStore:
                     "pdfs": [{"label": lab, "url": url(n)} for n, lab in pdfs if n in files],
                 })
                 item.update(extra)
+                if image and image in edits and "edit" not in extra:
+                    item["edit"] = edits[image]
                 items.append(item)
 
+            edits = self.get_edits(job.id)
             before = len(items)
             if job.kind == "generate":
                 for face in manifest.get("faces", []):
@@ -805,6 +808,36 @@ class JobStore:
                 "settings": settings if isinstance(settings, dict) else {}}
         (folder / f"{stem}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
         return {"name": label, "index": index, "url": f"files/{job_id}/saves/{stem}.png"}
+
+    # -- per-image adjustments, kept as you move the sliders -------------------
+    def edits_path(self, job_id: str) -> Path:
+        return self.job_dir(job_id) / "edits.json"
+
+    def get_edits(self, job_id: str) -> Dict[str, Any]:
+        try:
+            data = json.loads(self.edits_path(job_id).read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def set_edit(self, job_id: str, image: str, settings: Any) -> Dict[str, Any]:
+        """Remember the sliders for one picture, so reopening it looks the same."""
+        with self.lock:
+            job = self.jobs.get(job_id)
+        if job is None:
+            raise BadRequest("작업을 찾을 수 없습니다")
+        name = _text(image, 300)
+        if not name or not isinstance(settings, dict):
+            raise BadRequest("이미지 이름과 설정이 필요합니다")
+        with self.lock:
+            data = self.get_edits(job_id)
+            data[name] = {k: v for k, v in settings.items() if isinstance(v, (int, float, str, bool))}
+            path = self.edits_path(job_id)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+            tmp.replace(path)
+        return data[name]
 
     def saved_edits(self, job: Job, files: Dict[str, Any]) -> List[Dict[str, Any]]:
         out: List[Dict[str, Any]] = []
@@ -1278,6 +1311,11 @@ class Handler(BaseHTTPRequestHandler):
                     raise BadRequest("작업 종류를 고르세요")
                 job = self.server.store.submit(kind, body)
                 self.send_json(self.server.store.summary(job), HTTPStatus.CREATED)
+                return
+            if path == "/api/edits":
+                store = self.server.store
+                out = store.set_edit(str(body.get("job") or ""), str(body.get("image") or ""), body.get("settings"))
+                self.send_json(out)
                 return
             if path == "/api/saves":
                 store = self.server.store
