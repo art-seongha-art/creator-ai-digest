@@ -279,7 +279,22 @@ details.adv .body .wide{grid-column:1/-1}
   font-size:11.5px;font-weight:600;display:flex;align-items:center;pointer-events:none;transition:opacity .12s}
 .lb-cmp .tag-b{left:10px}.lb-cmp .tag-a{right:10px}
 .lb-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:5px 12px;border-radius:999px;
-  background:rgba(0,0,0,.55);color:#e8e2da;font-size:11.5px;pointer-events:none;white-space:nowrap}
+  background:rgba(0,0,0,.55);color:#e8e2da;font-size:11.5px;pointer-events:none;white-space:nowrap;max-width:92%;
+  overflow:hidden;text-overflow:ellipsis}
+.lb-cmp .lb-hint{animation:hintOut .3s 4s forwards}
+@keyframes hintOut{to{opacity:0;visibility:hidden}}
+.lb.full .lb-side{display:none}
+.lb.full .lb-box{grid-template-rows:minmax(0,1fr)}
+.lb.full .lb-img{padding:0}
+.lb.full .lb-cmp canvas,.lb.full .lb-img img{border-radius:0;box-shadow:none}
+.lb.full .lb-cmp .tag{top:62px}                       /* clear of the counter and the close button */
+.lb.full .lb-hint{bottom:max(58px,calc(env(safe-area-inset-bottom) + 54px))}
+.lb-info{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));right:12px;height:36px;padding:0 13px;border-radius:999px;
+  background:rgba(255,255,255,.92);color:#15120f;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px;z-index:3}
+.lb-swipe{position:absolute;bottom:max(22px,calc(env(safe-area-inset-bottom) + 10px));left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;z-index:3}
+.lb-swipe i{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.42)}
+.lb-swipe i.on{background:#fff;width:18px}
 .lb-nav,.lb-close,.lb-count{z-index:3}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:999px;background:rgba(255,255,255,.9);
   color:#15120f;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh2)}
@@ -625,6 +640,9 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <span class="lb-count num" id="lbCount"></span>
       <button class="lb-nav prev" id="lbPrev" type="button" aria-label="이전"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       <button class="lb-nav next" id="lbNext" type="button" aria-label="다음"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="lb-info" id="lbFit" type="button" style="right:auto;left:12px">맞춤</button>
+      <button class="lb-info" id="lbInfo" type="button">정보</button>
+      <div class="lb-swipe" id="lbDots"></div>
       <button class="lb-close" id="lbClose" type="button" aria-label="닫기"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
     </div>
     <div class="lb-side" id="lbSide"></div>
@@ -920,22 +938,24 @@ function renderGallery(){
 }
 
 /* ── lightbox: compare + adjust ──────────────────────────────────────── */
-const EDIT0={mode:'wipe', x:50, overlay:70, brightness:0, contrast:0, saturate:0, temp:0};
+const EDIT0={mode:'wipe', x:50, overlay:70, brightness:0, contrast:0, saturate:0, temp:0, fit:'contain'};
 let edit={...EDIT0}, editItem=null;
 const imgA=new Image(), imgB=new Image();   // after (result) / before (original)
 imgA.crossOrigin=imgB.crossOrigin='anonymous';
 const cmpEl=()=>$('#lbCmp');
 
+let drawRect={x:0,y:0,w:0,h:0};      // where the picture sits on the canvas
 function paint(ctx,w,h,opts){
-  const o=opts||edit;
+  const o=opts||edit, r=drawRect;
+  const put=im=>ctx.drawImage(im,r.x,r.y,r.w,r.h);
   ctx.save(); ctx.filter='none'; ctx.globalAlpha=1;
   ctx.clearRect(0,0,w,h);
-  if(imgB.complete&&imgB.naturalWidth) ctx.drawImage(imgB,0,0,w,h);
+  if(imgB.complete&&imgB.naturalWidth) put(imgB);
   if(imgA.complete&&imgA.naturalWidth){
     if(o.hold){ /* holding: show the original only */ }
-    else if(o.mode==='overlay'){ ctx.globalAlpha=o.overlay/100; ctx.drawImage(imgA,0,0,w,h); }
+    else if(o.mode==='overlay'){ ctx.globalAlpha=o.overlay/100; put(imgA); }
     else { const cut=Math.round(w*o.x/100);
-      ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); ctx.drawImage(imgA,0,0,w,h); ctx.restore(); }
+      ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(imgA); ctx.restore(); }
   }
   ctx.restore();
 }
@@ -956,10 +976,22 @@ function adjust(ctx,w,h,opts){
 }
 function renderCmp(opts){
   const cv=$('#lbCanvas'); if(!imgA.naturalWidth) return;
+  const iw=imgA.naturalWidth, ih=imgA.naturalHeight;
   const box=$('.lb-img').getBoundingClientRect();
-  const fit=Math.min((box.width-28)/imgA.naturalWidth,(box.height-28)/imgA.naturalHeight,1);
+  const pad=$('#lb').classList.contains('full')?0:28;
+  const bw=Math.max(1,box.width-pad), bh=Math.max(1,box.height-pad);
   const dpr=Math.min(window.devicePixelRatio||1,2);
-  const w=Math.max(1,Math.round(imgA.naturalWidth*fit*dpr)), h=Math.max(1,Math.round(imgA.naturalHeight*fit*dpr));
+  let w,h;
+  if(edit.fit==='cover'){                       // fill the screen, cropping the overflow
+    const k=Math.max(bw/iw,bh/ih);
+    w=Math.round(bw*dpr); h=Math.round(bh*dpr);
+    const dw=iw*k*dpr, dh=ih*k*dpr;
+    drawRect={x:(w-dw)/2, y:(h-dh)/2, w:dw, h:dh};
+  } else {                                      // whole picture, letterboxed
+    const k=Math.min(bw/iw,bh/ih,1);
+    w=Math.max(1,Math.round(iw*k*dpr)); h=Math.max(1,Math.round(ih*k*dpr));
+    drawRect={x:0, y:0, w, h};
+  }
   cv.width=w; cv.height=h;
   cv.style.width=Math.round(w/dpr)+'px'; cv.style.height=Math.round(h/dpr)+'px';
   const ctx=cv.getContext('2d'); paint(ctx,w,h,opts); adjust(ctx,w,h,opts);
@@ -967,8 +999,10 @@ function renderCmp(opts){
 function fullCanvas(){
   const cv=document.createElement('canvas');
   cv.width=imgA.naturalWidth; cv.height=imgA.naturalHeight;
+  const keep=drawRect; drawRect={x:0,y:0,w:cv.width,h:cv.height};   // saves are never cropped
   const ctx=cv.getContext('2d');
   paint(ctx,cv.width,cv.height); adjust(ctx,cv.width,cv.height);
+  drawRect=keep;
   return cv;
 }
 function setCmpX(pct){ edit.x=Math.max(0,Math.min(100,pct));
@@ -976,7 +1010,10 @@ function setCmpX(pct){ edit.x=Math.max(0,Math.min(100,pct));
 
 function showCompare(it){
   const c=cmpEl();
-  editItem=it; edit={...EDIT0, ...(it.edit||{})};
+  editItem=it; edit={...EDIT0, fit: narrow()?'cover':'contain', ...(it.edit||{})};
+  $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기';
+  const hint=c.querySelector('.lb-hint');
+  hint.style.animation='none'; void hint.offsetWidth; hint.style.animation='';   // replay the fade
   c.classList.remove('held'); c.classList.toggle('overlay', edit.mode==='overlay');
   c.style.setProperty('--x',edit.x+'%');
   $('#lbTagB').textContent=it.compare.before_label||'원본';
@@ -999,12 +1036,26 @@ function showCompare(it){
   div.addEventListener('pointermove',e=>{ if(dragging) setCmpX(pct(e)); });
   const stop=e=>{ if(!dragging) return; dragging=false; try{ div.releasePointerCapture(e.pointerId); }catch(_){} };
   div.addEventListener('pointerup',stop); div.addEventListener('pointercancel',stop);
-  // press and hold anywhere else on the picture to see the original underneath
+  // Anywhere else on the picture: hold still to see the original, or drag sideways
+  // to move to the next result. A gesture becomes a swipe once it has travelled far
+  // enough, which also cancels the hold, so the two never fire together.
+  let press=null;
   c.addEventListener('pointerdown',e=>{ if(dragging||e.target===div||div.contains(e.target)) return;
+    press={x:e.clientX, y:e.clientY, id:e.pointerId, swiping:false};
     c.classList.add('held'); c.setPointerCapture(e.pointerId); renderCmp({...edit,hold:true}); });
-  const release=e=>{ if(!c.classList.contains('held')) return; c.classList.remove('held');
-    try{ c.releasePointerCapture(e.pointerId); }catch(_){} renderCmp(); };
-  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release); c.addEventListener('pointerleave',release);
+  c.addEventListener('pointermove',e=>{ if(!press||press.id!==e.pointerId) return;
+    const dx=e.clientX-press.x, dy=e.clientY-press.y;
+    if(!press.swiping && Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
+      press.swiping=true; c.classList.remove('held'); renderCmp(); }   // it is a swipe, not a hold
+  });
+  const release=e=>{ if(!press||press.id!==e.pointerId) return;
+    const dx=e.clientX-press.x, swiped=press.swiping;
+    c.classList.remove('held'); try{ c.releasePointerCapture(e.pointerId); }catch(_){}
+    press=null;
+    if(swiped && Math.abs(dx)>40) step(dx<0?1:-1); else renderCmp(); };
+  // pointerup and pointercancel are guaranteed while the pointer is captured, and
+  // capture itself fires pointerleave - listening for that cancelled every hold
+  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release);
   addEventListener('resize',()=>{ if(!c.hidden) renderCmp(); });
 })();
 
@@ -1046,16 +1097,28 @@ function editPanel(it){
 }
 
 /* ── lightbox ────────────────────────────────────────────────────────── */
-function openLb(i){ lbIndex=i; $('#lb').hidden=false; renderLb(); }
+function openLb(i){ lbIndex=i; const lb=$('#lb');
+  lb.classList.toggle('full', narrow());        // on a phone the picture gets the whole screen
+  $('#lbInfo').textContent = lb.classList.contains('full')?'정보':'이미지만';
+  lb.hidden=false; renderLb(); }
 function closeLb(){ $('#lb').hidden=true; lbIndex=-1; }
 function step(d){ const list=visible(); if(!list.length) return; const cur=items[lbIndex];
   let pos=list.indexOf(cur); pos=(pos+d+list.length)%list.length; lbIndex=items.indexOf(list[pos]); renderLb(); }
 $('#lbClose').onclick=closeLb; $('#lbPrev').onclick=()=>step(-1); $('#lbNext').onclick=()=>step(1);
+const narrow=()=>matchMedia('(max-width:1119px)').matches;
+$('#lbFit').onclick=()=>{ edit.fit = edit.fit==='cover'?'contain':'cover';
+  $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기'; renderCmp(); };
+$('#lbInfo').onclick=()=>{ const lb=$('#lb'); lb.classList.toggle('full');
+  $('#lbInfo').textContent = lb.classList.contains('full')?'정보':'이미지만';
+  if(!$('#lbCmp').hidden) requestAnimationFrame(()=>renderCmp()); };
 $('#lb').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeLb(); });
 function spec(dl,k,v){ if(!v) return; dl.appendChild(el('dt','',k)); dl.appendChild(el('dd','',v)); }
 async function renderLb(){
   const it=items[lbIndex]; if(!it){ closeLb(); return; }
-  const list=visible(); $('#lbCount').textContent=(list.indexOf(it)+1)+' / '+list.length;
+  const list=visible(), at=list.indexOf(it);
+  $('#lbCount').textContent=(at+1)+' / '+list.length;
+  const dots=$('#lbDots'); dots.replaceChildren();
+  if(list.length>1 && list.length<=12) list.forEach((_,i)=>dots.appendChild(el('i', i===at?'on':'')));
   const img=$('#lbImg'), ph=$('#lbPh'), cmp=$('#lbCmp');
   if(it.image && it.compare && !it.saved){ showCompare(it); img.hidden=true; ph.hidden=true; }
   else if(it.image){ cmp.hidden=true; img.src=it.image; img.hidden=false; ph.hidden=true; }
