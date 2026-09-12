@@ -511,6 +511,46 @@ class FaceTileTests(unittest.TestCase):
         self.assertLess(tidied.getpixel((123, 78))[0], 100)         # ...and the extended tail came through
         self.assertEqual(tidied.getpixel((70, 10)), base.getpixel((70, 10)))    # outside the mask: untouched
 
+    def test_mask_opens_outward_for_the_tail_not_upward(self):
+        """MediaPipe traces ~46mm where a brow is 50-55mm, and designs lengthen the tail."""
+        lm = _pupil_landmarks()
+        tight = M.brow_region_mask(lm, pad_tail=0.0, pad_head=0.0)
+        wide = M.brow_region_mask(lm)
+        t, w = tight.getbbox(), wide.getbbox()
+        self.assertLess(w[0], t[0])                      # opened to the left...
+        self.assertGreater(w[2], t[2])                   # ...and to the right
+        self.assertEqual((w[1], w[3]), (t[1], t[3]))     # but not one pixel up or down
+        reach = min(t[0] - w[0], w[2] - t[2])
+        self.assertGreater(reach, 0.10 * lm.ipd_px)      # roughly 8mm on a 63mm face
+        self.assertLess(w[3], lm.eye_top_y)              # still never over the eyes
+
+    def test_core_mask_judges_each_brow_against_itself(self):
+        """A sparse brow measured against a dense one is erased wholesale."""
+        base = Image.new("RGB", (300, 140), (200, 170, 150))
+        d = ImageDraw.Draw(base)
+        d.rectangle((20, 60, 120, 84), fill=(30, 22, 18))            # a dense brow
+        d.rectangle((180, 66, 280, 74), fill=(120, 100, 90))         # a much fainter, thinner one
+        mask = Image.new("L", (300, 140), 0)
+        ImageDraw.Draw(mask).rectangle((10, 40, 130, 110), fill=255)   # two separate blobs,
+        ImageDraw.Draw(mask).rectangle((170, 40, 290, 110), fill=255)  # one per brow
+        core = M.brow_core_mask(base, mask, 4)
+        self.assertGreater(core.getpixel((70, 72)), 200)             # the dense brow is body
+        self.assertGreater(core.getpixel((230, 70)), 200)            # ...and so is the faint one
+        self.assertEqual(core.getpixel((150, 70)), 0)                # the gap between them is not
+
+    def test_hair_proximity_reaches_further_along_the_brow_than_across_it(self):
+        """Floating a second brow above is the worry; lengthening the tail is the goal."""
+        base = Image.new("RGB", (260, 160), (200, 170, 150))
+        ImageDraw.Draw(base).rectangle((80, 70, 180, 90), fill=(40, 30, 25))     # the brow
+        mask = Image.new("L", (260, 160), 0)
+        ImageDraw.Draw(mask).rectangle((20, 50, 240, 110), fill=255)             # the brow band
+        near = M.hair_proximity(base, mask, 6)
+        along = next(x - 180 for x in range(181, 240) if near.getpixel((x, 80)) < 128)
+        across = next(70 - y for y in range(69, 50, -1) if near.getpixel((130, y)) < 128)
+        self.assertGreater(along, 3 * across)                        # far further along the brow
+        self.assertGreater(along, 15)                                # enough to lengthen a tail
+        self.assertLess(across, 12)                                  # not enough to float a second brow
+
     def test_brow_core_mask_separates_the_body_from_the_strays(self):
         base = Image.new("RGB", (140, 140), (200, 170, 150))
         d = ImageDraw.Draw(base)

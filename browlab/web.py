@@ -41,7 +41,7 @@ from . import masks as M
 from . import presets as P
 
 KINDS = ("generate", "restyle", "sheet", "calibrate")
-KIND_KO = {"generate": "얼굴 생성", "restyle": "내 사진 눈썹 바꾸기", "sheet": "사진을 1:1 시트로", "calibrate": "프린터 보정 시트"}
+KIND_KO = {"generate": "연습용 얼굴 생성", "restyle": "눈썹 생성기", "sheet": "출력 시트 만들기", "calibrate": "프린터 보정 시트"}
 # shorter chip labels for the page (full names stay in presets.py)
 # Files the model actually saw, so a result can be judged against its inputs.
 INPUT_FILES = [

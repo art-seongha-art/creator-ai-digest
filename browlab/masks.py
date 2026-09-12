@@ -46,6 +46,8 @@ def brow_region_mask(
     pad_side: float = 0.035,
     pad_up: float = 0.03,
     pad_down: float = 0.03,
+    pad_tail: float = 0.13,
+    pad_head: float = 0.04,
     protect_eyes: bool = True,
     shape: str = "brow",
 ) -> Image.Image:
@@ -58,6 +60,12 @@ def brow_region_mask(
     because the design corrects the brow the person already has - a taller band
     only invites the model to move the brow up the forehead. MediaPipe traces
     the brow ridge slightly thinner than the real hair, which the padding covers.
+    Sideways it opens up much further: ``pad_tail`` past the outer end and
+    ``pad_head`` past the inner one. MediaPipe traces the brow about 46 mm long
+    where a real adult brow is 50-55 mm, and a design usually lengthens the tail,
+    so 2 mm of headroom there simply cut the tail off. Going wide sideways is
+    safe - the brow cannot drift up the forehead along its own axis.
+
     ``shape="box"`` is the older rounded bounding box. All paddings are
     fractions of the inter-pupillary distance.
     """
@@ -86,6 +94,16 @@ def brow_region_mask(
             for i in range(steps + 1):
                 dy = -up + (up + down) * i / steps
                 _dilated_polygon(draw, pts, radius, dy)
+            outward = 1 if sum(p[0] for p in pts) / len(pts) > lm.eye_center[0] else -1
+            tail_px = int(round(max(0.0, pad_tail) * ipd))
+            head_px = int(round(max(0.0, pad_head) * ipd))
+            if tail_px or head_px:
+                import numpy as np
+
+                a = np.asarray(layer, np.uint8) > 127
+                right, left = (tail_px, head_px) if outward > 0 else (head_px, tail_px)
+                layer = Image.fromarray((_dilate_x(a, left, right) * 255).astype(np.uint8))
+                draw = ImageDraw.Draw(layer)
         if protect_eyes:
             limit = int(lid_y - 0.05 * ipd)
             if limit < lm.height:
@@ -453,13 +471,20 @@ def hair_span(image: Image.Image, mask: Image.Image, frac: float = 0.25) -> Opti
     return float(keep.min()), float(keep.max()), float((rows * ys).sum() / total)
 
 
-def hair_proximity(image: Image.Image, mask: Image.Image, grow_px: float, min_cover: float = 0.08) -> Image.Image:
+def hair_proximity(
+    image: Image.Image, mask: Image.Image, grow_px: float,
+    grow_x_px: Optional[float] = None, min_cover: float = 0.08,
+) -> Image.Image:
     """Mask of the brow hair in ``image``, grown by ``grow_px`` and feathered.
 
     New pigment is only believable next to hairs that are already there; anything
-    further away reads as a second eyebrow floating above the real one. Returns
-    ``mask`` unchanged when there is almost no hair to anchor to (sparse brows),
-    since there is then nothing to sit beside.
+    further away reads as a second eyebrow floating above the real one. That is a
+    vertical worry, so the reach is deliberately lopsided: tight up and down,
+    generous along the brow (``grow_x_px``, default four times ``grow_px``) where
+    lengthening the tail is exactly what the design asks for.
+
+    Returns ``mask`` unchanged when there is almost no hair to anchor to (sparse
+    brows), since there is then nothing to sit beside.
     """
     import numpy as np
 
@@ -472,35 +497,79 @@ def hair_proximity(image: Image.Image, mask: Image.Image, grow_px: float, min_co
     if float(hair[inside].mean()) < min_cover:
         return mask
     grow_px = max(1.0, grow_px)
-    solid = Image.fromarray((hair * 255).astype(np.uint8))
-    grown = solid.filter(ImageFilter.GaussianBlur(grow_px * 0.5)).point(lambda v: 255 if v > 20 else 0)
-    soft = grown.filter(ImageFilter.GaussianBlur(max(1.0, grow_px / 3.0)))
+    reach_x = int(round(grow_x_px if grow_x_px is not None else grow_px * 4.0))
+    grown = hair.copy()
+    for step in range(1, int(round(grow_px)) + 1):                 # up and down
+        grown[step:] |= hair[:-step]
+        grown[:-step or None] |= hair[step:]
+    grown = _dilate_x(grown, reach_x, reach_x)                     # along the brow
+    soft = Image.fromarray((grown * 255).astype(np.uint8)).filter(
+        ImageFilter.GaussianBlur(max(1.0, grow_px / 2.0))
+    )
     return ImageChops.darker(soft, mask.convert("L"))
 
 
-def brow_core_mask(image: Image.Image, mask: Image.Image, spread_px: float, frac: float = 0.35) -> Image.Image:
-    """The body of the brow, separated from the stray hairs scattered around it.
+def _dilate_x(arr, left_px: int, right_px: int):
+    """Grow a boolean array horizontally by a different amount on each side."""
+    import numpy as np
+
+    out = arr.copy()
+    for step in range(1, int(right_px) + 1):
+        out[:, step:] |= arr[:, :-step]
+    for step in range(1, int(left_px) + 1):
+        out[:, :-step or None] |= arr[:, step:]
+    return out
+
+
+def brow_core_mask(image: Image.Image, mask: Image.Image, spread_px: float, frac: float = 0.22) -> Image.Image:
+    """The body of each brow, separated from the stray hairs scattered around it.
 
     Brow work is not only additive: gaps get filled and the strays outside the
     shape get tidied away. Keeping every hair makes that impossible and the brow
-    just grows thicker and heavier. Blurring the hair weight turns the dense brow
-    body into a high plateau while isolated strays stay low, so a threshold on
-    that density separates "the brow" from "hairs around the brow". Inside the
-    result the original hair is protected; outside it the model may clean up.
+    just grows thicker and heavier.
+
+    The split is by connectivity, not by how dark a spot is. Hairs are grown until
+    neighbours touch, and each resulting blob is kept or dropped by weight against
+    *the largest blob on its own side of the face*. A thin tail stays because it
+    hangs off the body; an isolated stray goes. Judging both brows against one
+    global threshold erased the sparser brow almost entirely - measured on a real
+    face, its head kept 0.4% and its tail 0%.
     """
     import numpy as np
 
+    try:
+        from scipy import ndimage
+    except ImportError:                                    # tidying is optional, mangling the brow is not
+        return mask
+
     w = hair_weight(image, mask)
-    if w.max() <= 0:
+    hair = w > 0.35
+    if not hair.any():
         return mask
-    blurred = Image.fromarray((np.clip(w, 0, 1) * 255).astype(np.uint8)).filter(
-        ImageFilter.GaussianBlur(max(1.0, spread_px))
-    )
-    d = np.asarray(blurred, np.float32)
-    peak = float(d.max())
-    if peak <= 0:
+    radius = max(1, int(round(spread_px)))
+    yy, xx = np.ogrid[-radius : radius + 1, -radius : radius + 1]
+    grown = ndimage.binary_dilation(hair, structure=(xx * xx + yy * yy) <= radius * radius)
+    labels, count = ndimage.label(grown)
+    if count == 0:
         return mask
-    core = Image.fromarray(((d >= peak * frac) * 255).astype(np.uint8))
+    index = np.arange(1, count + 1)
+    weights = np.atleast_1d(ndimage.sum(w, labels, index=index))
+    # judge each brow against itself, using the mask's own two blobs to say which
+    # brow a blob of hair belongs to; a sparse brow must not be measured against
+    # the dense one, or it is erased wholesale
+    regions, region_count = ndimage.label(np.asarray(mask.convert("L"), np.uint8) > 127)
+    if region_count > 1:
+        belongs = np.atleast_1d(ndimage.labeled_comprehension(
+            regions, labels, index, lambda v: np.bincount(v).argmax(), int, 0))
+    else:
+        belongs = np.zeros(count, int)
+
+    keep = np.zeros(count + 1, bool)
+    for region in np.unique(belongs):
+        same = belongs == region
+        best = float(weights[same].max())
+        keep[1:][same & (weights >= best * frac)] = True
+    core = Image.fromarray((keep[labels] * 255).astype(np.uint8))
     core = core.filter(ImageFilter.GaussianBlur(max(1.0, spread_px * 0.5)))
     return ImageChops.darker(core, mask.convert("L"))
 

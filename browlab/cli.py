@@ -429,7 +429,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
     mask_api_path: Optional[Path] = None
     guide_path: Optional[Path] = None
     if lm_edit is not None:
-        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down, shape=args.mask_shape)
+        mask = M.brow_region_mask(lm_edit, pad_side=args.mask_side, pad_up=args.mask_up, pad_down=args.mask_down,
+                                  pad_tail=args.mask_tail, pad_head=args.mask_head, shape=args.mask_shape)
         mask.save(out_dir / "mask.png")
         mask_api_path = out_dir / "mask_api.png"
         M.api_mask_image(mask).save(mask_api_path, optimize=True)  # black RGB + alpha: tiny file, alpha is all the API reads
@@ -750,6 +751,9 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--mask-up", type=float, default=0.03,
                    help="눈썹 위 추가 여유. 둘레 여유와 합쳐 눈썹 위 약 4mm. 키우면 모델이 눈썹을 이마 쪽으로 올립니다")
     r.add_argument("--mask-down", type=float, default=0.03, help="눈썹 아래 추가 여유. 윗눈꺼풀 위에서 항상 잘립니다")
+    r.add_argument("--mask-tail", type=float, default=0.13,
+                   help="눈썹 꼬리 바깥 여유 (63mm 기준 ≈ 8mm). 꼬리를 늘리는 디자인이 잘리지 않게 함")
+    r.add_argument("--mask-head", type=float, default=0.04, help="눈썹 앞머리 안쪽 여유 (63mm 기준 ≈ 2.5mm)")
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
     r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")

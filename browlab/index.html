@@ -402,7 +402,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
   <main class="work" id="work"><div class="work-in">
 
     <form id="fGen" class="panel on" data-mode="generate" autocomplete="off">
-      <div class="head"><h1>얼굴 생성</h1><p>눈썹이 부족한 연습용 얼굴을 만들고 A4 1:1 시트까지 한 번에 뽑습니다.</p></div>
+      <div class="head"><h1>연습용 얼굴 생성</h1><p>눈썹이 부족한 연습용 얼굴을 만들고 A4 1:1 시트까지 한 번에 뽑습니다.</p></div>
       <div class="fixed">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-top:3px"><path d="M20 6L9 17l-5-5"/></svg>
         <span>항상 고정 — 흰 배경 · 정면 · 눈썹 노출 · 안경/모자/앞머리 없음</span>
@@ -442,7 +442,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
     </form>
 
     <form id="fRestyle" class="panel" data-mode="restyle" autocomplete="off">
-      <div class="head"><h1>내 사진 눈썹 바꾸기</h1><p>얼굴을 잘라내 눈썹 부분만 다시 그리고, 원본 사진 제자리에 되붙입니다.</p></div>
+      <div class="head"><h1>눈썹 생성기</h1><p>얼굴을 잘라내 눈썹 부분만 다시 그리고, 원본 사진 제자리에 되붙입니다.</p></div>
       <label class="drop" data-drop>
         <img class="ph" alt="" hidden><span class="ph" data-ph><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
         <span class="pt"><b>사진 고르기</b><span>정면 · 눈썹이 보이는 사진. 끌어다 놓아도 됩니다. 갤러리의 생성 얼굴도 쓸 수 있습니다.</span></span>
@@ -485,7 +485,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
     </form>
 
     <div class="panel" data-mode="sheet">
-      <div class="head"><h1>사진 시트 · 프린터 보정</h1><p>가지고 있는 얼굴 사진을 실물 크기로 배치하고, 프린터 배율을 확인합니다.</p></div>
+      <div class="head"><h1>출력 시트 만들기</h1><p>가지고 있는 얼굴 사진을 실물 크기로 배치하고, 프린터 배율을 확인합니다.</p></div>
       <form id="fSheet" class="card card-b" style="display:flex;flex-direction:column;gap:12px" autocomplete="off">
         <div class="eyebrow">A4 1:1 시트</div>
         <label class="drop" data-drop>
@@ -612,7 +612,7 @@ const ICON={
   auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" stroke="none" opacity=".35"/>',
   empty:'<path d="M4 16l5-5 4 4 3-3 4 4"/><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.3"/>'
 };
-const VIEWS=[{k:'generate',ko:'얼굴 생성'},{k:'restyle',ko:'내 사진 눈썹'},{k:'sheet',ko:'사진 시트'},{k:'gallery',ko:'갤러리'}];
+const VIEWS=[{k:'generate',ko:'연습용 얼굴'},{k:'restyle',ko:'눈썹 생성기'},{k:'sheet',ko:'출력 시트'},{k:'gallery',ko:'갤러리'}];
 const STATUS_KO={queued:'대기',running:'진행 중',done:'완료',failed:'실패',cancelled:'취소'};
 const usd=v=>'$'+(Math.round((+v||0)*100)/100).toFixed(2);
 let presets=null, items=[], filter='all', lbIndex=-1, timer=null, usage=null, view='generate', loaded=false;
@@ -713,7 +713,7 @@ function updateEngineHints(){
     const text=key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진은 결과 상세에 표시`
       :(key==='codex'||key==='codex-only')?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`
       :key==='api'?`API만 · 2.5 → 2 → 1.5 → 1 → 1-mini 순 · 장당 과금 (high 1536×2304 ≈ $0.06)`
-      :'이미지를 직접 만들어 "사진 시트" 에서 시트로';
+      :'이미지를 직접 만들어 "출력 시트 만들기" 에서 시트로';
     box.replaceChildren();
     const tag=el('span','tag '+(b.available?'ok':'bad')); tag.appendChild(el('i','dot')); tag.appendChild(el('span','',label)); box.appendChild(tag);
     box.appendChild(el('span','',text));
