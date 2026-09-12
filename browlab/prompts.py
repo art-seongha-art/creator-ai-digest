@@ -283,11 +283,19 @@ def build_restyle_prompt(
             "stay visible underneath."
         ),
         (
-            "Eyebrow placement (horizontal only): the brow head starts on the vertical line rising from the outer edge "
-            "of the nostril; the arch peak sits on the line from the nostril through the outer edge of the iris; the "
-            "tail ends on the line from the nostril through the outer corner of the eye, level with or slightly above "
-            "the head; both brows symmetrical; realistic individual hairs with natural growth direction, matching the "
-            "lighting of the photo"
+            "Hair, not a drawn line: the brow is made of separate hairs, so its edge is slightly ragged and never a "
+            "clean curve or a straight ruled line. At the head the hairs fan upward and outward and the edge is soft "
+            "and open; through the body they lie flatter and overlap; towards the tail they sweep along the brow and "
+            "thin out. Do not comb them all into one direction and do not make the upper and lower edges run parallel. "
+            "Light them exactly as the photo lights that part of the face."
+            + (
+                ""
+                if style.key == "as_is"
+                else " The classic design lines - a head above the nostril, the arch on the line from the nostril past "
+                     "the outer edge of the iris, the tail on the line from the nostril past the outer corner of the "
+                     "eye - are a sanity check on the brow that is already there, not a target to move it to; where "
+                     "this person's brow does not match them, the brow wins."
+            )
         ),
         (
             "Constraints: change only the eyebrows; keep the face identity, skin texture, eyes, eyelids, nose, mouth, "
@@ -297,7 +305,9 @@ def build_restyle_prompt(
         (
             "Avoid: shaving off or covering the body of the brow, replacing it with a new shape that ignores where "
             "the hairs already grow, moving the arch to a different place along the brow, changing the angle the "
-            "brow runs at, straightening a curved brow or curving a straight one, making the two brows match each "
+            "brow runs at, straightening a curved brow or curving a straight one, a tail that lifts above the head "
+            "when the person's own tail does not, a sharp V or a peaked corner in place of a soft turn, a stiff "
+            "ruled or stencilled edge, making the two brows match each "
             "other more than they already do, a brow that no longer overlaps the original one, a brow that is thicker or "
             "heavier than the one in the photo, anything that reads as eyebrow makeup or pencil, "
             "a solid opaque block of colour, a hard painted or stencilled outline, uniformly dark fill with no "

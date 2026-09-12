@@ -137,13 +137,36 @@ class PromptTests(unittest.TestCase):
         self.assertIn("gap between the upper eyelid and the brow must stay exactly as it is", text)
         self.assertIn("Never move the brows up", text)
         self.assertIn("raising the brows higher on the forehead", text)      # in Avoid
-        self.assertIn("horizontal only", text)                                # the nostril lines are horizontal guides
+        # the nostril design lines used to prescribe the arch and a tail above the head,
+        # which overruled the shape rules and produced a stiff V; they are a check now
+        self.assertNotIn("the arch peak sits on the line", text)
+        self.assertNotIn("level with or slightly above the head", text)
+        self.assertNotIn("both brows symmetrical", text)
         up = PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="slight_up")
         self.assertIn("raise the brows very slightly, by at most 2-3 mm", up)
         self.assertNotIn("keep the new brows at exactly the height", up)
         self.assertIn("Never move the brows up", up)                          # the hard limits still apply
         with self.assertRaises(KeyError):
             PR.build_restyle_prompt("soft_arch", "dark_brown", height_key="sky")
+
+    def test_nothing_prescribes_a_v_shape_or_a_ruled_edge(self):
+        """A design template told the model exactly where to put the arch and the tail."""
+        keep = PR.build_restyle_prompt("as_is", "match_hair")
+        arch = PR.build_restyle_prompt("soft_arch", "match_hair")
+        # as_is gets no design map at all: its own head, arch and tail are already right
+        self.assertNotIn("outer edge of the iris", keep)
+        self.assertNotIn("outer corner of the eye", keep)
+        # a named style may see them, but only as a check it is allowed to lose
+        self.assertIn("outer edge of the iris", arch)
+        self.assertIn("not a target to move it to", arch)
+        self.assertIn("the brow wins", arch)
+        for t in (keep, arch):
+            self.assertIn("Hair, not a drawn line", t)
+            self.assertIn("never a clean curve or a straight ruled line", t)
+            self.assertIn("Do not comb them all into one direction", t)
+            self.assertIn("a tail that lifts above the head when the person's own tail does not", t)
+            self.assertIn("a sharp V or a peaked corner in place of a soft turn", t)
+            self.assertIn("a stiff ruled or stencilled edge", t)
 
     def test_prompt_protects_the_shape_the_person_already_has(self):
         """A catalogue shape must not overrule the brow somebody grew."""
