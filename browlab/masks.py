@@ -338,7 +338,8 @@ def similarity_from_pupils(src: FaceLandmarks, ref: FaceLandmarks) -> Similarity
     return Similarity(scale, math.degrees(angle), tx, ty, shift, abs(scale - 1.0))
 
 
-def warp_similarity(image: Image.Image, sim: Similarity, size: Tuple[int, int]) -> Image.Image:
+def warp_similarity(image: Image.Image, sim: Similarity, size: Tuple[int, int],
+                    background: Optional[Image.Image] = None) -> Image.Image:
     """Resample ``image`` so that its face lands where the reference face is."""
     a = math.radians(sim.angle_deg)
     cs, sn = math.cos(a), math.sin(a)
@@ -347,7 +348,13 @@ def warp_similarity(image: Image.Image, sim: Similarity, size: Tuple[int, int]) 
         cs / s, sn / s, -(cs * sim.tx + sn * sim.ty) / s,
         -sn / s, cs / s, (sn * sim.tx - cs * sim.ty) / s,
     )
-    return image.convert("RGB").transform(size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
+    src = image.convert("RGB")
+    if background is None:
+        return src.transform(size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
+    rgba = src.copy()
+    rgba.putalpha(255)
+    moved = rgba.transform(size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
+    return Image.composite(moved.convert("RGB"), _match_size(background, size), moved.getchannel("A"))
 
 
 def _mask_band_px(mask: Image.Image) -> int:
@@ -577,12 +584,29 @@ def brow_core_mask(image: Image.Image, mask: Image.Image, spread_px: float, frac
     return ImageChops.darker(core, mask.convert("L"))
 
 
-def shift_image(image: Image.Image, dx: float, dy: float) -> Image.Image:
-    """Move the picture content by (dx, dy) pixels; the vacated edge stays black."""
+def _match_size(image: Image.Image, size: Tuple[int, int]) -> Image.Image:
+    out = image.convert("RGB")
+    return out if out.size == size else out.resize(size, Image.LANCZOS)
+
+
+def shift_image(image: Image.Image, dx: float, dy: float,
+                background: Optional[Image.Image] = None) -> Image.Image:
+    """Move the picture content by (dx, dy) pixels.
+
+    The strip the move vacates is filled from ``background`` (the original tile);
+    without one PIL leaves it black, and a black strip that reaches the brow mask
+    gets composited into the face.
+    """
     img = image.convert("RGB")
     if abs(dx) < 0.5 and abs(dy) < 0.5:
         return img
-    return img.transform(img.size, Image.AFFINE, (1, 0, -dx, 0, 1, -dy), resample=Image.BICUBIC)
+    coeffs = (1, 0, -dx, 0, 1, -dy)
+    if background is None:
+        return img.transform(img.size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
+    rgba = img.copy()
+    rgba.putalpha(255)
+    moved = rgba.transform(img.size, Image.AFFINE, coeffs, resample=Image.BICUBIC)
+    return Image.composite(moved.convert("RGB"), _match_size(background, img.size), moved.getchannel("A"))
 
 
 def brow_baseline(lm: FaceLandmarks) -> Optional[float]:

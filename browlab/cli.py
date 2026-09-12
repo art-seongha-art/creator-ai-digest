@@ -103,6 +103,7 @@ def _detect_plain(args: argparse.Namespace, image: Image.Image, path: Optional[P
 
 def _align_edit(
     args: argparse.Namespace, edited: Image.Image, lm_ref: L.FaceLandmarks, size: Tuple[int, int],
+    reference: Optional[Image.Image] = None,
 ) -> Tuple[Optional[Image.Image], str, Dict[str, Any], Optional[L.FaceLandmarks]]:
     """Bring an edited image back onto the reference face geometry.
 
@@ -124,7 +125,7 @@ def _align_edit(
     if sim.shift_frac <= ALIGN_TOLERANCE and sim.scale_ratio <= ALIGN_TOLERANCE:
         return img, "aligned", info, lm_new
     if sim.shift_frac <= args.align_max and sim.scale_ratio <= ALIGN_SCALE_MAX and abs(sim.angle_deg) <= ALIGN_ANGLE_MAX:
-        return M.warp_similarity(img, sim, size), "warped", info, lm_new
+        return M.warp_similarity(img, sim, size, background=reference), "warped", info, lm_new
     return None, "misaligned", info, lm_new
 
 
@@ -156,7 +157,7 @@ def _brow_height_fix(
     dy = max(-limit, min(limit, dy))
     info["brow_shift_px"] = round(dy, 1)
     info["brow_shift_ipd"] = round(dy / ipd, 3)
-    return M.shift_image(aligned, 0, dy), info
+    return M.shift_image(aligned, 0, dy, background=reference), info
 
 
 def _chain(text: Optional[str]) -> Optional[List[str]]:
@@ -517,8 +518,8 @@ def cmd_restyle(args: argparse.Namespace) -> int:
         final_img: Image.Image = edited
         final_lm: Optional[L.FaceLandmarks] = None
         suffix = ""
-        if mask is not None and lm_edit is not None and not args.no_composite and args.landmarks != "none":
-            aligned_img, status, info, lm_new = _align_edit(args, edited, lm_edit, edit_img.size)
+        if mask is not None and lm_edit is not None and args.composite and args.landmarks != "none":
+            aligned_img, status, info, lm_new = _align_edit(args, edited, lm_edit, edit_img.size, edit_img)
             entry["align"] = {"status": status, **info}
             entry["aligned"] = status != "misaligned"
             if aligned_img is None:
@@ -756,7 +757,8 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--mask-head", type=float, default=0.04, help="눈썹 앞머리 안쪽 여유 (63mm 기준 ≈ 2.5mm)")
     r.add_argument("--no-mask", action="store_true", help="api 백엔드에서 알파 마스크를 보내지 않음")
     r.add_argument("--no-guide-image", action="store_true", help="codex 백엔드에 빨간 영역 가이드 이미지를 첨부하지 않음")
-    r.add_argument("--no-composite", action="store_true", help="결과의 눈썹 영역만 원본 위에 합성하는 단계를 생략")
+    r.add_argument("--composite", action="store_true",
+                   help="모델 결과의 눈썹 영역만 원본 사진에 합성 (기본은 모델 출력 그대로: 정렬·톤보정·되붙이기를 모두 건너뜀)")
     r.add_argument("--keep-hair", action="store_true",
                    help="기존 눈썹 털을 결과 위에 겹쳐서 보존. 모델이 더 얇게 그린 쪽에서 원본 눈썹이 삐져나와 두 줄로 보일 수 있음")
     r.add_argument("--no-tidy", action="store_true",

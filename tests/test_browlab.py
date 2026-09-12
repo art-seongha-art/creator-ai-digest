@@ -424,6 +424,23 @@ class FaceTileTests(unittest.TestCase):
         self.assertGreaterEqual(M.feather_for(thin), 3)          # never a hard edge
         self.assertEqual(M.feather_for(Image.new("L", (10, 10), 0)), 3)  # empty mask
 
+    def test_moves_never_leave_a_black_strip_behind(self):
+        """PIL fills what a transform vacates with black; inside the mask that is a smear."""
+        img = Image.new("RGB", (80, 80), (60, 50, 45))
+        back = Image.new("RGB", (80, 80), (205, 175, 155))          # the original tile
+
+        bare = M.shift_image(img, 0, 20)
+        self.assertLess(bare.getpixel((40, 5))[0], 20)              # vacated strip: black
+
+        filled = M.shift_image(img, 0, 20, background=back)
+        self.assertGreater(filled.getpixel((40, 5))[0], 180)        # ...now the original photo
+        self.assertEqual(filled.getpixel((40, 60)), (60, 50, 45))   # the moved content is untouched
+
+        sim = M.Similarity(scale=1.0, angle_deg=12.0, tx=0.0, ty=0.0, shift_frac=0.0, scale_ratio=1.0)
+        dark = lambda im: sum(1 for p in im.convert("L").getdata() if p < 20)
+        self.assertGreater(dark(M.warp_similarity(img, sim, img.size)), 100)          # a black wedge
+        self.assertEqual(dark(M.warp_similarity(img, sim, img.size, background=back)), 0)
+
     def test_brow_baseline_and_shift(self):
         lm = _pupil_landmarks()
         base = M.brow_baseline(lm)
@@ -1231,8 +1248,7 @@ class CliTests(unittest.TestCase):
             env["CODEX_HOME"] = str(home)
             with mock.patch.dict(os.environ, env, clear=True):
                 rc, out = self._run(["restyle", str(src), "--backend", "auto", "--codex-bin", str(fake), "--styles", "straight",
-                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none",
-                                     "--no-composite"])
+                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none"])
             self.assertEqual(rc, 0, out)
             first_call = (home / "args.txt").read_text().splitlines()[0]
             self.assertEqual(first_call.count("-i "), 2)  # prepared image + red region guide
@@ -1278,7 +1294,8 @@ class CliTests(unittest.TestCase):
             from browlab import cli as C
             with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(C, "_detect_plain", fake_detect):
                 rc, out = self._run(["restyle", str(src), "--backend", "auto", "--codex-bin", str(fake), "--styles", "straight",
-                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none"])
+                                     "--out-dir", str(tmp / "r"), "--landmarks", "manual", "--pupils", "400,450,600,450", "--sheet", "none",
+                                     "--composite"])
             self.assertEqual(rc, 0, out)
             with Image.open(tmp / "r" / "00_face_tile.png") as tile:
                 self.assertEqual(tile.size, (1024, 1536))
