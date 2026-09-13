@@ -489,6 +489,15 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 @media (min-width:1120px) and (max-width:1420px){
   .shell{grid-template-columns:218px minmax(400px,1fr) minmax(330px,.95fr)}
 }
+@media (pointer:coarse){
+  /* Tapping an input under 16px makes iOS zoom the page in, and it stays zoomed - the
+     "메뉴가 자꾸 확대되는" report. 16px is the threshold; nothing else stops it. */
+  input[type=text],input[type=number],input[type=password],input[type=search],input[type=email],
+  textarea,select,
+  .field input,.field select,.field textarea,
+  .dz-top input,.edit .row input[type=text],.login-card input,#dzSide{font-size:16px}
+}
+
 </style>
 </head>
 <body>
@@ -796,7 +805,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <div class="dz-tpls" id="dzTpls"></div>
         <div class="dz-row">
           <button class="btn" type="button" id="dzUpload">도안 올리기</button>
-          <select id="dzSide" class="btn" style="height:38px;font-size:13px" title="한 짝만 있는 PNG가 어느 쪽 눈썹인지">
+          <select id="dzSide" class="btn" style="height:38px" title="한 짝만 있는 PNG가 어느 쪽 눈썹인지">
             <option value="right">오른쪽 눈썹 (사진 왼편)</option><option value="left">왼쪽 눈썹 (사진 오른편)</option></select>
           <input class="dz-file" id="dzFile" type="file" accept="image/*" multiple>
         </div>
@@ -2028,7 +2037,9 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   // Safari zooms the whole page on a two-finger pinch, wherever it starts - which made the
   // panel grow instead of the photo. While the studio is open that gesture is ours to
   // refuse; the picture keeps its own zoom, which never touches the page.
-  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>{ if(!$('#dz').hidden) e.preventDefault(); },{passive:false}));
+  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>{ if(!$('#dz').hidden) e.preventDefault(); },{passive:false,capture:true}));
+  // belt and braces: Safari reads a two-finger drag as a page pinch before those fire
+  document.addEventListener('touchmove',e=>{ if(e.touches.length>1&&!$('#dz').hidden&&e.cancelable) e.preventDefault(); },{passive:false,capture:true});
   document.addEventListener('wheel',e=>{ if(e.ctrlKey&&!$('#dz').hidden) e.preventDefault(); },{passive:false});   // trackpad pinch / ctrl+wheel
   document.addEventListener('keydown',e=>{ if($('#dz').hidden||!(e.ctrlKey||e.metaKey)) return;
     if(e.key==='+'||e.key==='-'||e.key==='='||e.key==='0') e.preventDefault(); });
