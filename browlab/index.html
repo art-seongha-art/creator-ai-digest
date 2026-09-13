@@ -1,0 +1,2322 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- "홈 화면에 추가" runs the page with no browser chrome at all, which is the only way an
+     iPad gives a full screen no gesture can take back -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BrowLab">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f3f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
+<title>BrowLab · 눈썹 디자인 스튜디오</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315120f'/%3E%3Cpath d='M6 14c3-3.6 7.6-4.2 10.4-1.6' stroke='%23e2865f' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M17.6 12.4C20.4 9.8 25 10.4 28 14' stroke='%23e2865f' stroke-width='2.6' stroke-linecap='round' fill='none' opacity='.55'/%3E%3Ccircle cx='11' cy='21' r='2' fill='%23fff' opacity='.85'/%3E%3Ccircle cx='22' cy='21' r='2' fill='%23fff' opacity='.85'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ── tokens ─────────────────────────────────────────────────────────── */
+:root{
+  color-scheme:light;
+  --bg:#f4f2ef; --panel:#fff; --panel-2:#fbfaf8; --panel-3:#f1eeea; --panel-4:#e9e5df;
+  --ink:#15120f; --ink-2:#443e38; --muted:#6e675e; --faint:#9b938a;
+  --line:#e4dfd7; --line-2:#efebe5; --hair:#d7d1c7;
+  --brand:#a8492a; --brand-2:#bd5734; --brand-soft:#f7e8e0; --brand-ink:#7a3319;
+  --ok:#2d6b53; --ok-soft:#e1efe8; --warn:#a3362a; --warn-soft:#f9ded9;
+  --wait:#886312; --wait-soft:#f9edcd;
+  --sh1:0 1px 2px rgba(21,18,15,.05);
+  --sh2:0 10px 28px -14px rgba(21,18,15,.28),0 2px 6px rgba(21,18,15,.05);
+  --sh3:0 32px 74px -26px rgba(0,0,0,.6);
+  --r1:9px; --r2:12px; --r3:16px; --r4:22px;
+  --tabh:calc(64px + env(safe-area-inset-bottom));
+  --mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]){
+  color-scheme:dark;
+  --bg:#111010; --panel:#1a1817; --panel-2:#201e1c; --panel-3:#282523; --panel-4:#322e2b;
+  --ink:#f4f1ec; --ink-2:#d9d3cb; --muted:#a39a90; --faint:#7b736a;
+  --line:#302d2a; --line-2:#252221; --hair:#3d3834;
+  --brand:#e08a63; --brand-2:#ed9b76; --brand-soft:#3a2418; --brand-ink:#f1b79a;
+  --ok:#76c5a0; --ok-soft:#18251f; --warn:#ee9484; --warn-soft:#2e1d1a;
+  --wait:#ddb56c; --wait-soft:#2b2416;
+  --sh1:0 1px 2px rgba(0,0,0,.4); --sh2:0 12px 32px -14px rgba(0,0,0,.8),0 2px 6px rgba(0,0,0,.3);
+}}
+html[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#111010; --panel:#1a1817; --panel-2:#201e1c; --panel-3:#282523; --panel-4:#322e2b;
+  --ink:#f4f1ec; --ink-2:#d9d3cb; --muted:#a39a90; --faint:#7b736a;
+  --line:#302d2a; --line-2:#252221; --hair:#3d3834;
+  --brand:#e08a63; --brand-2:#ed9b76; --brand-soft:#3a2418; --brand-ink:#f1b79a;
+  --ok:#76c5a0; --ok-soft:#18251f; --warn:#ee9484; --warn-soft:#2e1d1a;
+  --wait:#ddb56c; --wait-soft:#2b2416;
+  --sh1:0 1px 2px rgba(0,0,0,.4); --sh2:0 12px 32px -14px rgba(0,0,0,.8),0 2px 6px rgba(0,0,0,.3);
+}
+
+/* ── base ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;letter-spacing:-.011em;
+  -webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;
+  font-family:Pretendard Variable,Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;color:inherit;touch-action:manipulation}
+svg{flex:0 0 auto;display:block}
+a{color:var(--brand);text-decoration:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--brand) 65%,transparent);outline-offset:2px;border-radius:4px}
+::selection{background:var(--brand-soft);color:var(--brand-ink)}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ── shell ──────────────────────────────────────────────────────────── */
+.shell{display:flex;flex-direction:column;min-height:100dvh}
+.side{display:none}
+.topbar{display:flex;align-items:center;gap:8px;height:58px;padding:0 14px;background:color-mix(in srgb,var(--panel) 88%,transparent);
+  backdrop-filter:saturate(1.6) blur(12px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.work{flex:1;min-width:0}
+.work-in{max-width:680px;margin:0 auto;padding:18px 15px 22px}
+.gal-pane{display:none;flex:1;min-width:0}
+.gal-in{padding:14px 14px 20px}
+body.show-jobs .work{display:none}
+body.show-jobs .gal-pane{display:block}
+.tabbar{position:sticky;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;height:var(--tabh);
+  padding-bottom:env(safe-area-inset-bottom);background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -6px 18px -12px rgba(21,18,15,.3)}
+.tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11.5px;font-weight:600;
+  color:var(--faint);letter-spacing:-.01em;position:relative}
+.tabbar button[aria-current=true]{color:var(--ink)}
+.tabbar button[aria-current=true]::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:30px;height:2.5px;background:var(--brand);border-radius:0 0 3px 3px}
+.tabbar .badge{position:absolute;top:6px;right:calc(50% - 22px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;
+  background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tabbar .badge:empty{display:none}
+
+/* ── brand ──────────────────────────────────────────────────────────── */
+.brand{display:flex;align-items:center;gap:9px;min-width:0}
+.mark{width:30px;height:30px;border-radius:9px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+.brand-t{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.brand-t b{font-size:15.5px;font-weight:700;letter-spacing:-.02em}
+.brand-t span{font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1}
+
+/* ── primitives ─────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 15px;border-radius:var(--r1);
+  border:1px solid var(--line);background:var(--panel);font-size:14px;font-weight:600;white-space:nowrap;color:var(--ink);
+  box-shadow:var(--sh1);transition:background .13s,border-color .13s,transform .08s}
+.btn:hover{background:var(--panel-2);border-color:var(--hair)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{border-color:transparent;background:transparent;box-shadow:none}
+.btn.ghost:hover{background:var(--panel-3)}
+.btn.icon{width:42px;padding:0}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.dark:hover{background:var(--ink-2);border-color:var(--ink-2)}
+.btn.danger{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 28%,var(--line))}
+.btn.danger:hover{background:var(--warn-soft)}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn.cta{height:54px;padding:0 22px;border-radius:var(--r2);background:var(--ink);border-color:var(--ink);color:var(--bg);
+  font-size:16.5px;font-weight:700;flex:1;box-shadow:var(--sh2)}
+.btn.cta:hover{background:var(--ink-2);border-color:var(--ink-2)}
+.btn.cta .spin{display:none}
+.btn.cta[data-busy] .spin{display:block;animation:spin .8s linear infinite}
+.btn.cta[data-busy] .go{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.tag{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:6px;background:var(--panel-3);
+  color:var(--muted);font-size:11.5px;font-weight:600;white-space:nowrap}
+.tag .dot{width:6px;height:6px;border-radius:999px;background:var(--faint)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.ok .dot{background:var(--ok)}
+.tag.bad{background:var(--warn-soft);color:var(--warn)} .tag.bad .dot{background:var(--warn)}
+
+.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.hint{font-size:13px;color:var(--muted);line-height:1.55}
+.msg{font-size:12.5px;color:var(--warn);white-space:pre-wrap}
+.msg:empty{display:none}
+.msg.ok{color:var(--ok)}
+
+/* ── sidebar (desktop) ──────────────────────────────────────────────── */
+.side-nav{display:flex;flex-direction:column;gap:2px;padding:10px 10px}
+.side-nav button{display:flex;align-items:center;gap:10px;height:40px;padding:0 11px;border-radius:var(--r1);font-size:13.5px;
+  font-weight:600;color:var(--muted);width:100%;text-align:left;transition:background .13s,color .13s}
+.side-nav button:hover{background:var(--panel-3);color:var(--ink)}
+.side-nav button[aria-current=true]{background:var(--ink);color:var(--bg)}
+.side-nav button[aria-current=true] svg{opacity:1}
+.side-nav svg{opacity:.75}
+.keys{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:2px 14px 0;font-size:10.5px;color:var(--faint);letter-spacing:0}
+.keys kbd{font:inherit;min-width:16px;height:16px;padding:0 4px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+  background:var(--panel);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600}
+.side-foot{margin-top:auto;padding:12px 12px 14px;display:flex;flex-direction:column;gap:9px;border-top:1px solid var(--line-2)}
+.conn{display:flex;flex-wrap:wrap;gap:5px}
+.meter{display:flex;flex-direction:column;gap:6px;padding:10px 11px;border:1px solid var(--line);border-radius:var(--r2);
+  background:var(--panel);text-align:left;box-shadow:var(--sh1);transition:border-color .13s}
+.meter:hover{border-color:var(--hair)}
+.meter-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.meter-top b{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.meter-top span{font-size:11px;color:var(--faint)}
+.track{height:5px;border-radius:999px;background:var(--panel-4);overflow:hidden}
+.track i{display:block;height:100%;background:var(--brand);width:0;border-radius:999px;transition:width .3s}
+.track i.hot{background:var(--warn)}
+
+/* ── workspace ──────────────────────────────────────────────────────── */
+.panel{display:none;flex-direction:column;gap:14px}
+.panel.on{display:flex}
+.head{display:flex;flex-direction:column;gap:3px;padding:2px 2px 0}
+.head h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.028em;line-height:1.25}
+.head p{margin:0;font-size:14px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);box-shadow:var(--sh1)}
+.card-b{padding:14px}
+.fields{display:flex;flex-direction:column}
+.frow{display:grid;grid-template-columns:1fr;gap:9px;padding:13px 0;border-bottom:1px solid var(--line-2)}
+.frow:last-child{border-bottom:0}
+.frow>.eyebrow{font-size:11.5px;letter-spacing:.1em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.chip{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border-radius:999px;
+  border:1.5px solid var(--line);background:var(--panel);font-size:15px;line-height:1.1;color:var(--ink-2);white-space:nowrap;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background .12s,border-color .12s,color .12s}
+.chip:hover{border-color:var(--hair);background:var(--panel-2)}
+.chip input{position:absolute;opacity:0;width:0;height:0;margin:0}
+.chip:has(input:checked){background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:600}
+.chip.multi:has(input:checked){background:var(--brand-soft);border-color:color-mix(in srgb,var(--brand) 55%,transparent);color:var(--brand-ink)}
+.chip:has(input:focus-visible){outline:2px solid color-mix(in srgb,var(--brand) 65%,transparent);outline-offset:2px}
+
+details.adv{border:1px solid var(--line);border-radius:var(--r2);background:var(--panel-2)}
+details.adv summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:52px;padding:0 14px;cursor:pointer;font-size:14.5px;font-weight:600}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary em{font-style:normal;font-weight:400;color:var(--faint);font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details.adv summary svg{transition:transform .16s;color:var(--faint)}
+details.adv[open] summary svg{transform:rotate(180deg)}
+details.adv .body{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:11px;padding:2px 13px 14px}
+details.adv .body .wide{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field>span{font-size:12.5px;color:var(--muted);font-weight:500}
+.hint-inline{font-style:normal;font-weight:400;opacity:.72}
+.field input,.field select,.field textarea{width:100%;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r1);
+  background:var(--panel);font-size:16px;transition:border-color .12s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:color-mix(in srgb,var(--brand) 50%,var(--line));outline:none}
+.field textarea{height:auto;min-height:58px;padding:8px 10px;resize:vertical;line-height:1.5}
+.chk{display:flex;align-items:center;gap:9px;font-size:14.5px;min-height:44px;cursor:pointer}
+.chk input{width:21px;height:21px;margin:0;accent-color:var(--brand)}
+
+.engine{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);padding:0 2px;line-height:1.5}
+.actionbar{position:sticky;bottom:var(--tabh);z-index:5;display:flex;align-items:center;gap:9px;padding:12px 0 14px;margin-top:-4px;
+  background:var(--bg)}
+.actionbar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:20px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,var(--bg))}
+.actionbar::after{content:"";position:absolute;left:-20px;right:-20px;top:0;bottom:-20px;background:var(--bg);z-index:-1}
+.stepper{display:flex;align-items:center;height:54px;border-radius:var(--r2);border:1px solid var(--line);background:var(--panel);box-shadow:var(--sh1)}
+.stepper button{width:46px;height:52px;font-size:22px;color:var(--muted)}
+.stepper button:hover{color:var(--ink)}
+.stepper output{min-width:44px;text-align:center;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+
+.drop{display:flex;align-items:center;gap:12px;padding:11px;border-radius:var(--r2);border:1.5px dashed var(--hair);
+  background:var(--panel-2);cursor:pointer;transition:border-color .13s,background .13s}
+.drop:hover,.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.drop .ph{width:74px;height:92px;border-radius:var(--r1);background:var(--panel-3);border:1px solid var(--line);object-fit:cover;
+  display:flex;align-items:center;justify-content:center;color:var(--faint);flex:0 0 74px}
+.drop .pt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.drop .pt b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drop .pt span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.drop input[type=file]{display:none}
+.consent{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--muted);padding:0 2px}
+
+/* ── gallery ────────────────────────────────────────────────────────── */
+.gal-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.gal-head h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:baseline;gap:7px}
+.gal-head .sub{font-size:12.5px;color:var(--faint);font-weight:500}
+.segs{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--panel-3);margin-left:auto}
+.segs button{height:34px;padding:0 14px;border-radius:999px;color:var(--muted);font-size:13.5px;font-weight:600}
+.segs button.on{background:var(--panel);color:var(--ink);box-shadow:var(--sh1)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gcard{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;background:var(--panel);
+  text-align:left;position:relative;box-shadow:var(--sh1);transition:transform .13s,box-shadow .13s,border-color .13s}
+.gcard:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:var(--hair)}
+.gcard .thumb{aspect-ratio:3/4;background:var(--panel-3);position:relative;overflow:hidden}
+.gcard .thumb .blend{position:absolute;inset:0}
+.gcard .thumb .blend img{position:absolute;inset:0}
+.gcard .thumb .blend .warm{position:absolute;inset:0;mix-blend-mode:soft-light;pointer-events:none}
+.gcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.gcard .thumb .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  padding:12px;text-align:center;color:var(--muted);font-size:12px}
+.gcard .meta{padding:8px 10px 9px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line-2);min-width:0}
+.gcard .meta b{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gcard .meta span{font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{position:absolute;top:8px;left:8px;display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;
+  font-size:11.5px;font-weight:700;background:var(--panel);color:var(--muted);box-shadow:var(--sh1)}
+.pill.running,.pill.queued{background:var(--wait-soft);color:var(--wait)}
+.pill.failed{background:var(--warn-soft);color:var(--warn)}
+.pill.cancelled{background:var(--panel-3);color:var(--faint)}
+.shimmer{position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,color-mix(in srgb,var(--panel) 65%,transparent) 40%,transparent 60%);
+  background-size:220% 100%;animation:sh 1.5s infinite}
+@keyframes sh{to{background-position:-220% 0}}
+.spinner{width:24px;height:24px;border:2.5px solid var(--panel-4);border-top-color:var(--brand);border-radius:50%;animation:spin .9s linear infinite}
+.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:9px;padding:44px 18px;text-align:center;
+  border:1px dashed var(--hair);border-radius:var(--r3);color:var(--muted);font-size:13px}
+
+/* ── overlays ───────────────────────────────────────────────────────── */
+.ov{position:fixed;inset:0;background:color-mix(in srgb,#0d0b0a 58%,transparent);backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;z-index:40;animation:fade .16s ease-out}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:520px;max-height:92dvh;overflow:auto;background:var(--panel);border-radius:var(--r4) var(--r4) 0 0;
+  padding:18px 18px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:13px;box-shadow:var(--sh3)}
+.sheet h2{margin:0;font-size:17.5px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.big{display:flex;align-items:baseline;gap:8px}
+.big b{font-size:30px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13.5px;color:var(--muted)}
+.kv b{color:var(--ink);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.divide{height:1px;background:var(--line-2);margin:2px 0}
+
+.lb{background:color-mix(in srgb,#0a0908 98%,transparent);align-items:stretch;backdrop-filter:none}
+.lb-box{display:grid;grid-template-rows:minmax(0,1fr) auto;width:100%;height:100dvh}
+.lb-img{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:14px}
+.lb-img img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r2);background:#fff;box-shadow:0 20px 60px -20px rgba(0,0,0,.7)}
+.lb-img .ph{color:#cdc6bd;font-size:13.5px;text-align:center;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.lb-cmp{position:relative;display:flex;max-width:100%;max-height:100%;touch-action:none;--x:50%}
+.lb-cmp img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r2);background:#fff;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.7);-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.lb-cmp canvas{display:block;max-width:100%;max-height:100%;border-radius:var(--r2);background:#fff;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.7)}
+.lb-cmp.held .lb-div,.lb-cmp.held .tag-a{opacity:0}
+.lb-div{position:absolute;top:0;bottom:0;left:var(--x);width:2px;margin-left:-1px;background:rgba(255,255,255,.95);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;touch-action:none;transition:opacity .12s}
+.lb-div i{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:999px;
+  background:rgba(255,255,255,.96);box-shadow:var(--sh2);display:flex;align-items:center;justify-content:center;color:#15120f}
+.lb-cmp .tag{position:absolute;top:10px;height:24px;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;
+  font-size:11.5px;font-weight:600;display:flex;align-items:center;pointer-events:none;transition:opacity .12s}
+.lb-cmp .tag-b{left:10px}.lb-cmp .tag-a{right:10px}
+.lb-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:5px 12px;border-radius:999px;
+  background:rgba(0,0,0,.55);color:#e8e2da;font-size:11.5px;pointer-events:none;white-space:nowrap;max-width:92%;
+  overflow:hidden;text-overflow:ellipsis}
+.lb-cmp .lb-hint{animation:hintOut .3s 4s forwards}
+@keyframes hintOut{to{opacity:0;visibility:hidden}}
+.lb.full .lb-side{display:none}
+.lb.full .lb-box{grid-template-rows:minmax(0,1fr)}
+.lb.full .lb-img{padding:0}
+.lb.full .lb-cmp canvas,.lb.full .lb-img img{border-radius:0;box-shadow:none}
+.lb.full .lb-cmp .tag{top:62px}                       /* clear of the counter and the close button */
+.lb.full .lb-hint{bottom:max(58px,calc(env(safe-area-inset-bottom) + 54px))}
+.lb-info{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));right:12px;height:36px;padding:0 13px;border-radius:999px;
+  background:rgba(255,255,255,.92);color:#15120f;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px;z-index:3}
+.lb-swipe{position:absolute;bottom:max(22px,calc(env(safe-area-inset-bottom) + 10px));left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;z-index:3}
+.lb-swipe i{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.42)}
+.lb-swipe i.on{background:#fff;width:18px}
+.lb-nav,.lb-close,.lb-count{z-index:3}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:999px;background:rgba(255,255,255,.9);
+  color:#15120f;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh2)}
+.lb-nav:hover{background:#fff}
+.lb-nav.prev{left:12px}.lb-nav.next{right:12px}
+.lb-close{position:absolute;top:12px;right:12px;width:42px;height:42px;border-radius:999px;background:rgba(255,255,255,.9);color:#15120f;
+  display:flex;align-items:center;justify-content:center}
+.lb-count{position:absolute;top:12px;left:12px;height:26px;padding:0 10px;border-radius:999px;background:rgba(0,0,0,.5);color:#fff;
+  font-size:11.5px;font-weight:600;display:flex;align-items:center;font-variant-numeric:tabular-nums}
+.edit{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:var(--r3);background:var(--card)}
+.edit .sl{display:grid;grid-template-columns:64px 1fr 46px;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.edit .sl input{width:100%;accent-color:var(--brand);height:22px}
+.edit .sl b{font-variant-numeric:tabular-nums;text-align:right;font-weight:600;color:var(--ink)}
+.edit .row{display:flex;gap:8px;align-items:center}
+.edit .row input[type=text]{flex:1;height:36px}
+.lb-side{background:var(--panel);padding:16px 16px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;
+  max-height:54dvh;overflow:auto;border-radius:var(--r4) var(--r4) 0 0}
+.lb-side h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:0;font-size:13.5px}
+.spec dt{color:var(--faint);white-space:nowrap}
+.spec dd{margin:0;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.banner{padding:11px 13px;border-radius:var(--r1);font-size:13px;line-height:1.55}
+.banner.warn{background:var(--warn-soft);color:color-mix(in srgb,var(--warn) 88%,var(--ink))}
+.banner.info{background:var(--brand-soft);color:var(--brand-ink)}
+.pdfs{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:8px}
+.pdfs a{display:flex;align-items:center;justify-content:center;gap:7px;height:50px;border-radius:var(--r2);background:var(--brand);
+  color:#fff;font-size:14.5px;font-weight:700;box-shadow:var(--sh1)}
+.pdfs a:hover{background:var(--brand-2)}
+.pdfs a.alt{background:var(--ink);color:var(--bg)}
+.acts{display:flex;gap:7px;flex-wrap:wrap}
+details.fold summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:12px 0 2px;border-top:1px solid var(--line-2);
+  font-size:13px;color:var(--muted);cursor:pointer;font-weight:600}
+details.fold summary::-webkit-details-marker{display:none}
+pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radius:var(--r1);font-size:11px;line-height:1.55;overflow:auto;
+  max-height:280px;white-space:pre-wrap;word-break:break-all;font-family:var(--mono)}
+.inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin-top:9px}
+.inputs a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--muted);font-size:10.5px;line-height:1.3}
+.inputs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--r1);border:1px solid var(--line);background:var(--panel-3)}
+.inputs a:hover img{border-color:var(--brand)}
+.files{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px}
+.files a{font-size:12px}
+.prompt{font-size:11.5px;color:var(--muted);white-space:pre-wrap;max-height:170px;overflow:auto;background:var(--panel-2);
+  border:1px solid var(--line-2);border-radius:var(--r1);padding:9px;line-height:1.55;margin-top:8px;font-family:var(--mono)}
+
+/* ── 상담 시뮬레이션 studio ─────────────────────────────────────────── */
+.dz{position:fixed;inset:0;z-index:55;background:#0a0908;display:grid;grid-template-rows:auto minmax(0,1fr) auto;color:#eee;
+  touch-action:manipulation}                            /* no double-tap zoom anywhere in the studio */
+.dz-top{display:flex;align-items:center;gap:7px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:#15120f;border-bottom:1px solid #2a2622;min-width:0}
+.dz-top input{height:36px;border-radius:8px;border:1px solid #3a3531;background:#1f1b18;color:#fff;padding:0 10px;font-size:14px;min-width:0;width:120px;flex:1}
+.dz-top .btn{height:36px;padding:0 11px;font-size:13px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none;flex:0 0 auto}
+.dz-top .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.dz-top .btn.icon{width:36px;padding:0}
+.dz-stage{position:relative;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
+.dz-stage canvas{display:block;width:100%;height:100%}
+.dz-nums{position:absolute;left:10px;bottom:10px;padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.6);font-size:12px;
+  font-variant-numeric:tabular-nums;color:#fff;pointer-events:none;white-space:nowrap;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis}
+.dz-nums:empty{display:none}
+.dz-tools{position:absolute;left:0;right:0;top:8px;display:flex;gap:6px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+.dz-tools::-webkit-scrollbar{display:none}
+@media (min-width:1120px){ .dz-tools{flex-wrap:wrap;right:auto;max-width:calc(100% - 20px);overflow:visible} }
+.dz-tools .btn{height:32px;padding:0 11px;font-size:12.5px;background:rgba(20,17,15,.8);border-color:rgba(255,255,255,.14);color:#eee;box-shadow:none}
+.dz-tools .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+#dzExit{order:-1}                                       /* first in the row: it only exists in 전체화면 */
+.dz-heal{position:absolute;left:10px;top:50px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:calc(100% - 20px);padding:7px 10px;border-radius:10px;
+  background:rgba(20,17,15,.85);color:#eee;font-size:12.5px}
+.dz-heal input{width:120px;accent-color:var(--brand)}
+.dz-heal .btn{height:30px;padding:0 10px;font-size:12px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none}
+.dz-heal .dz-note{color:#b9b1a8}
+.dz-stage.heal{cursor:none}
+.dz-legend{position:absolute;right:10px;bottom:10px;display:none;gap:9px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);font-size:11px;color:#ddd;pointer-events:none}
+.dz-legend i{display:inline-block;width:9px;height:9px;border-radius:999px;border:2px solid;background:#fff;vertical-align:-1px;margin-right:4px}
+.dz-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:#cdc6bd;font-size:14px;background:rgba(10,9,8,.7)}
+.dz-empty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(88%,420px);padding:14px 18px;border-radius:14px;background:rgba(20,17,15,.88);color:#f4f1ec;font-size:14px;line-height:1.55;text-align:center;pointer-events:none}
+.dz-side{background:var(--panel);color:var(--ink);display:flex;flex-direction:column;max-height:48dvh;border-top:1px solid var(--line);min-height:0;touch-action:pan-y}
+.dz-tabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.dz-tabs button{flex:1;height:36px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.dz-tabs button.on{background:var(--panel-3);color:var(--ink)}
+.dz-tabs .fold{flex:0 0 38px;font-size:17px;color:var(--muted)}
+.dz.folded .dz-body{display:none}
+.dz.folded .dz-tabs .fold{transform:rotate(180deg)}
+/* 전체화면: the page's own, so a swipe that cancels the browser's does not undo it */
+/* The panel stays: a bigger picture is no use if the templates and the look are gone. */
+.dz.immersive{grid-template-rows:minmax(0,1fr) auto}
+.dz.immersive .dz-top{display:none}
+.dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0;touch-action:pan-y}
+.dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
+.dz-tab .edit{padding:10px}
+.dz-tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.dz-tpl{position:relative;display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;text-align:left}
+.dz-tpl.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+.dz-tpl canvas{width:100%;height:34px;display:block}
+.dz-tpl span{font-size:11.5px;color:#443e38;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-tpl .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:999px;background:rgba(0,0,0,.07);color:#666;font-size:15px;line-height:22px;text-align:center}
+.dz-tpl .x:hover{background:var(--warn);color:#fff}
+.dz-sw{display:flex;gap:6px;flex-wrap:wrap}
+.dz-sw button{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;border-radius:999px;border:1.5px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--panel)}
+.dz-sw button i{width:20px;height:20px;border-radius:999px;display:block;border:1px solid rgba(0,0,0,.12)}
+.dz-sw button.on{border-color:var(--brand);background:var(--brand-soft)}
+.dz-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dz-pad button{height:38px;border-radius:9px;border:1px solid var(--line);background:var(--panel);font-size:13px;font-weight:600;color:var(--ink)}
+.dz-pad button:active{background:var(--panel-3)}
+.dz-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.dz-row .btn{height:38px;font-size:13px;padding:0 12px}
+.dz-row .sp{flex:1}
+.dz-note{font-size:12px;color:var(--muted)}
+.dz-auto{font-size:12px;color:var(--muted);padding:8px 10px;border-radius:9px;background:var(--panel-3);line-height:1.5}
+.dz-auto b{color:var(--ink)}
+.dz-auto::after{content:"";font-weight:600}
+.dz-auto[data-state=saving]::after{content:" · 저장 중…"}
+.dz-auto[data-state=saved]::after{content:" · 저장됨";color:var(--ok)}
+.dz-auto[data-state=failed]::after{content:" · 저장 실패 (연결 확인)";color:var(--warn)}
+.dz-shots{display:flex;flex-direction:column;gap:4px}
+.dz-shots span{display:flex;gap:8px;font-size:12px;color:var(--muted)}
+.dz-shots b{font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-file{display:none}
+@media (min-width:1120px){
+  .dz.immersive{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
+  .dz-legend{display:flex}
+  .dz-tabs .fold{display:none}
+  .dz.folded .dz-body{display:flex}
+  .dz{grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
+  .dz-top{grid-column:1/-1}
+  .dz-top input{flex:0 1 220px}
+  .dz-side{max-height:none;border-top:0;border-left:1px solid var(--line)}
+  .dz-body{padding:14px 16px}
+}
+
+/* ── login ──────────────────────────────────────────────────────────── */
+.login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:22px}
+.login-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:var(--r4);
+  background:var(--panel);border:1px solid var(--line);box-shadow:var(--sh2)}
+.login-card .brand{justify-content:flex-start}
+.login-card .mark{width:38px;height:38px;flex-basis:38px;border-radius:11px}
+.login-card input{height:44px;padding:0 13px;border:1px solid var(--line);border-radius:var(--r2);background:var(--panel-2);font-size:14px}
+.login-card input:focus{border-color:color-mix(in srgb,var(--brand) 50%,var(--line));outline:none}
+
+/* ── toasts ─────────────────────────────────────────────────────────── */
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + 14px);z-index:60;display:flex;flex-direction:column;
+  gap:8px;align-items:center;pointer-events:none;width:min(440px,calc(100% - 24px))}
+.toast{display:flex;align-items:center;gap:9px;padding:12px 17px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:14px;
+  font-weight:600;box-shadow:var(--sh2);animation:pop .22s cubic-bezier(.2,1.2,.4,1);max-width:100%}
+.toast.bad{background:var(--warn);color:#fff}
+.toast.good{background:var(--ok);color:#fff}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}}
+
+/* ── desktop ────────────────────────────────────────────────────────── */
+@media (min-width:1120px){
+  .shell{display:grid;grid-template-columns:244px minmax(440px,1fr) minmax(370px,1.02fr);height:100dvh;overflow:hidden}
+  .side{display:flex;flex-direction:column;height:100dvh;overflow:auto;background:var(--panel-2);border-right:1px solid var(--line)}
+  .side>.brand{padding:16px 14px 12px}
+  .topbar,.tabbar{display:none}
+  .work{overflow:auto;height:100dvh}
+  .work-in{max-width:620px;padding:26px 26px 34px}
+  .gal-pane{display:block;overflow:auto;height:100dvh;border-left:1px solid var(--line);background:var(--panel-2)}
+  .gal-in{padding:22px 22px 30px}
+  body.show-jobs .work{display:block}
+  .gal{grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:11px}
+  body{font-size:14px}
+  .btn{height:36px;padding:0 13px;font-size:13px} .btn.icon{width:36px}
+  .btn.cta{height:46px;font-size:14.5px;padding:0 20px}
+  .chip{min-height:34px;padding:0 12px;font-size:13px;border-width:1px}
+  .frow{grid-template-columns:66px minmax(0,1fr);gap:10px;padding:11px 0;align-items:start}
+  .frow>.eyebrow{padding-top:9px;font-size:10.5px;letter-spacing:.09em}
+  .field input,.field select,.field textarea{height:36px;font-size:13px;padding:0 10px}
+  .field>span{font-size:11.5px}
+  .chk{min-height:36px;font-size:13px;gap:7px} .chk input{width:17px;height:17px}
+  .head h1{font-size:21px} .head p{font-size:13px}
+  .stepper{height:46px} .stepper button{width:42px;height:44px;font-size:19px} .stepper output{min-width:42px;font-size:14.5px}
+  details.adv summary{min-height:44px;font-size:13px}
+  .hint{font-size:12px} .engine{font-size:11.5px}
+  .drop .ph{width:62px;height:92px;flex-basis:62px} .drop .pt b{font-size:13.5px} .drop .pt span{font-size:11.5px}
+  .gal-head h2{font-size:15px} .gal-head .sub{font-size:11.5px}
+  .segs button{height:28px;padding:0 11px;font-size:12.5px}
+  .gcard .meta b{font-size:12.5px} .gcard .meta span{font-size:11px}
+  .spec{font-size:12.5px;gap:5px 14px} .lb-side h3{font-size:15px}
+  .pdfs a{height:44px;font-size:13px}
+  .sheet h2{font-size:16px} .kv{font-size:12.5px;gap:6px 14px}
+  .actionbar{bottom:0;position:sticky;background:linear-gradient(180deg,transparent,var(--bg) 34%)}
+  .ov{align-items:center}
+  .sheet{border-radius:var(--r4);max-height:86dvh}
+  .lb-box{grid-template-rows:none;grid-template-columns:minmax(0,1fr) 370px}
+  .lb-side{max-height:none;border-radius:0;padding:24px 22px}
+  .toasts{bottom:24px}
+  .frow{grid-template-columns:66px minmax(0,1fr)}
+}
+@media (min-width:1120px) and (max-width:1420px){
+  .shell{grid-template-columns:218px minmax(400px,1fr) minmax(330px,.95fr)}
+}
+@media (pointer:coarse){
+  /* Tapping an input under 16px makes iOS zoom the page in, and it stays zoomed - the
+     "메뉴가 자꾸 확대되는" report. 16px is the threshold; nothing else stops it. */
+  input[type=text],input[type=number],input[type=password],input[type=search],input[type=email],
+  textarea,select,
+  .field input,.field select,.field textarea,
+  .dz-top input,.edit .row input[type=text],.login-card input,#dzSide{font-size:16px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell" hidden>
+  <aside class="side">
+    <div class="brand">
+      <span class="mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#e2865f" stroke-width="2.4" stroke-linecap="round"><path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10" opacity=".5"/></svg></span>
+      <span class="brand-t"><b>BrowLab</b><span>눈썹 디자인 · A4 실물 크기</span></span>
+    </div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="keys">전환 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> · 갤러리 <kbd>G</kbd> · 닫기 <kbd>Esc</kbd></div>
+    <div class="side-foot">
+      <div class="conn" id="status"></div>
+      <button class="meter" id="usageBtn" title="설정 · API 사용량">
+        <span class="meter-top"><b class="num" id="usageAmt">$0.00</b><span id="usageCap">사용량</span></span>
+        <span class="track"><i id="usageBar"></i></span>
+      </button>
+      <div style="display:flex;gap:6px">
+        <button class="btn ghost icon" id="themeBtn" title="화면 테마" aria-label="화면 테마"></button>
+        <button class="btn ghost" id="settingsBtn" style="flex:1">설정</button>
+        <button class="btn ghost" id="logoutBtn" style="flex:1">로그아웃</button>
+      </div>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e2865f" stroke-width="2.4" stroke-linecap="round"><path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10" opacity=".5"/></svg></span>
+      <span class="brand-t"><b>BrowLab</b><span id="topSub">눈썹 디자인 · A4 실물 크기</span></span>
+    </div>
+    <span class="sp"></span>
+    <button class="btn ghost icon" id="themeBtn2" aria-label="화면 테마"></button>
+    <button class="btn ghost" id="settingsBtn2" title="설정 · 서버 업데이트">설정</button>
+    <button class="btn" id="usageBtn2"><span class="num" id="usageAmt2">$0.00</span></button>
+  </header>
+
+  <main class="work" id="work"><div class="work-in">
+
+    <form id="fGen" class="panel on" data-mode="generate" autocomplete="off">
+      <div class="head"><h1>연습용 얼굴 생성</h1><p>눈썹이 부족한 연습용 얼굴을 만들고 A4 1:1 시트까지 한 번에 뽑습니다.</p></div>
+      <div class="card card-b fields">
+        <div class="frow"><span class="eyebrow">나이대</span><div class="chips" data-chips="ages" data-name="age"></div></div>
+        <div class="frow"><span class="eyebrow">성별</span><div class="chips" data-chips="genders" data-name="gender"></div></div>
+        <div class="frow"><span class="eyebrow">얼굴형</span><div class="chips" data-chips="face_shapes" data-name="face_shape"></div></div>
+        <div class="frow"><span class="eyebrow">눈썹</span><div class="chips" data-chips="brow_conditions" data-name="brow_condition" data-multi="1" data-default="random"></div></div>
+      </div>
+      <details class="adv">
+        <summary>고급 설정 <em>외모 · 시드 · 시트 구성 · 엔진 · 품질</em>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="body">
+          <label class="field"><span>외모</span><select name="ethnicity" data-src="ethnicities"></select></label>
+          <label class="field"><span>정확한 나이 (15~79)</span><input name="age_exact" type="number" min="15" max="79" placeholder="비우면 나이대 안에서"></label>
+          <label class="field"><span>시드 (조합 재현)</span><input name="seed" type="number" placeholder="비우면 무작위"></label>
+          <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+          <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
+          <label class="field"><span>시트 구성</span><select name="layout" data-src="layouts"></select></label>
+          <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
+          <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
+          <label class="field"><span>크기 (API, 16의 배수)</span><input name="size" type="text" value="1536x2304"></label>
+          <label class="field"><span>모델 (API)</span><select name="model" data-src="models"></select></label>
+          <label class="chk"><input name="guides" type="checkbox" checked> 눈썹 황금비 가이드선</label>
+          <label class="field wide"><span>추가 지시 (선택)</span><textarea name="notes" placeholder="예: 눈썹은 거의 없이, 이마 넓게, 머리는 뒤로 묶어서"></textarea></label>
+        </div>
+      </details>
+      <div class="engine" data-engine></div>
+      <div class="msg" data-msg></div>
+      <div class="actionbar">
+        <div class="stepper"><button type="button" data-step="-1" aria-label="줄이기">−</button><output>1명</output><button type="button" data-step="1" aria-label="늘리기">+</button><input type="hidden" name="count" value="1"></div>
+        <button class="btn cta" type="submit"><span>생성 시작</span>
+          <svg class="go" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
+          <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity=".9"/></svg></button>
+      </div>
+    </form>
+
+    <form id="fRestyle" class="panel" data-mode="restyle" autocomplete="off">
+      <div class="head"><h1>눈썹 생성기</h1><p>얼굴을 잘라내 눈썹 부분만 다시 그리고, 원본 사진 제자리에 되붙입니다.</p></div>
+      <label class="drop" data-drop>
+        <img class="ph" alt="" hidden><span class="ph" data-ph><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
+        <span class="pt"><b>사진 고르기</b><span>정면 · 눈썹이 보이는 사진. 끌어다 놓아도 됩니다. 갤러리의 생성 얼굴도 쓸 수 있습니다.</span></span>
+        <input name="photo" type="file" accept="image/*"><input type="hidden" name="photo_from_job"><input type="hidden" name="photo_from_file">
+      </label>
+      <div class="consent">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:3px;flex:0 0 13px"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span>사진은 편집을 위해 OpenAI 로 전송됩니다. 본인 또는 동의한 사람의 사진만 올리세요.</span>
+      </div>
+      <div class="card card-b fields">
+        <div class="frow"><span class="eyebrow">스타일</span><div class="chips" data-chips="brow_styles" data-name="styles" data-multi="1"></div></div>
+        <div class="frow"><span class="eyebrow">색</span><div class="chips" data-chips="brow_colors" data-name="color"></div></div>
+        <div class="frow"><span class="eyebrow">높이</span><div class="chips" data-chips="brow_heights" data-name="height"></div></div>
+        <div class="frow"><span class="eyebrow">농도</span><div class="chips" data-chips="brow_intensities" data-name="intensity"></div></div>
+      </div>
+      <details class="adv">
+        <summary>고급 설정 <em>비교 시트 · 합성 · 엔진 · 추가 지시</em>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="body">
+          <label class="field"><span>비교 시트</span><select name="sheet" data-src="sheets"></select></label>
+          <label class="field"><span>성별 (동공 간 거리 기본값)</span><select name="gender" data-src="genders"></select></label>
+          <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
+          <label class="field"><span>엔진</span><select name="backend" data-src="backends"></select></label>
+          <label class="field"><span>품질 (API)</span><select name="quality" data-src="qualities"></select></label>
+          <label class="field"><span>모델 (API)</span><select name="model" data-src="models"></select></label>
+          <label class="field"><span>추가 세기 <em class="hint-inline">1 = 그대로, 낮출수록 연하게</em></span><input name="blend" type="number" step="0.1" min="0.2" max="1" placeholder="1.0"></label>
+          <label class="field"><span>잔털 정리 범위 mm <em class="hint-inline">눈썹 몸통으로 볼 폭</em></span><input name="tidy_mm" type="number" step="0.5" min="0.5" max="8" placeholder="1.5"></label>
+          <label class="chk wide"><input name="no_tidy" type="checkbox"> 퍼진 잔털을 정리하지 않고 전부 보존</label>
+          <label class="field"><span>기존 털 근접 제한 mm <em class="hint-inline">0 = 제한 없음</em></span><input name="near_mm" type="number" step="0.5" min="0" max="12" placeholder="2.5"></label>
+          <label class="chk wide"><input name="keep_hair" type="checkbox"> 기존 눈썹 털을 결과 위에 겹쳐 보존 (눈썹이 두 줄로 보일 수 있음)</label>
+          <label class="chk wide"><input name="composite" type="checkbox"> 눈썹만 원본 사진에 합성 (기본은 모델 출력 그대로)</label>
+          <label class="field wide"><span>추가 지시 (선택)</span><textarea name="notes" placeholder="예: 앞머리는 연하게, 꼬리는 조금 길게"></textarea></label>
+        </div>
+      </details>
+      <div class="engine" data-engine></div>
+      <div class="msg" data-msg></div>
+      <div class="actionbar"><button class="btn cta" type="submit"><span data-restyle-label>눈썹 바꾸기</span>
+        <svg class="go" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
+        <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity=".9"/></svg></button></div>
+    </form>
+
+    <div class="panel" data-mode="sheet">
+      <div class="head"><h1>출력 시트 만들기</h1><p>가지고 있는 얼굴 사진을 실물 크기로 배치하고, 프린터 배율을 확인합니다.</p></div>
+      <form id="fSheet" class="card card-b" style="display:flex;flex-direction:column;gap:12px" autocomplete="off">
+        <div class="eyebrow">A4 1:1 시트</div>
+        <label class="drop" data-drop>
+          <img class="ph" alt="" hidden><span class="ph" data-ph><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
+          <span class="pt"><b>사진 고르기</b><span>동공 간 거리를 기준으로 실물 크기로 배치합니다.</span></span>
+          <input name="photo" type="file" accept="image/*"><input type="hidden" name="photo_from_job"><input type="hidden" name="photo_from_file">
+        </label>
+        <div class="fields">
+          <div class="frow"><span class="eyebrow">구성</span><div class="chips" data-chips="layouts" data-name="layout"></div></div>
+          <div class="frow"><span class="eyebrow">성별</span><div class="chips" data-chips="genders" data-name="gender"></div></div>
+        </div>
+        <details class="adv">
+          <summary>고급 설정 <em>얼굴형 문구 · 동공 좌표 · 거리</em>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+          <div class="body">
+            <label class="field"><span>얼굴형 (추천 문구)</span><select name="face_shape" data-src="face_shapes" data-none="없음"></select></label>
+            <label class="field"><span>동공 간 거리 mm</span><input name="ipd_mm" type="number" step="0.5" min="50" max="75" placeholder="여 62 / 남 64"></label>
+            <label class="field"><span>출력 여유 mm <em class="hint-inline">상하좌우 각각</em></span><input name="grow_mm" type="number" step="1" min="-20" max="40" placeholder="0 = 실물 1:1, 10 = 1cm씩 크게"></label>
+            <label class="field wide"><span>동공 픽셀 좌표 x1,y1,x2,y2 (자동 검출 실패 시)</span><input name="pupils" type="text" placeholder="비우면 자동 검출"></label>
+            <label class="chk wide"><input name="guides" type="checkbox" checked> 가이드선</label>
+          </div>
+        </details>
+        <div class="msg" data-msg></div>
+        <div><button class="btn dark" type="submit" style="height:42px;padding:0 18px">시트 만들기</button></div>
+      </form>
+      <form id="fCal" class="card card-b" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow">프린터 배율 확인</div>
+        <div class="hint">100 mm 자 · 20 mm 정사각형 · 평균 동공 간격이 그려진 페이지입니다. "실제 크기(100%)" 로 인쇄한 뒤 자로 재면 됩니다. 프린터마다 한 번이면 충분합니다.</div>
+        <div class="msg" data-msg></div>
+        <div><button class="btn" type="submit" style="height:42px;padding:0 18px">보정 시트 만들기</button></div>
+      </form>
+    </div>
+
+    <form id="fDesign" class="panel" data-mode="design" autocomplete="off">
+      <div class="head"><h1>상담 시뮬레이션</h1><p>상담자 사진 위에 직접 그린 눈썹 도안을 올려, 시술 후 모습을 그 자리에서 보여줍니다. 생성 없이 바로 됩니다.</p></div>
+      <label class="drop" data-drop>
+        <img class="ph" alt="" hidden><span class="ph" data-ph><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
+        <span class="pt"><b>상담자 사진 고르기</b><span>정면 · 눈썹이 보이는 사진. 카메라로 바로 찍어도 됩니다. 사진은 이 서버에만 저장됩니다.</span></span>
+        <input name="photo" type="file" accept="image/*"><input type="hidden" name="photo_from_job"><input type="hidden" name="photo_from_file">
+      </label>
+      <div class="card card-b fields">
+        <label class="field"><span>회원명</span><input name="client" type="text" placeholder="비우면 자동 (회원_N)"></label>
+      </div>
+      <div class="msg" data-msg></div>
+      <div class="actionbar"><button class="btn cta" type="submit"><span data-design-label>사진 분석하고 시작</span>
+        <svg class="go" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
+        <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity=".9"/></svg></button></div>
+      <div class="card card-b" id="dzRecent" hidden style="display:flex;flex-direction:column;gap:8px">
+        <div class="eyebrow">최근 상담</div>
+        <div id="dzRecentList" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </form>
+
+  </div></main>
+
+  <aside class="gal-pane" id="jobsPane"><div class="gal-in">
+    <div class="gal-head">
+      <h2>갤러리 <span class="sub" id="galSub"></span></h2>
+      <div class="segs" id="filters">
+        <button type="button" data-f="all" class="on">전체</button>
+        <button type="button" data-f="generate">생성</button>
+        <button type="button" data-f="restyle">내 사진</button>
+        <button type="button" data-f="sheet">시트</button>
+        <button type="button" data-f="design">상담</button>
+      </div>
+    </div>
+    <div id="gallery" class="gal"></div>
+  </div></aside>
+
+  <nav class="tabbar" id="tabbar"></nav>
+</div>
+
+<section class="login" id="login" hidden>
+  <div class="login-card">
+    <div class="brand">
+      <span class="mark"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#e2865f" stroke-width="2.4" stroke-linecap="round"><path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10" opacity=".5"/></svg></span>
+      <span class="brand-t"><b>BrowLab</b><span>눈썹 디자인 · A4 실물 크기 시트</span></span>
+    </div>
+    <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password" aria-label="비밀번호">
+    <button id="loginBtn" class="btn dark" style="height:44px">들어가기</button>
+    <div id="loginMsg" class="msg"></div>
+    <div class="conn" id="status2"></div>
+  </div>
+</section>
+
+<div class="toasts" id="toasts"></div>
+
+<div id="settingsOv" class="ov" hidden>
+  <div class="sheet" role="dialog" aria-label="설정과 사용량">
+    <h2>설정 · 사용량 · 서버 업데이트 <button id="settingsClose" class="btn ghost icon" type="button" aria-label="닫기"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button></h2>
+    <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap"><button id="updateBtn" class="btn dark" type="button" style="height:38px;padding:0 16px">서버 업데이트 (git pull + 재시작)</button><span class="msg" id="updateMsg"></span></div>
+    <div class="kv"><span>서버 코드</span><b id="uServer" style="font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere">—</b></div>
+    <pre id="updateOut" class="log" hidden style="margin:0"></pre>
+    <div class="divide"></div>
+    <div class="big"><b id="uTotal">$0.00</b><span>누적 API 지출 추정</span></div>
+    <div class="track"><i id="uBar"></i></div>
+    <div class="kv">
+      <span>충전 누계</span><b id="uBudget">설정 안 됨</b>
+      <span>남은 금액 (추정)</span><b id="uRemain">—</b>
+      <span>API 이미지</span><b id="uImages">0장</b>
+      <span>집계 시작</span><b id="uSince">—</b>
+    </div>
+    <form id="fBudget" style="display:flex;flex-direction:column;gap:9px">
+      <label class="field"><span>충전 누계 (USD) — 충전할 때마다 합계로 고쳐 쓰세요</span><input name="budget_usd" type="number" step="0.01" min="0" placeholder="예: 10"></label>
+      <label class="field"><span>메모 (선택)</span><input name="budget_note" type="text" maxlength="80" placeholder="예: 9/12 첫 충전"></label>
+      <div style="display:flex;gap:9px;align-items:center"><button class="btn dark" type="submit" style="height:38px;padding:0 16px">저장</button><span class="msg" data-msg></span></div>
+    </form>
+    <div class="divide"></div>
+    <div class="eyebrow">쓸 수 있는 이미지 모델</div>
+    <div class="kv" id="modelRows"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button id="modelCheck" class="btn" type="button">모델 확인 (무료)</button>
+      <button id="modelProbe" class="btn" type="button">1장 생성해 확인 (~$0.01)</button>
+      <span class="msg" id="modelMsg"></span>
+    </div>
+    <div class="hint">추정치 = API 응답의 토큰 수 × 공식 단가(이미지 출력 $30/M · 입력 $8/M · 텍스트 $5/M). 실제 청구액은 <a href="https://platform.openai.com/usage" target="_blank" rel="noopener">platform.openai.com/usage</a> 에서 확인하세요. Codex 모드는 구독 한도를 쓰므로 여기에 잡히지 않습니다. 삭제한 작업은 서버의 trash 폴더로 옮겨집니다.</div>
+  </div>
+</div>
+
+<div id="lb" class="ov lb" hidden role="dialog" aria-label="결과 보기">
+  <div class="lb-box">
+    <div class="lb-img">
+      <img id="lbImg" alt="" hidden><div class="ph" id="lbPh" hidden></div>
+      <div class="lb-cmp" id="lbCmp" hidden>
+        <canvas id="lbCanvas"></canvas>
+        <img class="after" id="lbAfter" alt="" hidden><img class="before" id="lbBefore" alt="" hidden>
+        <span class="tag tag-b" id="lbTagB">원본</span><span class="tag tag-a" id="lbTagA">생성</span>
+        <div class="lb-div" id="lbDiv"><i><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6"/><path d="M15 6l5 6-5 6"/></svg></i></div>
+        <span class="lb-hint">손잡이를 끌어 비교 · 겹치기로 세기 조절 · 누르고 있으면 원본</span>
+      </div>
+      <span class="lb-count num" id="lbCount"></span>
+      <button class="lb-nav prev" id="lbPrev" type="button" aria-label="이전"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="lb-nav next" id="lbNext" type="button" aria-label="다음"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="lb-info" id="lbFit" type="button" style="right:auto;left:12px">맞춤</button>
+      <button class="lb-info" id="lbInfo" type="button">정보</button>
+      <div class="lb-swipe" id="lbDots"></div>
+      <button class="lb-close" id="lbClose" type="button" aria-label="닫기"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
+    </div>
+    <div class="lb-side" id="lbSide"></div>
+  </div>
+</div>
+
+<div class="dz" id="dz" hidden>
+  <div class="dz-top">
+    <input id="dzClient" type="text" placeholder="회원명" aria-label="회원명">
+    <button class="btn icon" id="dzUndo" type="button" title="되돌리기 (Ctrl+Z)" aria-label="되돌리기">↶</button>
+    <button class="btn icon" id="dzRedo" type="button" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행">↷</button>
+    <button class="btn icon" id="dzFull" type="button" title="전체화면" aria-label="전체화면">⛶</button>
+    <button class="btn icon" id="dzClose" type="button" aria-label="닫기">✕</button>
+  </div>
+  <div class="dz-stage" id="dzStage">
+    <canvas id="dzCanvas"></canvas>
+    <div class="dz-tools" id="dzTools">
+      <button class="btn" id="dzOrig" type="button" title="누르고 있는 동안 원본 사진 · 빈 곳을 톡 치면 전후가 바뀝니다">원본</button>
+      <button class="btn" id="dzWipe" type="button" title="가운데 선을 끌어 전후를 반씩 비교">비교</button>
+      <button class="btn on" id="dzPts" type="button" title="조절점과 윤곽선 보이기/감추기">점</button>
+      <button class="btn" id="dzLines" type="button" title="콧방울 기준 눈썹 디자인 가이드선">가이드선</button>
+      <button class="btn on" id="dzSym" type="button" title="한쪽을 움직이면 반대쪽도 거울처럼">대칭</button>
+      <button class="btn" id="dzZoomBrow" type="button" title="눈썹 부분 확대">눈썹</button>
+      <button class="btn" id="dzZoomAll" type="button" title="사진 전체">전체</button>
+      <button class="btn" id="dzHeal" type="button" title="잔털·잡티 위를 문지르면 주변 피부로 메웁니다">잔털 지우기</button>
+      <button class="btn" id="dzExit" type="button" title="전체화면 끝내기" hidden>전체화면 끝내기</button>
+    </div>
+    <div class="dz-heal" id="dzHealBox" hidden>
+      <span>지름 <b id="dzHealMm">2.0</b> mm</span>
+      <input type="range" id="dzHealSize" min="5" max="40" value="20" aria-label="브러시 지름">
+      <button class="btn" id="dzHealClear" type="button">모두 복구</button>
+      <span class="dz-note">문지른 자리가 주변 피부로 바뀝니다 · 잘못 지웠으면 ↶</span>
+    </div>
+    <div class="dz-nums" id="dzNums"></div>
+    <div class="dz-legend" id="dzLegend"><span><i style="border-color:#4fa3ff"></i>윗선</span><span><i style="border-color:#ffb84f"></i>아랫선</span><span><i style="border-color:#e2865f"></i>꼬리</span></div>
+    <div class="dz-wait" id="dzWait" hidden><div class="spinner"></div><span>불러오는 중…</span></div>
+    <div class="dz-empty" id="dzEmpty" hidden>도안이 없어 눈썹을 올릴 수 없습니다. 아래 <b>도안</b> 탭에서 도안 PNG 나 도안 시트를 올리세요.</div>
+  </div>
+  <div class="dz-side">
+    <div class="dz-tabs" id="dzTabs">
+      <button type="button" data-t="tpl" class="on">도안</button>
+      <button type="button" data-t="shape">모양</button>
+      <button type="button" data-t="look">색·농도</button>
+      <button type="button" data-t="save">저장</button>
+      <button type="button" class="fold" id="dzFold" title="패널 접기/펴기" aria-label="패널 접기">▾</button>
+    </div>
+    <div class="dz-body">
+      <div class="dz-tab on" data-tab="tpl">
+        <div class="dz-tpls" id="dzTpls"></div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzUpload">도안 올리기</button>
+          <select id="dzSide" class="btn" style="height:38px" title="한 짝만 있는 PNG가 어느 쪽 눈썹인지">
+            <option value="right">오른쪽 눈썹 (사진 왼편)</option><option value="left">왼쪽 눈썹 (사진 오른편)</option></select>
+          <input class="dz-file" id="dzFile" type="file" accept="image/*" multiple>
+        </div>
+        <div class="dz-note">배경이 투명한 PNG 한 장, 또는 흰 종이에 그린 도안 시트(여러 쌍) 그대로 올리면 됩니다. 시트는 자동으로 한 쌍씩 잘려 들어갑니다.</div>
+      </div>
+      <div class="dz-tab" data-tab="shape">
+        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점 4개는 윗선을, 아랫선 점 4개는 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 톡 치면 전후 전환, 두 손가락으로 확대 · 화살표 키로 0.5 mm 씩 (Shift 2 mm)</div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzCopyRL">오른쪽 → 왼쪽 복사</button>
+          <button class="btn" type="button" id="dzCopyLR">왼쪽 → 오른쪽 복사</button>
+          <button class="btn" type="button" id="dzReset">자동 배치로</button>
+        </div>
+        <div class="eyebrow">미세 조정 <em class="hint-inline" id="dzActiveKo">· 오른쪽 눈썹</em></div>
+        <div class="dz-pad" id="dzPad">
+          <button type="button" data-n="up">▲ 위로</button><button type="button" data-n="down">▼ 아래로</button>
+          <button type="button" data-n="in">◀ 안쪽</button><button type="button" data-n="out">▶ 바깥</button>
+          <button type="button" data-n="longer">길게 +</button><button type="button" data-n="shorter">짧게 −</button>
+          <button type="button" data-n="thicker">두껍게 +</button><button type="button" data-n="thinner">얇게 −</button>
+          <button type="button" data-n="tailup">꼬리 ↑</button><button type="button" data-n="taildown">꼬리 ↓</button>
+          <button type="button" data-n="archup">아치 ↑</button><button type="button" data-n="archdown">아치 ↓</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="dzGuides" checked> 조절점과 윤곽선 보이기 <em class="hint-inline">(화면의 "점" 버튼과 같음)</em></label>
+      </div>
+      <div class="dz-tab" data-tab="look">
+        <div class="eyebrow">경과 미리보기</div>
+        <div class="dz-sw" id="dzStages"></div>
+        <div class="edit" id="dzLookSliders"></div>
+        <div class="eyebrow">색소</div>
+        <div class="dz-sw" id="dzColors"></div>
+        <div class="edit" id="dzColorSliders"></div>
+      </div>
+      <div class="dz-tab" data-tab="save">
+        <dl class="spec" id="dzSpec"></dl>
+        <label class="field"><span>동공 간 거리 mm <em class="hint-inline">치수 계산용 · 여 62 / 남 64</em></span><input id="dzIpd" type="number" step="0.5" min="50" max="75" value="62"></label>
+        <label class="field"><span>상담 메모</span><textarea id="dzNotes" placeholder="예: 꼬리 3mm 연장 희망, 애쉬 브라운, 2주 뒤 시술"></textarea></label>
+        <div class="dz-auto" id="dzAuto">조절한 내용은 저절로 저장됩니다 · 갤러리의 <b>상담 이어하기</b> 로 이 상태 그대로 열립니다</div>
+        <div class="eyebrow">시안 남기기 <em class="hint-inline">누를 때마다 지금 화면이 한 장으로 갤러리에 쌓입니다</em></div>
+        <div class="dz-row">
+          <button class="btn dark" type="button" id="dzSave">시안 한 장 저장</button>
+          <button class="btn" type="button" id="dzDownload">내려받기</button>
+          <button class="btn" type="button" id="dzPrint">1:1 출력 시트</button>
+        </div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzCmpSave">전후 비교로 한 장</button>
+          <button class="btn" type="button" id="dzCmpDl">전후 비교 내려받기</button>
+        </div>
+        <div class="msg ok" id="dzSaveNote"></div>
+        <div class="dz-shots" id="dzShots"></div>
+        <div class="dz-note">시안은 갤러리에서 눌러 원본과 반씩 비교하거나, 누르고 있는 동안 원본을 볼 수 있습니다. 여러 장을 남겨 두고 상담자와 고르면 됩니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const el=(tag,cls,text)=>{const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e;};
+const svg=(d,w=16,sw=2)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICON={
+  design:'<path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10"/><circle cx="6.5" cy="9.2" r="1.6" fill="currentColor" stroke="none"/><circle cx="17.5" cy="9.2" r="1.6" fill="currentColor" stroke="none"/><path d="M12 14v6"/><path d="M9 17h6"/>',
+  generate:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>',
+  restyle:'<path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10"/><path d="M7 16.5h10"/>',
+  sheet:'<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
+  gallery:'<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>',
+  print:'<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" stroke="none" opacity=".35"/>',
+  empty:'<path d="M4 16l5-5 4 4 3-3 4 4"/><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.3"/>'
+};
+const VIEWS=[{k:'design',ko:'상담 시뮬레이션'},{k:'generate',ko:'연습용 얼굴'},{k:'restyle',ko:'눈썹 생성기'},{k:'sheet',ko:'출력 시트'},{k:'gallery',ko:'갤러리'}];
+const STATUS_KO={queued:'대기',running:'진행 중',done:'완료',failed:'실패',cancelled:'취소'};
+const usd=v=>'$'+(Math.round((+v||0)*100)/100).toFixed(2);
+let presets=null, items=[], filter='all', lbIndex=-1, timer=null, usage=null, view='design', loaded=false;
+
+/* ── theme ───────────────────────────────────────────────────────────── */
+function applyTheme(t){
+  if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t);
+  const icon=t==='auto'?ICON.auto:t==='dark'?ICON.moon:ICON.sun;
+  ['#themeBtn','#themeBtn2'].forEach(s=>{ const b=$(s); if(b){ b.innerHTML=svg(icon,16,1.9); b.title='화면 테마: '+(t==='auto'?'시스템':t==='dark'?'어둡게':'밝게'); } });
+}
+let theme=(()=>{ try{ return localStorage.getItem('browlab.theme')||'auto'; }catch(e){ return 'auto'; } })();
+function cycleTheme(){ theme=theme==='auto'?'light':theme==='light'?'dark':'auto'; try{ localStorage.setItem('browlab.theme',theme); }catch(e){} applyTheme(theme); }
+applyTheme(theme);
+
+/* ── toasts ──────────────────────────────────────────────────────────── */
+function toast(text, kind){
+  const t=el('div','toast'+(kind?' '+kind:''),text); $('#toasts').appendChild(t);
+  setTimeout(()=>{ t.style.transition='opacity .3s,transform .3s'; t.style.opacity='0'; t.style.transform='translateY(8px)'; setTimeout(()=>t.remove(),320); }, kind==='bad'?5200:2800);
+}
+
+/* ── api ─────────────────────────────────────────────────────────────── */
+async function api(path, opts={}){
+  const r=await fetch(path, Object.assign({credentials:'same-origin'}, opts));
+  let data={}; try{ data=await r.json(); }catch(e){}
+  if(r.status===401){ showLogin(); throw new Error(data.error||'로그인이 필요합니다'); }
+  if(!r.ok) throw new Error(data.error||('HTTP '+r.status));
+  return data;
+}
+const post=(path, body)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+
+/* ── shell ───────────────────────────────────────────────────────────── */
+function showLogin(){ stopPolling(); $('#login').hidden=false; $('#shell').hidden=true; document.body.classList.remove('show-jobs'); $('#pw').focus(); }
+async function showApp(){
+  $('#login').hidden=true; $('#shell').hidden=false;
+  presets=await api('api/presets'); buildNav(); buildForms(); await refreshGallery(); await loadUsage(); startPolling();
+}
+function renderStatus(codexOk, apiOk){
+  const mk=(ok,on,off)=>{ const t=el('span','tag '+(ok?'ok':'bad')); t.appendChild(el('i','dot')); t.appendChild(el('span','',ok?on:off)); return t; };
+  ['#status','#status2'].forEach(s=>{ const box=$(s); if(!box) return; box.replaceChildren(); box.appendChild(mk(codexOk,'Codex 연결','Codex 없음')); box.appendChild(mk(apiOk,'API 키 연결','API 키 없음')); });
+}
+function buildNav(){
+  const side=$('#sideNav'), tabs=$('#tabbar'); side.replaceChildren(); tabs.replaceChildren();
+  VIEWS.forEach(v=>{
+    const b=el('button'); b.type='button'; b.dataset.k=v.k; b.innerHTML=svg(ICON[v.k],17,1.9); b.appendChild(el('span','',v.ko));
+    b.onclick=()=>setView(v.k); if(v.k==='gallery') b.style.display='none';
+    side.appendChild(b);
+    const t=el('button'); t.type='button'; t.dataset.k=v.k; t.innerHTML=svg(ICON[v.k],22,1.8); t.appendChild(el('span','',v.ko));
+    if(v.k==='gallery'){ const badge=el('span','badge'); badge.id='jobCount'; t.appendChild(badge); }
+    t.onclick=()=>setView(v.k); tabs.appendChild(t);
+  });
+  setView(view);
+}
+function setView(v){
+  view=v;
+  const isGal=v==='gallery';
+  if(!isGal){ $$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.mode===v)); const t=VIEWS.find(x=>x.k===v); if(t) $('#topSub').textContent=t.ko; }
+  document.body.classList.toggle('show-jobs', isGal);
+  $$('#sideNav button, #tabbar button').forEach(b=>b.setAttribute('aria-current', String(b.dataset.k===v)));
+  if(isGal) refreshGallery();
+}
+const setMode=setView;   /* kept: called from the lightbox actions */
+
+/* ── forms ───────────────────────────────────────────────────────────── */
+function buildForms(){
+  const has=k=>{ const b=presets.backends.find(x=>x.key===k); return !!(b&&b.available); };
+  renderStatus(has('codex')||has('codex-only'), has('api'));
+  $$('.chips[data-chips]').forEach(box=>{
+    const list=presets[box.dataset.chips]||[]; const name=box.dataset.name; const multi=!!box.dataset.multi;
+    box.replaceChildren();
+    list.forEach((it,i)=>{
+      const lab=el('label','chip'+(multi?' multi':'')); const inp=document.createElement('input');
+      inp.type=multi?'checkbox':'radio'; inp.name=name; inp.value=it.key;
+      if(!multi && (it.default || (i===0 && !list.some(x=>x.default)))) inp.checked=true;
+      if(multi && (box.dataset.default ? it.key===box.dataset.default : it.key==='as_is')) inp.checked=true;
+      if(multi) inp.addEventListener('change', updateRestyleLabel);
+      if(it.tip) lab.title=it.tip;
+      lab.appendChild(inp); lab.appendChild(el('span','',it.short||it.ko)); box.appendChild(lab);
+    });
+  });
+  $$('select[data-src]').forEach(sel=>{
+    let list=presets[sel.dataset.src]||[];
+    if(sel.dataset.src==='qualities') list=list.map(k=>({key:k,ko:k}));
+    if(sel.dataset.src==='backends') list=list.map(b=>({key:b.key,ko:b.ko+(b.available?'':' — 사용 불가')}));
+    sel.replaceChildren();
+    if(sel.dataset.none) sel.appendChild(new Option(sel.dataset.none,''));
+    list.forEach(it=>{ if(sel.dataset.none && it.key==='random') return; sel.appendChild(new Option(it.ko,it.key)); });
+    if(sel.dataset.src==='backends'){ sel.value=presets.default_backend; sel.addEventListener('change', updateEngineHints); }
+    if(sel.dataset.src==='qualities') sel.value='high';
+  });
+  updateEngineHints(); updateRestyleLabel();
+}
+function updateEngineHints(){
+  $$('form [data-engine]').forEach(box=>{
+    const form=box.closest('form'); const sel=$('select[name=backend]',form);
+    const key=sel?sel.value:presets.default_backend; const b=presets.backends.find(x=>x.key===key)||{};
+    // only speak up when the engine cannot actually run; the rest was noise
+    box.replaceChildren();
+    if(b.available) return;
+    const label=key==='auto'?'자동':(key==='codex'||key==='codex-only')?'Codex':key==='api'?'OpenAI API':'프롬프트만';
+    const tag=el('span','tag bad'); tag.appendChild(el('i','dot')); tag.appendChild(el('span','',label)); box.appendChild(tag);
+    box.appendChild(el('span','',key==='auto'?'codex 도 OPENAI_API_KEY 도 없습니다'
+      :(key==='codex'||key==='codex-only')?'codex 실행 파일이 없습니다':'서버에 OPENAI_API_KEY 가 없습니다'));
+  });
+}
+function updateRestyleLabel(){ const n=$$('#fRestyle input[name=styles]:checked').length; const l=$('[data-restyle-label]'); if(l) l.textContent=n?`눈썹 ${n}가지로 바꾸기`:'스타일을 고르세요'; }
+
+$$('#filters button').forEach(b=>b.onclick=()=>{ filter=b.dataset.f; $$('#filters button').forEach(x=>x.classList.toggle('on',x===b)); renderGallery(); });
+$$('.stepper').forEach(s=>{ const inp=$('input[name=count]',s), out=$('output',s);
+  $$('button',s).forEach(b=>b.onclick=()=>{ const v=Math.max(1,Math.min(8,(+inp.value||1)+(+b.dataset.step))); inp.value=v; out.textContent=v+'명'; }); });
+
+/* ── photo pickers ───────────────────────────────────────────────────── */
+function setPhotoFrom(form, item){
+  const lab=$('label.drop',form); $('input[name=photo]',lab).value='';
+  $('input[name=photo_from_job]',lab).value=item.id; $('input[name=photo_from_file]',lab).value=item.image_name;
+  const img=$('img.ph',lab); img.src=item.image+'?w=480'; img.hidden=false; $('[data-ph]',lab).hidden=true;
+  $('b',$('.pt',lab)).textContent=item.label||item.title;
+  $('.pt span',lab).textContent='갤러리에서 가져온 이미지 · 다른 사진을 쓰려면 누르세요';
+}
+function showPicked(lab, file){
+  const img=$('img.ph',lab), ph=$('[data-ph]',lab);
+  $('input[name=photo_from_job]',lab).value=''; $('input[name=photo_from_file]',lab).value='';
+  img.src=URL.createObjectURL(file); img.hidden=false; ph.hidden=true;
+  $('b',$('.pt',lab)).textContent=file.name;
+  $('.pt span',lab).textContent=(file.size/1024/1024).toFixed(1)+' MB · 다른 사진을 고르려면 누르세요';
+}
+$$('label.drop').forEach(lab=>{
+  const inp=$('input[type=file]',lab);
+  inp.addEventListener('change',()=>{ const f=inp.files[0]; if(f) showPicked(lab,f); });
+  ['dragenter','dragover'].forEach(ev=>lab.addEventListener(ev,e=>{ e.preventDefault(); lab.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev=>lab.addEventListener(ev,e=>{ e.preventDefault(); lab.classList.remove('over'); }));
+  lab.addEventListener('drop',e=>{ const f=e.dataTransfer&&e.dataTransfer.files[0]; if(!f||!f.type.startsWith('image/')) return;
+    const dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; showPicked(lab,f); });
+});
+
+/* ── submit ──────────────────────────────────────────────────────────── */
+function collect(form){
+  const o={}; Array.from(form.elements).forEach(e=>{ if(!e.name) return;
+    if(e.type==='checkbox'){ if(e.closest('.chips')){ (o[e.name]=o[e.name]||[]); if(e.checked) o[e.name].push(e.value); } else o[e.name]=e.checked; }
+    else if(e.type==='radio'){ if(e.checked) o[e.name]=e.value; }
+    else if(e.type!=='file') o[e.name]=e.value; });
+  return o;
+}
+function readFile(file){ return new Promise((res,rej)=>{ if(!file||!file.size) return rej(new Error('사진을 고르세요'));
+  if(file.size>25*1024*1024) return rej(new Error('사진은 25 MB 이하')); const r=new FileReader();
+  r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(new Error('파일을 읽지 못했습니다')); r.readAsDataURL(file); }); }
+async function submit(form, kind){
+  const msg=$('[data-msg]',form); if(msg) msg.textContent='';
+  const btn=$('button[type=submit]',form); btn.disabled=true; btn.dataset.busy='1';
+  try{
+    const body=Object.assign({kind}, collect(form));
+    if(body.age_exact) body.age=body.age_exact;
+    const f=$('input[type=file]',form);
+    if(f){
+      if(f.files[0]&&f.files[0].size){ body.photo=await readFile(f.files[0]); body.photo_name=f.files[0].name; }
+      else if(body.photo_from_job){ body.photo_from={job:body.photo_from_job, file:body.photo_from_file}; body.photo_name=$('.pt b',form).textContent; }
+      else throw new Error('사진을 고르세요');
+    }
+    delete body.photo_from_job; delete body.photo_from_file;
+    if(kind==='restyle' && !(body.styles||[]).length) throw new Error('스타일을 하나 이상 고르세요');
+    await post('api/jobs', body);
+    toast('작업을 시작했습니다','good');
+    await refreshGallery(); setView('gallery');
+  }catch(e){ if(msg) msg.textContent=e.message; toast(e.message,'bad'); }
+  finally{ btn.disabled=false; delete btn.dataset.busy; }
+}
+$('#fGen').onsubmit=e=>{ e.preventDefault(); submit(e.target,'generate'); };
+$('#fRestyle').onsubmit=e=>{ e.preventDefault(); submit(e.target,'restyle'); };
+$('#fSheet').onsubmit=e=>{ e.preventDefault(); submit(e.target,'sheet'); };
+$('#fCal').onsubmit=e=>{ e.preventDefault(); submit(e.target,'calibrate'); };
+$('#loginBtn').onclick=async()=>{ $('#loginMsg').textContent=''; try{ await post('api/login',{password:$('#pw').value}); $('#pw').value=''; await showApp(); }catch(e){ $('#loginMsg').textContent=e.message; } };
+$('#pw').onkeydown=e=>{ if(e.key==='Enter') $('#loginBtn').click(); };
+$('#logoutBtn').onclick=async()=>{ try{ await post('api/logout'); }catch(e){} showLogin(); };
+$('#themeBtn').onclick=cycleTheme; $('#themeBtn2').onclick=cycleTheme;
+
+/* ── usage / settings ────────────────────────────────────────────────── */
+function renderUsage(){
+  if(!usage) return; const u=usage;
+  const pct=u.budget_usd?Math.min(100,100*u.total_usd/u.budget_usd):0;
+  $('#usageAmt').textContent=usd(u.total_usd); $('#usageAmt2').textContent=usd(u.total_usd);
+  $('#usageCap').textContent=u.budget_usd!=null?('/ '+usd(u.budget_usd)):'사용량';
+  const bar=$('#usageBar'); bar.style.width=pct+'%'; bar.classList.toggle('hot',pct>=85);
+  $('#uTotal').textContent=usd(u.total_usd);
+  $('#uBudget').textContent=u.budget_usd!=null?usd(u.budget_usd)+(u.budget_note?' · '+u.budget_note:''):'설정 안 됨';
+  $('#uRemain').textContent=u.remaining_usd!=null?usd(u.remaining_usd):'—';
+  $('#uImages').textContent=u.api_images+'장 · 작업 '+u.api_jobs+'개';
+  $('#uSince').textContent=u.first?u.first.replace('T',' '):'—';
+  const b2=$('#uBar'); b2.style.width=pct+'%'; b2.classList.toggle('hot',pct>=85);
+  const f=$('#fBudget');
+  if(document.activeElement!==f.budget_usd) f.budget_usd.value=u.budget_usd!=null?u.budget_usd:'';
+  if(document.activeElement!==f.budget_note) f.budget_note.value=u.budget_note||'';
+}
+async function loadUsage(){ try{ usage=await api('api/usage'); renderUsage(); }catch(e){} }
+function openSettings(){ $('#settingsOv').hidden=false; loadUsage();
+  if(presets&&presets.server){ const sv=presets.server; const br=(sv.branch||'').split('/').pop();
+    $('#uServer').textContent=(sv.commit||'?')+' · v'+sv.version+(br?' · '+br:''); } }
+$('#usageBtn').onclick=openSettings; $('#usageBtn2').onclick=openSettings;
+$('#settingsBtn').onclick=openSettings; $('#settingsBtn2').onclick=openSettings;
+$('#settingsClose').onclick=()=>{ $('#settingsOv').hidden=true; };
+$('#settingsOv').addEventListener('click',e=>{ if(e.target===e.currentTarget) $('#settingsOv').hidden=true; });
+$('#fBudget').onsubmit=async e=>{ e.preventDefault(); const f=e.target; const msg=$('[data-msg]',f); msg.textContent='';
+  try{ usage=await post('api/settings',{budget_usd:f.budget_usd.value, budget_note:f.budget_note.value}); renderUsage();
+    msg.className='msg ok'; msg.textContent='저장됨'; setTimeout(()=>{msg.textContent='';msg.className='msg';},1600);
+  }catch(err){ msg.className='msg'; msg.textContent=err.message; } };
+function renderModels(rows, probed){
+  const box=$('#modelRows'); box.replaceChildren();
+  rows.forEach(r=>{
+    box.appendChild(el('span','',r.model));
+    const b=el('b'); b.style.display='flex'; b.style.alignItems='center'; b.style.justifyContent='flex-end'; b.style.gap='6px';
+    const dot=el('i','dot'); dot.style.cssText='width:7px;height:7px;border-radius:999px;flex:0 0 7px;background:'+(r.usable?'var(--ok)':r.status==='limit0'?'var(--wait)':'var(--warn)');
+    b.appendChild(dot); b.appendChild(el('span','',r.label+(r.cost_usd?' · '+usd(r.cost_usd):'')));
+    b.style.color=r.usable?'var(--ok)':r.status==='limit0'?'var(--wait)':'var(--warn)';
+    box.appendChild(b);
+  });
+  const best=rows.find(r=>r.usable);
+  $('#modelMsg').className='msg '+(best?'ok':'');
+  $('#modelMsg').textContent=best?('지금 쓰이는 모델: '+best.model+(probed?'':' · 한도 0 여부는 "1장 생성해 확인"')):'쓸 수 있는 모델이 없습니다';
+}
+async function checkModels(probe){
+  const b1=$('#modelCheck'), b2=$('#modelProbe'), m=$('#modelMsg');
+  b1.disabled=b2.disabled=true; m.className='msg'; m.textContent=probe?'1장 생성해 확인 중… 최대 1분':'확인 중…';
+  try{ const r=await post('api/models/check',{probe:!!probe}); renderModels(r.models, r.probed); }
+  catch(e){ m.className='msg'; m.textContent=e.message; }
+  finally{ b1.disabled=b2.disabled=false; }
+}
+$('#modelCheck').onclick=()=>checkModels(false);
+$('#modelProbe').onclick=()=>checkModels(true);
+$('#updateBtn').onclick=async()=>{ const b=$('#updateBtn'), m=$('#updateMsg'), o=$('#updateOut'); b.disabled=true; m.className='msg'; m.textContent='업데이트 중…';
+  const run=async force=>{
+    const r=await post('api/update',{restart:true, force:!!force}); o.hidden=false;
+    o.textContent=(r.before||'?')+' → '+(r.after||'?')+'\n'+(r.output||'');
+    if(r.restarting){ m.textContent='재시작 중… 10초 뒤 새로고침합니다'; setTimeout(()=>location.reload(),10000); return; }
+    m.className=r.ok?'msg ok':'msg';
+    m.textContent=r.ok?(r.changed?'업데이트됨':'최신 상태'):('실패 · '+((r.output||'').split('\n')[0]||'서버 로그를 보세요'));
+    b.disabled=false; };
+  try{ await run(false); }
+  catch(e){
+    // a job left running (or wedged) must not block the update for ever
+    if(/진행 중인 작업/.test(e.message) && confirm(e.message+'\n그래도 업데이트할까요? (진행 중인 작업은 중단됩니다)')){
+      try{ await run(true); }catch(e2){ m.textContent=e2.message; b.disabled=false; }
+    } else { m.textContent=e.message; b.disabled=false; }
+  } };
+
+/* ── gallery ─────────────────────────────────────────────────────────── */
+function fmtTime(iso){ if(!iso) return ''; const d=new Date(iso); const now=new Date();
+  const same=d.toDateString()===now.toDateString();
+  return (same?'':(d.getMonth()+1)+'/'+d.getDate()+' ')+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function dur(j){ if(!j.started||!j.finished) return ''; const s=Math.round((new Date(j.finished)-new Date(j.started))/1000);
+  return s>=60?Math.floor(s/60)+'분 '+(s%60)+'초':s+'초'; }
+function visible(){ return items.filter(it=>filter==='all' || it.kind===filter || (filter==='sheet' && it.kind==='calibrate')); }
+async function refreshGallery(){ try{ const d=await api('api/gallery'); items=d.items; loaded=true; }catch(e){ return; } renderGallery(); }
+function renderGallery(){
+  const list=visible(); const g=$('#gallery'); g.replaceChildren();
+  const active=items.filter(i=>i.status==='running'||i.status==='queued').length;
+  const badge=$('#jobCount'); if(badge) badge.textContent=active?String(active):'';
+  $('#galSub').textContent=(active?`${active}개 진행 중 · `:'')+`${items.filter(i=>i.image).length}장`;
+  document.title=(active?`(${active}) `:'')+'BrowLab · 눈썹 디자인 스튜디오';
+  if(!list.length){
+    const e=el('div','empty'); e.innerHTML=svg(ICON.empty,30,1.5);
+    e.appendChild(el('div','', loaded?'아직 결과가 없습니다. 조건을 고르고 생성을 누르면 여기에 쌓입니다.':'불러오는 중…'));
+    g.appendChild(e); return;
+  }
+  list.forEach(it=>{
+    const c=el('button','gcard'); c.type='button'; c.onclick=()=>openLb(items.indexOf(it));
+    const th=el('div','thumb');
+    if(it.image){
+      // the card shows exactly what the viewer would: the original underneath, the
+      // result over it at this item's own 겹치기 strength, with its adjustments applied
+      const e={...EDIT0, ...(it.edit||{})}, pair=it.compare&&!it.saved;
+      const blend=el('div','blend');
+      if(pair){ const under=document.createElement('img'); under.loading='lazy';
+        under.src=it.compare.before+'?w=480'; under.alt=''; blend.appendChild(under); }
+      const im=document.createElement('img'); im.loading='lazy'; im.src=it.image+'?w=480'; im.alt=it.label||'';
+      if(pair) im.style.opacity=(Math.max(0,Math.min(100,e.overlay))/100).toFixed(2);
+      blend.appendChild(im);
+      if(pair){
+        blend.style.filter=cssFilter(e);
+        if(e.temp){ const wash=el('i','warm'); wash.style.background=e.temp>0?'#ff9a3c':'#3ca0ff';
+          wash.style.opacity=Math.min(.5,Math.abs(e.temp)/100*.55).toFixed(3); blend.appendChild(wash); }
+      }
+      th.appendChild(blend); }
+    else {
+      const ph=el('div','ph');
+      if(it.status==='running'||it.status==='queued'){ ph.appendChild(el('div','spinner')); th.appendChild(el('div','shimmer')); }
+      ph.appendChild(el('span','', it.status==='queued'?'대기 중':it.status==='running'?('생성 중 '+(it.progress||'')):it.status==='failed'?'실패 · 눌러서 로그 보기':STATUS_KO[it.status]||''));
+      th.appendChild(ph);
+    }
+    if(it.status!=='done') th.appendChild(el('span','pill '+it.status, STATUS_KO[it.status]||it.status));
+    c.appendChild(th);
+    const m=el('div','meta'); m.appendChild(el('b','',it.label||it.title));
+    m.appendChild(el('span','',[it.kind_ko, fmtTime(it.created), it.cost_usd?usd(it.cost_usd):''].filter(Boolean).join(' · ')));
+    c.appendChild(m); g.appendChild(c);
+  });
+  renderRecentDesigns();
+}
+
+/* ── lightbox: compare + adjust ──────────────────────────────────────── */
+const EDIT0={x:50, overlay:75, brightness:0, contrast:0, saturate:0, temp:0, fit:'contain'};
+let edit={...EDIT0}, editItem=null;
+// The canvas works on a screen-sized copy: the originals are 2000-3000px photos and
+// the viewer loads two of them, which is ~14 MB a card over the network for pixels no
+// screen shows. Full resolution is fetched separately, in the background, for saving.
+const DISPLAY_W=1400;
+const imgA=new Image(), imgB=new Image();   // after (result) / before (original), display size
+const fullA=new Image(), fullB=new Image(); // the same pair at full resolution, for save/download
+[imgA,imgB,fullA,fullB].forEach(i=>i.crossOrigin='anonymous');
+// only served files can be resized; a data:/blob: source is used as it is
+const displaySrc=u=>/^(data:|blob:)/.test(u)?u:u+(u.includes('?')?'&':'?')+'w='+DISPLAY_W;
+const fullReady=()=>fullA.naturalWidth&&fullB.naturalWidth;
+let showToken=0;
+const cmpEl=()=>$('#lbCmp');
+
+let drawRect={x:0,y:0,w:0,h:0};      // where the picture sits on the canvas
+let paintA=null, paintB=null;        // which pair paint() uses (screen copy, or full size when saving)
+function paint(ctx,w,h,opts){
+  const o=opts||edit, r=drawRect;
+  const A=paintA||imgA, B=paintB||imgB;
+  const put=im=>ctx.drawImage(im,r.x,r.y,r.w,r.h);
+  ctx.save(); ctx.filter='none'; ctx.globalAlpha=1;
+  ctx.clearRect(0,0,w,h);
+  if(B.complete&&B.naturalWidth) put(B);
+  if(A.complete&&A.naturalWidth&&!o.hold){
+    const cut=Math.round(w*o.x/100);
+    ctx.globalAlpha=Math.max(0,Math.min(1,o.overlay/100));
+    ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(A); ctx.restore();
+  }
+  ctx.restore();
+}
+function cssFilter(o){
+  const b=1+o.brightness/100, c=1+o.contrast/100, sat=1+o.saturate/100;
+  return (b===1&&c===1&&sat===1) ? 'none' : `brightness(${b}) contrast(${c}) saturate(${sat})`;
+}
+function adjust(ctx,w,h,opts){
+  const o=opts||edit;
+  const b=1+o.brightness/100, c=1+o.contrast/100, sat=1+o.saturate/100;
+  if(b!==1||c!==1||sat!==1){
+    const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
+    tmp.getContext('2d').drawImage(ctx.canvas,0,0);
+    ctx.save(); ctx.filter=`brightness(${b}) contrast(${c}) saturate(${sat})`;
+    ctx.clearRect(0,0,w,h); ctx.drawImage(tmp,0,0); ctx.restore();
+  }
+  if(o.temp){ // warm / cool wash, soft-light so it tints rather than paints
+    ctx.save(); ctx.globalCompositeOperation='soft-light';
+    ctx.globalAlpha=Math.min(.5,Math.abs(o.temp)/100*.55);
+    ctx.fillStyle=o.temp>0?'#ff9a3c':'#3ca0ff'; ctx.fillRect(0,0,w,h); ctx.restore();
+  }
+}
+function renderCmp(opts){
+  const cv=$('#lbCanvas'); const A=paintA||imgA; if(!A.naturalWidth) return;
+  const iw=A.naturalWidth, ih=A.naturalHeight;
+  const box=$('.lb-img').getBoundingClientRect();
+  const pad=$('#lb').classList.contains('full')?0:28;
+  const bw=Math.max(1,box.width-pad), bh=Math.max(1,box.height-pad);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  let w,h;
+  if(edit.fit==='cover'){                       // fill the screen, cropping the overflow
+    const k=Math.max(bw/iw,bh/ih);
+    w=Math.round(bw*dpr); h=Math.round(bh*dpr);
+    const dw=iw*k*dpr, dh=ih*k*dpr;
+    drawRect={x:(w-dw)/2, y:(h-dh)/2, w:dw, h:dh};
+  } else {                                      // whole picture, letterboxed
+    const k=Math.min(bw/iw,bh/ih,1);
+    w=Math.max(1,Math.round(iw*k*dpr)); h=Math.max(1,Math.round(ih*k*dpr));
+    drawRect={x:0, y:0, w, h};
+  }
+  cv.width=w; cv.height=h;
+  cv.style.width=Math.round(w/dpr)+'px'; cv.style.height=Math.round(h/dpr)+'px';
+  const ctx=cv.getContext('2d'); paint(ctx,w,h,opts); adjust(ctx,w,h,opts);
+}
+function fullCanvas(){
+  // use the full-resolution pair when it has arrived; the screen copy is the fallback
+  const big=fullReady();
+  const A=big?fullA:imgA, B=big?fullB:imgB;
+  const cv=document.createElement('canvas');
+  cv.width=A.naturalWidth; cv.height=A.naturalHeight;
+  const keep=drawRect; drawRect={x:0,y:0,w:cv.width,h:cv.height};   // saves are never cropped
+  const ctx=cv.getContext('2d');
+  const out={...edit, x:0, hold:false};   // ...and never split: the handle is a way to look, not part of the picture
+  const keepA=paintA, keepB=paintB; paintA=A; paintB=B;
+  paint(ctx,cv.width,cv.height,out); adjust(ctx,cv.width,cv.height,out);
+  paintA=keepA; paintB=keepB;
+  drawRect=keep;
+  return cv;
+}
+function setCmpX(pct){ edit.x=Math.max(0,Math.min(100,pct));
+  cmpEl().style.setProperty('--x',edit.x+'%'); renderCmp(); }
+
+function showCompare(it){
+  const c=cmpEl();
+  editItem=it; edit={...EDIT0, fit: narrow()?'cover':'contain', ...(it.edit||{})};
+  $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기';
+  const hint=c.querySelector('.lb-hint');
+  hint.style.animation='none'; void hint.offsetWidth; hint.style.animation='';   // replay the fade
+  c.classList.remove('held');
+  c.style.setProperty('--x',edit.x+'%');
+  $('#lbTagB').textContent=it.compare.before_label||'원본';
+  $('#lbTagA').textContent=it.compare.after_label||'생성';
+  // Redraw on every arrival rather than counting loads: imgA/imgB are shared, and a
+  // cached src leaves .complete true with the PREVIOUS picture's pixels, so a counter
+  // reached zero early and the canvas kept showing the item before this one.
+  const token=++showToken;
+  const draw=()=>{ if(token===showToken) renderCmp(); };
+  // if the resized copy cannot be had, fall back to the original rather than a blank canvas
+  const fallback=(im,url)=>()=>{ if(token!==showToken) return;
+    if(im.src.endsWith('w='+DISPLAY_W)){ im.onerror=null; im.src=url; } };
+  imgA.onerror=fallback(imgA, it.image);
+  imgB.onerror=()=>{ if(token!==showToken) return;
+    if(imgB.src.endsWith('w='+DISPLAY_W)){ imgB.src=it.compare.before; return; }
+    c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };
+  imgA.onload=draw; imgB.onload=draw;
+  imgA.src=displaySrc(it.image); imgB.src=displaySrc(it.compare.before);
+  if(imgA.complete&&imgA.naturalWidth) draw();
+  c.hidden=false;
+}
+(function wireCompare(){
+  const c=cmpEl(), div=$('#lbDiv');
+  let dragging=false;
+  const pct=e=>{ const r=$('#lbCanvas').getBoundingClientRect(); return (e.clientX-r.left)/Math.max(1,r.width)*100; };
+  div.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); dragging=true;
+    div.setPointerCapture(e.pointerId); setCmpX(pct(e)); });
+  div.addEventListener('pointermove',e=>{ if(dragging) setCmpX(pct(e)); });
+  const stop=e=>{ if(!dragging) return; dragging=false; try{ div.releasePointerCapture(e.pointerId); }catch(_){} };
+  div.addEventListener('pointerup',stop); div.addEventListener('pointercancel',stop);
+  // Anywhere else on the picture: hold still to see the original, or drag sideways
+  // to move to the next result. A gesture becomes a swipe once it has travelled far
+  // enough, which also cancels the hold, so the two never fire together.
+  let press=null;
+  c.addEventListener('pointerdown',e=>{ if(dragging||e.target===div||div.contains(e.target)) return;
+    press={x:e.clientX, y:e.clientY, id:e.pointerId, swiping:false};
+    c.classList.add('held'); c.setPointerCapture(e.pointerId); renderCmp({...edit,hold:true}); });
+  c.addEventListener('pointermove',e=>{ if(!press||press.id!==e.pointerId) return;
+    const dx=e.clientX-press.x, dy=e.clientY-press.y;
+    if(!press.swiping && Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
+      press.swiping=true; c.classList.remove('held'); renderCmp(); }   // it is a swipe, not a hold
+  });
+  const release=e=>{ if(!press||press.id!==e.pointerId) return;
+    const dx=e.clientX-press.x, swiped=press.swiping;
+    c.classList.remove('held'); try{ c.releasePointerCapture(e.pointerId); }catch(_){}
+    press=null;
+    if(swiped && Math.abs(dx)>40) step(dx<0?1:-1); else renderCmp(); };
+  // pointerup and pointercancel are guaranteed while the pointer is captured, and
+  // capture itself fires pointerleave - listening for that cancelled every hold
+  c.addEventListener('pointerup',release); c.addEventListener('pointercancel',release);
+  addEventListener('resize',()=>{ if(!c.hidden) renderCmp(); });
+})();
+
+let saveTimer=null;
+function rememberEdit(it){
+  if(!it||!it.image_name||it.saved) return;
+  const note=$('#editNote'); if(note) note.textContent='저장 중…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const {x, hold, ...keepable}=edit;              // the handle position is a way to look, not a setting
+    try{ await post('api/edits',{job:it.id, image:it.image_name, settings:keepable});
+      it.edit={...keepable};                        // so the card redraws with them
+      if(note) note.textContent='자동 저장됨';
+      renderGallery();
+    }catch(e){ if(note) note.textContent='저장 실패: '+e.message; }
+  }, 500);
+}
+function downloadCanvas(it){
+  // toDataURL is synchronous on purpose: a download started from toBlob's callback
+  // has lost the click's user activation and the browser drops it silently
+  const stamp=new Date().toISOString().slice(0,10);
+  const safe=(it.label||'browlab').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,40)||'browlab';
+  const data=fullCanvas().toDataURL('image/png');
+  const bin=atob(data.slice(data.indexOf(',')+1));
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/png'}));
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`${safe}_${stamp}.png`;
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('이미지를 내려받았습니다','good');
+}
+const SLIDERS=[['overlay','겹치기',0,100,1],['brightness','밝기',-60,60,1],['contrast','대비',-60,60,1],
+               ['saturate','채도',-80,80,1],['temp','색온도',-60,60,1]];
+function wantFullSize(it){
+  // only worth 7 MB once somebody is actually adjusting: on a phone this panel sits
+  // behind the 정보 button, so browsing the gallery never pulls the originals
+  const a=displaySrc(it.image);
+  if(fullA.dataset.for!==a){ fullA.dataset.for=a; fullA.src=it.image; fullB.src=it.compare.before; }
+}
+function editPanel(it){
+  if(!$('#lb').classList.contains('full')) wantFullSize(it);   // visible now: desktop, or 정보 already open
+  const wrap=el('div','edit');
+  SLIDERS.forEach(([key,ko,lo,hi])=>{
+    const row=el('label','sl'); row.dataset.sl=key;
+    row.appendChild(el('span','',ko));
+    const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=edit[key];
+    const out=el('b','',String(edit[key]));
+    r.addEventListener('input',()=>{ wantFullSize(it); edit[key]=+r.value; out.textContent=r.value;
+      renderCmp(); rememberEdit(it); });
+    row.appendChild(r); row.appendChild(out); wrap.appendChild(row); });
+  const reset=el('button','btn','조정 초기화'); reset.type='button';
+  reset.onclick=()=>{ const x=edit.x; edit={...EDIT0, x}; rememberEdit(it);
+    cmpEl().style.setProperty('--x',x+'%'); renderLb(); };
+  const acts2=el('div','row');
+  const dl=el('button','btn','이미지 내려받기'); dl.type='button'; dl.onclick=()=>downloadCanvas(it);
+  const note=el('span','msg'); note.id='editNote'; note.textContent=it.edit?'자동 저장됨':'';
+  acts2.addEventListener('pointerdown',()=>wantFullSize(it));   // about to save or download
+  acts2.appendChild(dl); acts2.appendChild(note);
+  const row=el('div','row');
+  row.addEventListener('pointerdown',()=>wantFullSize(it));
+  const name=document.createElement('input'); name.type='text'; name.placeholder='회원명 (비우면 자동)'; name.id='saveName';
+  const save=el('button','btn dark','갤러리에 저장'); save.type='button';
+  save.onclick=async()=>{ save.disabled=true; const old=save.textContent; save.textContent='저장 중…';
+    try{
+      const data=fullCanvas().toDataURL('image/png');
+      const out=await post('api/saves',{job:it.id, name:name.value, image:data, settings:edit});
+      toast(out.name+' (으)로 저장했습니다','good'); await refreshGallery();
+    }catch(e){ toast(e.message,'bad'); }
+    save.textContent=old; save.disabled=false; };
+  row.appendChild(name); row.appendChild(save);
+  wrap.appendChild(reset); wrap.appendChild(acts2); wrap.appendChild(row);
+  return wrap;
+}
+
+/* ── lightbox ────────────────────────────────────────────────────────── */
+function openLb(i){ lbIndex=i; const lb=$('#lb');
+  lb.classList.toggle('full', narrow());        // on a phone the picture gets the whole screen
+  $('#lbInfo').textContent = lb.classList.contains('full')?'정보':'이미지만';
+  lb.hidden=false; renderLb(); }
+function closeLb(){ $('#lb').hidden=true; lbIndex=-1; }
+function step(d){ const list=visible(); if(!list.length) return; const cur=items[lbIndex];
+  let pos=list.indexOf(cur); pos=(pos+d+list.length)%list.length; lbIndex=items.indexOf(list[pos]); renderLb(); }
+$('#lbClose').onclick=closeLb; $('#lbPrev').onclick=()=>step(-1); $('#lbNext').onclick=()=>step(1);
+const narrow=()=>matchMedia('(max-width:1119px)').matches;
+$('#lbFit').onclick=()=>{ edit.fit = edit.fit==='cover'?'contain':'cover';
+  $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기'; renderCmp(); };
+$('#lbInfo').onclick=()=>{ const lb=$('#lb'); lb.classList.toggle('full');
+  if(!lb.classList.contains('full')&&editItem&&editItem.compare) wantFullSize(editItem);
+  $('#lbInfo').textContent = lb.classList.contains('full')?'정보':'이미지만';
+  if(!$('#lbCmp').hidden) requestAnimationFrame(()=>renderCmp()); };
+$('#lb').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeLb(); });
+function spec(dl,k,v){ if(!v) return; dl.appendChild(el('dt','',k)); dl.appendChild(el('dd','',v)); }
+async function renderLb(){
+  const it=items[lbIndex]; if(!it){ closeLb(); return; }
+  const list=visible(), at=list.indexOf(it);
+  $('#lbCount').textContent=(at+1)+' / '+list.length;
+  const dots=$('#lbDots'); dots.replaceChildren();
+  if(list.length>1 && list.length<=12) list.forEach((_,i)=>dots.appendChild(el('i', i===at?'on':'')));
+  const img=$('#lbImg'), ph=$('#lbPh'), cmp=$('#lbCmp');
+  if(it.image && it.compare && (!it.saved || it.design)){ showCompare(it); img.hidden=true; ph.hidden=true; }
+  else if(it.image){ cmp.hidden=true; img.src=it.image; img.hidden=false; ph.hidden=true; }
+  else { cmp.hidden=true; img.hidden=true; ph.hidden=false; ph.replaceChildren();
+    if(it.status==='running'||it.status==='queued') ph.appendChild(el('div','spinner'));
+    ph.appendChild(el('div','', it.status==='failed'?'실패한 작업입니다. 아래 로그를 보세요.':it.status==='queued'?'앞 작업이 끝나면 시작합니다.':'생성 중입니다. 완료되면 여기에 나타납니다.')); }
+  const side=$('#lbSide'); side.replaceChildren();
+  side.appendChild(el('h3','',it.label||it.title));
+  const dl=el('dl','spec');
+  spec(dl,'작업',it.kind_ko); spec(dl,'시각',fmtTime(it.created));
+  if(it.look){ const pg=PIGMENTS.find(p=>p[0]===it.look.color); spec(dl,'도안',it.look.tpl); spec(dl,'색소',pg?pg[1]:it.look.color);
+    if(it.look.opacity!==undefined) spec(dl,'강도 · 부드러움',`${it.look.opacity} · ${it.look.blur}`); if(it.look.notes) spec(dl,'메모',it.look.notes); }
+  spec(dl,'상태',it.status==='done'?('완료 · '+dur(it)):STATUS_KO[it.status]||it.status);
+  spec(dl,'엔진',(it.used&&it.used.length)?it.used.join(', '):(it.params&&it.params.backend||''));
+  spec(dl,'API 비용',it.cost_usd?usd(it.cost_usd):'');
+  if(it.aligned===false) spec(dl,'합성','생략 (얼굴 위치가 바뀜)');
+  side.appendChild(dl);
+  if(it.image&&it.compare&&!it.saved) side.appendChild(editPanel(it));
+  if(it.inputs&&it.inputs.length){
+    const d=el('details','fold'); d.open=true; const s2=el('summary'); s2.appendChild(el('span','','모델에 들어간 입력 · 마스크')); d.appendChild(s2);
+    const g=el('div','inputs');
+    it.inputs.forEach(inp=>{ const a=el('a'); a.href=inp.url; a.target='_blank'; a.title=inp.label;
+      const im=document.createElement('img'); im.loading='lazy'; im.src=inp.url+'?w=240'; im.alt=inp.label;
+      a.appendChild(im); a.appendChild(el('span','',inp.label)); g.appendChild(a); });
+    d.appendChild(g);
+    const notes=[];
+    if(it.mask_sent!==undefined&&it.mask_sent!==null) notes.push(it.mask_sent?'알파 마스크를 API 로 보냄':'마스크 없이 편집 (Codex 는 가이드 이미지)');
+    if(it.brow_shift_px) notes.push('눈썹 높이 보정 '+(it.brow_shift_px>0?'아래로 ':'위로 ')+Math.abs(it.brow_shift_px)+'px');
+    if(it.align&&it.align.status) notes.push('정렬 '+it.align.status+(it.align.shift_pct!==undefined?' · 이동 '+it.align.shift_pct+'%':''));
+    if(notes.length) d.appendChild(el('div','hint',notes.join(' · ')));
+    side.appendChild(d);
+  }
+  if(it.error) side.appendChild(el('div','banner warn',it.error));
+  if(it.hint) side.appendChild(el('div','banner info',it.hint));
+  if(it.pdfs&&it.pdfs.length){
+    const g=el('div','pdfs');
+    it.pdfs.forEach((p,i)=>{ const a=el('a',i?'alt':''); a.href=p.url; a.target='_blank'; a.innerHTML=svg(ICON.print,15,2); a.appendChild(el('span','',p.label)); g.appendChild(a); });
+    side.appendChild(g);
+    side.appendChild(el('div','hint','인쇄: A4 · 배율 100% · "페이지에 맞춤" 끄기 · 시트 아래 100 mm 자로 확인'));
+  }
+  const acts=el('div','acts');
+  if(it.image){ const a=el('a','btn','원본 열기'); a.href=it.image; a.target='_blank'; acts.appendChild(a); }
+  if(it.kind==='design'){
+    const b=el('button','btn dark','상담 이어하기'); b.type='button';
+    b.onclick=()=>{ closeLb(); openDesign(it.id); }; acts.appendChild(b); }
+  else if(it.image && !it.saved){
+    const b=el('button','btn','이 사진으로 상담'); b.type='button';
+    b.onclick=()=>{ closeLb(); startDesign({photo_from:{job:it.id, file:it.image_name}, photo_name:it.label||it.title, client:''}); }; acts.appendChild(b); }
+  if((it.kind==='generate'||it.kind==='sheet') && it.image){
+    const b=el('button','btn','이 얼굴로 눈썹 편집'); b.type='button';
+    b.onclick=()=>{ closeLb(); setView('restyle'); setPhotoFrom($('#fRestyle'), it); }; acts.appendChild(b); }
+  if(it.kind==='generate' && it.image){
+    const b2=el('button','btn','같은 조건으로 한 장 더'); b2.type='button';
+    b2.onclick=async()=>{ b2.disabled=true; try{ await post('api/jobs', Object.assign({kind:'generate'}, it.params, {count:1})); toast('한 장 더 시작했습니다','good'); closeLb(); await refreshGallery(); }catch(e){ toast(e.message,'bad'); b2.disabled=false; } };
+    acts.appendChild(b2); }
+  if(it.status==='running'||it.status==='queued'){
+    const c=el('button','btn','취소'); c.type='button';
+    c.onclick=async()=>{ await post('api/jobs/'+it.id+'/cancel'); await refreshGallery(); renderLb(); }; acts.appendChild(c); }
+  const del=el('button','btn danger','삭제'); del.type='button';
+  del.onclick=async()=>{ const n=items.filter(x=>x.id===it.id).length; if(!confirm(`이 작업(결과 ${n}장)을 삭제할까요?`)) return;
+    try{ await post('api/jobs/'+it.id+'/delete'); closeLb(); await refreshGallery(); await loadUsage(); toast('삭제했습니다'); }catch(e){ toast(e.message,'bad'); } };
+  acts.appendChild(del); side.appendChild(acts);
+  if(it.prompt){ const d=el('details','fold'); const s=el('summary'); s.appendChild(el('span','','프롬프트')); d.appendChild(s); d.appendChild(el('div','prompt',it.prompt)); side.appendChild(d); }
+  const d=el('details','fold'); const s=el('summary'); s.appendChild(el('span','','로그 · 파일')); d.appendChild(s);
+  const holder=el('div'); d.appendChild(holder); side.appendChild(d);
+  if(it.status==='failed') d.open=true;
+  const load=async()=>{ if(holder.dataset.loaded) return; holder.dataset.loaded='1';
+    try{ const j=await api('api/jobs/'+it.id); const others=j.files.filter(f=>f.kind!=='image');
+      if(others.length){ const fl=el('div','files'); others.forEach(f=>{ const a=el('a','',f.name); a.href=f.url; a.target='_blank'; fl.appendChild(a); }); holder.appendChild(fl); }
+      holder.appendChild(el('pre','log', j.log||'(아직 없음)'));
+    }catch(e){ holder.appendChild(el('div','msg',e.message)); } };
+  d.addEventListener('toggle',()=>{ if(d.open) load(); }); if(d.open) load();
+}
+
+/* ── 상담 시뮬레이션: a drawn template laid on the client's photo ─────────
+   No model draws anything here. A template is a transparent PNG the practitioner
+   drew once; the page measures its spine and thickness, lays it along the brow the
+   face detector found, and lets five points per brow reshape it: the head's upper and
+   lower edge, the arch's upper and lower edge, and the tail. The template is bent along
+   the curve those points make (a strip mesh, each piece an affine map), so a dragged
+   arch bends the whole brow instead of kinking it. Pigment goes on with multiply, so
+   the skin's own shading shows through the strokes the way healed pigment does. */
+const PIGMENTS=[['natural','내추럴 브라운',[112,80,60]],['dark','다크 브라운',[80,54,40]],['ash','애쉬 브라운',[98,88,80]],
+  ['light','라이트 브라운',[146,110,86]],['black','블랙 브라운',[54,42,36]],['red','레드 브라운',[132,76,56]],['hair','머리색 자동',null]];
+const STAGES=[['fresh','시술 직후',100,15],['healed','치유 후 (4주)',68,40],['year','1년 후',45,60]];
+const LOOK0={opacity:85, blur:25, density:1, weight:5, color:'natural', light:0, warm:0};
+// 선 진하기 1 and 선 굵기 5 are the drawing as drawn; below is lighter/thinner, above darker/thicker
+const LOOK_SLIDERS=[['opacity','강도',0,100,1],['blur','부드러움',0,100,1],['density','선 진하기',0.2,2,0.1],['weight','선 굵기',0,10,0.5]];
+const COLOR_SLIDERS=[['light','밝기',-40,40],['warm','따뜻함',-40,40]];
+const V={add:(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub:(a,b)=>({x:a.x-b.x,y:a.y-b.y}), mul:(a,k)=>({x:a.x*k,y:a.y*k}),
+  unit:a=>{ const l=Math.hypot(a.x,a.y)||1; return {x:a.x/l,y:a.y/l}; }, dot:(a,b)=>a.x*b.x+a.y*b.y,
+  perp:a=>({x:-a.y,y:a.x}), mid:(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}), dist:(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)};
+const DZ={id:null, photo:new Image(), W:0, H:0, lm:null, ipdPx:0, tpls:[], tplId:null, tex:{}, tint:{}, geo:{}, brows:{}, auto:{},
+  look:{...LOOK0}, sym:true, ipd:62, notes:'', client:'', view:{s:1,tx:0,ty:0}, dpr:1, active:'right', orig:false, guides:true,
+  wipe:{on:false,x:0.5}, lines:false, hist:[], histAt:-1, tool:'move', retouch:[], base:null, healMm:2.0, cursor:null,
+  saves:[], saveTimer:null, lastSave:null, dirtySince:0, imgCache:{}};
+DZ.photo.crossOrigin='anonymous';
+
+/* geometry helpers */
+// The spine is a quadratic through head, arch and tail, the arch sitting at the
+// parameter its distances earn (so the curve never loops), and the template's own
+// sampling is stretched onto it one segment at a time: head→arch, then arch→tail. The
+// tip before the head continues straight back along the head's tangent.
+function spineCurve(H,A,T){ const dHA=V.dist(H,A), dAT=V.dist(A,T), tA=Math.max(.05,Math.min(.95,dHA/((dHA+dAT)||1)));
+  const a=(1-tA)*(1-tA), b=tA*tA, m=2*tA*(1-tA);
+  return {P0:H, P1:{x:(A.x-a*H.x-b*T.x)/m, y:(A.y-a*H.y-b*T.y)/m}, P2:T, tA}; }
+function spineAt(S,u,uH,uA,tipLen){
+  if(u>=uH){ const t=u<uA ? S.tA*(u-uH)/(uA-uH) : S.tA+(1-S.tA)*(u-uA)/(1-uA); return bez(S,t); }
+  const tan=V.unit(V.sub(S.P1,S.P0)); return V.sub(S.P0, V.mul(tan, tipLen*(uH-u)/uH)); }
+function bez(B,u){ const a=(1-u)*(1-u), b=2*u*(1-u), c=u*u;
+  return {x:a*B.P0.x+b*B.P1.x+c*B.P2.x, y:a*B.P0.y+b*B.P1.y+c*B.P2.y}; }
+function frameNormals(pts){ // tangent by central differences on the polyline, normal rotated a quarter turn
+  const n=pts.length; pts.forEach((p,i)=>{ const a=pts[Math.max(0,i-1)].c, b=pts[Math.min(n-1,i+1)].c;
+    const t=V.unit(V.sub(b,a)); p.t=t; p.n={x:t.y,y:-t.x}; }); }
+function cloneBrow(b){ const o={}; for(const k in b) o[k]={x:b[k].x,y:b[k].y}; return o; }
+function crAt(knots, vals, u){ // non-uniform Catmull-Rom through (knot, vector) pairs; flat beyond the ends
+  const n=knots.length; if(u<=knots[0]) return vals[0]; if(u>=knots[n-1]) return vals[n-1];
+  let i=0; while(i<n-2&&u>knots[i+1]) i++;
+  const P=k=>vals[Math.max(0,Math.min(n-1,k))], K=k=>knots[Math.max(0,Math.min(n-1,k))];
+  const p0=P(i-1),p1=P(i),p2=P(i+1),p3=P(i+2), t0=K(i)-(K(i)-K(i-1)||(K(i+1)-K(i))), t1=K(i), t2=K(i+1), t3=K(i+2)+(K(i+2)===K(i+1)?(K(i+1)-K(i)):0);
+  const t=(u-t1)/(t2-t1||1e-9);
+  // tangents by finite differences over the knot spacing (Catmull-Rom with non-uniform knots)
+  const m1=V.mul(V.sub(p2,p0), (t2-t1)/((t2-t0)||1e-9)), m2=V.mul(V.sub(p3,p1), (t2-t1)/((t3-t1)||1e-9));
+  const h00=2*t*t*t-3*t*t+1, h10=t*t*t-2*t*t+t, h01=-2*t*t*t+3*t*t, h11=t*t*t-t*t;
+  return {x:h00*p1.x+h10*m1.x+h01*p2.x+h11*m2.x, y:h00*p1.y+h10*m1.y+h01*p2.y+h11*m2.y}; }
+function cubicFit(us,ys){ // least squares y = a0 + a1 u + a2 u² + a3 u³, so the outline is a curve, not the hairs' silhouette
+  const n=4, A=Array.from({length:n},()=>new Float64Array(n+1));
+  us.forEach((u,i)=>{ const pw=[1,u,u*u,u*u*u]; for(let r=0;r<n;r++){ for(let c=0;c<n;c++) A[r][c]+=pw[r]*pw[c]; A[r][n]+=pw[r]*ys[i]; } });
+  for(let c=0;c<n;c++){ let piv=c; for(let r=c+1;r<n;r++) if(Math.abs(A[r][c])>Math.abs(A[piv][c])) piv=r; [A[c],A[piv]]=[A[piv],A[c]];
+    if(Math.abs(A[c][c])<1e-12) return null;
+    for(let r=0;r<n;r++){ if(r===c) continue; const f=A[r][c]/A[c][c]; for(let k=c;k<=n;k++) A[r][k]-=f*A[c][k]; } }
+  const a=[0,1,2,3].map(r=>A[r][n]/A[r][r]); return u=>a[0]+a[1]*u+a[2]*u*u+a[3]*u*u*u; }
+
+/* the template: spine, thickness profile, where its arch is */
+function analyseTemplate(img, flip, headRight){
+  const W=img.naturalWidth, H=img.naturalHeight; if(!W||!H) return null;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const cx=cv.getContext('2d',{willReadFrequently:true});
+  if(flip){ cx.translate(W,0); cx.scale(-1,1); }
+  cx.drawImage(img,0,0); cx.setTransform(1,0,0,1,0,0);
+  const px=cx.getImageData(0,0,W,H).data;
+  const A=(x,y)=>{ x=Math.round(x); y=Math.round(y); return (x<0||y<0||x>=W||y>=H)?0:px[(y*W+x)*4+3]; };
+  const yc=new Float64Array(W); let x0=-1,x1=-1;
+  for(let x=0;x<W;x++){ let s=0,sy=0; for(let y=0;y<H;y++){ const v=px[(y*W+x)*4+3]; if(v>10){ s+=v; sy+=v*y; } }
+    yc[x]=s?sy/s:NaN; if(s){ if(x0<0) x0=x; x1=x; } }
+  if(x0<0||x1-x0<8) return null;
+  // bridge the gaps between hairs, then smooth: the spine follows the brow, not one stroke
+  let last=NaN;
+  for(let x=x0;x<=x1;x++){ if(isNaN(yc[x])){ let nx=x; while(nx<=x1&&isNaN(yc[nx])) nx++;
+      const nv=nx<=x1?yc[nx]:last, lv=isNaN(last)?nv:last; for(let k=x;k<nx;k++) yc[k]=lv+(nv-lv)*(k-x+1)/(nx-x+1); x=nx-1; continue; }
+    last=yc[x]; }
+  const win=Math.max(3,Math.round((x1-x0)/14)), sm=new Float64Array(W);
+  for(let x=x0;x<=x1;x++){ let s=0,n=0; for(let k=-win;k<=win;k++){ const j=x+k; if(j>=x0&&j<=x1){ s+=yc[j]; n++; } } sm[x]=s/n; }
+  const at=x=>{ const i=Math.floor(x), f=x-i; const cl=v=>Math.max(x0,Math.min(x1,v)); const a=sm[cl(i)], b=sm[cl(i+1)]; return a+(b-a)*f; };
+  const N=40, smp=[];
+  for(let i=0;i<=N;i++){ const u=i/N, x=headRight? x1-(x1-x0)*u : x0+(x1-x0)*u; smp.push({u, c:{x, y:at(x)}}); }
+  frameNormals(smp);
+  const flipN=smp.reduce((s,p)=>s+p.n.y,0)>0;             // normals must point at the drawing's top edge
+  if(flipN) smp.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
+  smp.forEach(p=>{ let t=0,b=0; for(let k=0;k<H;k++){ if(A(p.c.x+p.n.x*k,p.c.y+p.n.y*k)>14) t=k; if(A(p.c.x-p.n.x*k,p.c.y-p.n.y*k)>14) b=k; }
+    p.eT=t+2; p.eB=b+2; });
+  ['eT','eB'].forEach(key=>{ const v=smp.map(p=>p[key]);        // a gap between two hairs must not pinch the brow
+    smp.forEach((p,i)=>{ let m=0; for(let k=-2;k<=2;k++){ const j=i+k; if(j>=0&&j<smp.length) m=Math.max(m,v[j]); } p[key]=Math.max(3,m); }); });
+  // The outline the practitioner sees (and the handles sit on) is a smooth curve fitted
+  // through those extents - a brow shape, not the jagged silhouette of single hairs.
+  // The mesh underneath keeps an envelope that still covers every hair.
+  ['gT','gB'].forEach((key,k)=>{ const src=k?'eB':'eT'; const fit=cubicFit(smp.map(p=>p.u), smp.map(p=>p[src]));
+    smp.forEach(p=>{ p[key]=Math.max(3, fit?fit(p.u):p[src]); p[src]=Math.max(p[src], p[key])+1; }); });
+  let uA=0.6, best=Infinity;                                   // the arch: highest point of the upper edge, past the head's fan
+  smp.forEach(p=>{ if(p.u<0.3||p.u>0.85) return; const y=p.c.y+p.n.y*p.eT; if(y<best){ best=y; uA=p.u; } });
+  // The head handles sit a little in from the tip, where the head has its full height:
+  // the first columns hold only the tips of the fanned hairs and would make any handle
+  // there mean a wild thickness.
+  const iH=Math.round(0.12*N), uH=smp[iH].u, iA=Math.round(uA*N);
+  const head=smp[iH].c, tail=smp[N].c, e=V.unit(V.sub(tail,head)), ep=V.perp(e), chord=V.dist(head,tail);
+  const S=spineCurve(head, smp[iA].c, tail), tipLen=V.dist(smp[0].c, head), tipFrac=tipLen/(V.dist(head,smp[iA].c)||1);
+  // what the drawing does beyond that curve, in chord units, so placing the template only
+  // needs the head-to-tail distance on the face
+  smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; p.gT/=chord; p.gB/=chord; });
+  const iM=Math.round((iH+iA)/2), uM=smp[iM].u;                  // between head and arch
+  const iK=Math.round((iA+N)/2), uK=smp[iK].u;                   // between arch and tail: the run down to the tail
+  const alpha=new Float32Array(W*H); for(let i=0;i<W*H;i++) alpha[i]=px[i*4+3]/255;
+  return {W,H,cv,smp,uA,uH,uM,uK,iA,iH,iM,iK,chord,flipN,tipFrac,alpha};
+}
+function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous';
+  im.onload=()=>res(im); im.onerror=()=>{ delete DZ.imgCache[url]; rej(new Error('이미지를 불러오지 못했습니다')); }; im.src=url; })); }
+async function setTemplate(id){
+  const row=DZ.tpls.find(t=>t.id===id)||DZ.tpls[0]; if(!row){ DZ.tex={}; return; }
+  DZ.tplId=row.id;
+  DZ.shapeCache={}; DZ.layKey=null;
+  for(const side of ['right','left']){ const other=side==='right'?'left':'right';
+    const url=row[side]||row[other], flip=!row[side];        // one file serves both sides, mirrored
+    const img=await loadImg(url); DZ.tex[side]=analyseTemplate(img, flip, side==='right'); }
+  retint(); renderTplList();
+}
+function pigmentRGB(){
+  const o=DZ.look; let rgb=(PIGMENTS.find(p=>p[0]===o.color)||PIGMENTS[0])[2];
+  if(!rgb) rgb=DZ.hair||PIGMENTS[0][2];
+  const k=1+o.light/100; return rgb.map((v,i)=>Math.max(0,Math.min(255,Math.round(v*k+(i===0?o.warm*0.55:i===2?-o.warm*0.55:0)))));
+}
+// 선 굵기: above 5 each stroke grows toward a one-pixel dilation, below 5 it shrinks toward a
+// one-pixel erosion; 선 진하기: the alpha is raised (>1) or lowered (<1) as if the drawing were
+// laid on itself that many times. At 5 and 1 the drawing is exactly as drawn.
+// The per-pixel work depends only on those two, so it is cached: moving a colour slider (or
+// 강도, or 부드러움) never touches a pixel in JavaScript again.
+function shapeCanvas(side, wgt, dens){
+  const T=DZ.tex[side]; if(!T) return null;
+  const key=side+':'+wgt+':'+dens; DZ.shapeCache=DZ.shapeCache||{};
+  if(DZ.shapeCache[key]) return DZ.shapeCache[key];
+  const W=T.W, H=T.H, a=T.alpha, n=W*H, out=new Float32Array(a);
+  const grow=wgt>5?(wgt-5)/5:0, shrink=wgt<5?(5-wgt)/5:0;
+  if(grow||shrink){ for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x; let mx=a[i], mn=a[i];
+      for(let ky=-1;ky<=1;ky++){ const yy=y+ky; if(yy<0||yy>=H) continue; for(let kx=-1;kx<=1;kx++){ const xx=x+kx; if(xx<0||xx>=W) continue;
+        const v=a[yy*W+xx]; if(v>mx) mx=v; if(v<mn) mn=v; } }
+      out[i]=grow? a[i]+grow*(mx-a[i]) : a[i]-shrink*(a[i]-mn); } }
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const c=cv.getContext('2d'), img=c.createImageData(W,H), d=img.data;
+  for(let i=0;i<n;i++){ const v=out[i]; if(v<=0) continue; const al=dens===1?v:1-Math.pow(1-v,dens);
+    d[i*4+3]=Math.round(Math.min(1,al)*255); }                 // black, with the finished alpha
+  c.putImageData(img,0,0);
+  const keys=Object.keys(DZ.shapeCache); if(keys.length>24) delete DZ.shapeCache[keys[0]];
+  return DZ.shapeCache[key]=cv;
+}
+function retint(){ const rgb=pigmentRGB(), o=DZ.look;
+  const wgt=Math.max(0,Math.min(10,+o.weight||0)), dens=Math.max(0.2,Math.min(2,+o.density||1));
+  ['right','left'].forEach(side=>{ const T=DZ.tex[side], shape=shapeCanvas(side,wgt,dens); if(!T||!shape) return;
+    const cv=DZ.tint[side]||(DZ.tint[side]=document.createElement('canvas')); cv.width=T.W; cv.height=T.H;
+    const c=cv.getContext('2d'); c.clearRect(0,0,T.W,T.H); c.drawImage(shape,0,0);
+    c.globalCompositeOperation='source-in'; c.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; c.fillRect(0,0,T.W,T.H);
+    c.globalCompositeOperation='source-over'; });
+  DZ.layKey=null;                                              // the painted layer is stale
+}
+function sampleHair(){ // the darker part of the strip above the forehead; nothing there means no hair to match
+  const lm=DZ.lm; if(!lm||!DZ.photo.naturalWidth) return null; const ipd=DZ.ipdPx||DZ.W/6;
+  const fx=lm.forehead_top[0], fy=lm.forehead_top[1];
+  const x0=Math.max(0,Math.round(fx-0.9*ipd)), x1=Math.min(DZ.W,Math.round(fx+0.9*ipd));
+  const y0=Math.max(0,Math.round(fy-0.8*ipd)), y1=Math.max(0,Math.round(fy-0.05*ipd));
+  if(y1-y0<4||x1-x0<4) return null;
+  const cv=document.createElement('canvas'); cv.width=x1-x0; cv.height=y1-y0;
+  const c=cv.getContext('2d',{willReadFrequently:true}); c.drawImage(DZ.photo,x0,y0,x1-x0,y1-y0,0,0,cv.width,cv.height);
+  const d=c.getImageData(0,0,cv.width,cv.height).data, px=[];
+  for(let i=0;i<d.length;i+=16) px.push([d[i],d[i+1],d[i+2],0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]]);
+  px.sort((a,b)=>a[3]-b[3]); if(px[Math.floor(px.length/2)][3]>190) return null;
+  const dark=px.slice(0,Math.max(1,Math.floor(px.length*0.35))), m=[0,0,0];
+  dark.forEach(p=>{ m[0]+=p[0]; m[1]+=p[1]; m[2]+=p[2]; });
+  let rgb=m.map(v=>v/dark.length*1.5+22);                     // pigment a shade lighter than the hair itself
+  const lum=0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2]; if(lum>150) rgb=rgb.map(v=>v*150/lum);
+  return rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))));
+}
+
+/* where the brows are: from the detector, or a guess the practitioner drags into place */
+function anchorFromOutline(pts, centreX){ // the brow's head and tail from the detector's outline
+  const P=pts.map(p=>({x:p[0],y:p[1]})), h=P.length>>1;
+  let upper=P.slice(0,h), lower=P.slice(h);
+  const headFirst=arr=>Math.abs(arr[0].x-centreX)<Math.abs(arr[arr.length-1].x-centreX);
+  if(!headFirst(upper)) upper=upper.slice().reverse(); if(!headFirst(lower)) lower=lower.slice().reverse();
+  const H=V.mid(upper[0],lower[0]), T=V.mid(upper[upper.length-1], lower[lower.length-1]);
+  // the detector's tail is where the hair stops; a design usually carries the tail a little
+  // further out - along the eye line, so a brow that slopes down does not droop further
+  const up=faceUp(), out=V.unit({x:-up.y*Math.sign(T.x-H.x), y:up.x*Math.sign(T.x-H.x)});
+  return {H, T:V.add(T, V.mul(out, 0.1*V.dist(H,T)))};
+}
+function initAnchors(){
+  const lm=DZ.lm;
+  if(lm&&lm.right_brow&&lm.right_brow.length>=6&&lm.left_brow&&lm.left_brow.length>=6){
+    const cx=(lm.right_pupil[0]+lm.left_pupil[0])/2;
+    return {right:anchorFromOutline(lm.right_brow,cx), left:anchorFromOutline(lm.left_brow,cx)};
+  }
+  const cx=DZ.W/2, cy=DZ.H*0.42, d=DZ.W*0.18;                  // average proportions, to be dragged into place
+  const mk=s=>({H:{x:cx+s*0.28*d,y:cy-0.35*d}, T:{x:cx+s*0.98*d,y:cy-0.36*d}});
+  return {right:mk(-1), left:mk(1)};
+}
+function fitTemplate(side){ // the drawing as drawn, scaled and turned so its first hair and its tail meet the anchor's
+  const T=DZ.tex[side], a=DZ.anchor&&DZ.anchor[side]; if(!T||!a) return null;
+  const Ht=T.smp[0].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
+  const ang=Math.atan2(a.T.y-a.H.y,a.T.x-a.H.x)-Math.atan2(Tt.y-Ht.y,Tt.x-Ht.x), cs=Math.cos(ang), sn=Math.sin(ang);
+  const map=p=>{ const dx=p.x-Ht.x, dy=p.y-Ht.y; return {x:a.H.x+(dx*cs-dy*sn)*s, y:a.H.y+(dx*sn+dy*cs)*s}; };
+  const sH=T.smp[T.iH], sM=T.smp[T.iM], sA=T.smp[T.iA], sK=T.smp[T.iK], ch=T.chord;
+  return {hT:map(V.add(sH.c,V.mul(sH.n,sH.gT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.gB*ch))),
+          mT:map(V.add(sM.c,V.mul(sM.n,sM.gT*ch))), mB:map(V.sub(sM.c,V.mul(sM.n,sM.gB*ch))),
+          aT:map(V.add(sA.c,V.mul(sA.n,sA.gT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.gB*ch))),
+          tT:map(V.add(sK.c,V.mul(sK.n,sK.gT*ch))), tB:map(V.sub(sK.c,V.mul(sK.n,sK.gB*ch))), t:map(Tt)};
+}
+function initBrows(){ const out={right:fitTemplate('right'), left:fitTemplate('left')};
+  DZ.auto={right:cloneBrow(out.right), left:cloneBrow(out.left)}; return out; }
+function mirrorPt(p){ const lm=DZ.lm; let m,d;
+  if(lm){ m={x:(lm.right_pupil[0]+lm.left_pupil[0])/2, y:(lm.right_pupil[1]+lm.left_pupil[1])/2};
+    d=V.unit({x:lm.left_pupil[0]-lm.right_pupil[0], y:lm.left_pupil[1]-lm.right_pupil[1]}); }
+  else { m={x:DZ.W/2,y:0}; d={x:1,y:0}; }
+  return V.sub(p, V.mul(d, 2*V.dot(V.sub(p,m),d))); }
+function mirrorBrow(from){ const to=from==='right'?'left':'right', b=DZ.brows[from], o={};
+  for(const k in b) o[k]=mirrorPt(b[k]); DZ.brows[to]=o; }
+function faceUp(){ const lm=DZ.lm; if(!lm) return {x:0,y:-1};
+  const d=V.unit({x:lm.left_pupil[0]-lm.right_pupil[0], y:lm.left_pupil[1]-lm.right_pupil[1]}); return {x:d.y,y:-d.x}; }
+function pxPerMm(){ return (DZ.ipdPx||DZ.W/3.2)/(DZ.ipd||62); }
+
+/* the warped brow: the template's samples carried onto the curve the handles make */
+function browGeometry(side){
+  const T=DZ.tex[side], b=DZ.brows[side]; if(!T||!b) return null;
+  const H=V.mid(b.hT,b.hB), A=V.mid(b.aT,b.aB), Tl=b.t;
+  const chord=V.dist(H,Tl)||1, e=V.unit(V.sub(Tl,H)), ep=V.perp(e);
+  const S=spineCurve(H,A,Tl), tipLen=V.dist(H,A)*T.tipFrac;
+  const pts=T.smp.map(p=>{ const q=spineAt(S,p.u,T.uH,T.uA,tipLen); return {u:p.u, c:{x:q.x+(p.r.e*e.x+p.r.p*ep.x)*chord, y:q.y+(p.r.e*e.y+p.r.p*ep.y)*chord}}; });
+  frameNormals(pts); if(T.flipN) pts.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
+  // The drawing's own edges, laid along that spine, are the reference; each handle is a
+  // displacement from where the reference edge passes, and the displacements are blended
+  // between the handles. Untouched handles sit exactly on the reference, so the drawing is
+  // as drawn; a dragged handle is exactly where it was dragged to.
+  const {uH,uM,uA,uK}=T, gtop=i=>V.add(pts[i].c, V.mul(pts[i].n, T.smp[i].gT*chord)), gbot=i=>V.sub(pts[i].c, V.mul(pts[i].n, T.smp[i].gB*chord));
+  const knots=[uH,uM,uA,uK,1], zero={x:0,y:0};
+  const dT=[V.sub(b.hT,gtop(T.iH)), b.mT?V.sub(b.mT,gtop(T.iM)):zero, V.sub(b.aT,gtop(T.iA)), b.tT?V.sub(b.tT,gtop(T.iK)):zero, zero];
+  const dB=[V.sub(b.hB,gbot(T.iH)), b.mB?V.sub(b.mB,gbot(T.iM)):zero, V.sub(b.aB,gbot(T.iA)), b.tB?V.sub(b.tB,gbot(T.iK)):zero, zero];
+  // a design saved before one of these handles existed: start it where the curve already runs
+  if(!b.mT) dT[1]=V.mul(V.add(dT[0],dT[2]),0.5); if(!b.mB) dB[1]=V.mul(V.add(dB[0],dB[2]),0.5);
+  if(!b.tT) dT[3]=V.mul(dT[2],0.5); if(!b.tB) dB[3]=V.mul(dB[2],0.5);
+  pts.forEach((p,i)=>{ const s=T.smp[i];
+    p.gTop=V.add(gtop(i), crAt(knots,dT,p.u)); p.gBot=V.add(gbot(i), crAt(knots,dB,p.u));      // outline, through the handles
+    const vt=V.sub(p.gTop,p.c), vb=V.sub(p.gBot,p.c);                                            // the drawing scales with its edge
+    p.top=V.add(p.c, V.mul(vt, s.eT/s.gT)); p.bot=V.add(p.c, V.mul(vb, s.eB/s.gB)); });          // mesh envelope, past the outline
+  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, iM:T.iM, iK:T.iK, chord, e};
+}
+function drawTri(ctx, tex, s0,s1,s2, d0,d1,d2){
+  const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y); if(Math.abs(det)<1e-9) return;
+  const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))/det, b=((d1.y-d0.y)*(s2.y-s0.y)-(d2.y-d0.y)*(s1.y-s0.y))/det;
+  const c=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))/det, d=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))/det;
+  const e=d0.x-a*s0.x-c*s0.y, f=d0.y-b*s0.x-d*s0.y;
+  // the clip is grown a hair past the triangle so neighbours overlap instead of leaving seams
+  const cx=(d0.x+d1.x+d2.x)/3, cy=(d0.y+d1.y+d2.y)/3, grow=0.6/ctx.getTransform().a;
+  const ex=p=>{ const dx=p.x-cx, dy=p.y-cy, l=Math.hypot(dx,dy)||1; return {x:p.x+dx/l*grow, y:p.y+dy/l*grow}; };
+  const q0=ex(d0), q1=ex(d1), q2=ex(d2);
+  ctx.save(); ctx.beginPath(); ctx.moveTo(q0.x,q0.y); ctx.lineTo(q1.x,q1.y); ctx.lineTo(q2.x,q2.y); ctx.closePath(); ctx.clip();
+  ctx.transform(a,b,c,d,e,f); ctx.drawImage(tex,0,0); ctx.restore();
+}
+function drawMesh(ctx, side, g){
+  const T=DZ.tex[side], tex=DZ.tint[side]; if(!T||!tex) return;
+  const src=T.smp.map(p=>({c:p.c, top:V.add(p.c,V.mul(p.n,p.eT*T.chord)), bot:V.sub(p.c,V.mul(p.n,p.eB*T.chord))}));
+  for(let i=0;i<src.length-1;i++){ const a=src[i], b=src[i+1], A=g.pts[i], B=g.pts[i+1];
+    drawTri(ctx,tex, a.top,b.top,b.c, A.top,B.top,B.c); drawTri(ctx,tex, a.top,b.c,a.c, A.top,B.c,A.c);
+    drawTri(ctx,tex, a.c,b.c,b.bot, A.c,B.c,B.bot);     drawTri(ctx,tex, a.c,b.bot,a.bot, A.c,B.bot,A.bot); }
+}
+function paintBrows(ctx, view, clipX){
+  const geos=['right','left'].map(browGeometry).filter(Boolean); DZ.geo={}; geos.forEach(g=>DZ.geo[g.side]=g);
+  if(!geos.length) return;
+  const blur=DZ.look.blur/100*0.28*pxPerMm()*view.s;          // 부드러움 is in millimetres on the face, not screen pixels
+  // The mesh is 320 clipped affine draws; strength, softness, the compare line and the
+  // before/after tap do not change it, so it is painted once and kept until it really moves.
+  const key=JSON.stringify([DZ.brows, DZ.tplId, view.s, view.tx, view.ty, Math.round(blur*100), DZ.look.color, DZ.look.light, DZ.look.warm, DZ.look.weight, DZ.look.density]);
+  if(DZ.layKey!==key||!DZ.lay){
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+    geos.forEach(g=>g.pts.forEach(p=>[p.top,p.bot].forEach(q=>{ const X=q.x*view.s+view.tx, Y=q.y*view.s+view.ty;
+      if(X<x0) x0=X; if(Y<y0) y0=Y; if(X>x1) x1=X; if(Y>y1) y1=Y; })));
+    const pad=Math.ceil(blur*3+6); x0=Math.floor(x0)-pad; y0=Math.floor(y0)-pad; x1=Math.ceil(x1)+pad; y1=Math.ceil(y1)+pad;
+    const w=x1-x0, h=y1-y0; if(!(w>0&&h>0)||w>8192||h>8192) return;
+    const lay=DZ.lay||(DZ.lay=document.createElement('canvas')); lay.width=w; lay.height=h;
+    const lc=lay.getContext('2d'); lc.imageSmoothingQuality='high'; lc.setTransform(view.s,0,0,view.s,view.tx-x0,view.ty-y0);
+    geos.forEach(g=>drawMesh(lc,g.side,g));
+    DZ.layAt={x:x0,y:y0}; DZ.layKey=key;
+  }
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+  if(clipX!==undefined){ ctx.beginPath(); ctx.rect(clipX,0,ctx.canvas.width-clipX,ctx.canvas.height); ctx.clip(); }   // 비교: the design only right of the line
+  ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=Math.max(0,Math.min(1,DZ.look.opacity/100));
+  if(blur>0.15) ctx.filter=`blur(${blur.toFixed(2)}px)`;
+  ctx.drawImage(DZ.lay,DZ.layAt.x,DZ.layAt.y); ctx.restore();
+}
+function handlePoints(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return [];
+  return ['hT','mT','aT','tT','hB','mB','aB','tB','t'].filter(k=>b[k]).map(k=>({k, x:b[k].x, y:b[k].y})); }
+function ensureMid(side){ // designs saved before a handle existed get it where the outline already runs
+  const b=DZ.brows[side]; if(!b||(b.mT&&b.mB&&b.tT&&b.tB)) return; const g=browGeometry(side); if(!g) return;
+  b.mT=b.mT||{...g.pts[g.iM].gTop}; b.mB=b.mB||{...g.pts[g.iM].gBot};
+  b.tT=b.tT||{...g.pts[g.iK].gTop}; b.tB=b.tB||{...g.pts[g.iK].gBot}; }
+const HCOL={hT:'#4fa3ff',mT:'#4fa3ff',aT:'#4fa3ff',tT:'#4fa3ff',hB:'#ffb84f',mB:'#ffb84f',aB:'#ffb84f',tB:'#ffb84f',t:'#e2865f'};
+function drawHandles(ctx){
+  const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  ['right','left'].forEach(side=>{ const g=DZ.geo[side]; if(!g) return; const act=side===DZ.active;
+    ctx.beginPath(); g.pts.forEach((p,i)=>{ const X=p.gTop.x*s+tx, Y=p.gTop.y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); });
+    for(let i=g.pts.length-1;i>=0;i--){ const p=g.pts[i]; ctx.lineTo(p.gBot.x*s+tx,p.gBot.y*s+ty); } ctx.closePath();
+    ctx.strokeStyle=act?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+    handlePoints(side).forEach(h=>{ const X=h.x*s+tx, Y=h.y*s+ty; ctx.beginPath(); ctx.arc(X,Y,act?7:5.5,0,Math.PI*2);
+      ctx.fillStyle='#fff'; ctx.fill(); ctx.lineWidth=2.2; ctx.strokeStyle=HCOL[h.k]; ctx.stroke(); });
+  });
+}
+function dzResize(){ const cv=$('#dzCanvas'), box=$('#dzStage').getBoundingClientRect(); DZ.dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.max(1,Math.round(box.width*DZ.dpr)); cv.height=Math.max(1,Math.round(box.height*DZ.dpr)); DZ.box={w:box.width,h:box.height}; }
+function dzRenderSoon(){ if(DZ.raf) return; DZ.raf=requestAnimationFrame(()=>{ DZ.raf=0; dzRender(); }); }
+function photoFor(scale){ // a 1600 px copy of the photo for when the screen shows it smaller than that
+  if(!DZ.photo.naturalWidth) return DZ.photo;
+  if(!DZ.photoSmall||DZ.photoSmall.dataset.src!==DZ.photo.src){ const k=Math.min(1,1600/Math.max(DZ.W,DZ.H)); const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(DZ.W*k)); c.height=Math.max(1,Math.round(DZ.H*k)); const x=c.getContext('2d'); x.imageSmoothingQuality='high'; x.drawImage(DZ.photo,0,0,c.width,c.height);
+    c.dataset.src=DZ.photo.src; DZ.photoSmall=c; }
+  return scale*DZ.W<=DZ.photoSmall.width ? DZ.photoSmall : DZ.photo; }
+function dzRender(){
+  const cv=$('#dzCanvas'), ctx=cv.getContext('2d'), {s,tx,ty}=DZ.view, d=DZ.dpr;
+  ctx.setTransform(1,0,0,1,0,0); ctx.filter='none'; ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='#0a0908'; ctx.fillRect(0,0,cv.width,cv.height);
+  if(!DZ.photo.naturalWidth) return;
+  ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); ctx.imageSmoothingQuality='high';
+  const src=photoFor(d*s); ctx.drawImage(src,0,0,src.width,src.height,0,0,DZ.W,DZ.H);
+  const wipe=DZ.wipe.on&&DZ.box ? DZ.wipe.x*DZ.box.w : null;
+  if(!DZ.orig){
+    if(DZ.base&&DZ.baseRect){ const r=DZ.baseRect; ctx.save(); if(wipe!==null){ ctx.setTransform(1,0,0,1,0,0); ctx.beginPath(); ctx.rect(wipe*d,0,cv.width,cv.height); ctx.clip(); ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); }
+      ctx.drawImage(DZ.base, r.x0,r.y0,r.x1-r.x0,r.y1-r.y0, r.x0,r.y0,r.x1-r.x0,r.y1-r.y0); ctx.restore(); }   // the retouched skin, only where it changed, on the "after" side
+    paintBrows(ctx,{s:d*s,tx:d*tx,ty:d*ty}, wipe===null?undefined:wipe*d); if(DZ.guides&&DZ.tool!=='heal') drawHandles(ctx); }
+  else ['right','left'].forEach(side=>{ const g=browGeometry(side); if(g) DZ.geo[side]=g; });
+  if(DZ.lines) drawGuideLines(ctx);
+  if(wipe!==null) drawWipe(ctx, wipe);
+  if(DZ.tool==='heal') drawBrush(ctx);
+  dzMeasure();
+}
+function drawBrush(ctx){ const {s,tx,ty}=DZ.view, r=DZ.healMm*pxPerMm()*s; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0); ctx.save();
+  if(DZ.cursor){ ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r),0,Math.PI*2); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r)+1.5,0,Math.PI*2); ctx.stroke(); }
+  ctx.restore(); }
+function drawWipe(ctx, x){ // the before/after line, in screen pixels
+  const h=DZ.box.h; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  ctx.save(); ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=2; ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=4;
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x,h*0.32,19,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.shadowBlur=0; ctx.fillStyle='#15120f'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('◀ ▶',x,h*0.32+1);
+  const tag=(t,X,align)=>{ ctx.font='600 12px sans-serif'; ctx.textAlign=align; const w=ctx.measureText(t).width+18;
+    ctx.fillStyle='rgba(0,0,0,.55)'; const bx=align==='left'?X:X-w; ctx.beginPath(); ctx.roundRect(bx,h-38,w,24,12); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.fillText(t, align==='left'?X+9:X-9, h-26); };
+  tag('전 · 원본', Math.max(10,x-160), 'left'); tag('후 · 시안', Math.min(DZ.box.w-10,x+160), 'right');
+  ctx.restore();
+}
+function drawGuideLines(ctx){ // the sheet's design lines: nostril → inner corner (head), → outer iris (arch), → outer corner (tail)
+  const lm=DZ.lm; if(!lm) return; const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  const ipd=DZ.ipdPx||DZ.W/6, up=faceUp(), P=(a)=>({x:a[0],y:a[1]});
+  const brows=['right','left'].map(k=>DZ.brows[k]).filter(Boolean); let top=Infinity;
+  brows.forEach(b=>{ for(const k in b) top=Math.min(top, V.dot(b[k],up)); });
+  if(!isFinite(top)) top=V.dot(P(lm.right_pupil),up)+0.6*ipd;
+  const topLine=top+0.35*ipd;                                     // how far up the lines run, in face-up units
+  ctx.save(); ctx.strokeStyle='rgba(120,200,255,.85)'; ctx.lineWidth=1.2; ctx.setLineDash([6,5]);
+  const through=(o,t)=>{ const d=V.sub(t,o), k=(topLine-V.dot(o,up))/(V.dot(d,up)||1e-6); if(k<=0) return;
+    const e=V.add(o,V.mul(d,k)); ctx.beginPath(); ctx.moveTo(o.x*s+tx,o.y*s+ty); ctx.lineTo(e.x*s+tx,e.y*s+ty); ctx.stroke(); };
+  ['right','left'].forEach((side,i)=>{ const ala=P(lm[side+'_ala']), pupil=P(lm[side+'_pupil']), sign=side==='right'?-1:1;
+    const along=V.perp(up); const iris=V.add(pupil, V.mul(along, sign*0.095*ipd*(along.x<0?-1:1)));
+    through(ala,P(lm[side+'_inner'])); through(ala,iris); through(ala,P(lm[side+'_outer'])); });
+  const c=P(lm.right_pupil), c2=P(lm.left_pupil), dir=V.unit(V.sub(c2,c)), a=V.sub(c,V.mul(dir,0.9*ipd)), b=V.add(c2,V.mul(dir,0.9*ipd));
+  ctx.beginPath(); ctx.moveTo(a.x*s+tx,a.y*s+ty); ctx.lineTo(b.x*s+tx,b.y*s+ty); ctx.stroke();
+  ctx.restore();
+}
+function dzExport(){ const cv=document.createElement('canvas'); cv.width=DZ.W; cv.height=DZ.H; const ctx=cv.getContext('2d');
+  ctx.drawImage(DZ.base||DZ.photo,0,0);
+  const lay=DZ.lay, at=DZ.layAt, key=DZ.layKey; DZ.lay=null; DZ.layKey=null;   // full size, in its own layer
+  paintBrows(ctx,{s:1,tx:0,ty:0});
+  DZ.lay=lay; DZ.layAt=at; DZ.layKey=key;
+  return cv; }
+
+/* the view: fit, zoom to the brows, pinch, wheel */
+/* 잔털 지우기: a spot-heal brush. Under the brush, pixels darker than the skin around
+   them (a hair, a blemish) are refilled from the pixels that are not, so the skin's own
+   texture stays and only the hair goes. The strokes are kept, not the pixels, so a
+   design reopens with the same retouch and undo simply replays fewer strokes. */
+function baseCanvas(){ if(DZ.base) return DZ.base; const c=document.createElement('canvas'); c.width=DZ.W; c.height=DZ.H;
+  c.getContext('2d').drawImage(DZ.photo,0,0); DZ.baseRect=null; return DZ.base=c; }
+function healedMask(){ return DZ.healed||(DZ.healed=new Uint8Array(DZ.W*DZ.H)); }
+function growBaseRect(x0,y0,x1,y1){ const r=DZ.baseRect; DZ.baseRect=r?{x0:Math.min(r.x0,x0),y0:Math.min(r.y0,y0),x1:Math.max(r.x1,x1),y1:Math.max(r.y1,y1)}:{x0,y0,x1,y1}; }
+function healStamp(cx, cy, r){
+  // One dab of 잔털 지우기, the way a spot-heal brush works: whatever is under the brush is
+  // replaced with skin borrowed from nearby, not judged. Telling a hair from a pore by how
+  // dark it is cannot be done - measured on this client's own photo, clean cheek carried MORE
+  // dark contrast than the area with strays - and grouping dark pixels flips between erasing
+  // the whole brow and erasing nothing as soon as hairs touch each other. The brush is the
+  // decision; the work is finding clean skin to put there and making the seam invisible.
+  const base=baseCanvas(), ctx=base.getContext('2d',{willReadFrequently:true});
+  const reach=Math.round(r*2.3), pad=reach+r+2;
+  const x0=Math.max(0,Math.floor(cx-pad)), y0=Math.max(0,Math.floor(cy-pad));
+  const x1=Math.min(DZ.W,Math.ceil(cx+pad)), y1=Math.min(DZ.H,Math.ceil(cy+pad));
+  const w=x1-x0, h=y1-y0, n=w*h; if(w<8||h<8) return;
+  const img=ctx.getImageData(x0,y0,w,h), d=img.data;
+  const px=cx-x0, py=cy-y0, done=healedMask();
+  const L=new Float32Array(n); for(let i=0;i<n;i++) L[i]=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
+  // how "busy" each pixel is: hair and stubble stand out from their own neighbourhood
+  const blur=new Float32Array(n), t=new Float32Array(n), rb=3;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let s=0,c=0; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w){ s+=L[y*w+xx]; c++; } } t[y*w+x]=s/c; }
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let s=0,c=0; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h){ s+=t[yy*w+x]; c++; } } blur[y*w+x]=s/c; }
+  // the dab, soft at its rim
+  const disc=[], ring=[], rr=r*1.6;
+  for(let y=Math.max(0,Math.floor(py-rr));y<=Math.min(h-1,Math.ceil(py+rr));y++)
+    for(let x=Math.max(0,Math.floor(px-rr));x<=Math.min(w-1,Math.ceil(px+rr));x++){
+      const dd=Math.hypot(x-px,y-py);
+      if(dd<=r) disc.push({x,y,i:y*w+x, m:dd<=r*0.4?1:Math.max(0,(r-dd)/(r*0.6))});
+      else if(dd<=rr) ring.push({x,y,i:y*w+x}); }        // the skin just outside: what this spot should look like
+  if(disc.length<8||ring.length<8) return;
+  const score=(ox,oy)=>{  // darkness a source patch would bring in, and how far its colour is from here
+    let dark=0, sum=0, cnt=0, used=0, rs=0, rh=0, rn=0;
+    for(const p of disc){ const sx=p.x+ox, sy=p.y+oy; if(sx<0||sy<0||sx>=w||sy>=h) return null;
+      const j=sy*w+sx; const e=blur[j]-L[j]; if(e>0) dark+=e*e; sum+=L[j];
+      if(done[(sy+y0)*DZ.W+(sx+x0)]) used++; cnt++; }
+    for(const p of ring){ const sx=p.x+ox, sy=p.y+oy; if(sx<0||sy<0||sx>=w||sy>=h) continue;
+      rs+=L[sy*w+sx]; rh+=L[p.i]; rn++; }
+    if(!rn) return null;
+    // skin already borrowed once is a last resort: copying copies is what washes the grain out
+    return {dark:dark/cnt, dcol:Math.abs(rs/rn-rh/rn), used:used/cnt}; };
+  // Clean skin first - a source with hair in it would just move the hair. Among the sources
+  // that are about as clean as the cleanest, prefer the one that matches this spot's colour
+  // and has not been borrowed from before.
+  const cands=[];
+  for(let a=0;a<16;a++){ const ang=a*Math.PI/8;
+    for(const k of [2.3, 1.7, 3.0]){ const ox=Math.round(Math.cos(ang)*r*k), oy=Math.round(Math.sin(ang)*r*k);
+      const sc=score(ox,oy); if(sc&&sc.dcol<=18) cands.push({ox, oy, ...sc}); } }
+  if(!cands.length) return;
+  const cleanest=Math.min(...cands.map(c=>c.dark));
+  let best=null;
+  for(const c of cands){ if(c.dark>cleanest*1.5+12) continue;
+    const cost=c.dark*0.35+c.dcol*c.dcol*0.6+c.used*60;
+    if(!best||cost<best.cost) best={...c, cost}; }
+  if(!best) return;
+  // paste it, shifted to this spot's own brightness so the seam does not show
+  // match the source's brightness to the ring of skin actually around this dab, so no seam
+  // Match brightness on the ring of skin AROUND the dab, not on the dab itself: the dab holds
+  // the hair we are removing, and matching its average painted the clean skin dark, leaving a
+  // dusky patch wherever the brush had been.
+  const shift=[0,1,2].map(c=>{ let a=0,b=0,n2=0;
+    for(const p of ring){ const sx=p.x+best.ox, sy=p.y+best.oy; if(sx<0||sy<0||sx>=w||sy>=h) continue;
+      a+=d[p.i*4+c]; b+=d[(sy*w+sx)*4+c]; n2++; }
+    return n2?(a-b)/n2:0; });
+  const out=new Uint8ClampedArray(d);
+  for(const p of disc){ const j=(p.y+best.oy)*w+(p.x+best.ox);
+    for(let c=0;c<3;c++){ const v=d[j*4+c]+shift[c];
+      out[p.i*4+c]=d[p.i*4+c]+p.m*(Math.max(0,Math.min(255,v))-d[p.i*4+c]); }
+    if(p.m>0.5) done[(p.y+y0)*DZ.W+(p.x+x0)]=1; }
+  img.data.set(out); ctx.putImageData(img,x0,y0); growBaseRect(x0,y0,x1,y1);
+}
+function healStroke(stroke){ const r=stroke.r; stroke.pts.forEach(([x,y])=>healStamp(x,y,r)); }
+function rebuildBase(){ DZ.base=null; DZ.baseRect=null; DZ.healed=null; if(!DZ.retouch.length) return; DZ.retouch.forEach(healStroke); }
+function snap(){ return JSON.stringify({brows:DZ.brows, look:DZ.look, tpl:DZ.tplId, sym:DZ.sym, retouch:DZ.retouch}); }
+function pushHist(){ const cur=snap(); if(DZ.hist[DZ.histAt]===cur) return;
+  DZ.hist=DZ.hist.slice(0,DZ.histAt+1); DZ.hist.push(cur); if(DZ.hist.length>120) DZ.hist.shift(); DZ.histAt=DZ.hist.length-1; histButtons(); }
+function histButtons(){ $('#dzUndo').disabled=DZ.histAt<=0; $('#dzRedo').disabled=DZ.histAt>=DZ.hist.length-1; }
+async function restoreHist(at){ if(at<0||at>=DZ.hist.length) return; DZ.histAt=at; const st=JSON.parse(DZ.hist[at]);
+  DZ.brows={right:cloneBrow(st.brows.right), left:cloneBrow(st.brows.left)}; DZ.look={...LOOK0,...st.look}; DZ.sym=!!st.sym;
+  $('#dzSym').classList.toggle('on',DZ.sym);
+  const strokes=JSON.stringify(st.retouch||[]); if(strokes!==JSON.stringify(DZ.retouch)){ DZ.retouch=JSON.parse(strokes); rebuildBase(); }
+  if(st.tpl!==DZ.tplId) await setTemplate(st.tpl); else retint();
+  renderLookPanel(); histButtons(); dzRender(); dzDirty(); }
+function fitAll(){ const b=DZ.box; if(!b||!DZ.W) return; const s=Math.min(b.w/DZ.W,b.h/DZ.H); DZ.view={s, tx:(b.w-DZ.W*s)/2, ty:(b.h-DZ.H*s)/2}; }
+function zoomBrows(){ const b=DZ.box; if(!b) return; const pts=[]; ['right','left'].forEach(k=>{ const br=DZ.brows[k]; if(br) for(const j in br) pts.push(br[j]); });
+  if(!pts.length){ fitAll(); return; }
+  let x0=Math.min(...pts.map(p=>p.x)), x1=Math.max(...pts.map(p=>p.x)), y0=Math.min(...pts.map(p=>p.y)), y1=Math.max(...pts.map(p=>p.y));
+  const padx=(x1-x0)*0.22+20, pady=(x1-x0)*0.32+20; x0-=padx; x1+=padx; y0-=pady; y1+=pady;
+  const s=Math.min(b.w/(x1-x0), b.h/(y1-y0), 6); DZ.view={s, tx:(b.w-(x0+x1)*s)/2, ty:(b.h-(y0+y1)*s)/2}; }
+function zoomAt(c,k){ const v=DZ.view; const s=Math.max(0.03,Math.min(24,v.s*k)); k=s/v.s; DZ.view={s, tx:c.x-(c.x-v.tx)*k, ty:c.y-(c.y-v.ty)*k}; }
+function hitHandle(c, reach){ const {s,tx,ty}=DZ.view; let best=null, bd=reach||18;
+  [DZ.active, DZ.active==='right'?'left':'right'].forEach(side=>handlePoints(side).forEach(h=>{ const d=Math.hypot(h.x*s+tx-c.x, h.y*s+ty-c.y); if(d<bd){ bd=d; best={side,k:h.k}; } }));
+  return best; }
+function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; if(!g) continue;
+    const poly=g.pts.map(q=>q.gTop).concat(g.pts.slice().reverse().map(q=>q.gBot)); let inside=false;
+    for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const a=poly[i], b=poly[j];
+      if((a.y>p.y)!==(b.y>p.y) && p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x) inside=!inside; }
+    if(inside) return side; } return null; }
+(function wireDz(){
+  const st=$('#dzStage'), ptrs=new Map(); let drag=null, pinch=null;
+  const css=e=>{ const r=st.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
+  const toPhoto=e=>{ const c=css(e), {s,tx,ty}=DZ.view; return {x:(c.x-tx)/s, y:(c.y-ty)/s}; };
+  st.addEventListener('pointerdown',e=>{ if(e.button||e.target.closest('.dz-tools')) return;   // the buttons over the stage are not the stage
+    // A pen owns the gesture: on an iPad the palm resting on the glass arrives as extra touch
+    // pointers, and treating them as a second finger turned every pencil stroke into a pinch.
+    if(drag&&drag.pen&&e.pointerType==='touch') return;
+    e.preventDefault();
+    try{ st.setPointerCapture(e.pointerId); }catch(_){}                 // capture is a nicety; losing it must not drop the gesture
+    ptrs.set(e.pointerId,{...css(e), type:e.pointerType});
+    const touches=[...ptrs.values()].filter(p=>p.type!=='mouse');
+    if(touches.length===2 && !(drag&&drag.pen)){ drag=null; const [a,b]=touches; pinch={d:V.dist(a,b), m:V.mid(a,b), view:{...DZ.view}}; return; }
+    if(ptrs.size>2||!DZ.id) return;
+    const p=toPhoto(e), c=css(e);
+    if(DZ.wipe.on && Math.abs(c.x-DZ.wipe.x*DZ.box.w)<20){ drag={kind:'wipe'}; st.style.cursor='ew-resize'; return; }
+    if(DZ.tool==='heal'){ const r=DZ.healMm*pxPerMm();
+      drag={kind:'heal',changed:true}; DZ.stroke={r, pts:[[p.x,p.y]]}; DZ.cursor=c;
+      healStamp(p.x,p.y,r); dzRender(); return; }
+    const hit=DZ.guides&&!DZ.orig?hitHandle(c, e.pointerType==='touch'?30:18):null;
+    if(hit){ drag={kind:'handle',side:hit.side,k:hit.k,start:p,orig:{...DZ.brows[hit.side][hit.k]}}; DZ.active=hit.side; }
+    else { const side=DZ.orig?null:hitBrow(p);
+      if(side){ drag={kind:'brow',side,start:p,orig:cloneBrow(DZ.brows[side])}; DZ.active=side; }
+      else drag={kind:'pan',start:c,view:{...DZ.view},t0:Date.now(),moved:0}; }
+    drag.pen=e.pointerType==='pen'; drag.id=e.pointerId;
+    st.style.cursor=drag.kind==='pan'?'grabbing':'move'; dzActiveLabel(); dzRender(); });
+  st.addEventListener('pointermove',e=>{ if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId,{...css(e), type:e.pointerType});
+    if(drag&&drag.id!==undefined&&e.pointerId!==drag.id) return;        // only the pointer that started the drag moves it
+    const touches=[...ptrs.values()].filter(p=>p.type!=='mouse');
+    if(pinch&&touches.length===2){ const [a,b]=touches, d=V.dist(a,b), m=V.mid(a,b);
+      const s=Math.max(0.03,Math.min(24,pinch.view.s*d/Math.max(1,pinch.d))), k=s/pinch.view.s;
+      DZ.view={s, tx:m.x-(pinch.m.x-pinch.view.tx)*k, ty:m.y-(pinch.m.y-pinch.view.ty)*k}; dzRenderSoon(); return; }
+    if(DZ.tool==='heal') DZ.cursor=css(e);
+    if(!drag){ if(DZ.tool==='heal') dzRenderSoon(); return; }
+    if(drag.kind==='heal'){ const p=toPhoto(e), pts=DZ.stroke.pts, last=pts[pts.length-1], r=DZ.stroke.r;
+      // one dab per third of a brush width: the skin is healed under the finger, as it moves
+      if(Math.hypot(p.x-last[0],p.y-last[1])>=r*0.34){ pts.push([p.x,p.y]); healStamp(p.x,p.y,r); }
+      dzRenderSoon(); return; }
+    if(drag.kind==='wipe'){ DZ.wipe.x=Math.max(0.02,Math.min(0.98,css(e).x/DZ.box.w)); dzRenderSoon(); return; }
+    if(drag.kind==='pan'){ const c=css(e); drag.moved=Math.max(drag.moved, Math.hypot(c.x-drag.start.x,c.y-drag.start.y));
+      DZ.view.tx=drag.view.tx+(c.x-drag.start.x); DZ.view.ty=drag.view.ty+(c.y-drag.start.y); dzRenderSoon(); return; }
+    drag.changed=true;
+    const d=V.sub(toPhoto(e),drag.start);
+    if(drag.kind==='handle') DZ.brows[drag.side][drag.k]=V.add(drag.orig,d);
+    else { const b=DZ.brows[drag.side]; for(const k in drag.orig) b[k]=V.add(drag.orig[k],d); }
+    if(DZ.sym) mirrorBrow(drag.side);
+    dzRenderSoon(); dzDirty(); });
+  const up=e=>{ ptrs.delete(e.pointerId); try{ st.releasePointerCapture(e.pointerId); }catch(_){}
+    if(ptrs.size<2) pinch=null;
+    if(drag&&drag.id!==undefined&&e.pointerId!==drag.id) return;        // a palm lifting is not the end of the stroke
+    if(!ptrs.size||drag){
+      if(drag&&drag.kind==='heal'&&DZ.stroke&&!pinchSeen){ DZ.retouch.push(DZ.stroke);   // already healed, dab by dab
+        DZ.stroke=null; dzRender(); dzDirty(); pushHist(); }
+      DZ.stroke=null;
+      // a tap on empty skin (no drag, no pinch) flips before/after; a finished drag is a step to undo
+      if(drag&&drag.kind==='pan'&&drag.moved<6&&Date.now()-drag.t0<450&&!pinchSeen) hold(!DZ.orig);
+      if(drag&&drag.changed) pushHist();
+      drag=null; pinchSeen=false; st.style.cursor=''; dzRenderSoon(); } };
+  let pinchSeen=false; st.addEventListener('pointerdown',e=>{ if(ptrs.size>=2&&!e.target.closest('.dz-tools')&&!(drag&&drag.pen)) pinchSeen=true; });
+  st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(css(e), Math.exp(-e.deltaY*0.0015)); dzRender(); },{passive:false});
+  addEventListener('resize',()=>{ if($('#dz').hidden) return; dzResize(); dzRender(); });
+  // Safari zooms the whole page on a two-finger pinch, wherever it starts - which made the
+  // panel grow instead of the photo. While the studio is open that gesture is ours to
+  // refuse; the picture keeps its own zoom, which never touches the page.
+  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>{ if(!$('#dz').hidden) e.preventDefault(); },{passive:false,capture:true}));
+  // belt and braces: Safari reads a two-finger drag as a page pinch before those fire
+  document.addEventListener('touchmove',e=>{ if(e.touches.length>1&&!$('#dz').hidden&&e.cancelable) e.preventDefault(); },{passive:false,capture:true});
+  document.addEventListener('wheel',e=>{ if(e.ctrlKey&&!$('#dz').hidden) e.preventDefault(); },{passive:false});   // trackpad pinch / ctrl+wheel
+  document.addEventListener('keydown',e=>{ if($('#dz').hidden||!(e.ctrlKey||e.metaKey)) return;
+    if(e.key==='+'||e.key==='-'||e.key==='='||e.key==='0') e.preventDefault(); });
+  // 원본: held down it shows the photo alone; a tap on empty skin toggles it instead
+  const orig=$('#dzOrig'), hold=on=>{ DZ.orig=on; orig.classList.toggle('on',on); dzRender(); };
+  orig.addEventListener('pointerdown',e=>{ e.preventDefault(); try{ orig.setPointerCapture(e.pointerId); }catch(_){} hold(true); });
+  ['pointerup','pointercancel'].forEach(ev=>orig.addEventListener(ev,()=>hold(false)));
+  document.addEventListener('keydown',e=>{ if($('#dz').hidden) return; const tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea') return;
+    // this listener was registered first, so stopping it here also stops the page's own
+    // Escape handler further down - otherwise leaving 전체화면 closed the studio as well
+    if(e.key==='Escape'&&$('#dz').classList.contains('immersive')){ e.preventDefault(); e.stopImmediatePropagation(); $('#dzFull').onclick(); return; }
+    if(e.key===' '&&!e.repeat){ e.preventDefault(); hold(true); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); restoreHist(DZ.histAt+(e.shiftKey?1:-1)); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){ e.preventDefault(); restoreHist(DZ.histAt+1); return; }
+    const arrows={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];
+    if(arrows){ e.preventDefault(); moveActive(arrows[0]*(e.shiftKey?2:0.5), arrows[1]*(e.shiftKey?2:0.5)); } });
+  document.addEventListener('keyup',e=>{ if($('#dz').hidden) return; if(e.key===' ') hold(false); });
+  $('#dzZoomBrow').onclick=()=>{ zoomBrows(); dzRender(); }; $('#dzZoomAll').onclick=()=>{ fitAll(); dzRender(); };
+  $('#dzSym').onclick=()=>{ DZ.sym=!DZ.sym; $('#dzSym').classList.toggle('on',DZ.sym); if(DZ.sym){ mirrorBrow(DZ.active); dzRender(); dzDirty(); } pushHist(); };
+  $('#dzWipe').onclick=()=>{ DZ.wipe.on=!DZ.wipe.on; if(DZ.wipe.on) DZ.wipe.x=0.5; $('#dzWipe').classList.toggle('on',DZ.wipe.on); dzRender(); };
+  const showPts=on=>{ DZ.guides=on; $('#dzPts').classList.toggle('on',on); $('#dzGuides').checked=on; dzRender(); };
+  $('#dzPts').onclick=()=>showPts(!DZ.guides);
+  $('#dzLines').onclick=()=>{ if(!DZ.lm) return toast('얼굴을 찾지 못한 사진에는 가이드선을 그릴 수 없습니다','bad'); DZ.lines=!DZ.lines; $('#dzLines').classList.toggle('on',DZ.lines); dzRender(); };
+  $('#dzUndo').onclick=()=>restoreHist(DZ.histAt-1); $('#dzRedo').onclick=()=>restoreHist(DZ.histAt+1);
+  const setTool=t=>{ DZ.tool=t; DZ.cursor=null; DZ.stroke=null; $('#dzHeal').classList.toggle('on',t==='heal'); $('#dzHealBox').hidden=t!=='heal'; st.classList.toggle('heal',t==='heal'); dzRender(); };
+  $('#dzHeal').onclick=()=>setTool(DZ.tool==='heal'?'move':'heal');
+  $('#dzHealSize').addEventListener('input',()=>{ DZ.healMm=(+$('#dzHealSize').value)/10; $('#dzHealMm').textContent=DZ.healMm.toFixed(1); dzRender(); });
+  $('#dzHealClear').onclick=()=>{ if(!DZ.retouch.length) return; DZ.retouch=[]; rebuildBase(); dzRender(); dzDirty(); pushHist(); };
+  st.addEventListener('pointerleave',()=>{ if(DZ.tool==='heal'&&!drag){ DZ.cursor=null; dzRender(); } });
+  DZ.setTool=setTool;
+  $('#dzFold').onclick=()=>{ $('#dz').classList.toggle('folded'); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); };
+  // 전체화면: the browser's own full screen where it allows it (desktop, iPad); where it does not
+  // (iPhone), the panel folds away so the picture gets the whole screen anyway
+  const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+  const immersive=on=>{ const dz=$('#dz'); dz.classList.toggle('immersive',on);
+    if(narrow()) dz.classList.toggle('folded',on);              // on a phone the panel folds to its tabs
+    $('#dzFull').classList.toggle('on',on); $('#dzExit').hidden=!on;
+    requestAnimationFrame(()=>{ dzResize(); dzRender(); }); };
+  DZ.immersive=immersive;
+  $('#dzFull').onclick=async()=>{ const dz=$('#dz'), on=!dz.classList.contains('immersive');
+    immersive(on);                                             // the page's own full screen, first and always
+    try{ if(on){ const req=dz.requestFullscreen||dz.webkitRequestFullscreen; if(req) await req.call(dz); }
+      else if(fsEl()) await (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+    catch(_){}                                                 // the browser's is a bonus; losing it changes nothing
+  };
+  $('#dzExit').onclick=()=>$('#dzFull').onclick();
+  // an iPad leaves the browser's full screen on the smallest swipe: keep ours
+  ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>{ requestAnimationFrame(()=>{ dzResize(); dzRender(); }); }));
+  $('#dzClose').onclick=closeDz;
+  $('#dzClient').addEventListener('input',()=>{ DZ.client=$('#dzClient').value; dzDirty(); });
+  $$('#dzTabs button').forEach(b=>b.onclick=()=>{ $$('#dzTabs button').forEach(x=>x.classList.toggle('on',x===b));
+    $$('.dz-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===b.dataset.t)); });
+  $('#dzCopyRL').onclick=()=>{ mirrorBrow('right'); dzRender(); dzDirty(); pushHist(); }; $('#dzCopyLR').onclick=()=>{ mirrorBrow('left'); dzRender(); dzDirty(); pushHist(); };
+  $('#dzReset').onclick=()=>{ if(!DZ.tex.right) return; DZ.brows=initBrows(); dzRender(); dzDirty(); pushHist(); };
+  $('#dzGuides').onchange=()=>showPts($('#dzGuides').checked);
+  $('#dzPad').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ nudge(b.dataset.n); pushHist(); } });
+  $('#dzCmpDl').onclick=()=>dzCompare(false); $('#dzCmpSave').onclick=()=>dzCompare(true);
+  $('#dzIpd').addEventListener('input',()=>{ DZ.ipd=Math.max(50,Math.min(75,+$('#dzIpd').value||62)); dzRender(); dzDirty(); });
+  $('#dzNotes').addEventListener('input',()=>{ DZ.notes=$('#dzNotes').value; dzDirty(); });
+  $('#dzUpload').onclick=()=>$('#dzFile').click();
+  $('#dzFile').addEventListener('change',async()=>{ const files=[...$('#dzFile').files]; $('#dzFile').value=''; if(!files.length) return;
+    let added=[]; for(const f of files){ try{ const b64=await readFile(f); const out=await post('api/templates',{name:f.name.replace(/\.[^.]+$/,''), image:b64, side:$('#dzSide').value});
+        added=added.concat(out.added||[]); }catch(err){ toast(f.name+': '+err.message,'bad'); } }
+    if(added.length){ await loadTemplates(); await setTemplate(added[0].id); if(!DZ.brows.right) DZ.brows=initBrows(); zoomBrows(); dzRender(); dzDirty(); pushHist(); toast(`도안 ${added.length}개를 넣었습니다`,'good'); } });
+  $('#dzSave').onclick=()=>dzSave(false); $('#dzDownload').onclick=dzDownload; $('#dzPrint').onclick=()=>dzSave(true);
+})();
+function nudge(n){ const side=DZ.active, b=DZ.brows[side]; if(!b) return; const mm=pxPerMm(), up=faceUp(), sign=side==='right'?-1:1;
+  const move=(pts,d)=>pts.forEach(k=>{ b[k]=V.add(b[k],d); });
+  const all=Object.keys(b), H=V.mid(b.hT,b.hB);
+  const along=V.unit(V.sub(b.t,H));
+  if(n==='up') move(all,V.mul(up,0.5*mm)); if(n==='down') move(all,V.mul(up,-0.5*mm));
+  if(n==='in') move(all,V.mul({x:-sign*mm*0.5,y:0},1)); if(n==='out') move(all,V.mul({x:sign*mm*0.5,y:0},1));
+  if(n==='longer') b.t=V.add(b.t,V.mul(along,mm)); if(n==='shorter') b.t=V.sub(b.t,V.mul(along,mm));
+  const tops=['hT','mT','aT','tT'].filter(k=>b[k]), bots=['hB','mB','aB','tB'].filter(k=>b[k]);
+  if(n==='thicker'){ move(tops,V.mul(up,0.25*mm)); move(bots,V.mul(up,-0.25*mm)); }
+  if(n==='thinner'){ move(tops,V.mul(up,-0.25*mm)); move(bots,V.mul(up,0.25*mm)); }
+  if(n==='tailup') b.t=V.add(b.t,V.mul(up,0.5*mm)); if(n==='taildown') b.t=V.sub(b.t,V.mul(up,0.5*mm));
+  if(n==='archup') move(['aT','aB'].filter(k=>b[k]),V.mul(up,0.5*mm)); if(n==='archdown') move(['aT','aB'].filter(k=>b[k]),V.mul(up,-0.5*mm));
+  if(DZ.sym) mirrorBrow(side); dzRender(); dzDirty(); }
+function moveActive(dxMm,dyMm){ // arrow keys: along the eye line and the face's up, in millimetres
+  const b=DZ.brows[DZ.active]; if(!b) return; const mm=pxPerMm(), up=faceUp(), along=V.perp(up);
+  const d=V.add(V.mul(along,-dxMm*mm*(along.x<0?-1:1)), V.mul(up,-dyMm*mm));
+  for(const k in b) b[k]=V.add(b[k],d); if(DZ.sym) mirrorBrow(DZ.active); dzRender(); dzDirty(); pushHist(); }
+function dzActiveLabel(){ const l=$('#dzActiveKo'); if(l) l.textContent='· '+(DZ.active==='right'?'오른쪽':'왼쪽')+' 눈썹'; }
+function measure(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return null; const up=faceUp(), mm=pxPerMm();
+  return {길이:V.dist(g.H,g.T)/mm, '아치 두께':V.dist(b.aT,b.aB)/mm, '머리 두께':V.dist(b.hT,b.hB)/mm,
+          '꼬리 높이':V.dot(V.sub(g.T,g.H),up)/mm, '아치 높이':V.dot(V.sub(b.aT,b.hT),up)/mm}; }
+function dzMeasure(){
+  const R=measure('right'), L=measure('left'), me=DZ.active==='right'?R:L, g=DZ.geo[DZ.active];
+  if(!me){ $('#dzNums').textContent=''; return; }
+  const sg=(k,v)=>((k==='꼬리 높이'||k==='아치 높이')&&v>=0?'+':'')+v.toFixed(1);
+  $('#dzNums').textContent=(DZ.active==='right'?'오른쪽':'왼쪽')+' · '+Object.keys(me).slice(0,4).map(k=>k+' '+sg(k,me[k])+' mm').join(' · ');
+  const dl=$('#dzSpec'); dl.replaceChildren();
+  // both sides on one line each, and how far apart they are - the client always asks
+  Object.keys(me).forEach(k=>{ if(R&&L) spec(dl,k,`오른쪽 ${sg(k,R[k])} · 왼쪽 ${sg(k,L[k])}${Math.abs(R[k]-L[k])>=0.3?` · 차 ${Math.abs(R[k]-L[k]).toFixed(1)}`:''} mm`);
+    else spec(dl,k,sg(k,me[k])+' mm'); });
+  if(R&&L&&DZ.geo.right&&DZ.geo.left) spec(dl,'미간 (머리 사이)',(V.dist(DZ.geo.right.H,DZ.geo.left.H)/pxPerMm()).toFixed(1)+' mm');
+  if(g) spec(dl,'아치 위치', Math.round(DZ.tex[DZ.active].uA*100)+'% 지점');
+  if(!DZ.ipdPx) spec(dl,'주의','얼굴을 찾지 못해 치수는 대략값입니다');
+}
+
+/* panel contents */
+function renderTplList(){
+  const box=$('#dzTpls'); box.replaceChildren();
+  if(!DZ.tpls.length){ box.appendChild(el('div','hint','아직 도안이 없습니다. 아래에서 도안을 올리세요.')); return; }
+  DZ.tpls.forEach(t=>{ const c=el('button','dz-tpl'+(t.id===DZ.tplId?' on':'')); c.type='button';
+    const cv=document.createElement('canvas'); cv.width=240; cv.height=68; c.appendChild(cv);
+    loadImg(t.right||t.left).then(im=>{ const x=cv.getContext('2d'); const k=Math.min(220/im.naturalWidth, 60/im.naturalHeight);
+      x.save(); if(!t.right){ x.translate(240,0); x.scale(-1,1); } x.drawImage(im,(240-im.naturalWidth*k)/2,(68-im.naturalHeight*k)/2,im.naturalWidth*k,im.naturalHeight*k); x.restore(); }).catch(()=>{});
+    c.appendChild(el('span','',t.name+(t.side==='pair'?'':' · 한 짝')));
+    const x=el('span','x','×'); x.title='도안 삭제';
+    x.onclick=async e=>{ e.stopPropagation(); if(!confirm(`도안 "${t.name}"을 지울까요?`)) return;
+      try{ await post('api/templates/'+t.id+'/delete'); await loadTemplates(); if(DZ.tplId===t.id) await setTemplate(null); renderTplList(); dzRender(); }catch(err){ toast(err.message,'bad'); } };
+    c.appendChild(x);
+    c.onclick=async()=>{ await setTemplate(t.id); if(!DZ.brows.right) DZ.brows=initBrows(); dzRender(); dzDirty(); pushHist(); };
+    box.appendChild(c); });
+}
+async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templates||[]; }catch(e){ DZ.tpls=[]; }
+  $('#dzEmpty').hidden=!!DZ.tpls.length; renderTplList(); }
+function renderLookPanel(){
+  const st=$('#dzStages'); st.replaceChildren();
+  STAGES.forEach(([k,ko,op,bl])=>{ const b=el('button','',ko); b.type='button'; b.classList.toggle('on',DZ.look.opacity===op&&DZ.look.blur===bl);
+    b.onclick=()=>{ DZ.look.opacity=op; DZ.look.blur=bl; renderLookPanel(); dzRender(); dzDirty(); pushHist(); }; st.appendChild(b); });
+  const mkSliders=(box,list,after)=>{ box.replaceChildren();
+    list.forEach(([key,ko,lo,hi,step])=>{ const row=el('label','sl'); row.appendChild(el('span','',ko));
+      const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.step=step||1; r.value=DZ.look[key]; const out=el('b','',String(DZ.look[key]));
+      // an iPad fires input far faster than a frame; coalescing keeps the handle under the finger
+      r.addEventListener('input',()=>{ DZ.look[key]=+r.value; out.textContent=r.value; if(after||key==='density'||key==='weight') retint(); dzRenderSoon(); dzDirty();
+        if(key==='opacity'||key==='blur') $$('#dzStages button').forEach(b=>b.classList.remove('on')); });
+      r.addEventListener('change',pushHist);
+      row.appendChild(r); row.appendChild(out); box.appendChild(row); }); };
+  mkSliders($('#dzLookSliders'),LOOK_SLIDERS); mkSliders($('#dzColorSliders'),COLOR_SLIDERS,retint);
+  const cs=$('#dzColors'); cs.replaceChildren();
+  PIGMENTS.forEach(([k,ko,rgb])=>{ const b=el('button'); b.type='button'; const sw=el('i'); const c=rgb||DZ.hair;
+    sw.style.background=c?`rgb(${c[0]},${c[1]},${c[2]})`:'linear-gradient(135deg,#444,#c9a)'; b.appendChild(sw); b.appendChild(el('span','',ko));
+    b.classList.toggle('on',DZ.look.color===k); if(k==='hair'&&!DZ.hair) b.title='머리카락을 찾지 못해 기본 갈색을 씁니다';
+    b.onclick=()=>{ DZ.look.color=k; retint(); renderLookPanel(); dzRender(); dzDirty(); pushHist(); }; cs.appendChild(b); });
+}
+
+function immersiveOff(){ const dz=$('#dz'); if(!dz.classList.contains('immersive')) return;
+  dz.classList.remove('immersive'); $('#dzFull').classList.remove('on'); $('#dzExit').hidden=true; }
+
+/* open, save, close */
+function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active, retouch:DZ.retouch}; }
+function renderShots(){ const box=$('#dzShots'); if(!box) return; box.replaceChildren();
+  if(!DZ.saves.length){ box.appendChild(el('span','','아직 남긴 시안이 없습니다')); return; }
+  DZ.saves.slice(-6).forEach((sv,i,arr)=>{ const row=el('span');
+    row.appendChild(el('b','',(DZ.saves.length-arr.length+i+1)+'. '+(sv.name||'')));
+    row.appendChild(el('i','',fmtTime(sv.created))); box.appendChild(row); }); }
+function dzDirty(){ DZ.dirtySince=Date.now(); clearTimeout(DZ.saveTimer);
+  const auto=$('#dzAuto'); if(auto) auto.dataset.state='saving';
+  DZ.saveTimer=setTimeout(async()=>{ if(!DZ.id) return;
+    try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client});
+      if(auto) auto.dataset.state='saved';
+    }catch(e){ if(auto) auto.dataset.state='failed'; } }, 900); }
+async function openDesign(id){
+  const dz=$('#dz'); dz.hidden=false; $('#dzWait').hidden=false;
+  try{
+    const d=await api('api/designs/'+id);
+    DZ.id=id; DZ.W=d.width; DZ.H=d.height; DZ.lm=d.placement?d.placement.landmarks:null; DZ.ipdPx=d.placement?d.placement.ipd_px:0;
+    DZ.client=d.client||''; DZ.saves=d.saves||[]; DZ.lastSave=DZ.saves.length?DZ.saves[DZ.saves.length-1]:null;
+    DZ.look={...LOOK0}; DZ.sym=true; DZ.notes=''; DZ.ipd=62; DZ.tplId=null; DZ.active='right'; DZ.orig=false; DZ.geo={};
+    DZ.anchor=initAnchors(); DZ.brows={};
+    const s=d.state||{};
+    if(s.brows&&s.brows.right&&s.brows.left){ DZ.brows={right:cloneBrow(s.brows.right), left:cloneBrow(s.brows.left)}; }
+    if(s.look){ DZ.look={...LOOK0,...s.look};
+      if(DZ.look.weight>10){ DZ.look.weight=Math.min(10,5+DZ.look.weight/100*5); DZ.look.density=Math.min(2,Math.max(0.2,DZ.look.density||1)); } }   // the earlier scales
+    if(typeof s.sym==='boolean') DZ.sym=s.sym; if(s.ipd) DZ.ipd=+s.ipd; if(s.notes) DZ.notes=s.notes; if(s.tpl) DZ.tplId=s.tpl;
+    $('#dzClient').value=DZ.client; $('#dzNotes').value=DZ.notes; $('#dzIpd').value=DZ.ipd; $('#dzSym').classList.toggle('on',DZ.sym);
+    $('#dzGuides').checked=DZ.guides=true; $('#dzPts').classList.add('on'); DZ.wipe={on:false,x:0.5}; $('#dzWipe').classList.remove('on');
+    DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded'); immersiveOff();
+    DZ.hist=[]; DZ.histAt=-1; DZ.layKey=null; DZ.shapeCache={}; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.healed=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
+    $('#dzSaveNote').textContent=''; $('#dzAuto').dataset.state='saved';
+    dzResize();
+    await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
+    DZ.hair=sampleHair(); rebuildBase();
+    await loadTemplates(); await setTemplate(DZ.tplId);
+    if(DZ.tex.right){ const auto=initBrows(); if(!DZ.brows.right||!DZ.brows.left) DZ.brows=auto; ensureMid('right'); ensureMid('left'); }
+    renderLookPanel(); renderShots(); dzActiveLabel(); zoomBrows(); dzRender(); pushHist();
+    if(d.warning) toast(d.warning,'bad');
+    if(!DZ.tpls.length) { $$('#dzTabs button')[0].click(); toast('먼저 도안을 올려 주세요','bad'); }
+  }catch(e){ toast(e.message,'bad'); dz.hidden=true; }
+  $('#dzWait').hidden=true;
+}
+async function closeDz(){ clearTimeout(DZ.saveTimer);
+  if(DZ.id&&DZ.dirtySince){ try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client}); }catch(e){} }
+  $('#dz').hidden=true; DZ.id=null; DZ.dirtySince=0; await refreshGallery(); }
+async function dzSave(thenPrint){
+  if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const note=$('#dzSaveNote'); note.textContent='저장 중…';
+  try{
+    const data=dzExport().toDataURL('image/jpeg',0.93);
+    const tpl=DZ.tpls.find(t=>t.id===DZ.tplId);
+    const out=await post('api/saves',{job:DZ.id, name:DZ.client, image:data, settings:{...DZ.look, tpl:tpl?tpl.name:'', ipd:DZ.ipd, notes:DZ.notes}});
+    if(!DZ.client){ DZ.client=out.name; $('#dzClient').value=out.name; }
+    DZ.lastSave={image:out.url.replace(/^files\/[^/]+\//,''), name:out.name, created:new Date().toISOString()}; DZ.saves.push(DZ.lastSave);
+    note.textContent=`${out.name} · 시안 ${DZ.saves.length}장`; renderShots(); dzDirty();
+    if(thenPrint){ await post('api/jobs',{kind:'sheet', photo_from:{job:DZ.id, file:DZ.lastSave.image}, photo_name:out.name+' 상담 시안', layout:'both', ipd_mm:String(DZ.ipd)});
+      toast('1:1 출력 시트를 만들고 있습니다 · 갤러리에서 확인하세요','good'); }
+    else toast(out.name+' (으)로 갤러리에 저장했습니다','good');
+  }catch(e){ note.textContent=''; toast(e.message,'bad'); }
+}
+function compareCanvas(){ // the brow band of the photo, original and design side by side
+  const cv=dzExport(); const pts=[]; ['right','left'].forEach(k=>{ const b=DZ.brows[k]; if(b) for(const j in b) pts.push(b[j]); });
+  const ipd=DZ.ipdPx||DZ.W/6, cx=DZ.lm?(DZ.lm.right_pupil[0]+DZ.lm.left_pupil[0])/2:DZ.W/2;
+  let y0=Math.min(...pts.map(p=>p.y))-0.45*ipd, y1=(DZ.lm?(DZ.lm.right_pupil[1]+DZ.lm.left_pupil[1])/2:Math.max(...pts.map(p=>p.y))+0.3*ipd)+0.55*ipd;
+  let x0=cx-1.25*ipd, x1=cx+1.25*ipd; x0=Math.max(0,Math.round(x0)); x1=Math.min(DZ.W,Math.round(x1)); y0=Math.max(0,Math.round(y0)); y1=Math.min(DZ.H,Math.round(y1));
+  const w=x1-x0, h=y1-y0, gap=Math.round(w*0.02), out=document.createElement('canvas'); out.width=w*2+gap; out.height=h;
+  const c=out.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,out.width,out.height);
+  c.drawImage(DZ.photo,x0,y0,w,h,0,0,w,h); c.drawImage(cv,x0,y0,w,h,w+gap,0,w,h);
+  const fs=Math.max(14,Math.round(h*0.07)); c.font=`600 ${fs}px sans-serif`; c.textBaseline='top';
+  [['전',0],['후',w+gap]].forEach(([t,X])=>{ const tw=c.measureText(t).width+fs; c.fillStyle='rgba(0,0,0,.55)'; c.fillRect(X+fs*0.5,fs*0.5,tw,fs*1.5);
+    c.fillStyle='#fff'; c.fillText(t,X+fs,fs*0.75); });
+  return out; }
+async function dzCompare(toGallery){ if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const data=compareCanvas().toDataURL('image/jpeg',0.92);
+  if(!toGallery){ saveBlob(data, `${(DZ.client||'상담').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'상담'}_전후_${new Date().toISOString().slice(0,10)}.jpg`); return toast('비교 이미지를 내려받았습니다','good'); }
+  try{ const out=await post('api/saves',{job:DZ.id, name:(DZ.client||'')&&DZ.client+' 전후', image:data, settings:{...DZ.look, side_by_side:true, notes:DZ.notes}});
+    DZ.saves.push({image:out.url.replace(/^files\/[^/]+\//,''), name:out.name, created:new Date().toISOString()});
+    renderShots(); toast(out.name+' (으)로 갤러리에 저장했습니다','good'); }catch(e){ toast(e.message,'bad'); } }
+function saveBlob(dataUrl, filename){ // synchronous, so the click's activation still covers the download
+  const bin=atob(dataUrl.slice(dataUrl.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/jpeg'})), a=document.createElement('a');
+  a.href=url; a.download=filename; setTimeout(()=>URL.revokeObjectURL(url),4000); document.body.appendChild(a); a.click(); a.remove(); }
+function dzDownload(){ if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const data=dzExport().toDataURL('image/jpeg',0.93), bin=atob(data.slice(data.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/jpeg'})), a=document.createElement('a');
+  a.href=url; a.download=`${(DZ.client||'상담').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'상담'}_${new Date().toISOString().slice(0,10)}.jpg`;
+  setTimeout(()=>URL.revokeObjectURL(url),4000); document.body.appendChild(a); a.click(); a.remove(); toast('이미지를 내려받았습니다','good'); }
+async function startDesign(body, btn){
+  if(btn){ btn.disabled=true; btn.dataset.busy='1'; const l=$('[data-design-label]'); if(l) l.textContent='얼굴을 찾는 중…'; }
+  try{ const out=await post('api/designs', body); await refreshGallery(); await openDesign(out.id); }
+  catch(e){ toast(e.message,'bad'); }
+  finally{ if(btn){ btn.disabled=false; delete btn.dataset.busy; const l=$('[data-design-label]'); if(l) l.textContent='사진 분석하고 시작'; } }
+}
+$('#fDesign').onsubmit=async e=>{ e.preventDefault(); const form=e.target, msg=$('[data-msg]',form); msg.textContent='';
+  const body={client:form.client.value}; const f=$('input[type=file]',form);
+  try{
+    if(f.files[0]&&f.files[0].size){ body.photo=await readFile(f.files[0]); body.photo_name=f.files[0].name; }
+    else if(form.photo_from_job.value){ body.photo_from={job:form.photo_from_job.value, file:form.photo_from_file.value}; body.photo_name=$('.pt b',form).textContent; }
+    else throw new Error('사진을 고르세요');
+  }catch(err){ msg.textContent=err.message; return; }
+  await startDesign(body, $('button[type=submit]',form)); };
+function renderRecentDesigns(){
+  const box=$('#dzRecent'), list=$('#dzRecentList'); if(!box) return;
+  const seen=new Set(), rows=items.filter(it=>it.kind==='design'&&!seen.has(it.id)&&seen.add(it.id)).slice(0,6);
+  box.hidden=!rows.length; list.replaceChildren();
+  rows.forEach(it=>{ const b=el('button','btn'); b.type='button'; b.style.justifyContent='flex-start'; b.style.height='auto'; b.style.padding='6px 10px';
+    const im=document.createElement('img'); im.src=it.image+'?w=120'; im.alt=''; im.style.cssText='width:34px;height:42px;object-fit:cover;border-radius:6px';
+    b.appendChild(im); b.appendChild(el('span','',(it.client||it.title)+' · '+fmtTime(it.created)));
+    b.onclick=()=>openDesign(it.id); list.appendChild(b); });
+}
+
+/* ── keyboard ────────────────────────────────────────────────────────── */
+document.addEventListener('keydown',e=>{
+  if(!$('#lb').hidden){ if(e.key==='Escape') closeLb(); if(e.key==='ArrowLeft') step(-1); if(e.key==='ArrowRight') step(1); return; }
+  if(!$('#settingsOv').hidden && e.key==='Escape'){ $('#settingsOv').hidden=true; return; }
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select') return;
+  if(!$('#dz').hidden){ if(e.key==='Escape'&&!$('#dz').classList.contains('immersive')) closeDz(); return; }
+  if(e.key==='1') setView('design'); if(e.key==='2') setView('generate'); if(e.key==='3') setView('restyle'); if(e.key==='4') setView('sheet');
+  if(e.key==='g'||e.key==='ㅎ') setView('gallery');
+});
+
+/* ── polling ─────────────────────────────────────────────────────────── */
+function startPolling(){ stopPolling(); timer=setInterval(async()=>{ try{
+  if(document.hidden) return;
+  const active=items.some(i=>i.status==='running'||i.status==='queued');
+  if(active){ await refreshGallery(); if(lbIndex>=0) renderLb(); await loadUsage(); }
+}catch(e){} }, 4000); }
+function stopPolling(){ if(timer) clearInterval(timer); timer=null; }
+
+(async()=>{ try{ const me=await api('api/me'); renderStatus(!!me.codex, !!me.api_key); if(me.authed) await showApp(); else showLogin(); }catch(e){ showLogin(); } })();
+</script>
+</body>
+</html>

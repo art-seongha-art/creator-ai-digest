@@ -1,0 +1,7 @@
+# BrowLab (browlab/) 의존성
+pillow>=10.1
+numpy>=1.24
+# 얼굴 랜드마크 검출(권장, 1:1 배율·가이드선·눈썹 마스크에 사용)
+mediapipe>=0.10
+# OpenAI Images API 백엔드(선택, --backend api)
+openai>=1.0
