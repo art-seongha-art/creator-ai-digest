@@ -803,7 +803,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <div class="dz-note">배경이 투명한 PNG 한 장, 또는 흰 종이에 그린 도안 시트(여러 쌍) 그대로 올리면 됩니다. 시트는 자동으로 한 쌍씩 잘려 들어갑니다.</div>
       </div>
       <div class="dz-tab" data-tab="shape">
-        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점 3개는 윗선을, 아랫선 점 3개는 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 톡 치면 전후 전환, 두 손가락으로 확대 · 화살표 키로 0.5 mm 씩 (Shift 2 mm)</div>
+        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점 4개는 윗선을, 아랫선 점 4개는 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 톡 치면 전후 전환, 두 손가락으로 확대 · 화살표 키로 0.5 mm 씩 (Shift 2 mm)</div>
         <div class="dz-row">
           <button class="btn" type="button" id="dzCopyRL">오른쪽 → 왼쪽 복사</button>
           <button class="btn" type="button" id="dzCopyLR">왼쪽 → 오른쪽 복사</button>
@@ -1591,9 +1591,10 @@ function analyseTemplate(img, flip, headRight){
   // what the drawing does beyond that curve, in chord units, so placing the template only
   // needs the head-to-tail distance on the face
   smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; p.gT/=chord; p.gB/=chord; });
-  const iM=Math.round((iH+iA)/2), uM=smp[iM].u;                  // the extra handle between head and arch
+  const iM=Math.round((iH+iA)/2), uM=smp[iM].u;                  // between head and arch
+  const iK=Math.round((iA+N)/2), uK=smp[iK].u;                   // between arch and tail: the run down to the tail
   const alpha=new Float32Array(W*H); for(let i=0;i<W*H;i++) alpha[i]=px[i*4+3]/255;
-  return {W,H,cv,smp,uA,uH,uM,iA,iH,iM,chord,flipN,tipFrac,alpha};
+  return {W,H,cv,smp,uA,uH,uM,uK,iA,iH,iM,iK,chord,flipN,tipFrac,alpha};
 }
 function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous';
   im.onload=()=>res(im); im.onerror=()=>{ delete DZ.imgCache[url]; rej(new Error('이미지를 불러오지 못했습니다')); }; im.src=url; })); }
@@ -1688,10 +1689,11 @@ function fitTemplate(side){ // the drawing as drawn, scaled and turned so its fi
   const Ht=T.smp[0].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
   const ang=Math.atan2(a.T.y-a.H.y,a.T.x-a.H.x)-Math.atan2(Tt.y-Ht.y,Tt.x-Ht.x), cs=Math.cos(ang), sn=Math.sin(ang);
   const map=p=>{ const dx=p.x-Ht.x, dy=p.y-Ht.y; return {x:a.H.x+(dx*cs-dy*sn)*s, y:a.H.y+(dx*sn+dy*cs)*s}; };
-  const sH=T.smp[T.iH], sM=T.smp[T.iM], sA=T.smp[T.iA], ch=T.chord;
+  const sH=T.smp[T.iH], sM=T.smp[T.iM], sA=T.smp[T.iA], sK=T.smp[T.iK], ch=T.chord;
   return {hT:map(V.add(sH.c,V.mul(sH.n,sH.gT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.gB*ch))),
           mT:map(V.add(sM.c,V.mul(sM.n,sM.gT*ch))), mB:map(V.sub(sM.c,V.mul(sM.n,sM.gB*ch))),
-          aT:map(V.add(sA.c,V.mul(sA.n,sA.gT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.gB*ch))), t:map(Tt)};
+          aT:map(V.add(sA.c,V.mul(sA.n,sA.gT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.gB*ch))),
+          tT:map(V.add(sK.c,V.mul(sK.n,sK.gT*ch))), tB:map(V.sub(sK.c,V.mul(sK.n,sK.gB*ch))), t:map(Tt)};
 }
 function initBrows(){ const out={right:fitTemplate('right'), left:fitTemplate('left')};
   DZ.auto={right:cloneBrow(out.right), left:cloneBrow(out.left)}; return out; }
@@ -1718,16 +1720,18 @@ function browGeometry(side){
   // displacement from where the reference edge passes, and the displacements are blended
   // between the handles. Untouched handles sit exactly on the reference, so the drawing is
   // as drawn; a dragged handle is exactly where it was dragged to.
-  const {uH,uM,uA}=T, gtop=i=>V.add(pts[i].c, V.mul(pts[i].n, T.smp[i].gT*chord)), gbot=i=>V.sub(pts[i].c, V.mul(pts[i].n, T.smp[i].gB*chord));
-  const knots=[uH,uM,uA,1], zero={x:0,y:0};
-  const dT=[V.sub(b.hT,gtop(T.iH)), b.mT?V.sub(b.mT,gtop(T.iM)):zero, V.sub(b.aT,gtop(T.iA)), zero];
-  const dB=[V.sub(b.hB,gbot(T.iH)), b.mB?V.sub(b.mB,gbot(T.iM)):zero, V.sub(b.aB,gbot(T.iA)), zero];
-  if(!b.mT) dT[1]=V.mul(V.add(dT[0],dT[2]),0.5); if(!b.mB) dB[1]=V.mul(V.add(dB[0],dB[2]),0.5);   // saved before the middle handles existed
+  const {uH,uM,uA,uK}=T, gtop=i=>V.add(pts[i].c, V.mul(pts[i].n, T.smp[i].gT*chord)), gbot=i=>V.sub(pts[i].c, V.mul(pts[i].n, T.smp[i].gB*chord));
+  const knots=[uH,uM,uA,uK,1], zero={x:0,y:0};
+  const dT=[V.sub(b.hT,gtop(T.iH)), b.mT?V.sub(b.mT,gtop(T.iM)):zero, V.sub(b.aT,gtop(T.iA)), b.tT?V.sub(b.tT,gtop(T.iK)):zero, zero];
+  const dB=[V.sub(b.hB,gbot(T.iH)), b.mB?V.sub(b.mB,gbot(T.iM)):zero, V.sub(b.aB,gbot(T.iA)), b.tB?V.sub(b.tB,gbot(T.iK)):zero, zero];
+  // a design saved before one of these handles existed: start it where the curve already runs
+  if(!b.mT) dT[1]=V.mul(V.add(dT[0],dT[2]),0.5); if(!b.mB) dB[1]=V.mul(V.add(dB[0],dB[2]),0.5);
+  if(!b.tT) dT[3]=V.mul(dT[2],0.5); if(!b.tB) dB[3]=V.mul(dB[2],0.5);
   pts.forEach((p,i)=>{ const s=T.smp[i];
     p.gTop=V.add(gtop(i), crAt(knots,dT,p.u)); p.gBot=V.add(gbot(i), crAt(knots,dB,p.u));      // outline, through the handles
     const vt=V.sub(p.gTop,p.c), vb=V.sub(p.gBot,p.c);                                            // the drawing scales with its edge
     p.top=V.add(p.c, V.mul(vt, s.eT/s.gT)); p.bot=V.add(p.c, V.mul(vb, s.eB/s.gB)); });          // mesh envelope, past the outline
-  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, iM:T.iM, chord, e};
+  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, iM:T.iM, iK:T.iK, chord, e};
 }
 function drawTri(ctx, tex, s0,s1,s2, d0,d1,d2){
   const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y); if(Math.abs(det)<1e-9) return;
@@ -1773,11 +1777,12 @@ function paintBrows(ctx, view, clipX){
   ctx.drawImage(DZ.lay,DZ.layAt.x,DZ.layAt.y); ctx.restore();
 }
 function handlePoints(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return [];
-  return ['hT','mT','aT','hB','mB','aB','t'].filter(k=>b[k]).map(k=>({k, x:b[k].x, y:b[k].y})); }
-function ensureMid(side){ // designs saved before the middle handles existed get them where the outline already runs
-  const b=DZ.brows[side]; if(!b||(b.mT&&b.mB)) return; const g=browGeometry(side); if(!g) return;
-  b.mT=b.mT||{...g.pts[g.iM].gTop}; b.mB=b.mB||{...g.pts[g.iM].gBot}; }
-const HCOL={hT:'#4fa3ff',mT:'#4fa3ff',aT:'#4fa3ff',hB:'#ffb84f',mB:'#ffb84f',aB:'#ffb84f',t:'#e2865f'};
+  return ['hT','mT','aT','tT','hB','mB','aB','tB','t'].filter(k=>b[k]).map(k=>({k, x:b[k].x, y:b[k].y})); }
+function ensureMid(side){ // designs saved before a handle existed get it where the outline already runs
+  const b=DZ.brows[side]; if(!b||(b.mT&&b.mB&&b.tT&&b.tB)) return; const g=browGeometry(side); if(!g) return;
+  b.mT=b.mT||{...g.pts[g.iM].gTop}; b.mB=b.mB||{...g.pts[g.iM].gBot};
+  b.tT=b.tT||{...g.pts[g.iK].gTop}; b.tB=b.tB||{...g.pts[g.iK].gBot}; }
+const HCOL={hT:'#4fa3ff',mT:'#4fa3ff',aT:'#4fa3ff',tT:'#4fa3ff',hB:'#ffb84f',mB:'#ffb84f',aB:'#ffb84f',tB:'#ffb84f',t:'#e2865f'};
 function drawHandles(ctx){
   const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
   ['right','left'].forEach(side=>{ const g=DZ.geo[side]; if(!g) return; const act=side===DZ.active;
@@ -2093,16 +2098,16 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
 })();
 function nudge(n){ const side=DZ.active, b=DZ.brows[side]; if(!b) return; const mm=pxPerMm(), up=faceUp(), sign=side==='right'?-1:1;
   const move=(pts,d)=>pts.forEach(k=>{ b[k]=V.add(b[k],d); });
-  const all=['hT','hB','aT','aB','t'], H=V.mid(b.hT,b.hB);
+  const all=Object.keys(b), H=V.mid(b.hT,b.hB);
   const along=V.unit(V.sub(b.t,H));
   if(n==='up') move(all,V.mul(up,0.5*mm)); if(n==='down') move(all,V.mul(up,-0.5*mm));
   if(n==='in') move(all,V.mul({x:-sign*mm*0.5,y:0},1)); if(n==='out') move(all,V.mul({x:sign*mm*0.5,y:0},1));
   if(n==='longer') b.t=V.add(b.t,V.mul(along,mm)); if(n==='shorter') b.t=V.sub(b.t,V.mul(along,mm));
-  const tops=['hT','mT','aT'].filter(k=>b[k]), bots=['hB','mB','aB'].filter(k=>b[k]);
+  const tops=['hT','mT','aT','tT'].filter(k=>b[k]), bots=['hB','mB','aB','tB'].filter(k=>b[k]);
   if(n==='thicker'){ move(tops,V.mul(up,0.25*mm)); move(bots,V.mul(up,-0.25*mm)); }
   if(n==='thinner'){ move(tops,V.mul(up,-0.25*mm)); move(bots,V.mul(up,0.25*mm)); }
   if(n==='tailup') b.t=V.add(b.t,V.mul(up,0.5*mm)); if(n==='taildown') b.t=V.sub(b.t,V.mul(up,0.5*mm));
-  if(n==='archup') move(['aT','aB'],V.mul(up,0.5*mm)); if(n==='archdown') move(['aT','aB'],V.mul(up,-0.5*mm));
+  if(n==='archup') move(['aT','aB'].filter(k=>b[k]),V.mul(up,0.5*mm)); if(n==='archdown') move(['aT','aB'].filter(k=>b[k]),V.mul(up,-0.5*mm));
   if(DZ.sym) mirrorBrow(side); dzRender(); dzDirty(); }
 function moveActive(dxMm,dyMm){ // arrow keys: along the eye line and the face's up, in millimetres
   const b=DZ.brows[DZ.active]; if(!b) return; const mm=pxPerMm(), up=faceUp(), along=V.perp(up);
