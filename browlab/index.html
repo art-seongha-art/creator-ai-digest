@@ -346,7 +346,8 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
   border:1px solid var(--line-2);border-radius:var(--r1);padding:9px;line-height:1.55;margin-top:8px;font-family:var(--mono)}
 
 /* ── 상담 시뮬레이션 studio ─────────────────────────────────────────── */
-.dz{position:fixed;inset:0;z-index:55;background:#0a0908;display:grid;grid-template-rows:auto minmax(0,1fr) auto;color:#eee}
+.dz{position:fixed;inset:0;z-index:55;background:#0a0908;display:grid;grid-template-rows:auto minmax(0,1fr) auto;color:#eee;
+  touch-action:manipulation}                            /* no double-tap zoom anywhere in the studio */
 .dz-top{display:flex;align-items:center;gap:7px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:#15120f;border-bottom:1px solid #2a2622;min-width:0}
 .dz-top input{height:36px;border-radius:8px;border:1px solid #3a3531;background:#1f1b18;color:#fff;padding:0 10px;font-size:14px;min-width:0;width:120px;flex:1}
 .dz-top .btn{height:36px;padding:0 11px;font-size:13px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none;flex:0 0 auto}
@@ -373,7 +374,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-legend i{display:inline-block;width:9px;height:9px;border-radius:999px;border:2px solid;background:#fff;vertical-align:-1px;margin-right:4px}
 .dz-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:#cdc6bd;font-size:14px;background:rgba(10,9,8,.7)}
 .dz-empty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(88%,420px);padding:14px 18px;border-radius:14px;background:rgba(20,17,15,.88);color:#f4f1ec;font-size:14px;line-height:1.55;text-align:center;pointer-events:none}
-.dz-side{background:var(--panel);color:var(--ink);display:flex;flex-direction:column;max-height:48dvh;border-top:1px solid var(--line);min-height:0}
+.dz-side{background:var(--panel);color:var(--ink);display:flex;flex-direction:column;max-height:48dvh;border-top:1px solid var(--line);min-height:0;touch-action:pan-y}
 .dz-tabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);flex:0 0 auto}
 .dz-tabs button{flex:1;height:36px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
 .dz-tabs button.on{background:var(--panel-3);color:var(--ink)}
@@ -384,7 +385,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 /* The panel stays: a bigger picture is no use if the templates and the look are gone. */
 .dz.immersive{grid-template-rows:minmax(0,1fr) auto}
 .dz.immersive .dz-top{display:none}
-.dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0}
+.dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0;touch-action:pan-y}
 .dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
 .dz-tab .edit{padding:10px}
 .dz-tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
@@ -1988,6 +1989,13 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
   st.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(css(e), Math.exp(-e.deltaY*0.0015)); dzRender(); },{passive:false});
   addEventListener('resize',()=>{ if($('#dz').hidden) return; dzResize(); dzRender(); });
+  // Safari zooms the whole page on a two-finger pinch, wherever it starts - which made the
+  // panel grow instead of the photo. While the studio is open that gesture is ours to
+  // refuse; the picture keeps its own zoom, which never touches the page.
+  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>{ if(!$('#dz').hidden) e.preventDefault(); },{passive:false}));
+  document.addEventListener('wheel',e=>{ if(e.ctrlKey&&!$('#dz').hidden) e.preventDefault(); },{passive:false});   // trackpad pinch / ctrl+wheel
+  document.addEventListener('keydown',e=>{ if($('#dz').hidden||!(e.ctrlKey||e.metaKey)) return;
+    if(e.key==='+'||e.key==='-'||e.key==='='||e.key==='0') e.preventDefault(); });
   // 원본: held down it shows the photo alone; a tap on empty skin toggles it instead
   const orig=$('#dzOrig'), hold=on=>{ DZ.orig=on; orig.classList.toggle('on',on); dzRender(); };
   orig.addEventListener('pointerdown',e=>{ e.preventDefault(); try{ orig.setPointerCapture(e.pointerId); }catch(_){} hold(true); });
