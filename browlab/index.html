@@ -953,21 +953,32 @@ function renderGallery(){
 /* ── lightbox: compare + adjust ──────────────────────────────────────── */
 const EDIT0={x:50, overlay:75, brightness:0, contrast:0, saturate:0, temp:0, fit:'contain'};
 let edit={...EDIT0}, editItem=null;
-const imgA=new Image(), imgB=new Image();   // after (result) / before (original)
-imgA.crossOrigin=imgB.crossOrigin='anonymous';
+// The canvas works on a screen-sized copy: the originals are 2000-3000px photos and
+// the viewer loads two of them, which is ~14 MB a card over the network for pixels no
+// screen shows. Full resolution is fetched separately, in the background, for saving.
+const DISPLAY_W=1400;
+const imgA=new Image(), imgB=new Image();   // after (result) / before (original), display size
+const fullA=new Image(), fullB=new Image(); // the same pair at full resolution, for save/download
+[imgA,imgB,fullA,fullB].forEach(i=>i.crossOrigin='anonymous');
+// only served files can be resized; a data:/blob: source is used as it is
+const displaySrc=u=>/^(data:|blob:)/.test(u)?u:u+(u.includes('?')?'&':'?')+'w='+DISPLAY_W;
+const fullReady=()=>fullA.naturalWidth&&fullB.naturalWidth;
+let showToken=0;
 const cmpEl=()=>$('#lbCmp');
 
 let drawRect={x:0,y:0,w:0,h:0};      // where the picture sits on the canvas
+let paintA=null, paintB=null;        // which pair paint() uses (screen copy, or full size when saving)
 function paint(ctx,w,h,opts){
   const o=opts||edit, r=drawRect;
+  const A=paintA||imgA, B=paintB||imgB;
   const put=im=>ctx.drawImage(im,r.x,r.y,r.w,r.h);
   ctx.save(); ctx.filter='none'; ctx.globalAlpha=1;
   ctx.clearRect(0,0,w,h);
-  if(imgB.complete&&imgB.naturalWidth) put(imgB);
-  if(imgA.complete&&imgA.naturalWidth&&!o.hold){
+  if(B.complete&&B.naturalWidth) put(B);
+  if(A.complete&&A.naturalWidth&&!o.hold){
     const cut=Math.round(w*o.x/100);
     ctx.globalAlpha=Math.max(0,Math.min(1,o.overlay/100));
-    ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(imgA); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(cut,0,w-cut,h); ctx.clip(); put(A); ctx.restore();
   }
   ctx.restore();
 }
@@ -991,8 +1002,8 @@ function adjust(ctx,w,h,opts){
   }
 }
 function renderCmp(opts){
-  const cv=$('#lbCanvas'); if(!imgA.naturalWidth) return;
-  const iw=imgA.naturalWidth, ih=imgA.naturalHeight;
+  const cv=$('#lbCanvas'); const A=paintA||imgA; if(!A.naturalWidth) return;
+  const iw=A.naturalWidth, ih=A.naturalHeight;
   const box=$('.lb-img').getBoundingClientRect();
   const pad=$('#lb').classList.contains('full')?0:28;
   const bw=Math.max(1,box.width-pad), bh=Math.max(1,box.height-pad);
@@ -1013,12 +1024,17 @@ function renderCmp(opts){
   const ctx=cv.getContext('2d'); paint(ctx,w,h,opts); adjust(ctx,w,h,opts);
 }
 function fullCanvas(){
+  // use the full-resolution pair when it has arrived; the screen copy is the fallback
+  const big=fullReady();
+  const A=big?fullA:imgA, B=big?fullB:imgB;
   const cv=document.createElement('canvas');
-  cv.width=imgA.naturalWidth; cv.height=imgA.naturalHeight;
+  cv.width=A.naturalWidth; cv.height=A.naturalHeight;
   const keep=drawRect; drawRect={x:0,y:0,w:cv.width,h:cv.height};   // saves are never cropped
   const ctx=cv.getContext('2d');
   const out={...edit, x:0, hold:false};   // ...and never split: the handle is a way to look, not part of the picture
+  const keepA=paintA, keepB=paintB; paintA=A; paintB=B;
   paint(ctx,cv.width,cv.height,out); adjust(ctx,cv.width,cv.height,out);
+  paintA=keepA; paintB=keepB;
   drawRect=keep;
   return cv;
 }
@@ -1035,13 +1051,21 @@ function showCompare(it){
   c.style.setProperty('--x',edit.x+'%');
   $('#lbTagB').textContent=it.compare.before_label||'원본';
   $('#lbTagA').textContent=it.compare.after_label||'생성';
-  let left=2;
-  const ready=()=>{ if(--left===0) renderCmp(); };
-  imgB.onerror=()=>{ c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };
-  imgA.onload=ready; imgB.onload=ready;
-  imgA.src=it.image; imgB.src=it.compare.before;
-  if(imgA.complete&&imgA.naturalWidth) ready();
-  if(imgB.complete&&imgB.naturalWidth) ready();
+  // Redraw on every arrival rather than counting loads: imgA/imgB are shared, and a
+  // cached src leaves .complete true with the PREVIOUS picture's pixels, so a counter
+  // reached zero early and the canvas kept showing the item before this one.
+  const token=++showToken;
+  const draw=()=>{ if(token===showToken) renderCmp(); };
+  // if the resized copy cannot be had, fall back to the original rather than a blank canvas
+  const fallback=(im,url)=>()=>{ if(token!==showToken) return;
+    if(im.src.endsWith('w='+DISPLAY_W)){ im.onerror=null; im.src=url; } };
+  imgA.onerror=fallback(imgA, it.image);
+  imgB.onerror=()=>{ if(token!==showToken) return;
+    if(imgB.src.endsWith('w='+DISPLAY_W)){ imgB.src=it.compare.before; return; }
+    c.hidden=true; const im=$('#lbImg'); im.src=it.image; im.hidden=false; };
+  imgA.onload=draw; imgB.onload=draw;
+  imgA.src=displaySrc(it.image); imgB.src=displaySrc(it.compare.before);
+  if(imgA.complete&&imgA.naturalWidth) draw();
   c.hidden=false;
 }
 (function wireCompare(){
@@ -1109,14 +1133,22 @@ function downloadCanvas(it){
 }
 const SLIDERS=[['overlay','겹치기',0,100,1],['brightness','밝기',-60,60,1],['contrast','대비',-60,60,1],
                ['saturate','채도',-80,80,1],['temp','색온도',-60,60,1]];
+function wantFullSize(it){
+  // only worth 7 MB once somebody is actually adjusting: on a phone this panel sits
+  // behind the 정보 button, so browsing the gallery never pulls the originals
+  const a=displaySrc(it.image);
+  if(fullA.dataset.for!==a){ fullA.dataset.for=a; fullA.src=it.image; fullB.src=it.compare.before; }
+}
 function editPanel(it){
+  if(!$('#lb').classList.contains('full')) wantFullSize(it);   // visible now: desktop, or 정보 already open
   const wrap=el('div','edit');
   SLIDERS.forEach(([key,ko,lo,hi])=>{
     const row=el('label','sl'); row.dataset.sl=key;
     row.appendChild(el('span','',ko));
     const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=edit[key];
     const out=el('b','',String(edit[key]));
-    r.addEventListener('input',()=>{ edit[key]=+r.value; out.textContent=r.value; renderCmp(); rememberEdit(it); });
+    r.addEventListener('input',()=>{ wantFullSize(it); edit[key]=+r.value; out.textContent=r.value;
+      renderCmp(); rememberEdit(it); });
     row.appendChild(r); row.appendChild(out); wrap.appendChild(row); });
   const reset=el('button','btn','조정 초기화'); reset.type='button';
   reset.onclick=()=>{ const x=edit.x; edit={...EDIT0, x}; rememberEdit(it);
@@ -1124,8 +1156,10 @@ function editPanel(it){
   const acts2=el('div','row');
   const dl=el('button','btn','이미지 내려받기'); dl.type='button'; dl.onclick=()=>downloadCanvas(it);
   const note=el('span','msg'); note.id='editNote'; note.textContent=it.edit?'자동 저장됨':'';
+  acts2.addEventListener('pointerdown',()=>wantFullSize(it));   // about to save or download
   acts2.appendChild(dl); acts2.appendChild(note);
   const row=el('div','row');
+  row.addEventListener('pointerdown',()=>wantFullSize(it));
   const name=document.createElement('input'); name.type='text'; name.placeholder='회원명 (비우면 자동)'; name.id='saveName';
   const save=el('button','btn dark','갤러리에 저장'); save.type='button';
   save.onclick=async()=>{ save.disabled=true; const old=save.textContent; save.textContent='저장 중…';
@@ -1153,6 +1187,7 @@ const narrow=()=>matchMedia('(max-width:1119px)').matches;
 $('#lbFit').onclick=()=>{ edit.fit = edit.fit==='cover'?'contain':'cover';
   $('#lbFit').textContent = edit.fit==='cover'?'맞춤':'채우기'; renderCmp(); };
 $('#lbInfo').onclick=()=>{ const lb=$('#lb'); lb.classList.toggle('full');
+  if(!lb.classList.contains('full')&&editItem&&editItem.compare) wantFullSize(editItem);
   $('#lbInfo').textContent = lb.classList.contains('full')?'정보':'이미지만';
   if(!$('#lbCmp').hidden) requestAnimationFrame(()=>renderCmp()); };
 $('#lb').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeLb(); });
