@@ -635,6 +635,27 @@ def cmd_models(args: argparse.Namespace) -> int:
     return 0 if any(r["usable"] for r in rows) else 1
 
 
+def cmd_brows(args: argparse.Namespace) -> int:
+    """Cut a sheet of drawn brow pairs into one transparent PNG per brow."""
+    from . import sheetsplit as SS
+
+    src = Path(args.sheet)
+    if not src.is_file():
+        print(f"파일이 없습니다: {src}")
+        return 2
+    out_dir = Path(args.out_dir) if args.out_dir else src.parent / f"{src.stem}_brows"
+    names = [n.strip() for n in args.names.split(",")] if args.names else None
+    written = SS.split_sheet(src, out_dir, names=names, floor=args.floor)
+    if not written:
+        print("눈썹을 찾지 못했습니다. 흰 배경에 눈썹 쌍이 가로로 놓인 시트인지 확인하세요.")
+        return 1
+    print(f"{len(written) // 2}쌍 · {len(written)}장 저장: {out_dir}")
+    for path in written:
+        with Image.open(path) as im:
+            print(f"  {path.name:26} {im.size[0]}x{im.size[1]}")
+    return 0
+
+
 def cmd_presets(args: argparse.Namespace) -> int:
     def table(title: str, rows: List[Tuple[str, str]]) -> None:
         print(f"\n## {title}")
@@ -820,6 +841,14 @@ def build_parser() -> argparse.ArgumentParser:
     m.set_defaults(func=cmd_models)
 
     # presets ----------------------------------------------------------------
+    b = sub.add_parser("brows", help="직접 그린 눈썹 도안 시트를 한 장씩 투명 PNG 로 자릅니다")
+    b.add_argument("sheet", help="눈썹 쌍이 여러 줄 들어있는 흰 배경 이미지")
+    b.add_argument("--out-dir", help="저장 폴더 (기본: <시트이름>_brows)")
+    b.add_argument("--names", help="쌍마다 붙일 이름, 쉼표로 구분 (예: spine6,spine3,...)")
+    b.add_argument("--floor", type=float, default=20.0,
+                   help="이 잉크 이하를 배경으로 버림. 워터마크·종이 그라데이션·선 주변 안개가 여기 걸립니다 (0 이면 끄기)")
+    b.set_defaults(func=cmd_brows)
+
     p = sub.add_parser("presets", help="선택 가능한 값 목록을 보여줍니다")
     p.set_defaults(func=cmd_presets)
 

@@ -756,6 +756,79 @@ class FaceTileTests(unittest.TestCase):
         self.assertEqual(out.getpixel((100 + 195, 150 + 156)), (200, 100, 50))  # inside mask (tile 500,400 -> 195,156)
 
 
+def _brow_sheet(rows=3, size=(900, 700), watermark=True, scrollbar=True, stray=True):
+    """A white sheet with pairs of hand-drawn-looking brows, and the junk a screenshot adds."""
+    im = Image.new("L", size, 255)
+    d = ImageDraw.Draw(im)
+    pitch = size[1] // (rows + 1)
+    for r in range(rows):
+        cy = pitch * (r + 1)
+        for cx in (230, 640):                                  # left brow, right brow
+            for k in range(28):                                # fine dark strokes, like hair
+                x0 = cx - 120 + k * 8
+                d.line((x0, cy + 18, x0 + 26, cy - 22), fill=70 + (k % 5) * 10, width=1)
+        if stray:                                              # one long hair crossing the split
+            d.line((430, cy + 4, 470, cy - 30), fill=90, width=1)
+        if watermark:                                          # faint flat text across the middle
+            d.rectangle((380, cy - 8, 520, cy + 6), fill=240)
+    if scrollbar:                                              # an even grey bar down the right edge
+        d.rectangle((size[0] - 12, 60, size[0] - 6, 320), fill=170)
+    return im
+
+
+class SheetSplitTests(unittest.TestCase):
+    def test_finds_every_pair_and_splits_left_from_right(self):
+        from browlab import sheetsplit as SS
+        im = _brow_sheet(rows=4)
+        ink = SS.drop_flat_columns(SS.ink_of(im))
+        pairs = SS.find_pairs(ink)
+        self.assertEqual(len(pairs), 4)
+        for p in pairs:
+            self.assertLessEqual(p.left[2], p.split)           # left brow ends at or before the split
+            self.assertGreaterEqual(p.right[0], p.split)       # right brow starts after it
+            self.assertGreater(p.split, p.left[2] - 1)         # the split lies between the two brows,
+            self.assertLess(p.split, p.right[0] + 1)           # never on either of them
+
+    def test_scrollbar_and_watermark_go_but_the_strokes_stay(self):
+        from browlab import sheetsplit as SS
+        im = _brow_sheet(rows=2)
+        raw = SS.ink_of(im)
+        ink = SS.lift_floor(SS.drop_flat_columns(raw), 20.0)
+        self.assertGreater(raw[60:320, 888:894].sum(), 1000)   # the scrollbar is there in the raw ink
+        self.assertEqual(ink[60:320, 888:894].sum(), 0)        # ...and gone after
+        cy = 700 // 3
+        self.assertGreater(raw[cy - 8:cy + 6, 380:520].sum(), 500)   # so is the watermark
+        self.assertEqual(ink[cy - 8:cy + 6, 470:520].sum(), 0)       # gone where nothing else is drawn
+        stroke = raw[cy - 22:cy + 18, 110:340]
+        kept = ink[cy - 22:cy + 18, 110:340]
+        self.assertGreater(kept.sum(), 0.85 * stroke.sum())    # the hair keeps almost all its ink
+
+    def test_a_hair_crossing_the_split_does_not_travel_to_the_other_brow(self):
+        from browlab import sheetsplit as SS
+        im = _brow_sheet(rows=1, watermark=False, scrollbar=False)
+        ink = SS.ink_of(im)
+        pair = SS.find_pairs(ink)[0]
+        # the stray hair sits at x 430-470; the right brow starts at 520
+        self.assertGreaterEqual(pair.right[0], 500)
+        self.assertLessEqual(pair.left[2], 360)
+
+    def test_split_sheet_writes_named_transparent_pngs(self):
+        from browlab import sheetsplit as SS
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "sheet.png"
+            _brow_sheet(rows=2).save(src)
+            out = SS.split_sheet(src, Path(tmp) / "out", names=["arch", "flat"])
+            self.assertEqual([p.name for p in out], ["arch_right.png", "arch_left.png", "flat_right.png", "flat_left.png"])
+            with Image.open(out[0]) as im:
+                self.assertEqual(im.mode, "RGBA")
+                a = im.getchannel("A")
+                self.assertGreater(a.getextrema()[1], 150)      # strokes are strongly opaque
+                self.assertEqual(a.getpixel((0, 0)), 0)         # the corner (paper) is fully clear
+            # the sheet-left brow is the person's right brow, and it is the narrower crop here
+            with Image.open(out[0]) as r, Image.open(out[1]) as l:
+                self.assertLess(abs(r.size[1] - l.size[1]), 3)  # same row, same height
+
+
 class SheetTests(unittest.TestCase):
     def test_face_sheet_is_a4_and_life_size(self):
         opts = S.SheetOptions(ipd_mm=63.0, guides=True, caption="cap", note="note")

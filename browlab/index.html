@@ -159,8 +159,6 @@ body.show-jobs .gal-pane{display:block}
 .head p{margin:0;font-size:14px;color:var(--muted)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);box-shadow:var(--sh1)}
 .card-b{padding:14px}
-.fixed{display:flex;align-items:flex-start;gap:8px;padding:11px 13px;border:1px solid color-mix(in srgb,var(--ok) 22%,var(--line));
-  background:var(--ok-soft);border-radius:var(--r2);font-size:13px;color:color-mix(in srgb,var(--ok) 82%,var(--ink))}
 .fields{display:flex;flex-direction:column}
 .frow{display:grid;grid-template-columns:1fr;gap:9px;padding:13px 0;border-bottom:1px solid var(--line-2)}
 .frow:last-child{border-bottom:0}
@@ -383,7 +381,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
   .head h1{font-size:21px} .head p{font-size:13px}
   .stepper{height:46px} .stepper button{width:42px;height:44px;font-size:19px} .stepper output{min-width:42px;font-size:14.5px}
   details.adv summary{min-height:44px;font-size:13px}
-  .hint{font-size:12px} .engine{font-size:11.5px} .fixed{font-size:12px;padding:9px 12px}
+  .hint{font-size:12px} .engine{font-size:11.5px}
   .drop .ph{width:62px;height:92px;flex-basis:62px} .drop .pt b{font-size:13.5px} .drop .pt span{font-size:11.5px}
   .gal-head h2{font-size:15px} .gal-head .sub{font-size:11.5px}
   .segs button{height:28px;padding:0 11px;font-size:12.5px}
@@ -443,10 +441,6 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 
     <form id="fGen" class="panel on" data-mode="generate" autocomplete="off">
       <div class="head"><h1>연습용 얼굴 생성</h1><p>눈썹이 부족한 연습용 얼굴을 만들고 A4 1:1 시트까지 한 번에 뽑습니다.</p></div>
-      <div class="fixed">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-top:3px"><path d="M20 6L9 17l-5-5"/></svg>
-        <span>항상 고정 — 흰 배경 · 정면 · 눈썹 노출 · 안경/모자/앞머리 없음</span>
-      </div>
       <div class="card card-b fields">
         <div class="frow"><span class="eyebrow">나이대</span><div class="chips" data-chips="ages" data-name="age"></div></div>
         <div class="frow"><span class="eyebrow">성별</span><div class="chips" data-chips="genders" data-name="gender"></div></div>
@@ -758,16 +752,13 @@ function updateEngineHints(){
   $$('form [data-engine]').forEach(box=>{
     const form=box.closest('form'); const sel=$('select[name=backend]',form);
     const key=sel?sel.value:presets.default_backend; const b=presets.backends.find(x=>x.key===key)||{};
-    const per=form.id==='fRestyle'?'스타일당':'장당';
-    const label=key==='auto'?'자동':(key==='codex'||key==='codex-only')?'Codex':key==='api'?'OpenAI API':'프롬프트만';
-    const text=key==='auto'?`Codex 먼저 → 안 되면 API (2.5 → 2 → 1.5 → 1 → 1-mini) · 실제 쓰인 엔진은 결과 상세에 표시`
-      :(key==='codex'||key==='codex-only')?`ChatGPT 구독 한도 사용 · ${per} 1~3분 · 시트 PNG+PDF 자동`
-      :key==='api'?`API만 · 2.5 → 2 → 1.5 → 1 → 1-mini 순 · 장당 과금 (high 1536×2304 ≈ $0.06)`
-      :'이미지를 직접 만들어 "출력 시트 만들기" 에서 시트로';
+    // only speak up when the engine cannot actually run; the rest was noise
     box.replaceChildren();
-    const tag=el('span','tag '+(b.available?'ok':'bad')); tag.appendChild(el('i','dot')); tag.appendChild(el('span','',label)); box.appendChild(tag);
-    box.appendChild(el('span','',text));
-    if(!b.available) box.appendChild(el('span','',key==='auto'?'· codex 도 OPENAI_API_KEY 도 없습니다':(key==='codex'||key==='codex-only')?'· codex 실행 파일이 없습니다':'· 서버에 OPENAI_API_KEY 가 없습니다'));
+    if(b.available) return;
+    const label=key==='auto'?'자동':(key==='codex'||key==='codex-only')?'Codex':key==='api'?'OpenAI API':'프롬프트만';
+    const tag=el('span','tag bad'); tag.appendChild(el('i','dot')); tag.appendChild(el('span','',label)); box.appendChild(tag);
+    box.appendChild(el('span','',key==='auto'?'codex 도 OPENAI_API_KEY 도 없습니다'
+      :(key==='codex'||key==='codex-only')?'codex 실행 파일이 없습니다':'서버에 OPENAI_API_KEY 가 없습니다'));
   });
 }
 function updateRestyleLabel(){ const n=$$('#fRestyle input[name=styles]:checked').length; const l=$('[data-restyle-label]'); if(l) l.textContent=n?`눈썹 ${n}가지로 바꾸기`:'스타일을 고르세요'; }
