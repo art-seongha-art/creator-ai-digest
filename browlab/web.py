@@ -472,6 +472,14 @@ def _now() -> str:
     return _dt.datetime.now().isoformat(timespec="seconds")
 
 
+def _key(value: Any) -> str:
+    """A parameter as a dictionary key. Multi-select parameters are lists, and looking a
+    list up in a dict raises TypeError - which used to kill the request thread outright."""
+    if isinstance(value, list):
+        value = value[0] if value else ""
+    return value if isinstance(value, str) else ""
+
+
 class JobStore:
     def __init__(self, cfg: WebConfig) -> None:
         self.cfg = cfg
@@ -643,7 +651,7 @@ class JobStore:
                         # the "before" that lines up pixel-for-pixel with what is shown
                         pool = ["00_original.png"] if name.endswith("_composited.png") else ["00_face_tile.png", "00_prepared.png", "00_original.png"]
                         before = next((n for n in pool if n in files), None)
-                        add(name, f"{v.get('style_ko', '')} · {P.BROW_COLORS.get(job.params.get('color', ''), {}).get('ko', '')}", pdfs,
+                        add(name, f"{v.get('style_ko', '')} · {P.BROW_COLORS.get(_key(job.params.get('color')), {}).get('ko', '')}", pdfs,
                             inputs=inputs, mask_sent=v.get("mask_sent"), brow_shift_px=v.get("brow_shift_px"),
                             align=v.get("align"),
                             compare={"before": url(before), "before_label": "원본", "after_label": "생성"} if before else None,
@@ -758,16 +766,19 @@ class JobStore:
                 return labels[0] + (f" 외 {len(labels) - 1}명" if len(labels) > 1 else "")
             age = p.get("age", "random")
             age_ko = "무작위 나이" if age == "random" else (P.AGE_GROUP_KO.get(age) or f"{age}세")
-            gender_ko = P.GENDERS.get(p.get("gender", ""), {}).get("ko", "성별 무작위")
-            shape = P.FACE_SHAPES.get(p.get("face_shape", ""))
-            brow = P.BROW_CONDITIONS.get(p.get("brow_condition", ""))
-            parts = [f"{p.get('count', 1)}명", age_ko, gender_ko, shape.ko if shape else "얼굴형 무작위", brow.ko if brow else "눈썹 무작위"]
+            gender_ko = P.GENDERS.get(_key(p.get("gender")), {}).get("ko", "성별 무작위")
+            shape = P.FACE_SHAPES.get(_key(p.get("face_shape")))
+            # a multi-select parameter arrives as a list: name the first and count the rest
+            brows = p.get("brow_condition")
+            picked = [P.BROW_CONDITIONS[k].ko for k in (brows if isinstance(brows, list) else [brows]) if k in P.BROW_CONDITIONS]
+            brow_ko = "눈썹 무작위" if not picked else picked[0] + (f" 외 {len(picked) - 1}가지" if len(picked) > 1 else "")
+            parts = [f"{p.get('count', 1)}명", age_ko, gender_ko, shape.ko if shape else "얼굴형 무작위", brow_ko]
             return " · ".join(parts)
         if job.kind == "restyle":
-            colour = P.BROW_COLORS.get(p.get("color", ""), {}).get("ko", "")
+            colour = P.BROW_COLORS.get(_key(p.get("color")), {}).get("ko", "")
             return f"{p.get('photo', '사진')} · {len(p.get('styles', []))}개 스타일 · {colour}"
         if job.kind == "sheet":
-            layout_ko = {"both": "얼굴 + 눈썹 구역", "face": "얼굴 1:1", "browzone": "눈썹 구역"}.get(p.get("layout", ""), "")
+            layout_ko = {"both": "얼굴 + 눈썹 구역", "face": "얼굴 1:1", "browzone": "눈썹 구역"}.get(_key(p.get("layout")), "")
             return f"{p.get('photo', '사진')} · {layout_ko}"
         if job.kind == "design":
             return p.get("client") or p.get("photo") or "상담"
@@ -1392,6 +1403,19 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         except (BrokenPipeError, ConnectionResetError):
             pass
+        except Exception:
+            self.fail_500(path)
+
+    def fail_500(self, path: str) -> None:
+        """Answer, and log the traceback. A handler that dies silently leaves the browser
+        (or the reverse proxy in front of it) with a closed connection and a bare 502."""
+        import traceback
+
+        print(f"[browlab-web] 500 {path}\n{traceback.format_exc()}", file=sys.stderr)
+        try:
+            self.send_json({"error": "서버 오류가 났습니다. 서버 로그를 확인하세요."}, HTTPStatus.INTERNAL_SERVER_ERROR)
+        except Exception:
+            pass
 
     def serve_file(self, job_id: str, rel: str, query: Dict[str, List[str]]) -> None:
         store = self.server.store
@@ -1544,7 +1568,10 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/update":
                 active = [j for j in list(self.server.store.jobs.values()) if j.status in ("queued", "running")]
                 if active and not body.get("force"):
-                    self.send_json({"error": f"진행 중인 작업이 {len(active)}개 있어 업데이트를 미룹니다. 끝난 뒤 다시 누르세요."}, HTTPStatus.CONFLICT)
+                    # the page offers to go ahead anyway: a job wedged by an earlier error would
+                    # otherwise block every update until somebody cancelled it by hand
+                    self.send_json({"error": f"진행 중인 작업이 {len(active)}개 있습니다.", "active": len(active)},
+                                   HTTPStatus.CONFLICT)
                     return
                 result = git_update(self.server.cfg.repo_root)
                 restart = bool(body.get("restart", True))
@@ -1578,6 +1605,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         except (BrokenPipeError, ConnectionResetError):
             pass
+        except Exception:
+            self.fail_500(path)
 
 
 # ---------------------------------------------------------------------------

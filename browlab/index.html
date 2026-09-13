@@ -1071,10 +1071,20 @@ async function checkModels(probe){
 $('#modelCheck').onclick=()=>checkModels(false);
 $('#modelProbe').onclick=()=>checkModels(true);
 $('#updateBtn').onclick=async()=>{ const b=$('#updateBtn'), m=$('#updateMsg'), o=$('#updateOut'); b.disabled=true; m.className='msg'; m.textContent='업데이트 중…';
-  try{ const r=await post('api/update',{restart:true}); o.hidden=false; o.textContent=(r.before||'?')+' → '+(r.after||'?')+'\n'+(r.output||'');
-    if(r.restarting){ m.textContent='재시작 중… 10초 뒤 새로고침합니다'; setTimeout(()=>location.reload(),10000); }
-    else { m.className='msg ok'; m.textContent=r.ok?(r.changed?'업데이트됨':'최신 상태'):'실패'; b.disabled=false; }
-  }catch(e){ m.textContent=e.message; b.disabled=false; } };
+  const run=async force=>{
+    const r=await post('api/update',{restart:true, force:!!force}); o.hidden=false;
+    o.textContent=(r.before||'?')+' → '+(r.after||'?')+'\n'+(r.output||'');
+    if(r.restarting){ m.textContent='재시작 중… 10초 뒤 새로고침합니다'; setTimeout(()=>location.reload(),10000); return; }
+    m.className=r.ok?'msg ok':'msg';
+    m.textContent=r.ok?(r.changed?'업데이트됨':'최신 상태'):('실패 · '+((r.output||'').split('\n')[0]||'서버 로그를 보세요'));
+    b.disabled=false; };
+  try{ await run(false); }
+  catch(e){
+    // a job left running (or wedged) must not block the update for ever
+    if(/진행 중인 작업/.test(e.message) && confirm(e.message+'\n그래도 업데이트할까요? (진행 중인 작업은 중단됩니다)')){
+      try{ await run(true); }catch(e2){ m.textContent=e2.message; b.disabled=false; }
+    } else { m.textContent=e.message; b.disabled=false; }
+  } };
 
 /* ── gallery ─────────────────────────────────────────────────────────── */
 function fmtTime(iso){ if(!iso) return ''; const d=new Date(iso); const now=new Date();

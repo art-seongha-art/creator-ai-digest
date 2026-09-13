@@ -291,6 +291,33 @@ class WebServerTest(unittest.TestCase):
         self.assertEqual(bad["brow_condition"], "random")
         self.assertEqual(argv[argv.index("--brow-condition") + 1], "random")
 
+    def test_07c_several_brow_conditions_survive_the_summary(self):
+        """Two conditions used to raise in the title and kill the request: the proxy showed a bare 502."""
+        self.login()
+        status, job, _ = self.call("/api/jobs", {"kind": "generate", "count": 2, "backend": "manual",
+                                                "brow_condition": ["sparse", "almost_none"]})
+        self.assertEqual(status, 201, job)
+        self.assertEqual(job["params"]["brow_condition"], ["sparse", "almost_none"])
+        self.assertIn("외 1가지", job["title"])
+        # the gallery and the job list walk the same title, and used to fall over with it
+        status, gal, _ = self.call("/api/gallery")
+        self.assertEqual(status, 200, gal)
+        status, jobs, _ = self.call("/api/jobs")
+        self.assertEqual(status, 200, jobs)
+        self.assertTrue(any(j["id"] == job["id"] for j in jobs["jobs"]))
+        self.wait(job["id"])
+
+    def test_07d_an_unexpected_error_answers_rather_than_dropping_the_connection(self):
+        """A handler that dies silently reaches the user as a bare 502 from the proxy."""
+        self.login()
+        store = self.server.store
+        with mock.patch.object(type(store), "usage_totals", side_effect=RuntimeError("boom")):
+            status, body, _ = self.call("/api/usage")
+        self.assertEqual(status, 500)
+        self.assertIn("서버 오류", body["error"])
+        status, body, _ = self.call("/api/usage")           # and the server is still serving
+        self.assertEqual(status, 200, body)
+
     def test_08b_saving_an_edit_names_it_and_lists_it(self):
         """An edited picture goes back into the gallery under a client name."""
         import base64, io
