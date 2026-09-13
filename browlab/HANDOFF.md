@@ -1,33 +1,113 @@
-# BrowLab 핸드오프 문서 (로컬 작업용)
+# BrowLab 핸드오프 문서
 
-작성일: 2026-09-11 · 작성 세션: Claude Code 원격 세션 (`https://claude.ai/code/session_013K3VWBmC6gMtsyVn2maKrG`)
+눈썹 문신(반영구) 샵에서 쓰는 도구입니다. 이 문서는 **다음 사람(또는 다음 세션)이 이어받을 수 있도록**
+지금 상태·구조·결정·함정을 적은 것입니다. 아래 0~2장이 현재 상태이고, 3.2장은 문제마다 왜 그렇게
+고쳤는지 남긴 기록입니다. **처음 읽는다면 0장 → 1장 → 2장 → (필요한 항목만) 3.2장** 순서를 권합니다.
 
-이 문서는 **로컬 환경(사용자 PC)에서 Claude Code / Codex 등 에이전트가 이어서 작업**할 수 있도록,
-지금까지 한 일·확인한 사실·확인하지 못한 것·다음 할 일을 빠짐없이 적은 것입니다.
-원격 세션은 OpenAI 서버 접근이 막혀 있어 **실제 이미지 생성은 한 번도 실행하지 못했습니다.**
-로컬에서 가장 먼저 할 일은 그 검증입니다(6장).
+최종 갱신: 2026-09-13 · 세션 `https://claude.ai/code/session_013K3VWBmC6gMtsyVn2maKrG`
 
 ---
 
-## 0. 2026-09-12 로컬·4090 검증 결과 (최신 — 아래 2·6장보다 우선)
+## 0. 지금 상태 (여기부터)
 
-| 항목 | 결과 |
+| 항목 | 값 |
 | --- | --- |
-| 환경 | 맥 Python 3.11.15 / codex 0.153.2 · 4090 Python 3.12.3 / codex 0.153.3 (둘 다 ChatGPT 로그인). 테스트 59개 통과(웹 10개 포함) |
-| 6.2 Codex 실제 생성 | **미완.** (a) `codex exec -C` 에 상대경로를 넘기던 버그로 즉시 실패(`No such file or directory (os error 2)`) → 절대경로로 수정, 회귀 테스트 추가. (b) 계정의 Codex 이미지 한도 소진: `ERROR: You've hit your usage limit ... try again at Sep 15th, 2026 10:22 AM` (맥·4090 동일 계정). 4090 systemd 서비스 안에서 codex 실행·인증·프롬프트 전달까지는 확인(같은 오류로 실패). **9/15 이후 또는 크레딧 구매 후 6.2 의 1~5 항목 재검증** |
-| 6.3 API | 키 입력·$10 충전 완료(9/12 02시). **gpt-image-2.5-flare/sunburst·gpt-image-2 는 `429 ... (for limit gpt-image) ... Limit 0`** — OpenAI 조직 한도 0(결제 반영/조직 인증 확인 필요, platform.openai.com → Settings → Organization → Limits). `gpt-image-1-mini` 만 열려 있어 그 모델로 파이프라인 전 단계 실측 통과: 생성(50초, 1024x1536)→시트(mediapipe IPD 300px)→restyle 2스타일(마스크 편집·합성·비교/눈썹구역 시트, 110초)→보정→사용량 집계. 산출물 `~/browlab_data/_tests_20260912/jobs/`. 4090 감시기 `/tmp/watch_and_test.sh` 가 2.5 가 열리면 `/tmp/browlab_api_test_25.py` 로 자동 재시험(로그 `~/browlab_data/_tests_20260912/watch.log`). 기본 모델은 2.5 그대로(연구자 지시: 하위 모델 사용 금지) |
-| 관찰(품질) | 생성 얼굴: 정면·흰 배경·안경 없음은 지켜지나 **눈썹이 프롬프트만큼 듬성듬성하지 않음**(mini 기준, 2.5 로 재확인 후 prompts.py Eyebrows/Constraints 강화). mini 편집은 마스크 영역 피부톤이 주황빛으로 변함(합성 뒤에도 보임) → 2.5 sunburst 결과로 판단, 필요 시 합성 전 색 맞춤 검토 |
-| 6.4 restyle / 6.5 codex 랜드마크 | 실제 사진 없음 → 미검증(웹 테스트는 합성 이미지 + manual/none 랜드마크만) |
-| 웹 UI | `python -m browlab web` + `browlab/index.html`(컴팩트 UI: 칩 4줄 + 고급 설정 접기, 작업 목록/PDF, 사진 업로드, 상단 `$지출/$충전` 사용량·설정 창, 외모 기본 한국인). 설계 캔버스: https://claude.ai/code/artifact/15a0bc8f-b5d1-4985-9c96-af6e28ee16de |
-| 4090 상시 서비스 | `~/.config/systemd/user/browlab.service` (0.0.0.0:8177, `--base-path /browlab`), 데이터 `~/browlab_data`, 비밀번호 = 허브 비밀번호(`~/.config/browlab/password.txt`) |
-| 외부 접근 | `https://seongha-art-4090.tailc4181c.ts.net/browlab/` (Funnel 443 `/browlab`, 공개 DNS 경로로 200 확인). **주의**: `tailscale serve` 로 경로를 추가하면 그 포트 Funnel 이 꺼짐 — 반드시 `sudo tailscale funnel --bg --https=443 --set-path ...` (README 8장) |
-| 9/12 03시 mini 전 기능 실측 (연구자 지시) | gpt-image-1-mini 로 웹 API 경유 전 기능 통과: 생성 2명(95초, 크기 1536x2304 요청 → 1024x1536 자동 맞춤) · photo_from 시트(5초) · photo_from 눈썹 3스타일(145초, **정렬 검사가 3장 모두 얼굴 이동 13~18% 검출 → 합성 생략**, 눈 두 겹 없음) · 같은 조건 한 장 더(50초) · 큐 취소 · 보정 · 갤러리 10항목 · 삭제 → 9항목 · 사용량 집계. 실제 청구 $0.48/10요청(대시보드) → mini 단가 표 보정. 산출물은 갤러리에 남김(연구자 확인용) |
-| Free tier 원인 (9/12 06:50) | OpenAI 직원 답변(community.openai.com/t/usage-tier-not-upgrading-from-free-tier/1360606): 등급은 새 크레딧 구매 시점에만 재계산, 첫 결제 후 1주일 대기(사기 탐지). 첫 결제 9/12 → **9/19 이후 $5 이상 추가 구매**로 Tier 1 트리거. 지출액과 무관 |
-| **9/12 07:54 gpt-image-2.5 열림 (Tier 1)** | 대시보드 "Usage tier 1"(첫 결제 후 약 6시간, 추가 구매 없이, 인증은 아직 in review). 감시기가 자동으로 2.5 전 기능 시험 통과: 생성 1536x2304 high 25초·2127 출력토큰·$0.067(눈썹이 프롬프트대로 듬성듬성함) · 시트 5초 · sunburst 편집 2스타일 70초·$0.11(타일 방식 정렬 오차 1%·합성 성공, 눈 두 겹 없음, 얼굴 동일) · 보정. 산출물 `jobs/20260912_0754*`(restyle 은 trash 로 이동됨). 연구자가 08:06 부터 실사용 중(생성·실사진 시트·restyle) |
-| 랜드마크 검사 (9/12 07:10) | `tools/landmark_check.py` 로 생성 얼굴 전부 실측: 23/24 검출(미검출은 눈썹구역 시트=얼굴 아님), 동공·눈꼬리·코·턱 정확, 기울기 ≤1.1% IPD, 눈썹 폭 좌우 0.70~0.74 IPD(차 ≤0.03). A4 시트 위 IPD 731~757 px = 61.9~64.1 mm(목표 여62/남64) → 1:1 배율 확인. 눈썹 폴리곤은 MediaPipe 특성상 눈썹 능선만 따라가 실제보다 얇음(마스크 패딩이 보완). 마스크 위 여유 0.40 IPD 는 이마를 넓게 잡음 → 편집 톤 변화가 크면 0.30 검토 |
-| 남은 일 | 2.5 개방 대기(9/19 이후 소액 추가 구매 또는 지원 티켓 · 감시기 자동 시험 · 조직 인증 심사 중) → 6.2 Codex(9/15 10:22 이후) → 6.4 실제 사진(본인 동의) → 6.5 → 눈썹 희소성 프롬프트 튜닝(2.5 결과 보고) → 인쇄 배율 실측 |
+| 저장소 · 브랜치 | `art-seongha-art/creator-ai-digest` · `claude/eyebrow-tattoo-design-tool-q5twu7` (main 대비 63커밋, 충돌 없음) |
+| PR | [#1](https://github.com/art-seongha-art/creator-ai-digest/pull/1) — **draft, 미머지**. 연구자 판단으로 브랜치에 둔 상태. CI·리뷰어 없음 |
+| 실서비스 | `https://seongha-art-4090.tailc4181c.ts.net/browlab/` · 짧은 주소 **`art-psh.com/BLAB`** (포트폴리오 저장소 `BLAB/index.html` 이동 페이지, PR #4 머지 완료) |
+| 서버 | 4090의 `~/.config/systemd/user/browlab.service` · 데이터 `~/browlab_data` · 코드 `~/project/creator-ai-digest` |
+| 갱신 방법 | 화면의 `설정 → 서버 업데이트` (git pull + 재시작). 막히면 `cd ~/project/creator-ai-digest && git pull && systemctl --user restart browlab` |
+| 테스트 | 파이썬 120개(`python -m unittest discover -s tests`) + 브라우저 100항목(`browlab/tools/e2e/`) 전부 통과 |
+| 코드 규모 | `browlab/*.py` 6,400줄 · `browlab/index.html` 2,300줄(단일 페이지 앱) |
 
-## 1. 요구사항 (사용자 원문 요약)
+### 메뉴 다섯 개
+
+1. **상담 시뮬레이션** — 상담자 사진에 직접 그린 눈썹 도안을 올려 시술 후 모습을 보여줍니다. **생성 없이 즉시, 요금 0원.** 지금 가장 많이 쓰는 기능이고 이 문서 분량의 대부분이 여기입니다.
+2. **연습용 얼굴 생성** — 눈썹이 부족한 연습용 얼굴을 만들고 A4 1:1 시트까지. (OpenAI 과금)
+3. **눈썹 생성기** — 실제 사진의 눈썹만 AI로 다시 그림. (OpenAI 과금) 1번이 생기기 전의 방식으로, 지금은 보조 수단입니다.
+4. **출력 시트** — 가진 사진을 실물 크기 A4로.
+5. **갤러리** — 결과 보기·비교·보정·저장·삭제.
+
+### 바로 다음에 할 만한 일
+
+- **2단계 변형(MLS)**: 지금은 조절점 9개가 도안 전체를 부드럽게 휘게 합니다. 핀을 꽂아 일부를 고정한 채 국소적으로 당기는 방식(Moving Least Squares, Schaefer 2006 rigid)은 아직 미구현. 참고: `cxcxcxcx/imgwarp-opencv`(MIT, JS 포팅본 있음), `Jarvis73/Moving-Least-Squares`(MIT).
+- **파우더/옴브레 도안**: 지금 도안은 전부 헤어스트로크(선). 면으로 채우는 도안을 넣으면 시술 종류를 더 보여줄 수 있습니다.
+- **인쇄 배율 실측**: `calibrate` 시트를 실제로 인쇄해 자로 재고 결과를 README에 기록 (아직 미완).
+- **PR #1 머지 여부** 결정.
+
+---
+
+## 1. 상담 시뮬레이션은 어떻게 동작하나
+
+사진 한 장에 도안을 얹는 일이지만, 세 가지를 동시에 만족해야 해서 구조가 좀 있습니다:
+**손대지 않으면 도안이 그린 그대로일 것**, **조절점이 손가락 밑에 붙어 있을 것**, **결과가 진짜 피부처럼 보일 것**.
+
+### 서버 (`browlab/design.py`, `browlab/web.py`)
+
+- **도안 라이브러리** `<data-dir>/templates/` + `templates.json`. 투명 PNG 한 장이면 그대로, 흰 종이에 그린 **시트면 `sheetsplit.py` 가 쌍 단위로 잘라서** 들여옵니다. 비어 있으면 내장 5쌍(`browlab/templates/spine*.png`)으로 자동 시드 — 지우면 다시 안 생깁니다.
+- **`POST api/designs`** → 사진을 `jobs/<id>_design_*/photo.jpg` 로 (EXIF 보정·긴 변 3000px), MediaPipe로 눈썹 위치를 재서 `placement.json`. **서브프로세스 없이 동기**, 1.5초. 얼굴을 못 찾으면 실패가 아니라 `warning` 과 함께 평균 위치로 시작합니다.
+- **`POST api/designs/<id>`** — 페이지 상태 전체(도안·조절점·색·메모·지운 잔털)를 `design.json` 에. 상담 한 건당 하나, 계속 덮어씀.
+- **`POST api/saves`** — 지금 화면을 **새 그림 파일**로. 누를 때마다 쌓이고, 같은 회원명이면 번호가 붙습니다.
+- MediaPipe import 가 첫 호출에서 2.4초 걸리므로 서버 시작 시 백그라운드에서 미리 데워 둡니다(`JobStore._warm_up`).
+
+### 페이지 (`browlab/index.html` 의 `/* ── 상담 시뮬레이션 */` 이하)
+
+핵심 자료구조는 전역 `DZ` 하나입니다. 도안·조절점·보기 상태·되돌리기 스택이 전부 여기 있습니다.
+
+- **도안 분석 `analyseTemplate`** — 열마다 알파 가중 중심으로 등뼈를 뽑고, 법선 방향으로 두께를 재고, **3차 최소제곱 곡선**으로 매끄러운 윗선/아랫선(`gT`/`gB`)을 만듭니다. 메시는 그보다 넉넉한 덮개(`eT`/`eB`)를 써서 털이 잘리지 않습니다.
+- **배치 `fitTemplate`** — 랜드마크의 머리·꼬리만 앵커로 쓰고 도안을 **크기·각도만** 맞춥니다(아치는 안 씀 — 도안 비율이 깨짐).
+- **변형 `browGeometry`** — 도안의 매끄러운 윤곽이 **기준선**이고, 조절점 9개는 그 기준선에서의 **변위**입니다. 변위를 Catmull-Rom(매듭 `uH,uM,uA,uK,1`)으로 섞습니다. 손대지 않으면 변위 0 → 도안 그대로, 끌면 정확히 그 자리. 등뼈는 머리·아치·꼬리를 지나는 2차 곡선이고 아치의 매개변수는 **거리 비율**입니다(고정값을 쓰면 곡선이 접혀 털이 뒤집힙니다).
+- **그리기** — 구간마다 삼각형 4개, 삼각형별 아핀 + 클립. 색소 색으로 착색한 도안을 **multiply** 로 얹어 피부 음영이 선에 비치게 하고, `부드러움` 은 mm 단위로 흐립니다.
+- **성능** — 칠한 눈썹 레이어를 캐시하고(조절점·도안·뷰·색이 그대로면 재사용), 도안 착색은 모양(굵기·진하기)과 색을 분리해 캐시합니다. 슬라이더는 rAF로 프레임당 한 번만 그립니다. 실측: 색 슬라이더 0.04ms, 강도 0.53ms, 조절점 드래그 13ms.
+- **잔털 지우기 `healStamp`** — 털을 판정하지 않습니다. 붓 자국 아래를 주변 48곳 후보 중 가장 깨끗한 피부로 **옮겨 붙입니다**. 톤은 자국 **바깥 링**에 맞춥니다(자국 안에는 지우려는 털이 있어서). 획은 점 단위로 저장되어 다시 열 때 같은 순서로 재생됩니다.
+
+---
+
+## 2. 파일 지도
+
+| 파일 | 무엇 |
+| --- | --- |
+| `browlab/index.html` | 단일 페이지 앱 전부 — 폼·갤러리·라이트박스·**상담 스튜디오**. 빌드 없음, 서버가 그대로 내려줌 |
+| `browlab/web.py` | HTTP 서버. 작업 큐(서브프로세스 1개씩), 갤러리, 보정/저장, 도안·상담 API, 자체 업데이트 |
+| `browlab/design.py` | 도안 라이브러리, 시트 절단 연결, 사진 준비, 랜드마크 측정 |
+| `browlab/overlay.py` | 랜드마크 → 도안 배치(서버 쪽 계산). 지금은 페이지가 대부분 맡음 |
+| `browlab/sheetsplit.py` | 흰 종이 도안 시트 → 쌍 단위 투명 PNG. `browlab brows` CLI |
+| `browlab/landmarks.py` | MediaPipe / Codex 비전 / 동공 수동, 세 가지 랜드마크 경로 |
+| `browlab/masks.py` | 눈썹 마스크, 합성, 잔털 판정 — 2·3번 메뉴(AI 경로)용 |
+| `browlab/prompts.py`, `presets.py` | 생성·리스타일 프롬프트와 한국어 선택지 |
+| `browlab/backends.py` | Codex CLI / OpenAI Images API / 수동 |
+| `browlab/sheet.py`, `fonts.py` | A4 1:1 시트 합성, 가이드선, 한글 글꼴 |
+| `browlab/templates/` | 내장 도안 10장(연구자 시트에서 자른 5쌍) |
+| `browlab/tools/e2e/` | 브라우저 검증 스위트 8종 + 실행 안내 |
+| `tests/test_browlab*.py` | 파이썬 테스트 120개(네트워크 없음) |
+
+### 검증하는 법
+
+```bash
+python -m unittest discover -s tests                 # 120개, 네트워크 없음
+python -m browlab web --port 8177 --data-dir /tmp/browlab_e2e --no-auth &
+BROWLAB_PHOTO=/경로/얼굴.jpg node browlab/tools/e2e/studio.mjs
+for f in handles heal pen fullscreen save zoom speed; do node browlab/tools/e2e/$f.mjs; done
+```
+
+---
+
+## 2.5 되풀이하지 말 것 (비싸게 배운 것들)
+
+사소해 보이지만 전부 실제로 시간을 잡아먹은 것들입니다. 3.2장에 각각의 전말이 있습니다.
+
+1. **먼저 측정하고 방법을 고를 것.** 잔털 지우개를 두 번 잘못 만들었습니다. "털은 피부보다 어둡다"고 가정했는데, 실제로 재보니 **깨끗한 볼이 잔털 부위보다 대비가 컸습니다**. 모양(연결성분)으로 바꿨더니 털이 붙은 곳에서 전부/전무로 튀었습니다. 세 번째에야 맞는 방식(주변 피부 이식)에 도달했습니다. → 3.2.36
+2. **프롬프트에 규칙을 추가할 땐 모순되는 기존 문장을 지울 것.** 모델은 더 구체적인 쪽을 따릅니다. 스타일이 전혀 안 먹히던 원인이 이것이었고, 지금은 13스타일 × 7쌍을 자동으로 검사하는 테스트가 있습니다. → 3.2.25
+3. **고친 코드가 실제로 뭔가를 바꿨는지 확인할 것.** 마스크를 "고쳤는데" 결과 픽셀이 62559개로 완전히 동일했던 적이 있습니다(측정 스크립트가 틀렸음). → 3.2.26
+4. **단일값을 다중값으로 넓히면, 그 값을 읽는 모든 곳을 훑을 것.** 눈썹 조건을 여러 개 고를 수 있게 만들면서 제목 만드는 코드를 놓쳤고, `dict.get(리스트)` 가 예외를 던져 **HTTP 502** 가 났습니다. 핸들러에 만능 예외 처리가 없어 응답 없이 연결이 끊겼던 것도 원인의 절반입니다. → 3.2.32
+5. **테스트가 통과했다고 그 경로가 검증된 건 아님.** 위 502를 못 잡은 테스트는 인자 조립만 보고 제목 생성까지 가지 않았습니다.
+6. **패치 스크립트는 전부 아니면 전무.** 파이썬으로 여러 치환을 하다 하나가 실패하면 파일 쓰기에 도달하지 못해 **전체가 롤백**됩니다. 적용했다고 믿고 넘어가지 말고 `grep` 으로 확인할 것. → 3.2.37
+7. **UI를 "크게" 만들면서 기능을 빼앗지 말 것.** 전체화면에서 작업 패널까지 숨겼더니 사진만 크고 아무것도 못 하는 화면이 됐습니다. → 3.2.33
+8. **Tailscale**: 공개 포트에 경로를 추가할 땐 반드시 `tailscale funnel` 로. `tailscale serve` 를 쓰면 **그 포트의 Funnel 이 꺼집니다**(실제로 강의 허브가 1~2분 끊겼음).
+
+---
+
+## 2.9 처음 요청 (연구자 원문)
 
 - A4 용지에 **실제 사람 얼굴 크기(1:1)** 로 인쇄되는 이미지를 만드는 프로그램.
 - 목적: **눈썹 문신(반영구) 디자인 연습**. 눈썹 모량이 부족하거나, 형태가 불확실하거나, 연한 얼굴에
@@ -36,24 +116,6 @@
   **10대~70대, 다양한 얼굴 생김새의 남녀, 눈썹이 부족한** 얼굴. 얼굴형·나이·성별을 **직접 조절하거나 랜덤**.
 - 확장: **사람 얼굴 사진을 넣으면 눈썹 부분만 검출**해서 얼굴은 유지하고 **눈썹만 여러 스타일로** 생성.
 - 후속 질문: API 요금은 얼마인지, API를 먼저 연결할지 → 5장 참고.
-
----
-
-## 2. 현재 상태 요약
-
-| 항목 | 값 |
-| --- | --- |
-| 저장소 | `art-seongha-art/creator-ai-digest` |
-| 브랜치 | `claude/eyebrow-tattoo-design-tool-q5twu7` (main에서 분기, 충돌 없음) |
-| 커밋 | `679fcba` "Add BrowLab: life-size A4 practice sheets for eyebrow tattoo design" (+ 이 문서 커밋) |
-| PR | https://github.com/art-seongha-art/creator-ai-digest/pull/1 (**draft**, 리뷰/CI 없음, mergeable clean) |
-| 코드 위치 | `browlab/` 패키지, `tests/test_browlab.py`, `requirements-browlab.txt`, 루트 `README.md` 안내 문단 |
-| 테스트 | `python -m unittest discover -s tests` → 48 tests OK (mediapipe 실사진 테스트 1개는 환경변수 없으면 skip) |
-| 미검증 | 실제 이미지 생성(Codex `$imagegen`, OpenAI Images API), Codex 비전 랜드마크, API 마스크 편집 |
-
-`portfolio` 저장소에는 아무것도 넣지 않았습니다(같은 이름의 브랜치만 원격에 존재). Python 파이프라인과
-Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했습니다. 별도 저장소로 옮겨도 됩니다
-(`browlab/`, `tests/test_browlab.py`, `requirements-browlab.txt` 만 복사하면 독립 동작).
 
 ---
 
@@ -67,7 +129,9 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 | `sheet` | 기존 얼굴 이미지(들)를 A4 1:1 시트로. `--layout face/browzone/both`, `--guides`, `--pupils` 수동 배율 |
 | `restyle` | 사진 → 편집용 크기 정리 → 눈썹 마스크 → 스타일별 눈썹 편집 → 눈썹 영역만 원본에 합성 → 비교/1:1 시트 |
 | `calibrate` | 프린터 배율 확인용 눈금 시트(150 mm 자, 50 mm 정사각형, 평균 동공 간격) |
+| `brows` | 흰 종이에 그린 도안 시트를 쌍 단위 투명 PNG 로 자름 (`--out-dir`, `--names`, `--floor`) |
 | `presets` | 선택값 한국어 목록 |
+| `web` | 웹 UI 서버. 실제로 쓰는 건 거의 전부 이쪽입니다 (README 8장) |
 
 공통 옵션: `--backend codex|api|manual`, `--model`, `--quality`, `--size`(generate, api용), `--timeout`, `--codex-bin`,
 `--codex-arg`(반복), `--dry-run`, `--dpi`, `--ipd-mm`, `--layout`, `--copies`, `--guides`, `--title`, `--font`,
@@ -87,7 +151,14 @@ Codex 이미지 생성 코드가 이미 있는 creator-ai-digest 쪽을 택했�
 | `browlab/sheet.py` | A4 = 2480×3508 @300dpi. `life_size_scale`(IPD_mm×px/mm ÷ IPD_px; 랜드마크 없으면 이미지 높이 320 mm 가정), `place_face`(머리 위 0.95 IPD·목 아래 0.35 IPD 포함해 중앙 배치, 안 들어가면 눈썹·눈·턱 우선), `_draw_guides`(콧방울→눈앞머리/홍채 바깥(동공 ± 0.095 IPD)/눈꼬리 점선 + 동공 수평선), 헤더(제목·캡션·우측 정보), 푸터(100 mm 자 1 mm 눈금, 20 mm 정사각형, 메모 최대 4줄), `compose_browzone_sheet`(눈썹 위 0.25 IPD ~ 동공 아래 0.25 IPD 구역, 페이지 자동 분할), `compose_grid_sheet`(2열, ≤4개면 2행, 아니면 3행), `calibration_sheet`, `save_pages`(PNG dpi 메타 + 다중 페이지 PDF `resolution=dpi`) |
 | `browlab/fonts.py` | 한글 글꼴 후보 탐색(맥 AppleSDGothicNeo.ttc / AppleGothic.ttf, 윈도 malgun.ttf, 리눅스 NanumGothic / NotoSansCJK), `BROWLAB_FONT`, `--font`; 없으면 DejaVu/기본 글꼴 + 영어 라벨(`SheetFont.t(ko, en)`) |
 | `browlab/cli.py` | argparse, 명령 구현, manifest 기록(얼굴마다 즉시 저장), 한국어 로그 `[browlab] ...` |
-| `tests/test_browlab.py` | 48개: 프리셋/프롬프트 결정성/크기 검증/랜드마크 기하·JSON 변환/마스크·합성/시트 크기·dpi·PDF/가짜 `codex` 실행 파일/가짜 OpenAI 클라이언트/CLI(dry-run, sheet --pupils, manual generate, restyle manual, calibrate)/`BROWLAB_TEST_FACE` 실사진 mediapipe(옵션) |
+| `browlab/web.py` | HTTP 서버 · 작업 큐 · 갤러리 · 보정/저장 · 도안·상담 API · 자체 업데이트. 2장 참고 |
+| `browlab/design.py` | 도안 라이브러리(`TemplateStore`), 시트 절단 연결, 사진 준비, 랜드마크 측정. 1장 참고 |
+| `browlab/sheetsplit.py` | 도안 시트 → 쌍 단위 투명 PNG (3.2.28) |
+| `browlab/overlay.py` | 랜드마크 → 도안 배치의 서버 쪽 계산(`Placement`, `control_points`). 실제 배치는 페이지가 함 |
+| `browlab/index.html` | 단일 페이지 앱 전부. 상담 스튜디오는 `/* ── 상담 시뮬레이션 */` 이하 |
+| `browlab/templates/` | 내장 도안 10장(연구자 시트에서 자른 5쌍, 3.2.30) |
+| `browlab/tools/e2e/` | 브라우저 검증 스위트 8종(100항목) + 실행 안내 |
+| `tests/test_browlab*.py` | 120개: 프리셋/프롬프트 결정성·자기모순 검사/랜드마크/마스크·합성/시트/도안 라이브러리·상담 API/가짜 codex·OpenAI/CLI/`BROWLAB_TEST_FACE` 실사진(옵션) |
 
 ### 3.2.1 자동 백엔드 (2026-09-12 추가, 원격 세션)
 
@@ -490,7 +561,7 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <출력
 
 ---
 
-## 4. 조사로 확인한 사실 (2026-09-11 기준)
+## 4. 조사로 확인한 사실 (2026-09-11~12 기준, 그 뒤로 확인 안 함)
 
 ### 4.1 Codex CLI 0.154.0 (npm `@openai/codex`)
 
@@ -526,7 +597,9 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <출력
 
 ---
 
-## 5. 요금 정리 (사용자 질문에 대한 답, 서드파티 요약 기준)
+## 5. 요금 정리 (2026-09-12 기준)
+
+> 상담 시뮬레이션은 생성이 없어 **요금이 들지 않습니다.** 아래는 2·3번 메뉴(AI 생성) 이야기입니다.
 
 - API(gpt-image-2 = 2.5 flare/sunburst 동일 요율): 이미지 출력 $30/M 토큰, 이미지 입력 $8/M, 텍스트 입력 $5/M.
 - 장당 대략: 1024² low ≈ $0.006, 1024×1536 medium ≈ $0.04~0.05, 1024² high ≈ $0.17~0.21, BrowLab 기본 1536×2304 high ≈ $0.3~0.5(추정). Batch API 50% 할인(BrowLab 미사용). 2.5 의 실제 토큰 소모는 외부 검증 자료 없음.
@@ -535,84 +608,24 @@ codex exec --skip-git-repo-check -s workspace-write -C <출력폴더> -o <출력
 
 ---
 
-## 6. 로컬에서 해야 할 일 (우선순위 순)
+## 6. 남은 일
 
-### 6.1 준비
+이 장은 **아직 안 한 것만** 남겨 둡니다. 끝난 항목은 3.2장에 기록이 있습니다.
 
-```bash
-git fetch origin && git checkout claude/eyebrow-tattoo-design-tool-q5twu7
-python3 -m venv .venv && source .venv/bin/activate      # 윈도: .venv\Scripts\activate
-pip install -r requirements-browlab.txt
-python -m unittest discover -s tests                     # 48 OK 기대
-npm install -g @openai/codex && codex login && codex --version   # 0.154+ 
-python -m browlab presets
-python -m browlab calibrate                              # 인쇄해 자로 확인
-```
+### 6.1 검증이 남은 것
 
-macOS 에서 mediapipe 설치가 실패하면 `pip install "mediapipe>=0.10"` 로 낮은 버전을 시도하고, 그래도 안 되면
-`--landmarks codex` 또는 `--landmarks manual --pupils x1,y1,x2,y2` 로 우회. (0.10.x 도 `mediapipe.tasks.python.vision` API 동일.)
+- **인쇄 배율 실측** — `python -m browlab calibrate` 로 시트를 뽑아 **배율 100%** 로 인쇄하고, 100 mm 자와 20 mm 정사각형을 실제 자로 재기. 프린터마다 한 번이면 됩니다. 결과를 `browlab/README.md` 4장에 기록. (지금까지 화면상 1:1 은 확인됐지만 종이에서는 미확인)
+- **Codex 백엔드 실제 생성** — 계정 이미지 한도 때문에 한 번도 끝까지 못 돌렸습니다. `python -m browlab generate -n 1 --seed 1 --backend codex-only` 로 확인. API 경로(gpt-image-2.5)는 실측 통과했습니다.
+- **여러 사람 얼굴로 상담 시뮬레이션** — 지금까지 검증에 쓴 얼굴은 한 장뿐입니다. 피부색·조명·안경·앞머리가 다른 사진에서 자동 배치와 잔털 지우개가 어떻게 되는지 봐야 합니다.
 
-### 6.2 Codex 백엔드 실제 생성 검증 ← 가장 중요
+### 6.2 만들 만한 것
 
-```bash
-python -m browlab generate -n 1 --seed 1 --age 30s --gender female --face-shape oval --brow-condition sparse --guides --layout both
-```
-
-확인할 것:
-
-1. `codex exec` 가 대화 없이 끝나고 `output/browlab/faces_*/face_01_*.png` 가 생기는지.
-   - 안 생기면 `GenerationError` 메시지의 마지막 메시지/stderr 를 보고 원인 분류:
-     a. 에이전트가 `image_gen` 도구를 못 씀(계정/환경) → `--backend api` 로 전환 안내.
-     b. 생성은 됐는데 복사를 안 함 → 폴백 수집이 `~/.codex/generated_images` 에서 가져와야 함. 폴백도 실패하면 실제 저장 경로를 `ls -lt ~/.codex/generated_images` 로 확인하고 `CodexBackend.generated_dir` 수정.
-     c. `cp` 가 승인 대기/거부로 막힘 → `--codex-arg=--approve-for-me` 또는 `-c approval_policy=never` 같은 옵션을 `--codex-arg` 로 넘겨 테스트하고, 통하는 조합을 `backends.py` 기본값에 반영.
-     d. 프롬프트 첫 줄 `$imagegen` 이 exec 모드에서 스킬을 못 불러오면, 프롬프트 본문에 "Use the built-in image_gen tool" 지시가 이미 있으니 그래도 동작하는지 확인.
-2. 생성된 얼굴의 품질: 정면·눈썹 노출·**눈썹이 정말 듬성듬성한지**(모델이 눈썹을 또렷하게 그리는 경향이 있음). 또렷하면 `prompts.py` 의 Eyebrows/Constraints 문구를 강화하거나 `--notes` 로 실험 후 기본 문구를 갱신.
-3. 출력 크기·비율: 내장 도구가 세로 2:3 근처의 큰 해상도를 주는지. 1024 급이면 1:1 확대 시 흐릿하므로 프롬프트의 해상도 요청 문구를 조정하거나 API 백엔드 권장.
-4. `sheets/face_01_*_A4.pdf` 를 인쇄(배율 100%)해서 100 mm 자와 20 mm 정사각형, 동공 간격(약 62 mm)을 자로 확인.
-5. 소요 시간(장당 몇 분인지)을 README 에 기록.
-
-### 6.3 API 백엔드 검증 (키가 있을 때)
-
-```bash
-export OPENAI_API_KEY=sk-...
-python -m browlab generate -n 1 --seed 2 --backend api --quality medium --size 1024x1536
-python -m browlab generate -n 1 --seed 2 --backend api --quality high --size 1536x2304
-```
-
-- 2.5 flare 가 `size=1536x2304`, `quality=high` 를 받는지(거부되면 오류 메시지를 보고 `--model gpt-image-2` 로 재시도).
-- 응답이 `b64_json` 인지(`url` 이면 폴백 코드가 처리).
-- 실제 청구 금액을 대시보드에서 확인해 5장 요금표를 갱신.
-
-### 6.4 restyle 검증 (실제 사진, 본인 동의된 사진으로)
-
-```bash
-python -m browlab restyle photo.jpg --styles korean_natural,straight,feathered --color dark_brown            # codex
-python -m browlab restyle photo.jpg --backend api --styles all --sheet both                                    # api + 알파 마스크
-```
-
-확인할 것:
-
-1. `mask_guide.png` 의 빨간 영역이 눈썹 + 위쪽 여유를 덮고 눈은 안 덮는지(아니면 `--mask-up/--mask-side/--mask-down` 조정 후 기본값 변경).
-2. Codex 경로: 결과가 원본 프레이밍을 유지하는지. 프레이밍이 바뀌면 합성(`composite_brows`)이 어긋남 → 프롬프트 불변 조건 강화 또는 `--no-composite` 안내. (합성은 결과를 원본 크기로 리사이즈 후 마스크 영역만 붙임.)
-3. API 경로: `images.edit` 이 `mask` + `size=<원본 크기>` 를 받는지, 출력 크기가 입력과 같은지.
-4. `sheet_browzone*.pdf` 로 스타일 비교가 실물 크기로 잘 보이는지.
-
-### 6.5 Codex 비전 랜드마크 검증 (mediapipe 없을 때의 대안)
-
-```bash
-python -m browlab sheet photo.jpg --landmarks codex --save-landmarks
-```
-
-- `--output-schema` 로 JSON 이 나오는지, 좌표 오차가 IPD 5% 이내인지(mediapipe 결과와 비교).
-- 실패하면 `landmarks.detect_codex` 의 프롬프트/스키마 수정.
-
-### 6.6 마무리
-
-- 검증 결과를 `browlab/README.md`(문제 해결 표)와 PR 본문에 반영, 필요 시 기본값 수정.
-- 같은 브랜치에 커밋·푸시하면 PR #1 이 갱신됨. **force-push 금지**(원격 세션이 PR 을 구독 중).
-- 준비되면 draft 해제 후 머지.
-
----
+1. **2단계 변형(MLS)** — 핀 고정 + 국소 변형. 0장에 참고 프로젝트.
+2. **파우더/옴브레 도안** — 면으로 채우는 도안 지원.
+3. **도안 하나 지우기** — 지금 도안은 지울 수 있지만 저장한 시안은 갤러리에서만 지웁니다. 상담 안에서 시안 한 장을 지우는 길이 없습니다.
+4. **여러 시안 나란히 보기** — 같은 상담의 시안 2~3장을 한 화면에 놓고 상담자와 고르기.
+5. **인쇄 보정 옵션** — 인쇄해서 잰 자 길이를 넣으면 배율을 자동 보정(`--print-correction 0.98`).
+6. **생성 품질 튜닝** — 연습용 얼굴의 눈썹이 프롬프트만큼 듬성듬성하지 않은 경우가 있음.
 
 ## 7. 알려진 제약·설계 결정
 
@@ -624,28 +637,33 @@ python -m browlab sheet photo.jpg --landmarks codex --save-landmarks
 - **테스트는 네트워크를 쓰지 않음**. Pillow 없으면 모듈 전체 skip(CI 워크플로가 의존성을 설치하지 않기 때문).
 - 시트의 한글은 시스템 글꼴 탐색에 의존. 맥은 AppleSDGothicNeo.ttc(인덱스 0)로 동작할 것으로 예상하나 미확인.
 - `codex exec` 를 `workspace-write` 로 실행하므로 에이전트가 출력 폴더 안에 파일을 만들 수 있음. 출력 폴더를 프로젝트 외부(예: `~/BrowLab/out`)로 두면 안전.
-- 실제 고객 사진은 OpenAI 로 전송됨(동의 필요). README 에 명시.
+- 실제 고객 사진은 OpenAI 로 전송됨(동의 필요). README 에 명시. **상담 시뮬레이션은 예외** — 사진이 4090 밖으로 나가지 않습니다.
+- **상담 시뮬레이션의 전제**: 도안은 한쪽(사람의 오른쪽) 눈썹을 머리가 왼쪽에 오도록 그린 것. 반대쪽은 좌우 반전해 씁니다. 시트에서 자를 때 **종이 왼쪽 눈썹 = 사람의 오른쪽 눈썹**으로 봅니다.
+- **치수의 근거**는 동공 간 거리뿐입니다. 얼굴을 못 찾은 사진에서는 대략값이고 화면에 그렇게 표시합니다.
+- **잔털 지우개는 되돌릴 수 있지만 사진 원본을 바꾸지는 않습니다** — 획만 저장되고, 열 때마다 사진 위에 다시 재생됩니다.
+- 상담 상태(`design.json`)는 400KB 제한. 획이 아주 많아지면 걸릴 수 있습니다(아직 겪지 않음).
 
 ---
 
-## 8. 백로그 (검증 후 고려)
+## 8. 백로그
 
-1. 생성 품질 튜닝: 눈썹 희소성 강화 문구, 나이/얼굴형 반영도 평가, 얼굴형별 프롬프트 세부화.
-2. `generate --backend api` 에 Batch API(50% 할인) 옵션, `--n` 변형 생성.
-3. 인쇄 보정: 인쇄 후 잰 100 mm 자 길이를 입력하면 배율을 자동 보정하는 `--print-correction 0.98` 옵션.
-4. 여러 얼굴의 눈썹 구역만 모아 한 장에 인쇄하는 모드(`sheet --layout browzone` 다중 파일 조합).
-5. 간단한 GUI(Tkinter 또는 로컬 웹 UI) — 사용자가 "어플"이라 표현함.
-6. 눈썹 디자인 결과를 시트 위에 반투명 겹쳐 보는 "정답 비교" 모드(restyle 결과를 1:1 시트에 연하게 인쇄).
-7. Codex 비전 랜드마크 정확도가 충분하면 mediapipe 의존 제거 검토.
+6장으로 옮겼습니다.
 
 ---
 
-## 9. 로컬 세션 시작용 프롬프트 (복사해서 붙여넣기)
+## 9. 이어받는 세션에게
 
 ```
-저장소 art-seongha-art/creator-ai-digest 의 브랜치 claude/eyebrow-tattoo-design-tool-q5twu7 에 있는
-browlab/HANDOFF.md 를 먼저 끝까지 읽어. 그 문서의 6장 순서대로(6.1 준비 → 6.2 Codex 백엔드 실제 생성 검증 →
-6.3 API(키 있으면) → 6.4 restyle → 6.5 codex 랜드마크 → 6.6 마무리) 로컬에서 검증하고, 실패하는 부분은 원인을 찾아
-코드를 고친 뒤 테스트(python -m unittest discover -s tests)를 통과시키고 같은 브랜치에 커밋·푸시해. force-push 는 하지 마.
-바뀐 기본값·발견한 문제·소요 시간·실제 요금은 browlab/README.md 와 HANDOFF.md 에 기록해.
+저장소 art-seongha-art/creator-ai-digest, 브랜치 claude/eyebrow-tattoo-design-tool-q5twu7 입니다.
+browlab/HANDOFF.md 의 0~2장(지금 상태·구조·파일 지도·되풀이하지 말 것)을 먼저 읽으세요.
+바꾸기 전에 재고, 바꾼 뒤에는 파이썬 테스트(python -m unittest discover -s tests)와
+browlab/tools/e2e/ 의 브라우저 스위트를 돌려 통과시킨 뒤 같은 브랜치에 커밋·푸시하세요.
+force-push 는 하지 마세요. 배운 것은 HANDOFF.md 3.2장에 한 항목으로 남기세요.
 ```
+
+연구자와 일할 때 알아두면 좋은 것:
+
+- 한국어로 소통합니다. 짧고 구체적으로, 무엇을 왜 그렇게 했는지 수치와 함께.
+- "잘 안 되는 것 같다" 는 보고가 자주 옵니다. **추측하지 말고 실제 사진으로 재세요** — 그 방식으로 502, 잔털 지우개, 아이패드 끊김의 원인을 전부 찾았습니다.
+- 고친 것은 바로 커밋·푸시하면 됩니다. 연구자가 화면의 `서버 업데이트` 로 받습니다.
+- 확인용 스크린샷을 보내면 판단이 빨라집니다(Playwright로 찍어 `SendUserFile`).
