@@ -657,8 +657,18 @@ class JobStore:
                 add("photo.jpg" if "photo.jpg" in files else None, job.params.get("client") or base["title"], [],
                     design=True, client=job.params.get("client", ""))
             for saved in self.saved_edits(job, files):
-                add(saved["image"], saved["name"], [], kind_ko="상담 시안" if job.kind == "design" else "저장한 보정", saved=True,
-                    edit=saved["settings"], saved_at=saved.get("created"), design=job.kind == "design")
+                if job.kind == "design":
+                    # a saved design opens against its own photo: wipe and hold work like they
+                    # do for generated results, with the look shown in the side panel
+                    side_by_side = bool(saved["settings"].get("side_by_side"))
+                    add(saved["image"], saved["name"], [], kind_ko="상담 시안", saved=True, design=True,
+                        look=saved["settings"], saved_at=saved.get("created"),
+                        edit={"overlay": 100, **edits.get(saved["image"], {})},
+                        compare=None if side_by_side or "photo.jpg" not in files else
+                        {"before": url("photo.jpg"), "before_label": "원본", "after_label": "시안"})
+                else:
+                    add(saved["image"], saved["name"], [], kind_ko="저장한 보정", saved=True,
+                        edit=saved["settings"], saved_at=saved.get("created"))
             if len(items) == before and job.status in ("queued", "running", "failed", "cancelled"):
                 add(None, base["title"], [])
         return items

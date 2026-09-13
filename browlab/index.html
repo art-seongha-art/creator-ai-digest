@@ -346,12 +346,23 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-top .btn{height:36px;padding:0 11px;font-size:13px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none;flex:0 0 auto}
 .dz-top .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
 .dz-top .btn.icon{width:36px;padding:0}
-.dz-stage{position:relative;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
+.dz-stage{position:relative;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
 .dz-stage canvas{display:block;width:100%;height:100%}
 .dz-nums{position:absolute;left:10px;bottom:10px;padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.6);font-size:12px;
   font-variant-numeric:tabular-nums;color:#fff;pointer-events:none;white-space:nowrap;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis}
 .dz-nums:empty{display:none}
-.dz-legend{position:absolute;right:10px;top:10px;display:flex;gap:9px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);font-size:11px;color:#ddd;pointer-events:none}
+.dz-tools{position:absolute;left:0;right:0;top:8px;display:flex;gap:6px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+.dz-tools::-webkit-scrollbar{display:none}
+@media (min-width:1120px){ .dz-tools{flex-wrap:wrap;right:auto;max-width:calc(100% - 20px);overflow:visible} }
+.dz-tools .btn{height:32px;padding:0 11px;font-size:12.5px;background:rgba(20,17,15,.8);border-color:rgba(255,255,255,.14);color:#eee;box-shadow:none}
+.dz-tools .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.dz-heal{position:absolute;left:10px;top:50px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:calc(100% - 20px);padding:7px 10px;border-radius:10px;
+  background:rgba(20,17,15,.85);color:#eee;font-size:12.5px}
+.dz-heal input{width:120px;accent-color:var(--brand)}
+.dz-heal .btn{height:30px;padding:0 10px;font-size:12px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none}
+.dz-heal .dz-note{color:#b9b1a8}
+.dz-stage.heal{cursor:none}
+.dz-legend{position:absolute;right:10px;bottom:10px;display:none;gap:9px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);font-size:11px;color:#ddd;pointer-events:none}
 .dz-legend i{display:inline-block;width:9px;height:9px;border-radius:999px;border:2px solid;background:#fff;vertical-align:-1px;margin-right:4px}
 .dz-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:#cdc6bd;font-size:14px;background:rgba(10,9,8,.7)}
 .dz-empty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(88%,420px);padding:14px 18px;border-radius:14px;background:rgba(20,17,15,.88);color:#f4f1ec;font-size:14px;line-height:1.55;text-align:center;pointer-events:none}
@@ -359,6 +370,9 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-tabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);flex:0 0 auto}
 .dz-tabs button{flex:1;height:36px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
 .dz-tabs button.on{background:var(--panel-3);color:var(--ink)}
+.dz-tabs .fold{flex:0 0 38px;font-size:17px;color:var(--muted)}
+.dz.folded .dz-body{display:none}
+.dz.folded .dz-tabs .fold{transform:rotate(180deg)}
 .dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0}
 .dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
 .dz-tab .edit{padding:10px}
@@ -382,6 +396,9 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-note{font-size:12px;color:var(--muted)}
 .dz-file{display:none}
 @media (min-width:1120px){
+  .dz-legend{display:flex}
+  .dz-tabs .fold{display:none}
+  .dz.folded .dz-body{display:flex}
   .dz{grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
   .dz-top{grid-column:1/-1}
   .dz-top input{flex:0 1 220px}
@@ -715,14 +732,29 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 <div class="dz" id="dz" hidden>
   <div class="dz-top">
     <input id="dzClient" type="text" placeholder="회원명" aria-label="회원명">
-    <button class="btn" id="dzOrig" type="button" title="누르고 있는 동안 원본 사진">원본</button>
-    <button class="btn" id="dzZoomBrow" type="button" title="눈썹 부분 확대">눈썹</button>
-    <button class="btn" id="dzZoomAll" type="button" title="사진 전체">전체</button>
-    <button class="btn" id="dzSym" type="button" title="한쪽을 움직이면 반대쪽도 거울처럼">대칭</button>
+    <button class="btn icon" id="dzUndo" type="button" title="되돌리기 (Ctrl+Z)" aria-label="되돌리기">↶</button>
+    <button class="btn icon" id="dzRedo" type="button" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행">↷</button>
+    <button class="btn icon" id="dzFull" type="button" title="전체화면" aria-label="전체화면">⛶</button>
     <button class="btn icon" id="dzClose" type="button" aria-label="닫기">✕</button>
   </div>
   <div class="dz-stage" id="dzStage">
     <canvas id="dzCanvas"></canvas>
+    <div class="dz-tools" id="dzTools">
+      <button class="btn" id="dzOrig" type="button" title="누르고 있는 동안 원본 사진 · 빈 곳을 톡 치면 전후가 바뀝니다">원본</button>
+      <button class="btn" id="dzWipe" type="button" title="가운데 선을 끌어 전후를 반씩 비교">비교</button>
+      <button class="btn on" id="dzPts" type="button" title="조절점과 윤곽선 보이기/감추기">점</button>
+      <button class="btn" id="dzLines" type="button" title="콧방울 기준 눈썹 디자인 가이드선">가이드선</button>
+      <button class="btn on" id="dzSym" type="button" title="한쪽을 움직이면 반대쪽도 거울처럼">대칭</button>
+      <button class="btn" id="dzZoomBrow" type="button" title="눈썹 부분 확대">눈썹</button>
+      <button class="btn" id="dzZoomAll" type="button" title="사진 전체">전체</button>
+      <button class="btn" id="dzHeal" type="button" title="잔털·잡티 위를 문지르면 주변 피부로 메웁니다">잔털 지우기</button>
+    </div>
+    <div class="dz-heal" id="dzHealBox" hidden>
+      <span>지름 <b id="dzHealMm">1.5</b> mm</span>
+      <input type="range" id="dzHealSize" min="5" max="40" value="15" aria-label="브러시 지름">
+      <button class="btn" id="dzHealClear" type="button">모두 복구</button>
+      <span class="dz-note">털을 문지르면 지워집니다 · 잘못 지웠으면 ↶</span>
+    </div>
     <div class="dz-nums" id="dzNums"></div>
     <div class="dz-legend" id="dzLegend"><span><i style="border-color:#4fa3ff"></i>윗선</span><span><i style="border-color:#ffb84f"></i>아랫선</span><span><i style="border-color:#e2865f"></i>꼬리</span></div>
     <div class="dz-wait" id="dzWait" hidden><div class="spinner"></div><span>불러오는 중…</span></div>
@@ -734,6 +766,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <button type="button" data-t="shape">모양</button>
       <button type="button" data-t="look">색·농도</button>
       <button type="button" data-t="save">저장</button>
+      <button type="button" class="fold" id="dzFold" title="패널 접기/펴기" aria-label="패널 접기">▾</button>
     </div>
     <div class="dz-body">
       <div class="dz-tab on" data-tab="tpl">
@@ -747,7 +780,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <div class="dz-note">배경이 투명한 PNG 한 장, 또는 흰 종이에 그린 도안 시트(여러 쌍) 그대로 올리면 됩니다. 시트는 자동으로 한 쌍씩 잘려 들어갑니다.</div>
       </div>
       <div class="dz-tab" data-tab="shape">
-        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점은 윗선을, 아랫선 점은 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 두 손가락으로 확대</div>
+        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점 3개는 윗선을, 아랫선 점 3개는 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 톡 치면 전후 전환, 두 손가락으로 확대 · 화살표 키로 0.5 mm 씩 (Shift 2 mm)</div>
         <div class="dz-row">
           <button class="btn" type="button" id="dzCopyRL">오른쪽 → 왼쪽 복사</button>
           <button class="btn" type="button" id="dzCopyLR">왼쪽 → 오른쪽 복사</button>
@@ -762,7 +795,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
           <button type="button" data-n="tailup">꼬리 ↑</button><button type="button" data-n="taildown">꼬리 ↓</button>
           <button type="button" data-n="archup">아치 ↑</button><button type="button" data-n="archdown">아치 ↓</button>
         </div>
-        <label class="chk"><input type="checkbox" id="dzGuides" checked> 조절점과 윤곽선 보이기</label>
+        <label class="chk"><input type="checkbox" id="dzGuides" checked> 조절점과 윤곽선 보이기 <em class="hint-inline">(화면의 "점" 버튼과 같음)</em></label>
       </div>
       <div class="dz-tab" data-tab="look">
         <div class="eyebrow">경과 미리보기</div>
@@ -781,7 +814,13 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
           <button class="btn" type="button" id="dzDownload">내려받기</button>
           <button class="btn" type="button" id="dzPrint">1:1 출력 시트</button>
         </div>
+        <div class="eyebrow">전후 비교 이미지 <em class="hint-inline">눈썹 부분만 잘라 원본 · 시안을 나란히</em></div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzCmpSave">비교 이미지 갤러리에 저장</button>
+          <button class="btn" type="button" id="dzCmpDl">비교 이미지 내려받기</button>
+        </div>
         <div class="msg ok" id="dzSaveNote"></div>
+        <div class="dz-note">갤러리에 저장한 시안은 눌러서 열면 원본과 반씩 비교하거나, 누르고 있는 동안 원본을 볼 수 있습니다.</div>
       </div>
     </div>
   </div>
@@ -1339,7 +1378,7 @@ async function renderLb(){
   const dots=$('#lbDots'); dots.replaceChildren();
   if(list.length>1 && list.length<=12) list.forEach((_,i)=>dots.appendChild(el('i', i===at?'on':'')));
   const img=$('#lbImg'), ph=$('#lbPh'), cmp=$('#lbCmp');
-  if(it.image && it.compare && !it.saved){ showCompare(it); img.hidden=true; ph.hidden=true; }
+  if(it.image && it.compare && (!it.saved || it.design)){ showCompare(it); img.hidden=true; ph.hidden=true; }
   else if(it.image){ cmp.hidden=true; img.src=it.image; img.hidden=false; ph.hidden=true; }
   else { cmp.hidden=true; img.hidden=true; ph.hidden=false; ph.replaceChildren();
     if(it.status==='running'||it.status==='queued') ph.appendChild(el('div','spinner'));
@@ -1348,6 +1387,8 @@ async function renderLb(){
   side.appendChild(el('h3','',it.label||it.title));
   const dl=el('dl','spec');
   spec(dl,'작업',it.kind_ko); spec(dl,'시각',fmtTime(it.created));
+  if(it.look){ const pg=PIGMENTS.find(p=>p[0]===it.look.color); spec(dl,'도안',it.look.tpl); spec(dl,'색소',pg?pg[1]:it.look.color);
+    if(it.look.opacity!==undefined) spec(dl,'강도 · 부드러움',`${it.look.opacity} · ${it.look.blur}`); if(it.look.notes) spec(dl,'메모',it.look.notes); }
   spec(dl,'상태',it.status==='done'?('완료 · '+dur(it)):STATUS_KO[it.status]||it.status);
   spec(dl,'엔진',(it.used&&it.used.length)?it.used.join(', '):(it.params&&it.params.backend||''));
   spec(dl,'API 비용',it.cost_usd?usd(it.cost_usd):'');
@@ -1421,14 +1462,16 @@ async function renderLb(){
 const PIGMENTS=[['natural','내추럴 브라운',[112,80,60]],['dark','다크 브라운',[80,54,40]],['ash','애쉬 브라운',[98,88,80]],
   ['light','라이트 브라운',[146,110,86]],['black','블랙 브라운',[54,42,36]],['red','레드 브라운',[132,76,56]],['hair','머리색 자동',null]];
 const STAGES=[['fresh','시술 직후',100,15],['healed','치유 후 (4주)',68,40],['year','1년 후',45,60]];
-const LOOK0={opacity:85, blur:25, density:2, weight:30, color:'natural', light:0, warm:0};
-const LOOK_SLIDERS=[['opacity','강도',0,100],['blur','부드러움',0,100],['density','선 진하기',1,3],['weight','선 굵기',0,100]];
+const LOOK0={opacity:85, blur:25, density:1, weight:5, color:'natural', light:0, warm:0};
+// 선 진하기 1 and 선 굵기 5 are the drawing as drawn; below is lighter/thinner, above darker/thicker
+const LOOK_SLIDERS=[['opacity','강도',0,100,1],['blur','부드러움',0,100,1],['density','선 진하기',0.2,2,0.1],['weight','선 굵기',0,10,0.5]];
 const COLOR_SLIDERS=[['light','밝기',-40,40],['warm','따뜻함',-40,40]];
 const V={add:(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub:(a,b)=>({x:a.x-b.x,y:a.y-b.y}), mul:(a,k)=>({x:a.x*k,y:a.y*k}),
   unit:a=>{ const l=Math.hypot(a.x,a.y)||1; return {x:a.x/l,y:a.y/l}; }, dot:(a,b)=>a.x*b.x+a.y*b.y,
   perp:a=>({x:-a.y,y:a.x}), mid:(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}), dist:(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)};
 const DZ={id:null, photo:new Image(), W:0, H:0, lm:null, ipdPx:0, tpls:[], tplId:null, tex:{}, tint:{}, geo:{}, brows:{}, auto:{},
   look:{...LOOK0}, sym:true, ipd:62, notes:'', client:'', view:{s:1,tx:0,ty:0}, dpr:1, active:'right', orig:false, guides:true,
+  wipe:{on:false,x:0.5}, lines:false, hist:[], histAt:-1, tool:'move', retouch:[], base:null, healMm:1.5, cursor:null,
   saves:[], saveTimer:null, lastSave:null, dirtySince:0, imgCache:{}};
 DZ.photo.crossOrigin='anonymous';
 
@@ -1449,6 +1492,16 @@ function frameNormals(pts){ // tangent by central differences on the polyline, n
   const n=pts.length; pts.forEach((p,i)=>{ const a=pts[Math.max(0,i-1)].c, b=pts[Math.min(n-1,i+1)].c;
     const t=V.unit(V.sub(b,a)); p.t=t; p.n={x:t.y,y:-t.x}; }); }
 function cloneBrow(b){ const o={}; for(const k in b) o[k]={x:b[k].x,y:b[k].y}; return o; }
+function crAt(knots, vals, u){ // non-uniform Catmull-Rom through (knot, vector) pairs; flat beyond the ends
+  const n=knots.length; if(u<=knots[0]) return vals[0]; if(u>=knots[n-1]) return vals[n-1];
+  let i=0; while(i<n-2&&u>knots[i+1]) i++;
+  const P=k=>vals[Math.max(0,Math.min(n-1,k))], K=k=>knots[Math.max(0,Math.min(n-1,k))];
+  const p0=P(i-1),p1=P(i),p2=P(i+1),p3=P(i+2), t0=K(i)-(K(i)-K(i-1)||(K(i+1)-K(i))), t1=K(i), t2=K(i+1), t3=K(i+2)+(K(i+2)===K(i+1)?(K(i+1)-K(i)):0);
+  const t=(u-t1)/(t2-t1||1e-9);
+  // tangents by finite differences over the knot spacing (Catmull-Rom with non-uniform knots)
+  const m1=V.mul(V.sub(p2,p0), (t2-t1)/((t2-t0)||1e-9)), m2=V.mul(V.sub(p3,p1), (t2-t1)/((t3-t1)||1e-9));
+  const h00=2*t*t*t-3*t*t+1, h10=t*t*t-2*t*t+t, h01=-2*t*t*t+3*t*t, h11=t*t*t-t*t;
+  return {x:h00*p1.x+h10*m1.x+h01*p2.x+h11*m2.x, y:h00*p1.y+h10*m1.y+h01*p2.y+h11*m2.y}; }
 function cubicFit(us,ys){ // least squares y = a0 + a1 u + a2 u² + a3 u³, so the outline is a curve, not the hairs' silhouette
   const n=4, A=Array.from({length:n},()=>new Float64Array(n+1));
   us.forEach((u,i)=>{ const pw=[1,u,u*u,u*u*u]; for(let r=0;r<n;r++){ for(let c=0;c<n;c++) A[r][c]+=pw[r]*pw[c]; A[r][n]+=pw[r]*ys[i]; } });
@@ -1503,7 +1556,9 @@ function analyseTemplate(img, flip, headRight){
   // what the drawing does beyond that curve, in chord units, so placing the template only
   // needs the head-to-tail distance on the face
   smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; p.gT/=chord; p.gB/=chord; });
-  return {W,H,cv,smp,uA,uH,iA,iH,chord,flipN,tipFrac};
+  const iM=Math.round((iH+iA)/2), uM=smp[iM].u;                  // the extra handle between head and arch
+  const alpha=new Float32Array(W*H); for(let i=0;i<W*H;i++) alpha[i]=px[i*4+3]/255;
+  return {W,H,cv,smp,uA,uH,uM,iA,iH,iM,chord,flipN,tipFrac,alpha};
 }
 function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous';
   im.onload=()=>res(im); im.onerror=()=>{ delete DZ.imgCache[url]; rej(new Error('이미지를 불러오지 못했습니다')); }; im.src=url; })); }
@@ -1521,15 +1576,22 @@ function pigmentRGB(){
   const k=1+o.light/100; return rgb.map((v,i)=>Math.max(0,Math.min(255,Math.round(v*k+(i===0?o.warm*0.55:i===2?-o.warm*0.55:0)))));
 }
 function retint(){ const rgb=pigmentRGB(), o=DZ.look;
-  // 선 진하기 stacks the drawing on itself (a faint stroke stays faint, but less so);
-  // 선 굵기 draws it again around a small circle, which widens every stroke a little
-  const rad=(o.weight||0)/100*1.2, offs=[[0,0]];
-  if(rad>0.05) for(let k=0;k<6;k++) offs.push([Math.cos(k*Math.PI/3)*rad, Math.sin(k*Math.PI/3)*rad]);
+  // 선 굵기: above 5 each stroke grows toward a one-pixel dilation, below 5 it shrinks toward a
+  // one-pixel erosion; 선 진하기: the alpha is raised (>1) or lowered (<1) as if the drawing were
+  // laid on itself that many times. At 5 and 1 the drawing is exactly as drawn.
+  const wgt=Math.max(0,Math.min(10,+o.weight||0)), dens=Math.max(0.2,Math.min(2,+o.density||1));
+  const grow=wgt>5?(wgt-5)/5:0, shrink=wgt<5?(5-wgt)/5:0;
   ['right','left'].forEach(side=>{ const T=DZ.tex[side]; if(!T) return;
     const cv=DZ.tint[side]||(DZ.tint[side]=document.createElement('canvas')); cv.width=T.W; cv.height=T.H;
-    const c=cv.getContext('2d'); c.clearRect(0,0,T.W,T.H);
-    for(let d=0;d<Math.max(1,Math.min(3,Math.round(o.density||1)));d++) offs.forEach(([ox,oy])=>c.drawImage(T.cv,ox,oy));
-    c.globalCompositeOperation='source-in'; c.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; c.fillRect(0,0,T.W,T.H); });
+    const W=T.W, H=T.H, a=T.alpha, n=W*H, out=new Float32Array(a);
+    if(grow||shrink){ for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x; let mx=a[i], mn=a[i];
+        for(let ky=-1;ky<=1;ky++){ const yy=y+ky; if(yy<0||yy>=H) continue; for(let kx=-1;kx<=1;kx++){ const xx=x+kx; if(xx<0||xx>=W) continue;
+          const v=a[yy*W+xx]; if(v>mx) mx=v; if(v<mn) mn=v; } }
+        out[i]=grow? a[i]+grow*(mx-a[i]) : a[i]-shrink*(a[i]-mn); } }
+    const img=cv.getContext('2d').createImageData(W,H), d=img.data;
+    for(let i=0;i<n;i++){ const v=out[i]; if(v<=0) continue; const al=dens===1?v:1-Math.pow(1-v,dens);
+      d[i*4]=rgb[0]; d[i*4+1]=rgb[1]; d[i*4+2]=rgb[2]; d[i*4+3]=Math.round(Math.min(1,al)*255); }
+    cv.getContext('2d').putImageData(img,0,0); });
 }
 function sampleHair(){ // the darker part of the strip above the forehead; nothing there means no hair to match
   const lm=DZ.lm; if(!lm||!DZ.photo.naturalWidth) return null; const ipd=DZ.ipdPx||DZ.W/6;
@@ -1576,8 +1638,9 @@ function fitTemplate(side){ // the drawing as drawn, scaled and turned so its fi
   const Ht=T.smp[0].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
   const ang=Math.atan2(a.T.y-a.H.y,a.T.x-a.H.x)-Math.atan2(Tt.y-Ht.y,Tt.x-Ht.x), cs=Math.cos(ang), sn=Math.sin(ang);
   const map=p=>{ const dx=p.x-Ht.x, dy=p.y-Ht.y; return {x:a.H.x+(dx*cs-dy*sn)*s, y:a.H.y+(dx*sn+dy*cs)*s}; };
-  const sH=T.smp[T.iH], sA=T.smp[T.iA], ch=T.chord;
+  const sH=T.smp[T.iH], sM=T.smp[T.iM], sA=T.smp[T.iA], ch=T.chord;
   return {hT:map(V.add(sH.c,V.mul(sH.n,sH.gT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.gB*ch))),
+          mT:map(V.add(sM.c,V.mul(sM.n,sM.gT*ch))), mB:map(V.sub(sM.c,V.mul(sM.n,sM.gB*ch))),
           aT:map(V.add(sA.c,V.mul(sA.n,sA.gT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.gB*ch))), t:map(Tt)};
 }
 function initBrows(){ const out={right:fitTemplate('right'), left:fitTemplate('left')};
@@ -1601,16 +1664,20 @@ function browGeometry(side){
   const S=spineCurve(H,A,Tl), tipLen=V.dist(H,A)*T.tipFrac;
   const pts=T.smp.map(p=>{ const q=spineAt(S,p.u,T.uH,T.uA,tipLen); return {u:p.u, c:{x:q.x+(p.r.e*e.x+p.r.p*ep.x)*chord, y:q.y+(p.r.e*e.y+p.r.p*ep.y)*chord}}; });
   frameNormals(pts); if(T.flipN) pts.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
-  const sH=T.smp[T.iH], sA=T.smp[T.iA];
-  const kTH=V.dist(b.hT,H)/(sH.gT*chord), kBH=V.dist(b.hB,H)/(sH.gB*chord);
-  const kTA=V.dist(b.aT,A)/(sA.gT*chord), kBA=V.dist(b.aB,A)/(sA.gB*chord);
+  // The drawing's own edges, laid along that spine, are the reference; each handle is a
+  // displacement from where the reference edge passes, and the displacements are blended
+  // between the handles. Untouched handles sit exactly on the reference, so the drawing is
+  // as drawn; a dragged handle is exactly where it was dragged to.
+  const {uH,uM,uA}=T, gtop=i=>V.add(pts[i].c, V.mul(pts[i].n, T.smp[i].gT*chord)), gbot=i=>V.sub(pts[i].c, V.mul(pts[i].n, T.smp[i].gB*chord));
+  const knots=[uH,uM,uA,1], zero={x:0,y:0};
+  const dT=[V.sub(b.hT,gtop(T.iH)), b.mT?V.sub(b.mT,gtop(T.iM)):zero, V.sub(b.aT,gtop(T.iA)), zero];
+  const dB=[V.sub(b.hB,gbot(T.iH)), b.mB?V.sub(b.mB,gbot(T.iM)):zero, V.sub(b.aB,gbot(T.iA)), zero];
+  if(!b.mT) dT[1]=V.mul(V.add(dT[0],dT[2]),0.5); if(!b.mB) dB[1]=V.mul(V.add(dB[0],dB[2]),0.5);   // saved before the middle handles existed
   pts.forEach((p,i)=>{ const s=T.smp[i];
-    // the tip keeps the head's scale, the tail keeps the arch's; between them it blends
-    const f=p.u<=T.uH?0 : p.u>=T.uA?1 : (p.u-T.uH)/(T.uA-T.uH);
-    const kT=kTH+(kTA-kTH)*f, kB=kBH+(kBA-kBH)*f;
-    p.top=V.add(p.c, V.mul(p.n, s.eT*chord*kT)); p.bot=V.sub(p.c, V.mul(p.n, s.eB*chord*kB));     // mesh envelope
-    p.gTop=V.add(p.c, V.mul(p.n, s.gT*chord*kT)); p.gBot=V.sub(p.c, V.mul(p.n, s.gB*chord*kB)); });   // outline
-  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, chord, e};
+    p.gTop=V.add(gtop(i), crAt(knots,dT,p.u)); p.gBot=V.add(gbot(i), crAt(knots,dB,p.u));      // outline, through the handles
+    const vt=V.sub(p.gTop,p.c), vb=V.sub(p.gBot,p.c);                                            // the drawing scales with its edge
+    p.top=V.add(p.c, V.mul(vt, s.eT/s.gT)); p.bot=V.add(p.c, V.mul(vb, s.eB/s.gB)); });          // mesh envelope, past the outline
+  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, iM:T.iM, chord, e};
 }
 function drawTri(ctx, tex, s0,s1,s2, d0,d1,d2){
   const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y); if(Math.abs(det)<1e-9) return;
@@ -1631,7 +1698,7 @@ function drawMesh(ctx, side, g){
     drawTri(ctx,tex, a.top,b.top,b.c, A.top,B.top,B.c); drawTri(ctx,tex, a.top,b.c,a.c, A.top,B.c,A.c);
     drawTri(ctx,tex, a.c,b.c,b.bot, A.c,B.c,B.bot);     drawTri(ctx,tex, a.c,b.bot,a.bot, A.c,B.bot,A.bot); }
 }
-function paintBrows(ctx, view){
+function paintBrows(ctx, view, clipX){
   const geos=['right','left'].map(browGeometry).filter(Boolean); DZ.geo={}; geos.forEach(g=>DZ.geo[g.side]=g);
   if(!geos.length) return;
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
@@ -1643,13 +1710,18 @@ function paintBrows(ctx, view){
   const lay=DZ.lay||(DZ.lay=document.createElement('canvas')); lay.width=w; lay.height=h;
   const lc=lay.getContext('2d'); lc.imageSmoothingQuality='high'; lc.setTransform(view.s,0,0,view.s,view.tx-x0,view.ty-y0);
   geos.forEach(g=>drawMesh(lc,g.side,g));
-  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=Math.max(0,Math.min(1,DZ.look.opacity/100));
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+  if(clipX!==undefined){ ctx.beginPath(); ctx.rect(clipX,0,ctx.canvas.width-clipX,ctx.canvas.height); ctx.clip(); }   // 비교: the design only right of the line
+  ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=Math.max(0,Math.min(1,DZ.look.opacity/100));
   if(blur>0.15) ctx.filter=`blur(${blur.toFixed(2)}px)`;
   ctx.drawImage(lay,x0,y0); ctx.restore();
 }
-function handlePoints(side){ const g=DZ.geo[side]; if(!g) return [];
-  return [{k:'hT',...g.pts[g.iH].gTop},{k:'hB',...g.pts[g.iH].gBot},{k:'aT',...g.pts[g.iA].gTop},{k:'aB',...g.pts[g.iA].gBot},{k:'t',...g.T}]; }
-const HCOL={hT:'#4fa3ff',aT:'#4fa3ff',hB:'#ffb84f',aB:'#ffb84f',t:'#e2865f'};
+function handlePoints(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return [];
+  return ['hT','mT','aT','hB','mB','aB','t'].filter(k=>b[k]).map(k=>({k, x:b[k].x, y:b[k].y})); }
+function ensureMid(side){ // designs saved before the middle handles existed get them where the outline already runs
+  const b=DZ.brows[side]; if(!b||(b.mT&&b.mB)) return; const g=browGeometry(side); if(!g) return;
+  b.mT=b.mT||{...g.pts[g.iM].gTop}; b.mB=b.mB||{...g.pts[g.iM].gBot}; }
+const HCOL={hT:'#4fa3ff',mT:'#4fa3ff',aT:'#4fa3ff',hB:'#ffb84f',mB:'#ffb84f',aB:'#ffb84f',t:'#e2865f'};
 function drawHandles(ctx){
   const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
   ['right','left'].forEach(side=>{ const g=DZ.geo[side]; if(!g) return; const act=side===DZ.active;
@@ -1662,20 +1734,128 @@ function drawHandles(ctx){
 }
 function dzResize(){ const cv=$('#dzCanvas'), box=$('#dzStage').getBoundingClientRect(); DZ.dpr=Math.min(2,devicePixelRatio||1);
   cv.width=Math.max(1,Math.round(box.width*DZ.dpr)); cv.height=Math.max(1,Math.round(box.height*DZ.dpr)); DZ.box={w:box.width,h:box.height}; }
+function dzRenderSoon(){ if(DZ.raf) return; DZ.raf=requestAnimationFrame(()=>{ DZ.raf=0; dzRender(); }); }
+function photoFor(scale){ // a 1600 px copy of the photo for when the screen shows it smaller than that
+  if(!DZ.photo.naturalWidth) return DZ.photo;
+  if(!DZ.photoSmall||DZ.photoSmall.dataset.src!==DZ.photo.src){ const k=Math.min(1,1600/Math.max(DZ.W,DZ.H)); const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(DZ.W*k)); c.height=Math.max(1,Math.round(DZ.H*k)); const x=c.getContext('2d'); x.imageSmoothingQuality='high'; x.drawImage(DZ.photo,0,0,c.width,c.height);
+    c.dataset.src=DZ.photo.src; DZ.photoSmall=c; }
+  return scale*DZ.W<=DZ.photoSmall.width ? DZ.photoSmall : DZ.photo; }
 function dzRender(){
   const cv=$('#dzCanvas'), ctx=cv.getContext('2d'), {s,tx,ty}=DZ.view, d=DZ.dpr;
   ctx.setTransform(1,0,0,1,0,0); ctx.filter='none'; ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
   ctx.fillStyle='#0a0908'; ctx.fillRect(0,0,cv.width,cv.height);
   if(!DZ.photo.naturalWidth) return;
-  ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); ctx.imageSmoothingQuality='high'; ctx.drawImage(DZ.photo,0,0);
-  if(!DZ.orig){ paintBrows(ctx,{s:d*s,tx:d*tx,ty:d*ty}); if(DZ.guides) drawHandles(ctx); }
+  ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); ctx.imageSmoothingQuality='high';
+  const src=photoFor(d*s); ctx.drawImage(src,0,0,src.width,src.height,0,0,DZ.W,DZ.H);
+  const wipe=DZ.wipe.on&&DZ.box ? DZ.wipe.x*DZ.box.w : null;
+  if(!DZ.orig){
+    if(DZ.base&&DZ.baseRect){ const r=DZ.baseRect; ctx.save(); if(wipe!==null){ ctx.setTransform(1,0,0,1,0,0); ctx.beginPath(); ctx.rect(wipe*d,0,cv.width,cv.height); ctx.clip(); ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); }
+      ctx.drawImage(DZ.base, r.x0,r.y0,r.x1-r.x0,r.y1-r.y0, r.x0,r.y0,r.x1-r.x0,r.y1-r.y0); ctx.restore(); }   // the retouched skin, only where it changed, on the "after" side
+    paintBrows(ctx,{s:d*s,tx:d*tx,ty:d*ty}, wipe===null?undefined:wipe*d); if(DZ.guides&&DZ.tool!=='heal') drawHandles(ctx); }
   else ['right','left'].forEach(side=>{ const g=browGeometry(side); if(g) DZ.geo[side]=g; });
+  if(DZ.lines) drawGuideLines(ctx);
+  if(wipe!==null) drawWipe(ctx, wipe);
+  if(DZ.tool==='heal') drawBrush(ctx);
   dzMeasure();
 }
+function drawBrush(ctx){ const {s,tx,ty}=DZ.view, r=DZ.healMm*pxPerMm()*s; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0); ctx.save();
+  if(DZ.stroke&&DZ.stroke.length){ ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=r*2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.beginPath();
+    DZ.stroke.forEach(([x,y],i)=>{ const X=x*s+tx, Y=y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); if(DZ.stroke.length===1){ const [x,y]=DZ.stroke[0]; ctx.lineTo(x*s+tx+0.01,y*s+ty); } ctx.stroke(); }
+  if(DZ.cursor){ ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r),0,Math.PI*2); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r)+1.5,0,Math.PI*2); ctx.stroke(); }
+  ctx.restore(); }
+function drawWipe(ctx, x){ // the before/after line, in screen pixels
+  const h=DZ.box.h; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  ctx.save(); ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=2; ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=4;
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x,h*0.32,19,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.shadowBlur=0; ctx.fillStyle='#15120f'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('◀ ▶',x,h*0.32+1);
+  const tag=(t,X,align)=>{ ctx.font='600 12px sans-serif'; ctx.textAlign=align; const w=ctx.measureText(t).width+18;
+    ctx.fillStyle='rgba(0,0,0,.55)'; const bx=align==='left'?X:X-w; ctx.beginPath(); ctx.roundRect(bx,h-38,w,24,12); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.fillText(t, align==='left'?X+9:X-9, h-26); };
+  tag('전 · 원본', Math.max(10,x-160), 'left'); tag('후 · 시안', Math.min(DZ.box.w-10,x+160), 'right');
+  ctx.restore();
+}
+function drawGuideLines(ctx){ // the sheet's design lines: nostril → inner corner (head), → outer iris (arch), → outer corner (tail)
+  const lm=DZ.lm; if(!lm) return; const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  const ipd=DZ.ipdPx||DZ.W/6, up=faceUp(), P=(a)=>({x:a[0],y:a[1]});
+  const brows=['right','left'].map(k=>DZ.brows[k]).filter(Boolean); let top=Infinity;
+  brows.forEach(b=>{ for(const k in b) top=Math.min(top, V.dot(b[k],up)); });
+  if(!isFinite(top)) top=V.dot(P(lm.right_pupil),up)+0.6*ipd;
+  const topLine=top+0.35*ipd;                                     // how far up the lines run, in face-up units
+  ctx.save(); ctx.strokeStyle='rgba(120,200,255,.85)'; ctx.lineWidth=1.2; ctx.setLineDash([6,5]);
+  const through=(o,t)=>{ const d=V.sub(t,o), k=(topLine-V.dot(o,up))/(V.dot(d,up)||1e-6); if(k<=0) return;
+    const e=V.add(o,V.mul(d,k)); ctx.beginPath(); ctx.moveTo(o.x*s+tx,o.y*s+ty); ctx.lineTo(e.x*s+tx,e.y*s+ty); ctx.stroke(); };
+  ['right','left'].forEach((side,i)=>{ const ala=P(lm[side+'_ala']), pupil=P(lm[side+'_pupil']), sign=side==='right'?-1:1;
+    const along=V.perp(up); const iris=V.add(pupil, V.mul(along, sign*0.095*ipd*(along.x<0?-1:1)));
+    through(ala,P(lm[side+'_inner'])); through(ala,iris); through(ala,P(lm[side+'_outer'])); });
+  const c=P(lm.right_pupil), c2=P(lm.left_pupil), dir=V.unit(V.sub(c2,c)), a=V.sub(c,V.mul(dir,0.9*ipd)), b=V.add(c2,V.mul(dir,0.9*ipd));
+  ctx.beginPath(); ctx.moveTo(a.x*s+tx,a.y*s+ty); ctx.lineTo(b.x*s+tx,b.y*s+ty); ctx.stroke();
+  ctx.restore();
+}
 function dzExport(){ const cv=document.createElement('canvas'); cv.width=DZ.W; cv.height=DZ.H; const ctx=cv.getContext('2d');
-  ctx.drawImage(DZ.photo,0,0); paintBrows(ctx,{s:1,tx:0,ty:0}); return cv; }
+  ctx.drawImage(DZ.base||DZ.photo,0,0); paintBrows(ctx,{s:1,tx:0,ty:0}); return cv; }
 
 /* the view: fit, zoom to the brows, pinch, wheel */
+/* 잔털 지우기: a spot-heal brush. Under the brush, pixels darker than the skin around
+   them (a hair, a blemish) are refilled from the pixels that are not, so the skin's own
+   texture stays and only the hair goes. The strokes are kept, not the pixels, so a
+   design reopens with the same retouch and undo simply replays fewer strokes. */
+function baseCanvas(){ if(DZ.base) return DZ.base; const c=document.createElement('canvas'); c.width=DZ.W; c.height=DZ.H;
+  c.getContext('2d').drawImage(DZ.photo,0,0); DZ.baseRect=null; return DZ.base=c; }
+function growBaseRect(x0,y0,x1,y1){ const r=DZ.baseRect; DZ.baseRect=r?{x0:Math.min(r.x0,x0),y0:Math.min(r.y0,y0),x1:Math.max(r.x1,x1),y1:Math.max(r.y1,y1)}:{x0,y0,x1,y1}; }
+function healStroke(stroke){
+  const base=baseCanvas(), ctx=base.getContext('2d',{willReadFrequently:true}), r=stroke.r, pad=Math.ceil(r)+10;
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  stroke.pts.forEach(([x,y])=>{ x0=Math.min(x0,x); y0=Math.min(y0,y); x1=Math.max(x1,x); y1=Math.max(y1,y); });
+  x0=Math.max(0,Math.floor(x0-pad)); y0=Math.max(0,Math.floor(y0-pad)); x1=Math.min(DZ.W,Math.ceil(x1+pad)); y1=Math.min(DZ.H,Math.ceil(y1+pad));
+  const w=x1-x0, h=y1-y0; if(w<3||h<3) return;
+  const img=ctx.getImageData(x0,y0,w,h), d=img.data, n=w*h;
+  // the brush's footprint, soft at the edge
+  const M=new Float32Array(n);
+  stroke.pts.forEach(([px,py])=>{ const cx=px-x0, cy=py-y0;
+    for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(h-1,Math.ceil(cy+r));y++) for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(w-1,Math.ceil(cx+r));x++){
+      const dd=Math.hypot(x-cx,y-cy); if(dd>r) continue; const v=dd<=r*0.7?1:(r-dd)/(r*0.3); const i=y*w+x; if(v>M[i]) M[i]=v; } });
+  // what the skin would be without the hair: a max filter (thin dark lines vanish) then a small blur
+  const L=new Float32Array(n); for(let i=0;i<n;i++) L[i]=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
+  const rb=Math.max(2,Math.min(6,Math.round(r*0.45)));
+  const maxf=(src)=>{ const t=new Float32Array(n), o=new Float32Array(n);
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let m=-1; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w) m=Math.max(m,src[y*w+xx]); } t[y*w+x]=m; }
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let m=-1; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h) m=Math.max(m,t[yy*w+x]); } o[y*w+x]=m; }
+    return o; };
+  const boxf=(src)=>{ const t=new Float32Array(n), o=new Float32Array(n);
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let sum=0,c=0; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w){ sum+=src[y*w+xx]; c++; } } t[y*w+x]=sum/c; }
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let sum=0,c=0; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h){ sum+=t[yy*w+x]; c++; } } o[y*w+x]=sum/c; }
+    return o; };
+  const B=boxf(maxf(L)), tau=10;
+  const F=new Uint8Array(n); for(let i=0;i<n;i++) if(M[i]>0&&L[i]<B[i]-tau) F[i]=1;
+  const F2=new Uint8Array(F);                                  // grow by one pixel: a hair's soft edge is hair too
+  for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){ const i=y*w+x; if(F[i]) { F2[i-1]=F2[i+1]=F2[i-w]=F2[i+w]=1; } }
+  // refill every hair pixel from the non-hair pixels around it (a Gaussian-weighted average)
+  const R=7, G=[]; for(let k=-R;k<=R;k++) G.push(Math.exp(-(k*k)/(2*3*3)));
+  const out=new Uint8ClampedArray(d);
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const i=y*w+x; if(!F2[i]||M[i]<=0) continue;
+    let sr=0,sg=0,sb=0,sw=0;
+    for(let ky=-R;ky<=R;ky++){ const yy=y+ky; if(yy<0||yy>=h) continue; for(let kx=-R;kx<=R;kx++){ const xx=x+kx; if(xx<0||xx>=w) continue;
+      const j=yy*w+xx; if(F2[j]) continue; const wgt=G[ky+R]*G[kx+R]; sr+=d[j*4]*wgt; sg+=d[j*4+1]*wgt; sb+=d[j*4+2]*wgt; sw+=wgt; } }
+    let nr,ng,nb;
+    if(sw>0.05){ nr=sr/sw; ng=sg/sw; nb=sb/sw; }
+    else { const k=B[i]/Math.max(1,L[i]); nr=d[i*4]*k; ng=d[i*4+1]*k; nb=d[i*4+2]*k; }   // nothing but hair nearby: lift it to the skin level
+    const a=M[i]; out[i*4]=d[i*4]+a*(nr-d[i*4]); out[i*4+1]=d[i*4+1]+a*(ng-d[i*4+1]); out[i*4+2]=d[i*4+2]+a*(nb-d[i*4+2]); }
+  img.data.set(out); ctx.putImageData(img,x0,y0); growBaseRect(x0,y0,x1,y1);
+}
+function rebuildBase(){ DZ.base=null; DZ.baseRect=null; if(!DZ.retouch.length) return; DZ.retouch.forEach(healStroke); }
+function snap(){ return JSON.stringify({brows:DZ.brows, look:DZ.look, tpl:DZ.tplId, sym:DZ.sym, retouch:DZ.retouch}); }
+function pushHist(){ const cur=snap(); if(DZ.hist[DZ.histAt]===cur) return;
+  DZ.hist=DZ.hist.slice(0,DZ.histAt+1); DZ.hist.push(cur); if(DZ.hist.length>120) DZ.hist.shift(); DZ.histAt=DZ.hist.length-1; histButtons(); }
+function histButtons(){ $('#dzUndo').disabled=DZ.histAt<=0; $('#dzRedo').disabled=DZ.histAt>=DZ.hist.length-1; }
+async function restoreHist(at){ if(at<0||at>=DZ.hist.length) return; DZ.histAt=at; const st=JSON.parse(DZ.hist[at]);
+  DZ.brows={right:cloneBrow(st.brows.right), left:cloneBrow(st.brows.left)}; DZ.look={...LOOK0,...st.look}; DZ.sym=!!st.sym;
+  $('#dzSym').classList.toggle('on',DZ.sym);
+  const strokes=JSON.stringify(st.retouch||[]); if(strokes!==JSON.stringify(DZ.retouch)){ DZ.retouch=JSON.parse(strokes); rebuildBase(); }
+  if(st.tpl!==DZ.tplId) await setTemplate(st.tpl); else retint();
+  renderLookPanel(); histButtons(); dzRender(); dzDirty(); }
 function fitAll(){ const b=DZ.box; if(!b||!DZ.W) return; const s=Math.min(b.w/DZ.W,b.h/DZ.H); DZ.view={s, tx:(b.w-DZ.W*s)/2, ty:(b.h-DZ.H*s)/2}; }
 function zoomBrows(){ const b=DZ.box; if(!b) return; const pts=[]; ['right','left'].forEach(k=>{ const br=DZ.brows[k]; if(br) for(const j in br) pts.push(br[j]); });
   if(!pts.length){ fitAll(); return; }
@@ -1683,7 +1863,7 @@ function zoomBrows(){ const b=DZ.box; if(!b) return; const pts=[]; ['right','lef
   const padx=(x1-x0)*0.22+20, pady=(x1-x0)*0.32+20; x0-=padx; x1+=padx; y0-=pady; y1+=pady;
   const s=Math.min(b.w/(x1-x0), b.h/(y1-y0), 6); DZ.view={s, tx:(b.w-(x0+x1)*s)/2, ty:(b.h-(y0+y1)*s)/2}; }
 function zoomAt(c,k){ const v=DZ.view; const s=Math.max(0.03,Math.min(24,v.s*k)); k=s/v.s; DZ.view={s, tx:c.x-(c.x-v.tx)*k, ty:c.y-(c.y-v.ty)*k}; }
-function hitHandle(c){ const {s,tx,ty}=DZ.view; let best=null, bd=18;
+function hitHandle(c, reach){ const {s,tx,ty}=DZ.view; let best=null, bd=reach||18;
   [DZ.active, DZ.active==='right'?'left':'right'].forEach(side=>handlePoints(side).forEach(h=>{ const d=Math.hypot(h.x*s+tx-c.x, h.y*s+ty-c.y); if(d<bd){ bd=d; best={side,k:h.k}; } }));
   return best; }
 function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; if(!g) continue;
@@ -1695,54 +1875,110 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   const st=$('#dzStage'), ptrs=new Map(); let drag=null, pinch=null;
   const css=e=>{ const r=st.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
   const toPhoto=e=>{ const c=css(e), {s,tx,ty}=DZ.view; return {x:(c.x-tx)/s, y:(c.y-ty)/s}; };
-  st.addEventListener('pointerdown',e=>{ if(e.button) return; e.preventDefault(); st.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,css(e));
-    if(ptrs.size===2){ drag=null; const [a,b]=[...ptrs.values()]; pinch={d:V.dist(a,b), m:V.mid(a,b), view:{...DZ.view}}; return; }
+  st.addEventListener('pointerdown',e=>{ if(e.button||e.target.closest('.dz-tools')) return;   // the buttons over the stage are not the stage
+    // A pen owns the gesture: on an iPad the palm resting on the glass arrives as extra touch
+    // pointers, and treating them as a second finger turned every pencil stroke into a pinch.
+    if(drag&&drag.pen&&e.pointerType==='touch') return;
+    e.preventDefault();
+    try{ st.setPointerCapture(e.pointerId); }catch(_){}                 // capture is a nicety; losing it must not drop the gesture
+    ptrs.set(e.pointerId,{...css(e), type:e.pointerType});
+    const touches=[...ptrs.values()].filter(p=>p.type!=='mouse');
+    if(touches.length===2 && !(drag&&drag.pen)){ drag=null; const [a,b]=touches; pinch={d:V.dist(a,b), m:V.mid(a,b), view:{...DZ.view}}; return; }
     if(ptrs.size>2||!DZ.id) return;
-    const p=toPhoto(e), c=css(e), hit=DZ.guides&&!DZ.orig?hitHandle(c):null;
+    const p=toPhoto(e), c=css(e);
+    if(DZ.wipe.on && Math.abs(c.x-DZ.wipe.x*DZ.box.w)<20){ drag={kind:'wipe'}; st.style.cursor='ew-resize'; return; }
+    if(DZ.tool==='heal'){ drag={kind:'heal'}; DZ.stroke=[[p.x,p.y]]; DZ.cursor=c; dzRender(); return; }
+    const hit=DZ.guides&&!DZ.orig?hitHandle(c, e.pointerType==='touch'?30:18):null;
     if(hit){ drag={kind:'handle',side:hit.side,k:hit.k,start:p,orig:{...DZ.brows[hit.side][hit.k]}}; DZ.active=hit.side; }
     else { const side=DZ.orig?null:hitBrow(p);
       if(side){ drag={kind:'brow',side,start:p,orig:cloneBrow(DZ.brows[side])}; DZ.active=side; }
-      else drag={kind:'pan',start:c,view:{...DZ.view}}; }
+      else drag={kind:'pan',start:c,view:{...DZ.view},t0:Date.now(),moved:0}; }
+    drag.pen=e.pointerType==='pen'; drag.id=e.pointerId;
     st.style.cursor=drag.kind==='pan'?'grabbing':'move'; dzActiveLabel(); dzRender(); });
-  st.addEventListener('pointermove',e=>{ if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId,css(e));
-    if(pinch&&ptrs.size===2){ const [a,b]=[...ptrs.values()], d=V.dist(a,b), m=V.mid(a,b);
+  st.addEventListener('pointermove',e=>{ if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId,{...css(e), type:e.pointerType});
+    if(drag&&drag.id!==undefined&&e.pointerId!==drag.id) return;        // only the pointer that started the drag moves it
+    const touches=[...ptrs.values()].filter(p=>p.type!=='mouse');
+    if(pinch&&touches.length===2){ const [a,b]=touches, d=V.dist(a,b), m=V.mid(a,b);
       const s=Math.max(0.03,Math.min(24,pinch.view.s*d/Math.max(1,pinch.d))), k=s/pinch.view.s;
-      DZ.view={s, tx:m.x-(pinch.m.x-pinch.view.tx)*k, ty:m.y-(pinch.m.y-pinch.view.ty)*k}; dzRender(); return; }
-    if(!drag) return;
-    if(drag.kind==='pan'){ const c=css(e); DZ.view.tx=drag.view.tx+(c.x-drag.start.x); DZ.view.ty=drag.view.ty+(c.y-drag.start.y); dzRender(); return; }
+      DZ.view={s, tx:m.x-(pinch.m.x-pinch.view.tx)*k, ty:m.y-(pinch.m.y-pinch.view.ty)*k}; dzRenderSoon(); return; }
+    if(DZ.tool==='heal') DZ.cursor=css(e);
+    if(!drag){ if(DZ.tool==='heal') dzRenderSoon(); return; }
+    if(drag.kind==='heal'){ const p=toPhoto(e), last=DZ.stroke[DZ.stroke.length-1];
+      if(Math.hypot(p.x-last[0],p.y-last[1])>=DZ.healMm*pxPerMm()*0.35) DZ.stroke.push([p.x,p.y]); dzRenderSoon(); return; }
+    if(drag.kind==='wipe'){ DZ.wipe.x=Math.max(0.02,Math.min(0.98,css(e).x/DZ.box.w)); dzRenderSoon(); return; }
+    if(drag.kind==='pan'){ const c=css(e); drag.moved=Math.max(drag.moved, Math.hypot(c.x-drag.start.x,c.y-drag.start.y));
+      DZ.view.tx=drag.view.tx+(c.x-drag.start.x); DZ.view.ty=drag.view.ty+(c.y-drag.start.y); dzRenderSoon(); return; }
+    drag.changed=true;
     const d=V.sub(toPhoto(e),drag.start);
     if(drag.kind==='handle') DZ.brows[drag.side][drag.k]=V.add(drag.orig,d);
     else { const b=DZ.brows[drag.side]; for(const k in drag.orig) b[k]=V.add(drag.orig[k],d); }
     if(DZ.sym) mirrorBrow(drag.side);
-    dzRender(); dzDirty(); });
+    dzRenderSoon(); dzDirty(); });
   const up=e=>{ ptrs.delete(e.pointerId); try{ st.releasePointerCapture(e.pointerId); }catch(_){}
-    if(ptrs.size<2) pinch=null; if(!ptrs.size){ drag=null; st.style.cursor=''; } };
+    if(ptrs.size<2) pinch=null;
+    if(drag&&drag.id!==undefined&&e.pointerId!==drag.id) return;        // a palm lifting is not the end of the stroke
+    if(!ptrs.size||drag){
+      if(drag&&drag.kind==='heal'&&DZ.stroke&&!pinchSeen){ const stroke={r:DZ.healMm*pxPerMm(), pts:DZ.stroke}; DZ.stroke=null;
+        DZ.retouch.push(stroke); healStroke(stroke); dzRender(); dzDirty(); pushHist(); }
+      DZ.stroke=null;
+      // a tap on empty skin (no drag, no pinch) flips before/after; a finished drag is a step to undo
+      if(drag&&drag.kind==='pan'&&drag.moved<6&&Date.now()-drag.t0<450&&!pinchSeen) hold(!DZ.orig);
+      if(drag&&drag.changed) pushHist();
+      drag=null; pinchSeen=false; st.style.cursor=''; dzRenderSoon(); } };
+  let pinchSeen=false; st.addEventListener('pointerdown',e=>{ if(ptrs.size>=2&&!e.target.closest('.dz-tools')&&!(drag&&drag.pen)) pinchSeen=true; });
   st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
   st.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(css(e), Math.exp(-e.deltaY*0.0015)); dzRender(); },{passive:false});
   addEventListener('resize',()=>{ if($('#dz').hidden) return; dzResize(); dzRender(); });
-  const orig=$('#dzOrig'); const hold=on=>{ DZ.orig=on; orig.classList.toggle('on',on); dzRender(); };
-  orig.addEventListener('pointerdown',e=>{ e.preventDefault(); orig.setPointerCapture(e.pointerId); hold(true); });
+  // 원본: held down it shows the photo alone; a tap on empty skin toggles it instead
+  const orig=$('#dzOrig'), hold=on=>{ DZ.orig=on; orig.classList.toggle('on',on); dzRender(); };
+  orig.addEventListener('pointerdown',e=>{ e.preventDefault(); try{ orig.setPointerCapture(e.pointerId); }catch(_){} hold(true); });
   ['pointerup','pointercancel'].forEach(ev=>orig.addEventListener(ev,()=>hold(false)));
-  document.addEventListener('keydown',e=>{ if($('#dz').hidden||e.repeat) return; const tag=(e.target.tagName||'').toLowerCase();
-    if(e.key===' '&&tag!=='input'&&tag!=='textarea'){ e.preventDefault(); hold(true); } });
+  document.addEventListener('keydown',e=>{ if($('#dz').hidden) return; const tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea') return;
+    if(e.key===' '&&!e.repeat){ e.preventDefault(); hold(true); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); restoreHist(DZ.histAt+(e.shiftKey?1:-1)); return; }
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){ e.preventDefault(); restoreHist(DZ.histAt+1); return; }
+    const arrows={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];
+    if(arrows){ e.preventDefault(); moveActive(arrows[0]*(e.shiftKey?2:0.5), arrows[1]*(e.shiftKey?2:0.5)); } });
   document.addEventListener('keyup',e=>{ if($('#dz').hidden) return; if(e.key===' ') hold(false); });
   $('#dzZoomBrow').onclick=()=>{ zoomBrows(); dzRender(); }; $('#dzZoomAll').onclick=()=>{ fitAll(); dzRender(); };
-  $('#dzSym').onclick=()=>{ DZ.sym=!DZ.sym; $('#dzSym').classList.toggle('on',DZ.sym); if(DZ.sym){ mirrorBrow(DZ.active); dzRender(); dzDirty(); } };
+  $('#dzSym').onclick=()=>{ DZ.sym=!DZ.sym; $('#dzSym').classList.toggle('on',DZ.sym); if(DZ.sym){ mirrorBrow(DZ.active); dzRender(); dzDirty(); } pushHist(); };
+  $('#dzWipe').onclick=()=>{ DZ.wipe.on=!DZ.wipe.on; if(DZ.wipe.on) DZ.wipe.x=0.5; $('#dzWipe').classList.toggle('on',DZ.wipe.on); dzRender(); };
+  const showPts=on=>{ DZ.guides=on; $('#dzPts').classList.toggle('on',on); $('#dzGuides').checked=on; dzRender(); };
+  $('#dzPts').onclick=()=>showPts(!DZ.guides);
+  $('#dzLines').onclick=()=>{ if(!DZ.lm) return toast('얼굴을 찾지 못한 사진에는 가이드선을 그릴 수 없습니다','bad'); DZ.lines=!DZ.lines; $('#dzLines').classList.toggle('on',DZ.lines); dzRender(); };
+  $('#dzUndo').onclick=()=>restoreHist(DZ.histAt-1); $('#dzRedo').onclick=()=>restoreHist(DZ.histAt+1);
+  const setTool=t=>{ DZ.tool=t; DZ.cursor=null; DZ.stroke=null; $('#dzHeal').classList.toggle('on',t==='heal'); $('#dzHealBox').hidden=t!=='heal'; st.classList.toggle('heal',t==='heal'); dzRender(); };
+  $('#dzHeal').onclick=()=>setTool(DZ.tool==='heal'?'move':'heal');
+  $('#dzHealSize').addEventListener('input',()=>{ DZ.healMm=(+$('#dzHealSize').value)/10; $('#dzHealMm').textContent=DZ.healMm.toFixed(1); dzRender(); });
+  $('#dzHealClear').onclick=()=>{ if(!DZ.retouch.length) return; DZ.retouch=[]; rebuildBase(); dzRender(); dzDirty(); pushHist(); };
+  st.addEventListener('pointerleave',()=>{ if(DZ.tool==='heal'&&!drag){ DZ.cursor=null; dzRender(); } });
+  DZ.setTool=setTool;
+  $('#dzFold').onclick=()=>{ $('#dz').classList.toggle('folded'); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); };
+  // 전체화면: the browser's own full screen where it allows it (desktop, iPad); where it does not
+  // (iPhone), the panel folds away so the picture gets the whole screen anyway
+  const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+  $('#dzFull').onclick=async()=>{ const dz=$('#dz');
+    try{ if(fsEl()){ await (document.exitFullscreen||document.webkitExitFullscreen).call(document); return; }
+      const req=dz.requestFullscreen||dz.webkitRequestFullscreen; if(!req) throw new Error('no fullscreen'); await req.call(dz); }
+    catch(_){ dz.classList.toggle('folded'); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); } };
+  ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>{ $('#dzFull').classList.toggle('on',!!fsEl()); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); }));
   $('#dzClose').onclick=closeDz;
   $('#dzClient').addEventListener('input',()=>{ DZ.client=$('#dzClient').value; dzDirty(); });
   $$('#dzTabs button').forEach(b=>b.onclick=()=>{ $$('#dzTabs button').forEach(x=>x.classList.toggle('on',x===b));
     $$('.dz-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===b.dataset.t)); });
-  $('#dzCopyRL').onclick=()=>{ mirrorBrow('right'); dzRender(); dzDirty(); }; $('#dzCopyLR').onclick=()=>{ mirrorBrow('left'); dzRender(); dzDirty(); };
-  $('#dzReset').onclick=()=>{ if(!DZ.tex.right) return; DZ.brows=initBrows(); dzRender(); dzDirty(); };
-  $('#dzGuides').onchange=()=>{ DZ.guides=$('#dzGuides').checked; dzRender(); };
-  $('#dzPad').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) nudge(b.dataset.n); });
+  $('#dzCopyRL').onclick=()=>{ mirrorBrow('right'); dzRender(); dzDirty(); pushHist(); }; $('#dzCopyLR').onclick=()=>{ mirrorBrow('left'); dzRender(); dzDirty(); pushHist(); };
+  $('#dzReset').onclick=()=>{ if(!DZ.tex.right) return; DZ.brows=initBrows(); dzRender(); dzDirty(); pushHist(); };
+  $('#dzGuides').onchange=()=>showPts($('#dzGuides').checked);
+  $('#dzPad').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ nudge(b.dataset.n); pushHist(); } });
+  $('#dzCmpDl').onclick=()=>dzCompare(false); $('#dzCmpSave').onclick=()=>dzCompare(true);
   $('#dzIpd').addEventListener('input',()=>{ DZ.ipd=Math.max(50,Math.min(75,+$('#dzIpd').value||62)); dzRender(); dzDirty(); });
   $('#dzNotes').addEventListener('input',()=>{ DZ.notes=$('#dzNotes').value; dzDirty(); });
   $('#dzUpload').onclick=()=>$('#dzFile').click();
   $('#dzFile').addEventListener('change',async()=>{ const files=[...$('#dzFile').files]; $('#dzFile').value=''; if(!files.length) return;
     let added=[]; for(const f of files){ try{ const b64=await readFile(f); const out=await post('api/templates',{name:f.name.replace(/\.[^.]+$/,''), image:b64, side:$('#dzSide').value});
         added=added.concat(out.added||[]); }catch(err){ toast(f.name+': '+err.message,'bad'); } }
-    if(added.length){ await loadTemplates(); await setTemplate(added[0].id); if(!DZ.brows.right) DZ.brows=initBrows(); zoomBrows(); dzRender(); dzDirty(); toast(`도안 ${added.length}개를 넣었습니다`,'good'); } });
+    if(added.length){ await loadTemplates(); await setTemplate(added[0].id); if(!DZ.brows.right) DZ.brows=initBrows(); zoomBrows(); dzRender(); dzDirty(); pushHist(); toast(`도안 ${added.length}개를 넣었습니다`,'good'); } });
   $('#dzSave').onclick=()=>dzSave(false); $('#dzDownload').onclick=dzDownload; $('#dzPrint').onclick=()=>dzSave(true);
 })();
 function nudge(n){ const side=DZ.active, b=DZ.brows[side]; if(!b) return; const mm=pxPerMm(), up=faceUp(), sign=side==='right'?-1:1;
@@ -1752,22 +1988,31 @@ function nudge(n){ const side=DZ.active, b=DZ.brows[side]; if(!b) return; const 
   if(n==='up') move(all,V.mul(up,0.5*mm)); if(n==='down') move(all,V.mul(up,-0.5*mm));
   if(n==='in') move(all,V.mul({x:-sign*mm*0.5,y:0},1)); if(n==='out') move(all,V.mul({x:sign*mm*0.5,y:0},1));
   if(n==='longer') b.t=V.add(b.t,V.mul(along,mm)); if(n==='shorter') b.t=V.sub(b.t,V.mul(along,mm));
-  if(n==='thicker'){ b.hT=V.add(b.hT,V.mul(up,0.25*mm)); b.hB=V.sub(b.hB,V.mul(up,0.25*mm)); b.aT=V.add(b.aT,V.mul(up,0.25*mm)); b.aB=V.sub(b.aB,V.mul(up,0.25*mm)); }
-  if(n==='thinner'){ b.hT=V.sub(b.hT,V.mul(up,0.25*mm)); b.hB=V.add(b.hB,V.mul(up,0.25*mm)); b.aT=V.sub(b.aT,V.mul(up,0.25*mm)); b.aB=V.add(b.aB,V.mul(up,0.25*mm)); }
+  const tops=['hT','mT','aT'].filter(k=>b[k]), bots=['hB','mB','aB'].filter(k=>b[k]);
+  if(n==='thicker'){ move(tops,V.mul(up,0.25*mm)); move(bots,V.mul(up,-0.25*mm)); }
+  if(n==='thinner'){ move(tops,V.mul(up,-0.25*mm)); move(bots,V.mul(up,0.25*mm)); }
   if(n==='tailup') b.t=V.add(b.t,V.mul(up,0.5*mm)); if(n==='taildown') b.t=V.sub(b.t,V.mul(up,0.5*mm));
   if(n==='archup') move(['aT','aB'],V.mul(up,0.5*mm)); if(n==='archdown') move(['aT','aB'],V.mul(up,-0.5*mm));
   if(DZ.sym) mirrorBrow(side); dzRender(); dzDirty(); }
+function moveActive(dxMm,dyMm){ // arrow keys: along the eye line and the face's up, in millimetres
+  const b=DZ.brows[DZ.active]; if(!b) return; const mm=pxPerMm(), up=faceUp(), along=V.perp(up);
+  const d=V.add(V.mul(along,-dxMm*mm*(along.x<0?-1:1)), V.mul(up,-dyMm*mm));
+  for(const k in b) b[k]=V.add(b[k],d); if(DZ.sym) mirrorBrow(DZ.active); dzRender(); dzDirty(); pushHist(); }
 function dzActiveLabel(){ const l=$('#dzActiveKo'); if(l) l.textContent='· '+(DZ.active==='right'?'오른쪽':'왼쪽')+' 눈썹'; }
+function measure(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return null; const up=faceUp(), mm=pxPerMm();
+  return {길이:V.dist(g.H,g.T)/mm, '아치 두께':V.dist(b.aT,b.aB)/mm, '머리 두께':V.dist(b.hT,b.hB)/mm,
+          '꼬리 높이':V.dot(V.sub(g.T,g.H),up)/mm, '아치 높이':V.dot(V.sub(b.aT,b.hT),up)/mm}; }
 function dzMeasure(){
-  const g=DZ.geo[DZ.active], o=DZ.geo[DZ.active==='right'?'left':'right'], mm=pxPerMm(), up=faceUp(), f=v=>(v/mm).toFixed(1);
-  if(!g){ $('#dzNums').textContent=''; return; }
-  const b=DZ.brows[DZ.active], rows=[['길이', f(V.dist(g.H,g.T))+' mm'], ['아치 두께', f(V.dist(b.aT,b.aB))+' mm'], ['머리 두께', f(V.dist(b.hT,b.hB))+' mm']];
-  const tail=V.dot(V.sub(g.T,g.H),up), arch=V.dot(V.sub(b.aT,b.hT),up);
-  rows.push(['꼬리 높이', (tail>=0?'+':'')+f(tail)+' mm']); rows.push(['아치 높이', (arch>=0?'+':'')+f(arch)+' mm']);
-  if(o) rows.push(['미간 (머리 사이)', f(V.dist(g.H,o.H))+' mm']);
-  rows.push(['아치 위치', Math.round(DZ.tex[DZ.active].uA*100)+'% 지점']);
-  $('#dzNums').textContent=(DZ.active==='right'?'오른쪽':'왼쪽')+' · '+rows.slice(0,4).map(r=>r[0]+' '+r[1]).join(' · ');
-  const dl=$('#dzSpec'); dl.replaceChildren(); rows.forEach(([k,v])=>spec(dl,k,v));
+  const R=measure('right'), L=measure('left'), me=DZ.active==='right'?R:L, g=DZ.geo[DZ.active];
+  if(!me){ $('#dzNums').textContent=''; return; }
+  const sg=(k,v)=>((k==='꼬리 높이'||k==='아치 높이')&&v>=0?'+':'')+v.toFixed(1);
+  $('#dzNums').textContent=(DZ.active==='right'?'오른쪽':'왼쪽')+' · '+Object.keys(me).slice(0,4).map(k=>k+' '+sg(k,me[k])+' mm').join(' · ');
+  const dl=$('#dzSpec'); dl.replaceChildren();
+  // both sides on one line each, and how far apart they are - the client always asks
+  Object.keys(me).forEach(k=>{ if(R&&L) spec(dl,k,`오른쪽 ${sg(k,R[k])} · 왼쪽 ${sg(k,L[k])}${Math.abs(R[k]-L[k])>=0.3?` · 차 ${Math.abs(R[k]-L[k]).toFixed(1)}`:''} mm`);
+    else spec(dl,k,sg(k,me[k])+' mm'); });
+  if(R&&L&&DZ.geo.right&&DZ.geo.left) spec(dl,'미간 (머리 사이)',(V.dist(DZ.geo.right.H,DZ.geo.left.H)/pxPerMm()).toFixed(1)+' mm');
+  if(g) spec(dl,'아치 위치', Math.round(DZ.tex[DZ.active].uA*100)+'% 지점');
   if(!DZ.ipdPx) spec(dl,'주의','얼굴을 찾지 못해 치수는 대략값입니다');
 }
 
@@ -1784,7 +2029,7 @@ function renderTplList(){
     x.onclick=async e=>{ e.stopPropagation(); if(!confirm(`도안 "${t.name}"을 지울까요?`)) return;
       try{ await post('api/templates/'+t.id+'/delete'); await loadTemplates(); if(DZ.tplId===t.id) await setTemplate(null); renderTplList(); dzRender(); }catch(err){ toast(err.message,'bad'); } };
     c.appendChild(x);
-    c.onclick=async()=>{ await setTemplate(t.id); if(!DZ.brows.right) DZ.brows=initBrows(); dzRender(); dzDirty(); };
+    c.onclick=async()=>{ await setTemplate(t.id); if(!DZ.brows.right) DZ.brows=initBrows(); dzRender(); dzDirty(); pushHist(); };
     box.appendChild(c); });
 }
 async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templates||[]; }catch(e){ DZ.tpls=[]; }
@@ -1792,23 +2037,24 @@ async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templa
 function renderLookPanel(){
   const st=$('#dzStages'); st.replaceChildren();
   STAGES.forEach(([k,ko,op,bl])=>{ const b=el('button','',ko); b.type='button'; b.classList.toggle('on',DZ.look.opacity===op&&DZ.look.blur===bl);
-    b.onclick=()=>{ DZ.look.opacity=op; DZ.look.blur=bl; renderLookPanel(); dzRender(); dzDirty(); }; st.appendChild(b); });
+    b.onclick=()=>{ DZ.look.opacity=op; DZ.look.blur=bl; renderLookPanel(); dzRender(); dzDirty(); pushHist(); }; st.appendChild(b); });
   const mkSliders=(box,list,after)=>{ box.replaceChildren();
-    list.forEach(([key,ko,lo,hi])=>{ const row=el('label','sl'); row.appendChild(el('span','',ko));
-      const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=DZ.look[key]; const out=el('b','',String(DZ.look[key]));
+    list.forEach(([key,ko,lo,hi,step])=>{ const row=el('label','sl'); row.appendChild(el('span','',ko));
+      const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.step=step||1; r.value=DZ.look[key]; const out=el('b','',String(DZ.look[key]));
       r.addEventListener('input',()=>{ DZ.look[key]=+r.value; out.textContent=r.value; if(after||key==='density'||key==='weight') retint(); dzRender(); dzDirty();
         if(key==='opacity'||key==='blur') $$('#dzStages button').forEach(b=>b.classList.remove('on')); });
+      r.addEventListener('change',pushHist);
       row.appendChild(r); row.appendChild(out); box.appendChild(row); }); };
   mkSliders($('#dzLookSliders'),LOOK_SLIDERS); mkSliders($('#dzColorSliders'),COLOR_SLIDERS,retint);
   const cs=$('#dzColors'); cs.replaceChildren();
   PIGMENTS.forEach(([k,ko,rgb])=>{ const b=el('button'); b.type='button'; const sw=el('i'); const c=rgb||DZ.hair;
     sw.style.background=c?`rgb(${c[0]},${c[1]},${c[2]})`:'linear-gradient(135deg,#444,#c9a)'; b.appendChild(sw); b.appendChild(el('span','',ko));
     b.classList.toggle('on',DZ.look.color===k); if(k==='hair'&&!DZ.hair) b.title='머리카락을 찾지 못해 기본 갈색을 씁니다';
-    b.onclick=()=>{ DZ.look.color=k; retint(); renderLookPanel(); dzRender(); dzDirty(); }; cs.appendChild(b); });
+    b.onclick=()=>{ DZ.look.color=k; retint(); renderLookPanel(); dzRender(); dzDirty(); pushHist(); }; cs.appendChild(b); });
 }
 
 /* open, save, close */
-function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active}; }
+function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active, retouch:DZ.retouch}; }
 function dzDirty(){ DZ.dirtySince=Date.now(); clearTimeout(DZ.saveTimer);
   DZ.saveTimer=setTimeout(async()=>{ if(!DZ.id) return; try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client}); }catch(e){} }, 900); }
 async function openDesign(id){
@@ -1821,15 +2067,20 @@ async function openDesign(id){
     DZ.anchor=initAnchors(); DZ.brows={};
     const s=d.state||{};
     if(s.brows&&s.brows.right&&s.brows.left){ DZ.brows={right:cloneBrow(s.brows.right), left:cloneBrow(s.brows.left)}; }
-    if(s.look) DZ.look={...LOOK0,...s.look}; if(typeof s.sym==='boolean') DZ.sym=s.sym; if(s.ipd) DZ.ipd=+s.ipd; if(s.notes) DZ.notes=s.notes; if(s.tpl) DZ.tplId=s.tpl;
+    if(s.look){ DZ.look={...LOOK0,...s.look};
+      if(DZ.look.weight>10){ DZ.look.weight=Math.min(10,5+DZ.look.weight/100*5); DZ.look.density=Math.min(2,Math.max(0.2,DZ.look.density||1)); } }   // the earlier scales
+    if(typeof s.sym==='boolean') DZ.sym=s.sym; if(s.ipd) DZ.ipd=+s.ipd; if(s.notes) DZ.notes=s.notes; if(s.tpl) DZ.tplId=s.tpl;
     $('#dzClient').value=DZ.client; $('#dzNotes').value=DZ.notes; $('#dzIpd').value=DZ.ipd; $('#dzSym').classList.toggle('on',DZ.sym);
-    $('#dzGuides').checked=DZ.guides=true; $('#dzSaveNote').textContent=DZ.saves.length?`저장 ${DZ.saves.length}장 · 마지막 ${fmtTime(DZ.lastSave.created)}`:'';
+    $('#dzGuides').checked=DZ.guides=true; $('#dzPts').classList.add('on'); DZ.wipe={on:false,x:0.5}; $('#dzWipe').classList.remove('on');
+    DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded');
+    DZ.hist=[]; DZ.histAt=-1; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
+    $('#dzSaveNote').textContent=DZ.saves.length?`저장 ${DZ.saves.length}장 · 마지막 ${fmtTime(DZ.lastSave.created)}`:'';
     dzResize();
     await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
-    DZ.hair=sampleHair();
+    DZ.hair=sampleHair(); rebuildBase();
     await loadTemplates(); await setTemplate(DZ.tplId);
-    if(DZ.tex.right){ const auto=initBrows(); if(!DZ.brows.right||!DZ.brows.left) DZ.brows=auto; }
-    renderLookPanel(); dzActiveLabel(); zoomBrows(); dzRender();
+    if(DZ.tex.right){ const auto=initBrows(); if(!DZ.brows.right||!DZ.brows.left) DZ.brows=auto; ensureMid('right'); ensureMid('left'); }
+    renderLookPanel(); dzActiveLabel(); zoomBrows(); dzRender(); pushHist();
     if(d.warning) toast(d.warning,'bad');
     if(!DZ.tpls.length) { $$('#dzTabs button')[0].click(); toast('먼저 도안을 올려 주세요','bad'); }
   }catch(e){ toast(e.message,'bad'); dz.hidden=true; }
@@ -1853,6 +2104,28 @@ async function dzSave(thenPrint){
     else toast(out.name+' (으)로 갤러리에 저장했습니다','good');
   }catch(e){ note.textContent=''; toast(e.message,'bad'); }
 }
+function compareCanvas(){ // the brow band of the photo, original and design side by side
+  const cv=dzExport(); const pts=[]; ['right','left'].forEach(k=>{ const b=DZ.brows[k]; if(b) for(const j in b) pts.push(b[j]); });
+  const ipd=DZ.ipdPx||DZ.W/6, cx=DZ.lm?(DZ.lm.right_pupil[0]+DZ.lm.left_pupil[0])/2:DZ.W/2;
+  let y0=Math.min(...pts.map(p=>p.y))-0.45*ipd, y1=(DZ.lm?(DZ.lm.right_pupil[1]+DZ.lm.left_pupil[1])/2:Math.max(...pts.map(p=>p.y))+0.3*ipd)+0.55*ipd;
+  let x0=cx-1.25*ipd, x1=cx+1.25*ipd; x0=Math.max(0,Math.round(x0)); x1=Math.min(DZ.W,Math.round(x1)); y0=Math.max(0,Math.round(y0)); y1=Math.min(DZ.H,Math.round(y1));
+  const w=x1-x0, h=y1-y0, gap=Math.round(w*0.02), out=document.createElement('canvas'); out.width=w*2+gap; out.height=h;
+  const c=out.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,out.width,out.height);
+  c.drawImage(DZ.photo,x0,y0,w,h,0,0,w,h); c.drawImage(cv,x0,y0,w,h,w+gap,0,w,h);
+  const fs=Math.max(14,Math.round(h*0.07)); c.font=`600 ${fs}px sans-serif`; c.textBaseline='top';
+  [['전',0],['후',w+gap]].forEach(([t,X])=>{ const tw=c.measureText(t).width+fs; c.fillStyle='rgba(0,0,0,.55)'; c.fillRect(X+fs*0.5,fs*0.5,tw,fs*1.5);
+    c.fillStyle='#fff'; c.fillText(t,X+fs,fs*0.75); });
+  return out; }
+async function dzCompare(toGallery){ if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const data=compareCanvas().toDataURL('image/jpeg',0.92);
+  if(!toGallery){ saveBlob(data, `${(DZ.client||'상담').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'상담'}_전후_${new Date().toISOString().slice(0,10)}.jpg`); return toast('비교 이미지를 내려받았습니다','good'); }
+  try{ const out=await post('api/saves',{job:DZ.id, name:(DZ.client||'')&&DZ.client+' 전후', image:data, settings:{...DZ.look, side_by_side:true, notes:DZ.notes}});
+    toast(out.name+' (으)로 갤러리에 저장했습니다','good'); }catch(e){ toast(e.message,'bad'); } }
+function saveBlob(dataUrl, filename){ // synchronous, so the click's activation still covers the download
+  const bin=atob(dataUrl.slice(dataUrl.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/jpeg'})), a=document.createElement('a');
+  a.href=url; a.download=filename; setTimeout(()=>URL.revokeObjectURL(url),4000); document.body.appendChild(a); a.click(); a.remove(); }
 function dzDownload(){ if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
   const data=dzExport().toDataURL('image/jpeg',0.93), bin=atob(data.slice(data.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
