@@ -773,10 +773,10 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <button class="btn" id="dzExit" type="button" title="전체화면 끝내기" hidden>전체화면 끝내기</button>
     </div>
     <div class="dz-heal" id="dzHealBox" hidden>
-      <span>지름 <b id="dzHealMm">1.5</b> mm</span>
-      <input type="range" id="dzHealSize" min="5" max="40" value="15" aria-label="브러시 지름">
+      <span>지름 <b id="dzHealMm">2.0</b> mm</span>
+      <input type="range" id="dzHealSize" min="5" max="40" value="20" aria-label="브러시 지름">
       <button class="btn" id="dzHealClear" type="button">모두 복구</button>
-      <span class="dz-note">털을 문지르면 지워집니다 · 잘못 지웠으면 ↶</span>
+      <span class="dz-note">문지른 자리가 주변 피부로 바뀝니다 · 잘못 지웠으면 ↶</span>
     </div>
     <div class="dz-nums" id="dzNums"></div>
     <div class="dz-legend" id="dzLegend"><span><i style="border-color:#4fa3ff"></i>윗선</span><span><i style="border-color:#ffb84f"></i>아랫선</span><span><i style="border-color:#e2865f"></i>꼬리</span></div>
@@ -1506,7 +1506,7 @@ const V={add:(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub:(a,b)=>({x:a.x-b.x,y:a.y-b.y}),
   perp:a=>({x:-a.y,y:a.x}), mid:(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}), dist:(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)};
 const DZ={id:null, photo:new Image(), W:0, H:0, lm:null, ipdPx:0, tpls:[], tplId:null, tex:{}, tint:{}, geo:{}, brows:{}, auto:{},
   look:{...LOOK0}, sym:true, ipd:62, notes:'', client:'', view:{s:1,tx:0,ty:0}, dpr:1, active:'right', orig:false, guides:true,
-  wipe:{on:false,x:0.5}, lines:false, hist:[], histAt:-1, tool:'move', retouch:[], base:null, healMm:1.5, cursor:null,
+  wipe:{on:false,x:0.5}, lines:false, hist:[], histAt:-1, tool:'move', retouch:[], base:null, healMm:2.0, cursor:null,
   saves:[], saveTimer:null, lastSave:null, dirtySince:0, imgCache:{}};
 DZ.photo.crossOrigin='anonymous';
 
@@ -1816,8 +1816,6 @@ function dzRender(){
   dzMeasure();
 }
 function drawBrush(ctx){ const {s,tx,ty}=DZ.view, r=DZ.healMm*pxPerMm()*s; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0); ctx.save();
-  if(DZ.stroke&&DZ.stroke.length){ ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=r*2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.beginPath();
-    DZ.stroke.forEach(([x,y],i)=>{ const X=x*s+tx, Y=y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); if(DZ.stroke.length===1){ const [x,y]=DZ.stroke[0]; ctx.lineTo(x*s+tx+0.01,y*s+ty); } ctx.stroke(); }
   if(DZ.cursor){ ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r),0,Math.PI*2); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
     ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(DZ.cursor.x,DZ.cursor.y,Math.max(3,r)+1.5,0,Math.PI*2); ctx.stroke(); }
   ctx.restore(); }
@@ -1864,48 +1862,77 @@ function dzExport(){ const cv=document.createElement('canvas'); cv.width=DZ.W; c
    design reopens with the same retouch and undo simply replays fewer strokes. */
 function baseCanvas(){ if(DZ.base) return DZ.base; const c=document.createElement('canvas'); c.width=DZ.W; c.height=DZ.H;
   c.getContext('2d').drawImage(DZ.photo,0,0); DZ.baseRect=null; return DZ.base=c; }
+function healedMask(){ return DZ.healed||(DZ.healed=new Uint8Array(DZ.W*DZ.H)); }
 function growBaseRect(x0,y0,x1,y1){ const r=DZ.baseRect; DZ.baseRect=r?{x0:Math.min(r.x0,x0),y0:Math.min(r.y0,y0),x1:Math.max(r.x1,x1),y1:Math.max(r.y1,y1)}:{x0,y0,x1,y1}; }
-function healStroke(stroke){
-  const base=baseCanvas(), ctx=base.getContext('2d',{willReadFrequently:true}), r=stroke.r, pad=Math.ceil(r)+10;
-  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
-  stroke.pts.forEach(([x,y])=>{ x0=Math.min(x0,x); y0=Math.min(y0,y); x1=Math.max(x1,x); y1=Math.max(y1,y); });
-  x0=Math.max(0,Math.floor(x0-pad)); y0=Math.max(0,Math.floor(y0-pad)); x1=Math.min(DZ.W,Math.ceil(x1+pad)); y1=Math.min(DZ.H,Math.ceil(y1+pad));
-  const w=x1-x0, h=y1-y0; if(w<3||h<3) return;
-  const img=ctx.getImageData(x0,y0,w,h), d=img.data, n=w*h;
-  // the brush's footprint, soft at the edge
-  const M=new Float32Array(n);
-  stroke.pts.forEach(([px,py])=>{ const cx=px-x0, cy=py-y0;
-    for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(h-1,Math.ceil(cy+r));y++) for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(w-1,Math.ceil(cx+r));x++){
-      const dd=Math.hypot(x-cx,y-cy); if(dd>r) continue; const v=dd<=r*0.7?1:(r-dd)/(r*0.3); const i=y*w+x; if(v>M[i]) M[i]=v; } });
-  // what the skin would be without the hair: a max filter (thin dark lines vanish) then a small blur
+function healStamp(cx, cy, r){
+  // One dab of 잔털 지우기, the way a spot-heal brush works: whatever is under the brush is
+  // replaced with skin borrowed from nearby, not judged. Telling a hair from a pore by how
+  // dark it is cannot be done - measured on this client's own photo, clean cheek carried MORE
+  // dark contrast than the area with strays - and grouping dark pixels flips between erasing
+  // the whole brow and erasing nothing as soon as hairs touch each other. The brush is the
+  // decision; the work is finding clean skin to put there and making the seam invisible.
+  const base=baseCanvas(), ctx=base.getContext('2d',{willReadFrequently:true});
+  const reach=Math.round(r*2.3), pad=reach+r+2;
+  const x0=Math.max(0,Math.floor(cx-pad)), y0=Math.max(0,Math.floor(cy-pad));
+  const x1=Math.min(DZ.W,Math.ceil(cx+pad)), y1=Math.min(DZ.H,Math.ceil(cy+pad));
+  const w=x1-x0, h=y1-y0, n=w*h; if(w<8||h<8) return;
+  const img=ctx.getImageData(x0,y0,w,h), d=img.data;
+  const px=cx-x0, py=cy-y0, done=healedMask();
   const L=new Float32Array(n); for(let i=0;i<n;i++) L[i]=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
-  const rb=Math.max(2,Math.min(6,Math.round(r*0.45)));
-  const maxf=(src)=>{ const t=new Float32Array(n), o=new Float32Array(n);
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let m=-1; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w) m=Math.max(m,src[y*w+xx]); } t[y*w+x]=m; }
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let m=-1; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h) m=Math.max(m,t[yy*w+x]); } o[y*w+x]=m; }
-    return o; };
-  const boxf=(src)=>{ const t=new Float32Array(n), o=new Float32Array(n);
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let sum=0,c=0; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w){ sum+=src[y*w+xx]; c++; } } t[y*w+x]=sum/c; }
-    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let sum=0,c=0; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h){ sum+=t[yy*w+x]; c++; } } o[y*w+x]=sum/c; }
-    return o; };
-  const B=boxf(maxf(L)), tau=10;
-  const F=new Uint8Array(n); for(let i=0;i<n;i++) if(M[i]>0&&L[i]<B[i]-tau) F[i]=1;
-  const F2=new Uint8Array(F);                                  // grow by one pixel: a hair's soft edge is hair too
-  for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){ const i=y*w+x; if(F[i]) { F2[i-1]=F2[i+1]=F2[i-w]=F2[i+w]=1; } }
-  // refill every hair pixel from the non-hair pixels around it (a Gaussian-weighted average)
-  const R=7, G=[]; for(let k=-R;k<=R;k++) G.push(Math.exp(-(k*k)/(2*3*3)));
+  // how "busy" each pixel is: hair and stubble stand out from their own neighbourhood
+  const blur=new Float32Array(n), t=new Float32Array(n), rb=3;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let s=0,c=0; for(let k=-rb;k<=rb;k++){ const xx=x+k; if(xx>=0&&xx<w){ s+=L[y*w+xx]; c++; } } t[y*w+x]=s/c; }
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let s=0,c=0; for(let k=-rb;k<=rb;k++){ const yy=y+k; if(yy>=0&&yy<h){ s+=t[yy*w+x]; c++; } } blur[y*w+x]=s/c; }
+  // the dab, soft at its rim
+  const disc=[], ring=[], rr=r*1.6;
+  for(let y=Math.max(0,Math.floor(py-rr));y<=Math.min(h-1,Math.ceil(py+rr));y++)
+    for(let x=Math.max(0,Math.floor(px-rr));x<=Math.min(w-1,Math.ceil(px+rr));x++){
+      const dd=Math.hypot(x-px,y-py);
+      if(dd<=r) disc.push({x,y,i:y*w+x, m:dd<=r*0.4?1:Math.max(0,(r-dd)/(r*0.6))});
+      else if(dd<=rr) ring.push({x,y,i:y*w+x}); }        // the skin just outside: what this spot should look like
+  if(disc.length<8||ring.length<8) return;
+  const score=(ox,oy)=>{  // darkness a source patch would bring in, and how far its colour is from here
+    let dark=0, sum=0, cnt=0, used=0, rs=0, rh=0, rn=0;
+    for(const p of disc){ const sx=p.x+ox, sy=p.y+oy; if(sx<0||sy<0||sx>=w||sy>=h) return null;
+      const j=sy*w+sx; const e=blur[j]-L[j]; if(e>0) dark+=e*e; sum+=L[j];
+      if(done[(sy+y0)*DZ.W+(sx+x0)]) used++; cnt++; }
+    for(const p of ring){ const sx=p.x+ox, sy=p.y+oy; if(sx<0||sy<0||sx>=w||sy>=h) continue;
+      rs+=L[sy*w+sx]; rh+=L[p.i]; rn++; }
+    if(!rn) return null;
+    // skin already borrowed once is a last resort: copying copies is what washes the grain out
+    return {dark:dark/cnt, dcol:Math.abs(rs/rn-rh/rn), used:used/cnt}; };
+  // Clean skin first - a source with hair in it would just move the hair. Among the sources
+  // that are about as clean as the cleanest, prefer the one that matches this spot's colour
+  // and has not been borrowed from before.
+  const cands=[];
+  for(let a=0;a<16;a++){ const ang=a*Math.PI/8;
+    for(const k of [2.3, 1.7, 3.0]){ const ox=Math.round(Math.cos(ang)*r*k), oy=Math.round(Math.sin(ang)*r*k);
+      const sc=score(ox,oy); if(sc&&sc.dcol<=18) cands.push({ox, oy, ...sc}); } }
+  if(!cands.length) return;
+  const cleanest=Math.min(...cands.map(c=>c.dark));
+  let best=null;
+  for(const c of cands){ if(c.dark>cleanest*1.5+12) continue;
+    const cost=c.dark*0.35+c.dcol*c.dcol*0.6+c.used*60;
+    if(!best||cost<best.cost) best={...c, cost}; }
+  if(!best) return;
+  // paste it, shifted to this spot's own brightness so the seam does not show
+  // match the source's brightness to the ring of skin actually around this dab, so no seam
+  // Match brightness on the ring of skin AROUND the dab, not on the dab itself: the dab holds
+  // the hair we are removing, and matching its average painted the clean skin dark, leaving a
+  // dusky patch wherever the brush had been.
+  const shift=[0,1,2].map(c=>{ let a=0,b=0,n2=0;
+    for(const p of ring){ const sx=p.x+best.ox, sy=p.y+best.oy; if(sx<0||sy<0||sx>=w||sy>=h) continue;
+      a+=d[p.i*4+c]; b+=d[(sy*w+sx)*4+c]; n2++; }
+    return n2?(a-b)/n2:0; });
   const out=new Uint8ClampedArray(d);
-  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const i=y*w+x; if(!F2[i]||M[i]<=0) continue;
-    let sr=0,sg=0,sb=0,sw=0;
-    for(let ky=-R;ky<=R;ky++){ const yy=y+ky; if(yy<0||yy>=h) continue; for(let kx=-R;kx<=R;kx++){ const xx=x+kx; if(xx<0||xx>=w) continue;
-      const j=yy*w+xx; if(F2[j]) continue; const wgt=G[ky+R]*G[kx+R]; sr+=d[j*4]*wgt; sg+=d[j*4+1]*wgt; sb+=d[j*4+2]*wgt; sw+=wgt; } }
-    let nr,ng,nb;
-    if(sw>0.05){ nr=sr/sw; ng=sg/sw; nb=sb/sw; }
-    else { const k=B[i]/Math.max(1,L[i]); nr=d[i*4]*k; ng=d[i*4+1]*k; nb=d[i*4+2]*k; }   // nothing but hair nearby: lift it to the skin level
-    const a=M[i]; out[i*4]=d[i*4]+a*(nr-d[i*4]); out[i*4+1]=d[i*4+1]+a*(ng-d[i*4+1]); out[i*4+2]=d[i*4+2]+a*(nb-d[i*4+2]); }
+  for(const p of disc){ const j=(p.y+best.oy)*w+(p.x+best.ox);
+    for(let c=0;c<3;c++){ const v=d[j*4+c]+shift[c];
+      out[p.i*4+c]=d[p.i*4+c]+p.m*(Math.max(0,Math.min(255,v))-d[p.i*4+c]); }
+    if(p.m>0.5) done[(p.y+y0)*DZ.W+(p.x+x0)]=1; }
   img.data.set(out); ctx.putImageData(img,x0,y0); growBaseRect(x0,y0,x1,y1);
 }
-function rebuildBase(){ DZ.base=null; DZ.baseRect=null; if(!DZ.retouch.length) return; DZ.retouch.forEach(healStroke); }
+function healStroke(stroke){ const r=stroke.r; stroke.pts.forEach(([x,y])=>healStamp(x,y,r)); }
+function rebuildBase(){ DZ.base=null; DZ.baseRect=null; DZ.healed=null; if(!DZ.retouch.length) return; DZ.retouch.forEach(healStroke); }
 function snap(){ return JSON.stringify({brows:DZ.brows, look:DZ.look, tpl:DZ.tplId, sym:DZ.sym, retouch:DZ.retouch}); }
 function pushHist(){ const cur=snap(); if(DZ.hist[DZ.histAt]===cur) return;
   DZ.hist=DZ.hist.slice(0,DZ.histAt+1); DZ.hist.push(cur); if(DZ.hist.length>120) DZ.hist.shift(); DZ.histAt=DZ.hist.length-1; histButtons(); }
@@ -1947,7 +1974,9 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
     if(ptrs.size>2||!DZ.id) return;
     const p=toPhoto(e), c=css(e);
     if(DZ.wipe.on && Math.abs(c.x-DZ.wipe.x*DZ.box.w)<20){ drag={kind:'wipe'}; st.style.cursor='ew-resize'; return; }
-    if(DZ.tool==='heal'){ drag={kind:'heal'}; DZ.stroke=[[p.x,p.y]]; DZ.cursor=c; dzRender(); return; }
+    if(DZ.tool==='heal'){ const r=DZ.healMm*pxPerMm();
+      drag={kind:'heal',changed:true}; DZ.stroke={r, pts:[[p.x,p.y]]}; DZ.cursor=c;
+      healStamp(p.x,p.y,r); dzRender(); return; }
     const hit=DZ.guides&&!DZ.orig?hitHandle(c, e.pointerType==='touch'?30:18):null;
     if(hit){ drag={kind:'handle',side:hit.side,k:hit.k,start:p,orig:{...DZ.brows[hit.side][hit.k]}}; DZ.active=hit.side; }
     else { const side=DZ.orig?null:hitBrow(p);
@@ -1963,8 +1992,10 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
       DZ.view={s, tx:m.x-(pinch.m.x-pinch.view.tx)*k, ty:m.y-(pinch.m.y-pinch.view.ty)*k}; dzRenderSoon(); return; }
     if(DZ.tool==='heal') DZ.cursor=css(e);
     if(!drag){ if(DZ.tool==='heal') dzRenderSoon(); return; }
-    if(drag.kind==='heal'){ const p=toPhoto(e), last=DZ.stroke[DZ.stroke.length-1];
-      if(Math.hypot(p.x-last[0],p.y-last[1])>=DZ.healMm*pxPerMm()*0.35) DZ.stroke.push([p.x,p.y]); dzRenderSoon(); return; }
+    if(drag.kind==='heal'){ const p=toPhoto(e), pts=DZ.stroke.pts, last=pts[pts.length-1], r=DZ.stroke.r;
+      // one dab per third of a brush width: the skin is healed under the finger, as it moves
+      if(Math.hypot(p.x-last[0],p.y-last[1])>=r*0.34){ pts.push([p.x,p.y]); healStamp(p.x,p.y,r); }
+      dzRenderSoon(); return; }
     if(drag.kind==='wipe'){ DZ.wipe.x=Math.max(0.02,Math.min(0.98,css(e).x/DZ.box.w)); dzRenderSoon(); return; }
     if(drag.kind==='pan'){ const c=css(e); drag.moved=Math.max(drag.moved, Math.hypot(c.x-drag.start.x,c.y-drag.start.y));
       DZ.view.tx=drag.view.tx+(c.x-drag.start.x); DZ.view.ty=drag.view.ty+(c.y-drag.start.y); dzRenderSoon(); return; }
@@ -1978,8 +2009,8 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
     if(ptrs.size<2) pinch=null;
     if(drag&&drag.id!==undefined&&e.pointerId!==drag.id) return;        // a palm lifting is not the end of the stroke
     if(!ptrs.size||drag){
-      if(drag&&drag.kind==='heal'&&DZ.stroke&&!pinchSeen){ const stroke={r:DZ.healMm*pxPerMm(), pts:DZ.stroke}; DZ.stroke=null;
-        DZ.retouch.push(stroke); healStroke(stroke); dzRender(); dzDirty(); pushHist(); }
+      if(drag&&drag.kind==='heal'&&DZ.stroke&&!pinchSeen){ DZ.retouch.push(DZ.stroke);   // already healed, dab by dab
+        DZ.stroke=null; dzRender(); dzDirty(); pushHist(); }
       DZ.stroke=null;
       // a tap on empty skin (no drag, no pinch) flips before/after; a finished drag is a step to undo
       if(drag&&drag.kind==='pan'&&drag.moved<6&&Date.now()-drag.t0<450&&!pinchSeen) hold(!DZ.orig);
@@ -2165,7 +2196,7 @@ async function openDesign(id){
     $('#dzClient').value=DZ.client; $('#dzNotes').value=DZ.notes; $('#dzIpd').value=DZ.ipd; $('#dzSym').classList.toggle('on',DZ.sym);
     $('#dzGuides').checked=DZ.guides=true; $('#dzPts').classList.add('on'); DZ.wipe={on:false,x:0.5}; $('#dzWipe').classList.remove('on');
     DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded'); immersiveOff();
-    DZ.hist=[]; DZ.histAt=-1; DZ.layKey=null; DZ.shapeCache={}; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
+    DZ.hist=[]; DZ.histAt=-1; DZ.layKey=null; DZ.shapeCache={}; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.healed=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
     $('#dzSaveNote').textContent=''; $('#dzAuto').dataset.state='saved';
     dzResize();
     await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
