@@ -362,6 +362,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 @media (min-width:1120px){ .dz-tools{flex-wrap:wrap;right:auto;max-width:calc(100% - 20px);overflow:visible} }
 .dz-tools .btn{height:32px;padding:0 11px;font-size:12.5px;background:rgba(20,17,15,.8);border-color:rgba(255,255,255,.14);color:#eee;box-shadow:none}
 .dz-tools .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+#dzExit{order:-1}                                       /* first in the row: it only exists in 전체화면 */
 .dz-heal{position:absolute;left:10px;top:50px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:calc(100% - 20px);padding:7px 10px;border-radius:10px;
   background:rgba(20,17,15,.85);color:#eee;font-size:12.5px}
 .dz-heal input{width:120px;accent-color:var(--brand)}
@@ -380,8 +381,9 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz.folded .dz-body{display:none}
 .dz.folded .dz-tabs .fold{transform:rotate(180deg)}
 /* 전체화면: the page's own, so a swipe that cancels the browser's does not undo it */
-.dz.immersive{grid-template-rows:minmax(0,1fr)}
-.dz.immersive .dz-top,.dz.immersive .dz-side{display:none}
+/* The panel stays: a bigger picture is no use if the templates and the look are gone. */
+.dz.immersive{grid-template-rows:minmax(0,1fr) auto}
+.dz.immersive .dz-top{display:none}
 .dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0}
 .dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
 .dz-tab .edit{padding:10px}
@@ -405,7 +407,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-note{font-size:12px;color:var(--muted)}
 .dz-file{display:none}
 @media (min-width:1120px){
-  .dz.immersive{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+  .dz.immersive{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
   .dz-legend{display:flex}
   .dz-tabs .fold{display:none}
   .dz.folded .dz-body{display:flex}
@@ -2008,6 +2010,7 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   // (iPhone), the panel folds away so the picture gets the whole screen anyway
   const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
   const immersive=on=>{ const dz=$('#dz'); dz.classList.toggle('immersive',on);
+    if(narrow()) dz.classList.toggle('folded',on);              // on a phone the panel folds to its tabs
     $('#dzFull').classList.toggle('on',on); $('#dzExit').hidden=!on;
     requestAnimationFrame(()=>{ dzResize(); dzRender(); }); };
   DZ.immersive=immersive;
