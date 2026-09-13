@@ -275,6 +275,22 @@ class WebServerTest(unittest.TestCase):
         status, body, _ = self.call("/api/settings", {"budget_usd": ""})
         self.assertIsNone(body["budget_usd"])
 
+    def test_07b_generate_takes_several_brow_conditions(self):
+        self.login()
+        from browlab import web as W
+        from pathlib import Path as _P
+        cfg = W.WebConfig(data_dir=_P(self.tmp.name) / "data", repo_root=REPO, password=None)
+        argv, shown = W.build_argv("generate", {"brow_condition": ["sparse", "almost_none"], "count": 2},
+                                   _P(self.tmp.name), cfg)
+        self.assertEqual(argv[argv.index("--brow-condition") + 1], "sparse,almost_none")
+        self.assertEqual(shown["brow_condition"], ["sparse", "almost_none"])
+        # one stays a plain string, and junk falls back rather than reaching argv
+        _, one = W.build_argv("generate", {"brow_condition": "sparse"}, _P(self.tmp.name), cfg)
+        self.assertEqual(one["brow_condition"], "sparse")
+        argv, bad = W.build_argv("generate", {"brow_condition": ["; rm -rf /"]}, _P(self.tmp.name), cfg)
+        self.assertEqual(bad["brow_condition"], "random")
+        self.assertEqual(argv[argv.index("--brow-condition") + 1], "random")
+
     def test_08b_saving_an_edit_names_it_and_lists_it(self):
         """An edited picture goes back into the gallery under a client name."""
         import base64, io

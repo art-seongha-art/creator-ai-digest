@@ -451,7 +451,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <div class="frow"><span class="eyebrow">나이대</span><div class="chips" data-chips="ages" data-name="age"></div></div>
         <div class="frow"><span class="eyebrow">성별</span><div class="chips" data-chips="genders" data-name="gender"></div></div>
         <div class="frow"><span class="eyebrow">얼굴형</span><div class="chips" data-chips="face_shapes" data-name="face_shape"></div></div>
-        <div class="frow"><span class="eyebrow">눈썹</span><div class="chips" data-chips="brow_conditions" data-name="brow_condition"></div></div>
+        <div class="frow"><span class="eyebrow">눈썹</span><div class="chips" data-chips="brow_conditions" data-name="brow_condition" data-multi="1" data-default="random"></div></div>
       </div>
       <details class="adv">
         <summary>고급 설정 <em>외모 · 시드 · 시트 구성 · 엔진 · 품질</em>
@@ -736,7 +736,7 @@ function buildForms(){
       const lab=el('label','chip'+(multi?' multi':'')); const inp=document.createElement('input');
       inp.type=multi?'checkbox':'radio'; inp.name=name; inp.value=it.key;
       if(!multi && (it.default || (i===0 && !list.some(x=>x.default)))) inp.checked=true;
-      if(multi && it.key==='as_is') inp.checked=true;
+      if(multi && (box.dataset.default ? it.key===box.dataset.default : it.key==='as_is')) inp.checked=true;
       if(multi) inp.addEventListener('change', updateRestyleLabel);
       if(it.tip) lab.title=it.tip;
       lab.appendChild(inp); lab.appendChild(el('span','',it.short||it.ko)); box.appendChild(lab);

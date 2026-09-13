@@ -280,6 +280,22 @@ class PromptTests(unittest.TestCase):
         self.assertIn("bare skin left between the strokes", P.BROW_STYLES["feathered"].prompt)
         self.assertNotIn("dense", P.BROW_STYLES["bold_thick"].prompt)
 
+    def test_several_brow_conditions_are_dealt_round_robin(self):
+        """Choosing three conditions should show all three, not a random sample of them."""
+        got = [s.brow_condition for s in PR.make_specs(6, seed=7,
+                                                       brow_condition="sparse,almost_none,missing_tail")]
+        self.assertEqual(got, ["sparse", "almost_none", "missing_tail"] * 2)
+        self.assertEqual([s.brow_condition for s in PR.make_specs(2, seed=7,
+                                                                  brow_condition=["sparse", "almost_none"])],
+                         ["sparse", "almost_none"])                 # a list works the same as a string
+        # one choice still means that one, every time
+        self.assertEqual({s.brow_condition for s in PR.make_specs(3, seed=7, brow_condition="sparse")}, {"sparse"})
+        # "random" anywhere in the choice hands it back to chance
+        mixed = {s.brow_condition for s in PR.make_specs(6, seed=7, brow_condition="sparse,random")}
+        self.assertFalse(mixed <= {"sparse"})
+        with self.assertRaises(ValueError):
+            PR.make_specs(1, seed=1, brow_condition="sparse,nope")
+
     def test_spec_roundtrip(self):
         spec = PR.make_specs(1, seed=9)[0]
         d = spec.to_dict()

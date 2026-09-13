@@ -94,7 +94,22 @@ def resolve_age(value: Union[str, int, None], rng: random.Random) -> int:
     raise ValueError(f"unknown age value: {value!r} (use 10s..70s, a number, or random)")
 
 
-def resolve_choice(value: Optional[str], table: Dict[str, Any], rng: random.Random, name: str) -> str:
+def resolve_choice(value: Any, table: Dict[str, Any], rng: random.Random, name: str) -> str:
+    """One key from ``table``. ``value`` may be a key, "random", or several keys.
+
+    Several keys - a list, or a comma-separated string - means each face picks one of
+    them, so a single run can cover a few brow conditions at once.
+    """
+    if isinstance(value, str) and "," in value:
+        value = [v.strip() for v in value.split(",") if v.strip()]
+    if isinstance(value, (list, tuple)):
+        picks = [v for v in value if v in table]
+        unknown = [v for v in value if v not in table and v != "random"]
+        if unknown:
+            raise ValueError(f"unknown {name}: {unknown[0]!r} (choose from {', '.join(table)} or random)")
+        if "random" in value or not picks:
+            return rng.choice(list(table))
+        return rng.choice(picks)
     if value is None or value == "random":
         return rng.choice(list(table))
     if value in table:
@@ -136,13 +151,37 @@ def make_spec(
     )
 
 
+def _spread(value: Any, table: Dict[str, Any], count: int) -> Optional[List[str]]:
+    """Several chosen keys, dealt round-robin so every one of them actually appears.
+
+    Picking three brow conditions for six faces should give two of each, not whatever
+    random sampling happens to produce.
+    """
+    if isinstance(value, str) and "," in value:
+        value = [v.strip() for v in value.split(",") if v.strip()]
+    if not isinstance(value, (list, tuple)) or len(value) < 2 or "random" in value:
+        return None
+    picks = [v for v in value if v in table]
+    if len(picks) < 2:
+        return None
+    return [picks[i % len(picks)] for i in range(count)]
+
+
 def make_specs(count: int, seed: Optional[int] = None, **overrides: Any) -> List[FaceSpec]:
     """Build ``count`` specs. The same ``seed`` always yields the same list."""
     base = random.Random(seed)
+    dealt = {name: _spread(overrides.get(name), table, count)
+             for name, table in (("brow_condition", P.BROW_CONDITIONS),
+                                 ("face_shape", P.FACE_SHAPES),
+                                 ("gender", P.GENDERS))}
     specs: List[FaceSpec] = []
-    for _ in range(count):
+    for i in range(count):
         item_seed = base.randrange(1, 2**31 - 1)
-        specs.append(make_spec(random.Random(item_seed), seed=item_seed, **overrides))
+        per_face = dict(overrides)
+        for name, series in dealt.items():
+            if series is not None:
+                per_face[name] = series[i]
+        specs.append(make_spec(random.Random(item_seed), seed=item_seed, **per_face))
     return specs
 
 

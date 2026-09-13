@@ -711,7 +711,9 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--age", default="random", help="10s..70s, 정확한 나이(예: 34), random")
     g.add_argument("--gender", choices=P.GENDER_CHOICES, default="random")
     g.add_argument("--face-shape", choices=P.FACE_SHAPE_CHOICES, default="random")
-    g.add_argument("--brow-condition", choices=P.BROW_CONDITION_CHOICES, default="random")
+    g.add_argument("--brow-condition", default="random",
+                   help="눈썹 상태. 쉼표로 여러 개를 주면 얼굴마다 그중 하나를 골라 씁니다 "
+                        f"({', '.join(P.BROW_CONDITION_CHOICES)})")
     g.add_argument("--ethnicity", choices=P.ETHNICITY_CHOICES, default="korean",
                    help="외모. 기본 korean(한국인 100%%). random 은 한국인 비중 높은 가중 무작위, any 는 균등")
     g.add_argument("--notes", help="프롬프트에 덧붙일 자유 지시문")

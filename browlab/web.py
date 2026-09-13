@@ -33,7 +33,7 @@ from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from . import __version__
@@ -168,6 +168,16 @@ def _pupils(value: Any) -> Optional[str]:
         return ",".join(str(float(p)) for p in parts)
     except ValueError as exc:
         raise BadRequest("동공 좌표는 숫자") from exc
+
+
+def _many(value: Any, choices: Sequence[str], default: str = "random") -> List[str]:
+    """One or several keys from ``choices``; anything unrecognised falls back to ``default``."""
+    if isinstance(value, str):
+        value = [v.strip() for v in value.split(",")]
+    if not isinstance(value, (list, tuple)):
+        return [default]
+    picked = [v for v in value if isinstance(v, str) and v in choices]
+    return picked or [default]
 
 
 def _styles(value: Any) -> List[str]:
@@ -316,11 +326,13 @@ def build_argv(kind: str, p: Dict[str, Any], job_dir: Path, cfg: WebConfig) -> T
         for key, flag, choices in (
             ("gender", "--gender", P.GENDER_CHOICES),
             ("face_shape", "--face-shape", P.FACE_SHAPE_CHOICES),
-            ("brow_condition", "--brow-condition", P.BROW_CONDITION_CHOICES),
         ):
             v = _choice(p.get(key), choices, "random")
             argv += [flag, v]
             shown[key] = v
+        brows = _many(p.get("brow_condition"), P.BROW_CONDITION_CHOICES)  # several: one per face
+        argv += ["--brow-condition", ",".join(brows)]
+        shown["brow_condition"] = brows if len(brows) > 1 else brows[0]
         # 외모 기본값은 한국인 (연구자 지시 2026-09-12). 무작위/다른 외모는 고급 설정에서만.
         eth = _choice(p.get("ethnicity"), P.ETHNICITY_CHOICES, "korean")
         argv += ["--ethnicity", eth]
