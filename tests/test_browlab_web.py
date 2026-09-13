@@ -381,6 +381,126 @@ class WebServerTest(unittest.TestCase):
         status, body, _ = self.call(f"/api/jobs/{job['id']}/delete", {})
         self.assertEqual(status, 404)
 
+    def test_09b_design_keeps_the_photo_and_its_state(self):
+        """A consultation: the photo is kept, measured, and the page's state comes back as left."""
+        self.login()
+        status, d, _ = self.call("/api/designs", {"photo": _png_b64((900, 1200)), "photo_name": "client.png", "client": " 김하늘 "})
+        self.assertEqual(status, 201, d)
+        self.assertTrue(d["id"].split("_")[2] == "design" and d["photo"].endswith("/photo.jpg"))
+        self.assertEqual((d["width"], d["height"]), (900, 1200))
+        self.assertEqual(d["client"], "김하늘")
+        self.assertIsNone(d["state"])
+        # a flat picture has no face: no placement, but a reason, and the design still opens
+        self.assertIsNone(d["placement"])
+        self.assertTrue(d["warning"])
+        status, raw, _ = self.call("/" + d["photo"], raw=True)
+        self.assertEqual(status, 200)
+        with Image.open(io.BytesIO(raw)) as im:
+            self.assertEqual(im.size, (900, 1200))
+
+        state = {"tpl": "abcd", "brows": {"right": {"hT": {"x": 1, "y": 2}}, "left": {}}, "look": {"opacity": 70}, "notes": "꼬리 3mm"}
+        status, out, _ = self.call(f"/api/designs/{d['id']}", {"state": state, "client": "박지민"})
+        self.assertEqual(status, 200, out)
+        status, again, _ = self.call(f"/api/designs/{d['id']}")
+        self.assertEqual(again["state"], state)
+        self.assertEqual(again["client"], "박지민")
+
+        status, gal, _ = self.call("/api/gallery")
+        card = next(i for i in gal["items"] if i["id"] == d["id"])
+        self.assertEqual((card["kind"], card["kind_ko"], card["label"], card["image_name"]), ("design", "상담 시뮬레이션", "박지민", "photo.jpg"))
+        self.assertTrue(card["design"])
+        self.assertEqual(card["status"], "done")
+        # a rendered design saved under the client's name sits with it in the gallery
+        status, saved, _ = self.call("/api/saves", {"job": d["id"], "name": "", "image": _png_b64((90, 60)), "settings": {"opacity": 70}})
+        self.assertEqual(status, 200, saved)
+        status, gal, _ = self.call("/api/gallery")
+        shot = next(i for i in gal["items"] if i["id"] == d["id"] and i.get("saved"))
+        self.assertEqual(shot["kind_ko"], "상담 시안")
+        status, again, _ = self.call(f"/api/designs/{d['id']}")
+        self.assertEqual(len(again["saves"]), 1)
+        # and the same photo can start a design straight from an earlier job
+        status, d2, _ = self.call("/api/designs", {"photo_from": {"job": d["id"], "file": "photo.jpg"}, "client": ""})
+        self.assertEqual(status, 201, d2)
+        self.assertEqual((d2["width"], d2["height"]), (900, 1200))
+
+        for bad in ({"photo": ""}, {"photo": "zzz"}, {"photo_from": {"job": d["id"], "file": "../job.json"}}):
+            status, _, _ = self.call("/api/designs", bad)
+            self.assertEqual(status, 400, bad)
+        status, _, _ = self.call(f"/api/designs/{d['id']}", {"state": "not a dict"})
+        self.assertEqual(status, 400)
+        status, _, _ = self.call(f"/api/designs/{d['id']}", {"state": {"notes": "x" * (W.MAX_STATE + 10)}})
+        self.assertEqual(status, 400)
+        status, _, _ = self.call("/api/designs/nope", {"state": {}})
+        self.assertEqual(status, 400)
+        status, _, _ = self.call("/api/designs/nope")
+        self.assertEqual(status, 404)
+
+    def test_09c_template_library(self):
+        """Templates arrive as cut-out PNGs or whole drawn sheets, and are served back for the page."""
+        from tests.test_browlab import _brow_sheet
+
+        self.login()
+        # one transparent brow
+        one = Image.new("RGBA", (300, 80), (0, 0, 0, 0))
+        px = one.load()
+        for x in range(40, 260):
+            px[x, 30 + (x // 20) % 3] = (0, 0, 0, 230)
+        buf = io.BytesIO(); one.save(buf, "PNG")
+        status, out, _ = self.call("/api/templates", {"name": "내 도안.png", "image": base64.b64encode(buf.getvalue()).decode(), "side": "left"})
+        self.assertEqual(status, 201, out)
+        self.assertEqual(len(out["added"]), 1)
+        single = out["added"][0]
+        self.assertEqual((single["side"], single["right"]), ("left", None))
+        self.assertTrue(single["left"].startswith("tfiles/t_") and single["name"] == "내 도안.png")
+        self.assertLess(single["w"], 300)                                   # trimmed to its ink
+        # a whole sheet of drawn pairs
+        buf = io.BytesIO(); _brow_sheet(rows=2).save(buf, "PNG")
+        status, out, _ = self.call("/api/templates", {"name": "시트", "image": base64.b64encode(buf.getvalue()).decode()})
+        self.assertEqual(status, 201, out)
+        self.assertEqual([t["side"] for t in out["added"]], ["pair", "pair"])
+        self.assertEqual([t["name"] for t in out["added"]], ["시트 1", "시트 2"])
+        pair = out["added"][0]
+        self.assertTrue(pair["right"] and pair["left"])
+
+        status, lst, _ = self.call("/api/templates")
+        self.assertEqual([t["id"] for t in lst["templates"]], [single["id"], out["added"][0]["id"], out["added"][1]["id"]])
+        status, raw, headers = self.call("/" + pair["right"], raw=True)
+        self.assertEqual((status, headers["Content-Type"]), (200, "image/png"))
+        with Image.open(io.BytesIO(raw)) as im:
+            self.assertEqual(im.mode, "RGBA")
+            self.assertGreater(im.getchannel("A").getextrema()[1], 150)     # real ink, on transparency
+
+        status, row, _ = self.call(f"/api/templates/{pair['id']}/rename", {"name": "  볼드 아치 "})
+        self.assertEqual((status, row["name"]), (200, "볼드 아치"))
+        status, _, _ = self.call(f"/api/templates/{single['id']}/delete", {})
+        self.assertEqual(status, 200)
+        status, lst, _ = self.call("/api/templates")
+        self.assertEqual(len(lst["templates"]), 2)
+        status, _, _ = self.call("/" + single["left"], raw=True)
+        self.assertEqual(status, 404)                                       # the file went with it
+        status, _, _ = self.call(f"/api/templates/{single['id']}/delete", {})
+        self.assertEqual(status, 404)
+        for path in ("/tfiles/../settings.json", "/tfiles/templates.json", "/tfiles/t_zz.png"):
+            status, _, _ = self.call(path, raw=True)
+            self.assertEqual(status, 404, path)
+        for bad in ({"image": ""}, {"image": "not-base64!!"}, {"image": base64.b64encode(b"not an image").decode()}):
+            status, _, _ = self.call("/api/templates", bad)
+            self.assertEqual(status, 400, bad)
+        # a blank page holds no drawing
+        buf = io.BytesIO(); Image.new("L", (200, 100), 255).save(buf, "PNG")
+        status, out, _ = self.call("/api/templates", {"image": base64.b64encode(buf.getvalue()).decode()})
+        self.assertEqual(status, 400, out)
+
+    def test_09d_templates_need_login(self):
+        jar = CookieJar()
+        opener = request.build_opener(request.HTTPCookieProcessor(jar))
+        for path in ("/api/templates", "/tfiles/t_00000000.png", "/api/designs/x"):
+            try:
+                with opener.open(self.url(path), timeout=10) as r:
+                    self.fail(f"{path} answered {r.status} without a session")
+            except error.HTTPError as exc:
+                self.assertEqual(exc.code, 401, path)
+
     def test_10_keepalive_post_without_reading_body(self):
         # cancel/delete/logout used to leave the JSON body unread; on a keep-alive connection the
         # next request then started with "{}" and failed with 501.

@@ -41,7 +41,9 @@ from . import masks as M
 from . import presets as P
 
 KINDS = ("generate", "restyle", "sheet", "calibrate")
-KIND_KO = {"generate": "연습용 얼굴 생성", "restyle": "눈썹 생성기", "sheet": "출력 시트 만들기", "calibrate": "프린터 보정 시트"}
+KIND_KO = {"generate": "연습용 얼굴 생성", "restyle": "눈썹 생성기", "sheet": "출력 시트 만들기", "calibrate": "프린터 보정 시트",
+           "design": "상담 시뮬레이션"}
+MAX_STATE = 400 * 1024   # a design's saved state: template, handles, look, notes
 # shorter chip labels for the page (full names stay in presets.py)
 # Files the model actually saw, so a result can be judged against its inputs.
 INPUT_FILES = [
@@ -94,6 +96,10 @@ class WebConfig:
     @property
     def jobs_root(self) -> Path:
         return self.data_dir / "jobs"
+
+    @property
+    def templates_root(self) -> Path:
+        return self.data_dir / "templates"
 
 
 # ---------------------------------------------------------------------------
@@ -475,8 +481,24 @@ class JobStore:
         self.queue: "queue.Queue[str]" = queue.Queue()
         cfg.jobs_root.mkdir(parents=True, exist_ok=True)
         self._load()
+        from .design import TemplateStore
+
+        self.templates = TemplateStore(cfg.templates_root)
         self.worker = threading.Thread(target=self._run_forever, name="browlab-worker", daemon=True)
         self.worker.start()
+        # The first face measurement pays for importing mediapipe (several seconds); do
+        # that now, in the background, rather than while a client is waiting.
+        threading.Thread(target=self._warm_up, name="browlab-warmup", daemon=True).start()
+
+    @staticmethod
+    def _warm_up() -> None:
+        try:
+            from PIL import Image
+            from . import landmarks as L
+
+            L.detect(Image.new("RGB", (64, 64), (200, 170, 150)), provider="mediapipe")
+        except Exception:
+            pass
 
     # -- persistence ----------------------------------------------------------
     def job_dir(self, job_id: str) -> Path:
@@ -631,9 +653,12 @@ class JobStore:
                 add(inp, base["title"], [(n, "얼굴 1:1 PDF" if n.endswith("_A4.pdf") else "눈썹 구역 PDF") for n in sorted(files) if n.endswith(".pdf")])
             elif job.kind == "calibrate":
                 add("calibration_A4.png" if "calibration_A4.png" in files else None, "프린터 보정 시트", [("calibration_A4.pdf", "보정 시트 PDF")])
+            elif job.kind == "design":
+                add("photo.jpg" if "photo.jpg" in files else None, job.params.get("client") or base["title"], [],
+                    design=True, client=job.params.get("client", ""))
             for saved in self.saved_edits(job, files):
-                add(saved["image"], saved["name"], [], kind_ko="저장한 보정", saved=True,
-                    edit=saved["settings"], saved_at=saved.get("created"))
+                add(saved["image"], saved["name"], [], kind_ko="상담 시안" if job.kind == "design" else "저장한 보정", saved=True,
+                    edit=saved["settings"], saved_at=saved.get("created"), design=job.kind == "design")
             if len(items) == before and job.status in ("queued", "running", "failed", "cancelled"):
                 add(None, base["title"], [])
         return items
@@ -734,6 +759,8 @@ class JobStore:
         if job.kind == "sheet":
             layout_ko = {"both": "얼굴 + 눈썹 구역", "face": "얼굴 1:1", "browzone": "눈썹 구역"}.get(p.get("layout", ""), "")
             return f"{p.get('photo', '사진')} · {layout_ko}"
+        if job.kind == "design":
+            return p.get("client") or p.get("photo") or "상담"
         return "100 mm 자 · 20 mm 정사각형"
 
     def thumb(self, job: Job) -> Optional[str]:
@@ -745,12 +772,96 @@ class JobStore:
             "restyle": ["*_composited.png", "0[1-9]_*.png", "00_original.png"],
             "sheet": ["*_A4.png", "input.*"],
             "calibrate": ["calibration_A4.png"],
+            "design": ["saves/*.png", "photo.jpg"],
         }.get(job.kind, ["*.png"])
         for pat in patterns:
             hits = sorted(root.glob(pat))
             if hits:
                 return f"files/{job.id}/{hits[0].relative_to(root).as_posix()}"
         return None
+
+    # -- consultation designs: a photo, its measured brows, and the state of the page ----
+    def create_design(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Keep a client's photo and answer with where its brows are. No subprocess: the
+        measurement takes well under a second and the design itself happens in the page."""
+        from PIL import Image
+        from . import design as D
+
+        job_id = f"{_dt.datetime.now().strftime('%Y%m%d_%H%M%S')}_design_{secrets.token_hex(2)}"
+        job_dir = self.job_dir(job_id)
+        job_dir.mkdir(parents=True, exist_ok=False)
+        try:
+            if body.get("photo_from"):
+                src = copy_from_job(job_dir, self.cfg.jobs_root, body.get("photo_from"))
+                photo_name = _text(body.get("photo_name"), 120) or src.name
+            else:
+                src = save_upload(job_dir, body.get("photo"))
+                photo_name = _text(body.get("photo_name"), 120) or src.name
+            with Image.open(src) as im:
+                picture = D.prepare_photo(im)
+            src.unlink(missing_ok=True)
+            picture.save(job_dir / "photo.jpg", quality=93)
+            payload, warning = D.analyse(picture)
+        except BadRequest:
+            shutil.rmtree(job_dir, ignore_errors=True)
+            raise
+        except Exception as exc:
+            shutil.rmtree(job_dir, ignore_errors=True)
+            raise BadRequest(f"사진을 준비하지 못했습니다: {exc}") from exc
+        (job_dir / "placement.json").write_text(
+            json.dumps({"placement": payload, "warning": warning, "width": picture.width, "height": picture.height},
+                       ensure_ascii=False), encoding="utf-8")
+        params = {"photo": photo_name, "client": _text(body.get("client"), 60), "width": picture.width, "height": picture.height}
+        job = Job(id=job_id, kind="design", created=_now(), params=params, argv=[], status="done",
+                  started=_now(), finished=_now(), rc=0)
+        with self.lock:
+            self.jobs[job_id] = job
+            self._save(job)
+        return self.design_detail(job)
+
+    def design_detail(self, job: Job) -> Dict[str, Any]:
+        root = self.job_dir(job.id)
+        try:
+            placed = json.loads((root / "placement.json").read_text(encoding="utf-8"))
+        except Exception:
+            placed = {}
+        try:
+            state = json.loads((root / "design.json").read_text(encoding="utf-8"))
+        except Exception:
+            state = None
+        files = {f["name"]: f for f in self.list_files(job)}
+        return {
+            "id": job.id, "kind": job.kind, "created": job.created, "client": job.params.get("client", ""),
+            "photo": f"files/{job.id}/photo.jpg", "width": job.params.get("width"), "height": job.params.get("height"),
+            "placement": placed.get("placement"), "warning": placed.get("warning", ""),
+            "state": state if isinstance(state, dict) else None,
+            "saves": self.saved_edits(job, files),
+        }
+
+    def set_design(self, job_id: str, body: Dict[str, Any]) -> Dict[str, Any]:
+        """The page's whole state - template, handles, look, notes - so a client's design
+        opens again exactly as it was left. The client name is kept on the job too, so the
+        gallery card and the title follow it."""
+        with self.lock:
+            job = self.jobs.get(job_id)
+        if job is None or job.kind != "design":
+            raise BadRequest("상담을 찾을 수 없습니다")
+        state = body.get("state")
+        if state is not None:
+            if not isinstance(state, dict):
+                raise BadRequest("상태 형식 오류")
+            text = json.dumps(state, ensure_ascii=False)
+            if len(text.encode("utf-8")) > MAX_STATE:
+                raise BadRequest("상태가 너무 큽니다")
+            path = self.job_dir(job_id) / "design.json"
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(text, encoding="utf-8")
+            tmp.replace(path)
+        if "client" in body:
+            with self.lock:
+                job.params["client"] = _text(body.get("client"), 60)
+                self._save(job)
+        return self.design_detail(job)
 
     # -- usage / settings -----------------------------------------------------
     @property
@@ -1215,7 +1326,7 @@ class Handler(BaseHTTPRequestHandler):
                     "api_key": bool(os.environ.get("OPENAI_API_KEY")),
                 })
                 return
-            if not path.startswith(("/api/", "/files/")):
+            if not path.startswith(("/api/", "/files/", "/tfiles/")):
                 self.send_json({"error": "not found"}, HTTPStatus.NOT_FOUND)
                 return
             if not self.require_auth():
@@ -1242,6 +1353,25 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_json({"error": "없는 작업"}, HTTPStatus.NOT_FOUND)
                     return
                 self.send_json(self.server.store.detail(job))
+                return
+            if path == "/api/templates":
+                self.send_json({"templates": self.server.store.templates.list()})
+                return
+            m = re.match(r"^/api/designs/([A-Za-z0-9_]+)$", path)
+            if m:
+                job = self.server.store.jobs.get(m.group(1))
+                if job is None or job.kind != "design":
+                    self.send_json({"error": "없는 상담"}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_json(self.server.store.design_detail(job))
+                return
+            m = re.match(r"^/tfiles/([A-Za-z0-9_.]+)$", path)
+            if m:
+                target = self.server.store.templates.file(m.group(1))
+                if target is None:
+                    self.send_json({"error": "없는 도안"}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_bytes(target.read_bytes(), "image/png", cache="private, max-age=3600")
                 return
             m = re.match(r"^/files/([A-Za-z0-9_]+)/(.+)$", path)
             if m:
@@ -1292,6 +1422,35 @@ class Handler(BaseHTTPRequestHandler):
         cached.write_bytes(buf.getvalue())
         return buf.getvalue()
 
+    def template_upload(self, body: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """A transparent brow PNG, or a whole sheet of drawn pairs, into the library."""
+        from PIL import Image
+
+        b64 = body.get("image")
+        if not isinstance(b64, str) or not b64:
+            raise BadRequest("도안 이미지가 없습니다")
+        if b64.startswith("data:") and "," in b64[:64]:
+            b64 = b64.split(",", 1)[1]
+        try:
+            raw = base64.b64decode(b64, validate=True)
+        except Exception as exc:
+            raise BadRequest("도안 인코딩 오류") from exc
+        if len(raw) > MAX_UPLOAD:
+            raise BadRequest("도안은 25 MB 이하")
+        try:
+            with Image.open(io.BytesIO(raw)) as im:
+                im.verify()
+            with Image.open(io.BytesIO(raw)) as im:
+                im.load()
+                picture = im.copy()
+        except Exception as exc:
+            raise BadRequest("이미지 파일이 아닙니다 (PNG/JPEG)") from exc
+        side = body.get("side") if body.get("side") in ("right", "left") else "right"
+        try:
+            return self.server.store.templates.add(_text(body.get("name"), 40), picture, side)
+        except ValueError as exc:
+            raise BadRequest(str(exc)) from exc
+
     # -- POST -------------------------------------------------------------------
     def do_POST(self) -> None:  # noqa: N802
         try:
@@ -1341,6 +1500,31 @@ class Handler(BaseHTTPRequestHandler):
                 self.server.store.set_settings(body)
                 self.send_json(self.server.store.usage_totals())
                 return
+            if path == "/api/designs":
+                self.send_json(self.server.store.create_design(body), HTTPStatus.CREATED)
+                return
+            m = re.match(r"^/api/designs/([A-Za-z0-9_]+)$", path)
+            if m:
+                self.send_json(self.server.store.set_design(m.group(1), body))
+                return
+            if path == "/api/templates":
+                self.send_json({"added": self.template_upload(body)}, HTTPStatus.CREATED)
+                return
+            m = re.match(r"^/api/templates/([0-9a-f]+)/(delete|rename)$", path)
+            if m:
+                store = self.server.store.templates
+                if m.group(2) == "delete":
+                    if not store.remove(m.group(1)):
+                        self.send_json({"error": "없는 도안"}, HTTPStatus.NOT_FOUND)
+                        return
+                    self.send_json({"ok": True})
+                    return
+                row = store.rename(m.group(1), str(body.get("name") or ""))
+                if row is None:
+                    self.send_json({"error": "없는 도안"}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_json(row)
+                return
             if path == "/api/models/check":
                 from . import backends as B
 
@@ -1379,6 +1563,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_json({"error": "not found"}, HTTPStatus.NOT_FOUND)
         except BadRequest as exc:
+            # the page shows the reason in a toast; the log keeps it for later
+            print(f"[browlab-web] 400 {path}: {exc}", file=sys.stderr)
             self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         except (BrokenPipeError, ConnectionResetError):
             pass

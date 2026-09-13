@@ -339,6 +339,55 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .prompt{font-size:11.5px;color:var(--muted);white-space:pre-wrap;max-height:170px;overflow:auto;background:var(--panel-2);
   border:1px solid var(--line-2);border-radius:var(--r1);padding:9px;line-height:1.55;margin-top:8px;font-family:var(--mono)}
 
+/* ── 상담 시뮬레이션 studio ─────────────────────────────────────────── */
+.dz{position:fixed;inset:0;z-index:55;background:#0a0908;display:grid;grid-template-rows:auto minmax(0,1fr) auto;color:#eee}
+.dz-top{display:flex;align-items:center;gap:7px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:#15120f;border-bottom:1px solid #2a2622;min-width:0}
+.dz-top input{height:36px;border-radius:8px;border:1px solid #3a3531;background:#1f1b18;color:#fff;padding:0 10px;font-size:14px;min-width:0;width:120px;flex:1}
+.dz-top .btn{height:36px;padding:0 11px;font-size:13px;background:#26221f;border-color:#3a3531;color:#eee;box-shadow:none;flex:0 0 auto}
+.dz-top .btn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.dz-top .btn.icon{width:36px;padding:0}
+.dz-stage{position:relative;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
+.dz-stage canvas{display:block;width:100%;height:100%}
+.dz-nums{position:absolute;left:10px;bottom:10px;padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.6);font-size:12px;
+  font-variant-numeric:tabular-nums;color:#fff;pointer-events:none;white-space:nowrap;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis}
+.dz-nums:empty{display:none}
+.dz-legend{position:absolute;right:10px;top:10px;display:flex;gap:9px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);font-size:11px;color:#ddd;pointer-events:none}
+.dz-legend i{display:inline-block;width:9px;height:9px;border-radius:999px;border:2px solid;background:#fff;vertical-align:-1px;margin-right:4px}
+.dz-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:#cdc6bd;font-size:14px;background:rgba(10,9,8,.7)}
+.dz-side{background:var(--panel);color:var(--ink);display:flex;flex-direction:column;max-height:48dvh;border-top:1px solid var(--line);min-height:0}
+.dz-tabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.dz-tabs button{flex:1;height:36px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.dz-tabs button.on{background:var(--panel-3);color:var(--ink)}
+.dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0}
+.dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
+.dz-tab .edit{padding:10px}
+.dz-tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.dz-tpl{position:relative;display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;text-align:left}
+.dz-tpl.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+.dz-tpl canvas{width:100%;height:34px;display:block}
+.dz-tpl span{font-size:11.5px;color:#443e38;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-tpl .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:999px;background:rgba(0,0,0,.07);color:#666;font-size:15px;line-height:22px;text-align:center}
+.dz-tpl .x:hover{background:var(--warn);color:#fff}
+.dz-sw{display:flex;gap:6px;flex-wrap:wrap}
+.dz-sw button{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;border-radius:999px;border:1.5px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--panel)}
+.dz-sw button i{width:20px;height:20px;border-radius:999px;display:block;border:1px solid rgba(0,0,0,.12)}
+.dz-sw button.on{border-color:var(--brand);background:var(--brand-soft)}
+.dz-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dz-pad button{height:38px;border-radius:9px;border:1px solid var(--line);background:var(--panel);font-size:13px;font-weight:600;color:var(--ink)}
+.dz-pad button:active{background:var(--panel-3)}
+.dz-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.dz-row .btn{height:38px;font-size:13px;padding:0 12px}
+.dz-row .sp{flex:1}
+.dz-note{font-size:12px;color:var(--muted)}
+.dz-file{display:none}
+@media (min-width:1120px){
+  .dz{grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
+  .dz-top{grid-column:1/-1}
+  .dz-top input{flex:0 1 220px}
+  .dz-side{max-height:none;border-top:0;border-left:1px solid var(--line)}
+  .dz-body{padding:14px 16px}
+}
+
 /* ── login ──────────────────────────────────────────────────────────── */
 .login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:22px}
 .login-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:var(--r4);
@@ -411,7 +460,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <span class="brand-t"><b>BrowLab</b><span>눈썹 디자인 · A4 실물 크기</span></span>
     </div>
     <nav class="side-nav" id="sideNav"></nav>
-    <div class="keys">전환 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> · 갤러리 <kbd>G</kbd> · 닫기 <kbd>Esc</kbd></div>
+    <div class="keys">전환 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> · 갤러리 <kbd>G</kbd> · 닫기 <kbd>Esc</kbd></div>
     <div class="side-foot">
       <div class="conn" id="status"></div>
       <button class="meter" id="usageBtn" title="설정 · API 사용량">
@@ -553,6 +602,26 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       </form>
     </div>
 
+    <form id="fDesign" class="panel" data-mode="design" autocomplete="off">
+      <div class="head"><h1>상담 시뮬레이션</h1><p>상담자 사진 위에 직접 그린 눈썹 도안을 올려, 시술 후 모습을 그 자리에서 보여줍니다. 생성 없이 바로 됩니다.</p></div>
+      <label class="drop" data-drop>
+        <img class="ph" alt="" hidden><span class="ph" data-ph><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></span>
+        <span class="pt"><b>상담자 사진 고르기</b><span>정면 · 눈썹이 보이는 사진. 카메라로 바로 찍어도 됩니다. 사진은 이 서버에만 저장됩니다.</span></span>
+        <input name="photo" type="file" accept="image/*"><input type="hidden" name="photo_from_job"><input type="hidden" name="photo_from_file">
+      </label>
+      <div class="card card-b fields">
+        <label class="field"><span>회원명</span><input name="client" type="text" placeholder="비우면 자동 (회원_N)"></label>
+      </div>
+      <div class="msg" data-msg></div>
+      <div class="actionbar"><button class="btn cta" type="submit"><span data-design-label>사진 분석하고 시작</span>
+        <svg class="go" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
+        <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity=".9"/></svg></button></div>
+      <div class="card card-b" id="dzRecent" hidden style="display:flex;flex-direction:column;gap:8px">
+        <div class="eyebrow">최근 상담</div>
+        <div id="dzRecentList" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </form>
+
   </div></main>
 
   <aside class="gal-pane" id="jobsPane"><div class="gal-in">
@@ -563,6 +632,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <button type="button" data-f="generate">생성</button>
         <button type="button" data-f="restyle">내 사진</button>
         <button type="button" data-f="sheet">시트</button>
+        <button type="button" data-f="design">상담</button>
       </div>
     </div>
     <div id="gallery" class="gal"></div>
@@ -641,11 +711,87 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
   </div>
 </div>
 
+<div class="dz" id="dz" hidden>
+  <div class="dz-top">
+    <input id="dzClient" type="text" placeholder="회원명" aria-label="회원명">
+    <button class="btn" id="dzOrig" type="button" title="누르고 있는 동안 원본 사진">원본</button>
+    <button class="btn" id="dzZoomBrow" type="button" title="눈썹 부분 확대">눈썹</button>
+    <button class="btn" id="dzZoomAll" type="button" title="사진 전체">전체</button>
+    <button class="btn" id="dzSym" type="button" title="한쪽을 움직이면 반대쪽도 거울처럼">대칭</button>
+    <button class="btn icon" id="dzClose" type="button" aria-label="닫기">✕</button>
+  </div>
+  <div class="dz-stage" id="dzStage">
+    <canvas id="dzCanvas"></canvas>
+    <div class="dz-nums" id="dzNums"></div>
+    <div class="dz-legend" id="dzLegend"><span><i style="border-color:#4fa3ff"></i>윗선</span><span><i style="border-color:#ffb84f"></i>아랫선</span><span><i style="border-color:#e2865f"></i>꼬리</span></div>
+    <div class="dz-wait" id="dzWait" hidden><div class="spinner"></div><span>불러오는 중…</span></div>
+  </div>
+  <div class="dz-side">
+    <div class="dz-tabs" id="dzTabs">
+      <button type="button" data-t="tpl" class="on">도안</button>
+      <button type="button" data-t="shape">모양</button>
+      <button type="button" data-t="look">색·농도</button>
+      <button type="button" data-t="save">저장</button>
+    </div>
+    <div class="dz-body">
+      <div class="dz-tab on" data-tab="tpl">
+        <div class="dz-tpls" id="dzTpls"></div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzUpload">도안 올리기</button>
+          <select id="dzSide" class="btn" style="height:38px;font-size:13px" title="한 짝만 있는 PNG가 어느 쪽 눈썹인지">
+            <option value="right">오른쪽 눈썹 (사진 왼편)</option><option value="left">왼쪽 눈썹 (사진 오른편)</option></select>
+          <input class="dz-file" id="dzFile" type="file" accept="image/*" multiple>
+        </div>
+        <div class="dz-note">배경이 투명한 PNG 한 장, 또는 흰 종이에 그린 도안 시트(여러 쌍) 그대로 올리면 됩니다. 시트는 자동으로 한 쌍씩 잘려 들어갑니다.</div>
+      </div>
+      <div class="dz-tab" data-tab="shape">
+        <div class="dz-note">점을 끌어 모양을 맞춥니다 · 윗선 점은 윗선을, 아랫선 점은 아랫선을, 꼬리 점은 길이와 각도를 · 눈썹 몸통을 끌면 통째로 이동 · 빈 곳을 끌면 화면 이동, 두 손가락으로 확대</div>
+        <div class="dz-row">
+          <button class="btn" type="button" id="dzCopyRL">오른쪽 → 왼쪽 복사</button>
+          <button class="btn" type="button" id="dzCopyLR">왼쪽 → 오른쪽 복사</button>
+          <button class="btn" type="button" id="dzReset">자동 배치로</button>
+        </div>
+        <div class="eyebrow">미세 조정 <em class="hint-inline" id="dzActiveKo">· 오른쪽 눈썹</em></div>
+        <div class="dz-pad" id="dzPad">
+          <button type="button" data-n="up">▲ 위로</button><button type="button" data-n="down">▼ 아래로</button>
+          <button type="button" data-n="in">◀ 안쪽</button><button type="button" data-n="out">▶ 바깥</button>
+          <button type="button" data-n="longer">길게 +</button><button type="button" data-n="shorter">짧게 −</button>
+          <button type="button" data-n="thicker">두껍게 +</button><button type="button" data-n="thinner">얇게 −</button>
+          <button type="button" data-n="tailup">꼬리 ↑</button><button type="button" data-n="taildown">꼬리 ↓</button>
+          <button type="button" data-n="archup">아치 ↑</button><button type="button" data-n="archdown">아치 ↓</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="dzGuides" checked> 조절점과 윤곽선 보이기</label>
+      </div>
+      <div class="dz-tab" data-tab="look">
+        <div class="eyebrow">경과 미리보기</div>
+        <div class="dz-sw" id="dzStages"></div>
+        <div class="edit" id="dzLookSliders"></div>
+        <div class="eyebrow">색소</div>
+        <div class="dz-sw" id="dzColors"></div>
+        <div class="edit" id="dzColorSliders"></div>
+      </div>
+      <div class="dz-tab" data-tab="save">
+        <dl class="spec" id="dzSpec"></dl>
+        <label class="field"><span>동공 간 거리 mm <em class="hint-inline">치수 계산용 · 여 62 / 남 64</em></span><input id="dzIpd" type="number" step="0.5" min="50" max="75" value="62"></label>
+        <label class="field"><span>상담 메모</span><textarea id="dzNotes" placeholder="예: 꼬리 3mm 연장 희망, 애쉬 브라운, 2주 뒤 시술"></textarea></label>
+        <div class="dz-row">
+          <button class="btn dark" type="button" id="dzSave">갤러리에 저장</button>
+          <button class="btn" type="button" id="dzDownload">내려받기</button>
+          <button class="btn" type="button" id="dzPrint">1:1 출력 시트</button>
+        </div>
+        <div class="msg ok" id="dzSaveNote"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const el=(tag,cls,text)=>{const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e;};
 const svg=(d,w=16,sw=2)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICON={
+  design:'<path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10"/><circle cx="6.5" cy="9.2" r="1.6" fill="currentColor" stroke="none"/><circle cx="17.5" cy="9.2" r="1.6" fill="currentColor" stroke="none"/><path d="M12 14v6"/><path d="M9 17h6"/>',
   generate:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>',
   restyle:'<path d="M3 10c2.6-3 6.4-3.4 8.6-1.2"/><path d="M12.4 8.8C14.6 6.6 18.4 7 21 10"/><path d="M7 16.5h10"/>',
   sheet:'<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
@@ -656,10 +802,10 @@ const ICON={
   auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" stroke="none" opacity=".35"/>',
   empty:'<path d="M4 16l5-5 4 4 3-3 4 4"/><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.3"/>'
 };
-const VIEWS=[{k:'generate',ko:'연습용 얼굴'},{k:'restyle',ko:'눈썹 생성기'},{k:'sheet',ko:'출력 시트'},{k:'gallery',ko:'갤러리'}];
+const VIEWS=[{k:'design',ko:'상담 시뮬레이션'},{k:'generate',ko:'연습용 얼굴'},{k:'restyle',ko:'눈썹 생성기'},{k:'sheet',ko:'출력 시트'},{k:'gallery',ko:'갤러리'}];
 const STATUS_KO={queued:'대기',running:'진행 중',done:'완료',failed:'실패',cancelled:'취소'};
 const usd=v=>'$'+(Math.round((+v||0)*100)/100).toFixed(2);
-let presets=null, items=[], filter='all', lbIndex=-1, timer=null, usage=null, view='generate', loaded=false;
+let presets=null, items=[], filter='all', lbIndex=-1, timer=null, usage=null, view='design', loaded=false;
 
 /* ── theme ───────────────────────────────────────────────────────────── */
 function applyTheme(t){
@@ -939,6 +1085,7 @@ function renderGallery(){
     m.appendChild(el('span','',[it.kind_ko, fmtTime(it.created), it.cost_usd?usd(it.cost_usd):''].filter(Boolean).join(' · ')));
     c.appendChild(m); g.appendChild(c);
   });
+  renderRecentDesigns();
 }
 
 /* ── lightbox: compare + adjust ──────────────────────────────────────── */
@@ -1229,6 +1376,12 @@ async function renderLb(){
   }
   const acts=el('div','acts');
   if(it.image){ const a=el('a','btn','원본 열기'); a.href=it.image; a.target='_blank'; acts.appendChild(a); }
+  if(it.kind==='design'){
+    const b=el('button','btn dark','상담 이어하기'); b.type='button';
+    b.onclick=()=>{ closeLb(); openDesign(it.id); }; acts.appendChild(b); }
+  else if(it.image && !it.saved){
+    const b=el('button','btn','이 사진으로 상담'); b.type='button';
+    b.onclick=()=>{ closeLb(); startDesign({photo_from:{job:it.id, file:it.image_name}, photo_name:it.label||it.title, client:''}); }; acts.appendChild(b); }
   if((it.kind==='generate'||it.kind==='sheet') && it.image){
     const b=el('button','btn','이 얼굴로 눈썹 편집'); b.type='button';
     b.onclick=()=>{ closeLb(); setView('restyle'); setPhotoFrom($('#fRestyle'), it); }; acts.appendChild(b); }
@@ -1255,6 +1408,461 @@ async function renderLb(){
   d.addEventListener('toggle',()=>{ if(d.open) load(); }); if(d.open) load();
 }
 
+/* ── 상담 시뮬레이션: a drawn template laid on the client's photo ─────────
+   No model draws anything here. A template is a transparent PNG the practitioner
+   drew once; the page measures its spine and thickness, lays it along the brow the
+   face detector found, and lets five points per brow reshape it: the head's upper and
+   lower edge, the arch's upper and lower edge, and the tail. The template is bent along
+   the curve those points make (a strip mesh, each piece an affine map), so a dragged
+   arch bends the whole brow instead of kinking it. Pigment goes on with multiply, so
+   the skin's own shading shows through the strokes the way healed pigment does. */
+const PIGMENTS=[['natural','내추럴 브라운',[112,80,60]],['dark','다크 브라운',[80,54,40]],['ash','애쉬 브라운',[98,88,80]],
+  ['light','라이트 브라운',[146,110,86]],['black','블랙 브라운',[54,42,36]],['red','레드 브라운',[132,76,56]],['hair','머리색 자동',null]];
+const STAGES=[['fresh','시술 직후',100,15],['healed','치유 후 (4주)',68,40],['year','1년 후',45,60]];
+const LOOK0={opacity:85, blur:25, density:2, weight:30, color:'natural', light:0, warm:0};
+const LOOK_SLIDERS=[['opacity','강도',0,100],['blur','부드러움',0,100],['density','선 진하기',1,3],['weight','선 굵기',0,100]];
+const COLOR_SLIDERS=[['light','밝기',-40,40],['warm','따뜻함',-40,40]];
+const V={add:(a,b)=>({x:a.x+b.x,y:a.y+b.y}), sub:(a,b)=>({x:a.x-b.x,y:a.y-b.y}), mul:(a,k)=>({x:a.x*k,y:a.y*k}),
+  unit:a=>{ const l=Math.hypot(a.x,a.y)||1; return {x:a.x/l,y:a.y/l}; }, dot:(a,b)=>a.x*b.x+a.y*b.y,
+  perp:a=>({x:-a.y,y:a.x}), mid:(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}), dist:(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)};
+const DZ={id:null, photo:new Image(), W:0, H:0, lm:null, ipdPx:0, tpls:[], tplId:null, tex:{}, tint:{}, geo:{}, brows:{}, auto:{},
+  look:{...LOOK0}, sym:true, ipd:62, notes:'', client:'', view:{s:1,tx:0,ty:0}, dpr:1, active:'right', orig:false, guides:true,
+  saves:[], saveTimer:null, lastSave:null, dirtySince:0, imgCache:{}};
+DZ.photo.crossOrigin='anonymous';
+
+/* geometry helpers */
+// The spine is a quadratic through head, arch and tail, the arch sitting at the
+// parameter its distances earn (so the curve never loops), and the template's own
+// sampling is stretched onto it one segment at a time: head→arch, then arch→tail. The
+// tip before the head continues straight back along the head's tangent.
+function spineCurve(H,A,T){ const dHA=V.dist(H,A), dAT=V.dist(A,T), tA=Math.max(.05,Math.min(.95,dHA/((dHA+dAT)||1)));
+  const a=(1-tA)*(1-tA), b=tA*tA, m=2*tA*(1-tA);
+  return {P0:H, P1:{x:(A.x-a*H.x-b*T.x)/m, y:(A.y-a*H.y-b*T.y)/m}, P2:T, tA}; }
+function spineAt(S,u,uH,uA,tipLen){
+  if(u>=uH){ const t=u<uA ? S.tA*(u-uH)/(uA-uH) : S.tA+(1-S.tA)*(u-uA)/(1-uA); return bez(S,t); }
+  const tan=V.unit(V.sub(S.P1,S.P0)); return V.sub(S.P0, V.mul(tan, tipLen*(uH-u)/uH)); }
+function bez(B,u){ const a=(1-u)*(1-u), b=2*u*(1-u), c=u*u;
+  return {x:a*B.P0.x+b*B.P1.x+c*B.P2.x, y:a*B.P0.y+b*B.P1.y+c*B.P2.y}; }
+function frameNormals(pts){ // tangent by central differences on the polyline, normal rotated a quarter turn
+  const n=pts.length; pts.forEach((p,i)=>{ const a=pts[Math.max(0,i-1)].c, b=pts[Math.min(n-1,i+1)].c;
+    const t=V.unit(V.sub(b,a)); p.t=t; p.n={x:t.y,y:-t.x}; }); }
+function cloneBrow(b){ const o={}; for(const k in b) o[k]={x:b[k].x,y:b[k].y}; return o; }
+
+/* the template: spine, thickness profile, where its arch is */
+function analyseTemplate(img, flip, headRight){
+  const W=img.naturalWidth, H=img.naturalHeight; if(!W||!H) return null;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const cx=cv.getContext('2d',{willReadFrequently:true});
+  if(flip){ cx.translate(W,0); cx.scale(-1,1); }
+  cx.drawImage(img,0,0); cx.setTransform(1,0,0,1,0,0);
+  const px=cx.getImageData(0,0,W,H).data;
+  const A=(x,y)=>{ x=Math.round(x); y=Math.round(y); return (x<0||y<0||x>=W||y>=H)?0:px[(y*W+x)*4+3]; };
+  const yc=new Float64Array(W); let x0=-1,x1=-1;
+  for(let x=0;x<W;x++){ let s=0,sy=0; for(let y=0;y<H;y++){ const v=px[(y*W+x)*4+3]; if(v>10){ s+=v; sy+=v*y; } }
+    yc[x]=s?sy/s:NaN; if(s){ if(x0<0) x0=x; x1=x; } }
+  if(x0<0||x1-x0<8) return null;
+  // bridge the gaps between hairs, then smooth: the spine follows the brow, not one stroke
+  let last=NaN;
+  for(let x=x0;x<=x1;x++){ if(isNaN(yc[x])){ let nx=x; while(nx<=x1&&isNaN(yc[nx])) nx++;
+      const nv=nx<=x1?yc[nx]:last, lv=isNaN(last)?nv:last; for(let k=x;k<nx;k++) yc[k]=lv+(nv-lv)*(k-x+1)/(nx-x+1); x=nx-1; continue; }
+    last=yc[x]; }
+  const win=Math.max(3,Math.round((x1-x0)/14)), sm=new Float64Array(W);
+  for(let x=x0;x<=x1;x++){ let s=0,n=0; for(let k=-win;k<=win;k++){ const j=x+k; if(j>=x0&&j<=x1){ s+=yc[j]; n++; } } sm[x]=s/n; }
+  const at=x=>{ const i=Math.floor(x), f=x-i; const cl=v=>Math.max(x0,Math.min(x1,v)); const a=sm[cl(i)], b=sm[cl(i+1)]; return a+(b-a)*f; };
+  const N=40, smp=[];
+  for(let i=0;i<=N;i++){ const u=i/N, x=headRight? x1-(x1-x0)*u : x0+(x1-x0)*u; smp.push({u, c:{x, y:at(x)}}); }
+  frameNormals(smp);
+  const flipN=smp.reduce((s,p)=>s+p.n.y,0)>0;             // normals must point at the drawing's top edge
+  if(flipN) smp.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
+  smp.forEach(p=>{ let t=0,b=0; for(let k=0;k<H;k++){ if(A(p.c.x+p.n.x*k,p.c.y+p.n.y*k)>14) t=k; if(A(p.c.x-p.n.x*k,p.c.y-p.n.y*k)>14) b=k; }
+    p.eT=t+2; p.eB=b+2; });
+  ['eT','eB'].forEach(key=>{ const v=smp.map(p=>p[key]);        // a gap between two hairs must not pinch the brow
+    smp.forEach((p,i)=>{ let m=0; for(let k=-2;k<=2;k++){ const j=i+k; if(j>=0&&j<smp.length) m=Math.max(m,v[j]); } p[key]=Math.max(3,m); }); });
+  let uA=0.6, best=Infinity;                                   // the arch: highest point of the upper edge, past the head's fan
+  smp.forEach(p=>{ if(p.u<0.3||p.u>0.85) return; const y=p.c.y+p.n.y*p.eT; if(y<best){ best=y; uA=p.u; } });
+  // The head handles sit a little in from the tip, where the head has its full height:
+  // the first columns hold only the tips of the fanned hairs and would make any handle
+  // there mean a wild thickness.
+  const iH=Math.round(0.12*N), uH=smp[iH].u, iA=Math.round(uA*N);
+  const head=smp[iH].c, tail=smp[N].c, e=V.unit(V.sub(tail,head)), ep=V.perp(e), chord=V.dist(head,tail);
+  const S=spineCurve(head, smp[iA].c, tail), tipLen=V.dist(smp[0].c, head), tipFrac=tipLen/(V.dist(head,smp[iA].c)||1);
+  // what the drawing does beyond that curve, in chord units, so placing the template only
+  // needs the head-to-tail distance on the face
+  smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; });
+  return {W,H,cv,smp,uA,uH,iA,iH,chord,flipN,tipFrac};
+}
+function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous';
+  im.onload=()=>res(im); im.onerror=()=>{ delete DZ.imgCache[url]; rej(new Error('이미지를 불러오지 못했습니다')); }; im.src=url; })); }
+async function setTemplate(id){
+  const row=DZ.tpls.find(t=>t.id===id)||DZ.tpls[0]; if(!row){ DZ.tex={}; return; }
+  DZ.tplId=row.id;
+  for(const side of ['right','left']){ const other=side==='right'?'left':'right';
+    const url=row[side]||row[other], flip=!row[side];        // one file serves both sides, mirrored
+    const img=await loadImg(url); DZ.tex[side]=analyseTemplate(img, flip, side==='right'); }
+  retint(); renderTplList();
+}
+function pigmentRGB(){
+  const o=DZ.look; let rgb=(PIGMENTS.find(p=>p[0]===o.color)||PIGMENTS[0])[2];
+  if(!rgb) rgb=DZ.hair||PIGMENTS[0][2];
+  const k=1+o.light/100; return rgb.map((v,i)=>Math.max(0,Math.min(255,Math.round(v*k+(i===0?o.warm*0.55:i===2?-o.warm*0.55:0)))));
+}
+function retint(){ const rgb=pigmentRGB(), o=DZ.look;
+  // 선 진하기 stacks the drawing on itself (a faint stroke stays faint, but less so);
+  // 선 굵기 draws it again around a small circle, which widens every stroke a little
+  const rad=(o.weight||0)/100*1.2, offs=[[0,0]];
+  if(rad>0.05) for(let k=0;k<6;k++) offs.push([Math.cos(k*Math.PI/3)*rad, Math.sin(k*Math.PI/3)*rad]);
+  ['right','left'].forEach(side=>{ const T=DZ.tex[side]; if(!T) return;
+    const cv=DZ.tint[side]||(DZ.tint[side]=document.createElement('canvas')); cv.width=T.W; cv.height=T.H;
+    const c=cv.getContext('2d'); c.clearRect(0,0,T.W,T.H);
+    for(let d=0;d<Math.max(1,Math.min(3,Math.round(o.density||1)));d++) offs.forEach(([ox,oy])=>c.drawImage(T.cv,ox,oy));
+    c.globalCompositeOperation='source-in'; c.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; c.fillRect(0,0,T.W,T.H); });
+}
+function sampleHair(){ // the darker part of the strip above the forehead; nothing there means no hair to match
+  const lm=DZ.lm; if(!lm||!DZ.photo.naturalWidth) return null; const ipd=DZ.ipdPx||DZ.W/6;
+  const fx=lm.forehead_top[0], fy=lm.forehead_top[1];
+  const x0=Math.max(0,Math.round(fx-0.9*ipd)), x1=Math.min(DZ.W,Math.round(fx+0.9*ipd));
+  const y0=Math.max(0,Math.round(fy-0.8*ipd)), y1=Math.max(0,Math.round(fy-0.05*ipd));
+  if(y1-y0<4||x1-x0<4) return null;
+  const cv=document.createElement('canvas'); cv.width=x1-x0; cv.height=y1-y0;
+  const c=cv.getContext('2d',{willReadFrequently:true}); c.drawImage(DZ.photo,x0,y0,x1-x0,y1-y0,0,0,cv.width,cv.height);
+  const d=c.getImageData(0,0,cv.width,cv.height).data, px=[];
+  for(let i=0;i<d.length;i+=16) px.push([d[i],d[i+1],d[i+2],0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]]);
+  px.sort((a,b)=>a[3]-b[3]); if(px[Math.floor(px.length/2)][3]>190) return null;
+  const dark=px.slice(0,Math.max(1,Math.floor(px.length*0.35))), m=[0,0,0];
+  dark.forEach(p=>{ m[0]+=p[0]; m[1]+=p[1]; m[2]+=p[2]; });
+  let rgb=m.map(v=>v/dark.length*1.5+22);                     // pigment a shade lighter than the hair itself
+  const lum=0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2]; if(lum>150) rgb=rgb.map(v=>v*150/lum);
+  return rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))));
+}
+
+/* where the brows are: from the detector, or a guess the practitioner drags into place */
+function anchorFromOutline(pts, centreX){ // the brow's head and tail from the detector's outline
+  const P=pts.map(p=>({x:p[0],y:p[1]})), h=P.length>>1;
+  let upper=P.slice(0,h), lower=P.slice(h);
+  const headFirst=arr=>Math.abs(arr[0].x-centreX)<Math.abs(arr[arr.length-1].x-centreX);
+  if(!headFirst(upper)) upper=upper.slice().reverse(); if(!headFirst(lower)) lower=lower.slice().reverse();
+  return {H:V.mid(upper[0],lower[0]), T:V.mid(upper[upper.length-1], lower[lower.length-1])};
+}
+function initAnchors(){
+  const lm=DZ.lm;
+  if(lm&&lm.right_brow&&lm.right_brow.length>=6&&lm.left_brow&&lm.left_brow.length>=6){
+    const cx=(lm.right_pupil[0]+lm.left_pupil[0])/2;
+    return {right:anchorFromOutline(lm.right_brow,cx), left:anchorFromOutline(lm.left_brow,cx)};
+  }
+  const cx=DZ.W/2, cy=DZ.H*0.42, d=DZ.W*0.18;                  // average proportions, to be dragged into place
+  const mk=s=>({H:{x:cx+s*0.28*d,y:cy-0.35*d}, T:{x:cx+s*0.98*d,y:cy-0.36*d}});
+  return {right:mk(-1), left:mk(1)};
+}
+function fitTemplate(side){ // the drawing as drawn, scaled and turned so its head and tail meet the anchor's
+  const T=DZ.tex[side], a=DZ.anchor&&DZ.anchor[side]; if(!T||!a) return null;
+  const Ht=T.smp[T.iH].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
+  const ang=Math.atan2(a.T.y-a.H.y,a.T.x-a.H.x)-Math.atan2(Tt.y-Ht.y,Tt.x-Ht.x), cs=Math.cos(ang), sn=Math.sin(ang);
+  const map=p=>{ const dx=p.x-Ht.x, dy=p.y-Ht.y; return {x:a.H.x+(dx*cs-dy*sn)*s, y:a.H.y+(dx*sn+dy*cs)*s}; };
+  const sH=T.smp[T.iH], sA=T.smp[T.iA], ch=T.chord;
+  return {hT:map(V.add(sH.c,V.mul(sH.n,sH.eT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.eB*ch))),
+          aT:map(V.add(sA.c,V.mul(sA.n,sA.eT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.eB*ch))), t:map(Tt)};
+}
+function initBrows(){ const out={right:fitTemplate('right'), left:fitTemplate('left')};
+  DZ.auto={right:cloneBrow(out.right), left:cloneBrow(out.left)}; return out; }
+function mirrorPt(p){ const lm=DZ.lm; let m,d;
+  if(lm){ m={x:(lm.right_pupil[0]+lm.left_pupil[0])/2, y:(lm.right_pupil[1]+lm.left_pupil[1])/2};
+    d=V.unit({x:lm.left_pupil[0]-lm.right_pupil[0], y:lm.left_pupil[1]-lm.right_pupil[1]}); }
+  else { m={x:DZ.W/2,y:0}; d={x:1,y:0}; }
+  return V.sub(p, V.mul(d, 2*V.dot(V.sub(p,m),d))); }
+function mirrorBrow(from){ const to=from==='right'?'left':'right', b=DZ.brows[from], o={};
+  for(const k in b) o[k]=mirrorPt(b[k]); DZ.brows[to]=o; }
+function faceUp(){ const lm=DZ.lm; if(!lm) return {x:0,y:-1};
+  const d=V.unit({x:lm.left_pupil[0]-lm.right_pupil[0], y:lm.left_pupil[1]-lm.right_pupil[1]}); return {x:d.y,y:-d.x}; }
+function pxPerMm(){ return (DZ.ipdPx||DZ.W/3.2)/(DZ.ipd||62); }
+
+/* the warped brow: the template's samples carried onto the curve the handles make */
+function browGeometry(side){
+  const T=DZ.tex[side], b=DZ.brows[side]; if(!T||!b) return null;
+  const H=V.mid(b.hT,b.hB), A=V.mid(b.aT,b.aB), Tl=b.t;
+  const chord=V.dist(H,Tl)||1, e=V.unit(V.sub(Tl,H)), ep=V.perp(e);
+  const S=spineCurve(H,A,Tl), tipLen=V.dist(H,A)*T.tipFrac;
+  const pts=T.smp.map(p=>{ const q=spineAt(S,p.u,T.uH,T.uA,tipLen); return {u:p.u, c:{x:q.x+(p.r.e*e.x+p.r.p*ep.x)*chord, y:q.y+(p.r.e*e.y+p.r.p*ep.y)*chord}}; });
+  frameNormals(pts); if(T.flipN) pts.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
+  const sH=T.smp[T.iH], sA=T.smp[T.iA];
+  const kTH=V.dist(b.hT,H)/(sH.eT*chord), kBH=V.dist(b.hB,H)/(sH.eB*chord);
+  const kTA=V.dist(b.aT,A)/(sA.eT*chord), kBA=V.dist(b.aB,A)/(sA.eB*chord);
+  pts.forEach((p,i)=>{ const s=T.smp[i];
+    // the tip keeps the head's scale, the tail keeps the arch's; between them it blends
+    const f=p.u<=T.uH?0 : p.u>=T.uA?1 : (p.u-T.uH)/(T.uA-T.uH);
+    const kT=kTH+(kTA-kTH)*f, kB=kBH+(kBA-kBH)*f;
+    p.top=V.add(p.c, V.mul(p.n, s.eT*chord*kT)); p.bot=V.sub(p.c, V.mul(p.n, s.eB*chord*kB)); });
+  return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, chord, e};
+}
+function drawTri(ctx, tex, s0,s1,s2, d0,d1,d2){
+  const det=(s1.x-s0.x)*(s2.y-s0.y)-(s2.x-s0.x)*(s1.y-s0.y); if(Math.abs(det)<1e-9) return;
+  const a=((d1.x-d0.x)*(s2.y-s0.y)-(d2.x-d0.x)*(s1.y-s0.y))/det, b=((d1.y-d0.y)*(s2.y-s0.y)-(d2.y-d0.y)*(s1.y-s0.y))/det;
+  const c=((d2.x-d0.x)*(s1.x-s0.x)-(d1.x-d0.x)*(s2.x-s0.x))/det, d=((d2.y-d0.y)*(s1.x-s0.x)-(d1.y-d0.y)*(s2.x-s0.x))/det;
+  const e=d0.x-a*s0.x-c*s0.y, f=d0.y-b*s0.x-d*s0.y;
+  // the clip is grown a hair past the triangle so neighbours overlap instead of leaving seams
+  const cx=(d0.x+d1.x+d2.x)/3, cy=(d0.y+d1.y+d2.y)/3, grow=0.6/ctx.getTransform().a;
+  const ex=p=>{ const dx=p.x-cx, dy=p.y-cy, l=Math.hypot(dx,dy)||1; return {x:p.x+dx/l*grow, y:p.y+dy/l*grow}; };
+  const q0=ex(d0), q1=ex(d1), q2=ex(d2);
+  ctx.save(); ctx.beginPath(); ctx.moveTo(q0.x,q0.y); ctx.lineTo(q1.x,q1.y); ctx.lineTo(q2.x,q2.y); ctx.closePath(); ctx.clip();
+  ctx.transform(a,b,c,d,e,f); ctx.drawImage(tex,0,0); ctx.restore();
+}
+function drawMesh(ctx, side, g){
+  const T=DZ.tex[side], tex=DZ.tint[side]; if(!T||!tex) return;
+  const src=T.smp.map(p=>({c:p.c, top:V.add(p.c,V.mul(p.n,p.eT*T.chord)), bot:V.sub(p.c,V.mul(p.n,p.eB*T.chord))}));
+  for(let i=0;i<src.length-1;i++){ const a=src[i], b=src[i+1], A=g.pts[i], B=g.pts[i+1];
+    drawTri(ctx,tex, a.top,b.top,b.c, A.top,B.top,B.c); drawTri(ctx,tex, a.top,b.c,a.c, A.top,B.c,A.c);
+    drawTri(ctx,tex, a.c,b.c,b.bot, A.c,B.c,B.bot);     drawTri(ctx,tex, a.c,b.bot,a.bot, A.c,B.bot,A.bot); }
+}
+function paintBrows(ctx, view){
+  const geos=['right','left'].map(browGeometry).filter(Boolean); DZ.geo={}; geos.forEach(g=>DZ.geo[g.side]=g);
+  if(!geos.length) return;
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  geos.forEach(g=>g.pts.forEach(p=>[p.top,p.bot].forEach(q=>{ const X=q.x*view.s+view.tx, Y=q.y*view.s+view.ty;
+    if(X<x0) x0=X; if(Y<y0) y0=Y; if(X>x1) x1=X; if(Y>y1) y1=Y; })));
+  const blur=DZ.look.blur/100*0.28*pxPerMm()*view.s;          // 부드러움 is in millimetres on the face, not screen pixels
+  const pad=Math.ceil(blur*3+6); x0=Math.floor(x0)-pad; y0=Math.floor(y0)-pad; x1=Math.ceil(x1)+pad; y1=Math.ceil(y1)+pad;
+  const w=x1-x0, h=y1-y0; if(!(w>0&&h>0)||w>8192||h>8192) return;
+  const lay=DZ.lay||(DZ.lay=document.createElement('canvas')); lay.width=w; lay.height=h;
+  const lc=lay.getContext('2d'); lc.imageSmoothingQuality='high'; lc.setTransform(view.s,0,0,view.s,view.tx-x0,view.ty-y0);
+  geos.forEach(g=>drawMesh(lc,g.side,g));
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=Math.max(0,Math.min(1,DZ.look.opacity/100));
+  if(blur>0.15) ctx.filter=`blur(${blur.toFixed(2)}px)`;
+  ctx.drawImage(lay,x0,y0); ctx.restore();
+}
+function handlePoints(side){ const g=DZ.geo[side]; if(!g) return [];
+  return [{k:'hT',...g.pts[g.iH].top},{k:'hB',...g.pts[g.iH].bot},{k:'aT',...g.pts[g.iA].top},{k:'aB',...g.pts[g.iA].bot},{k:'t',...g.T}]; }
+const HCOL={hT:'#4fa3ff',aT:'#4fa3ff',hB:'#ffb84f',aB:'#ffb84f',t:'#e2865f'};
+function drawHandles(ctx){
+  const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
+  ['right','left'].forEach(side=>{ const g=DZ.geo[side]; if(!g) return; const act=side===DZ.active;
+    ctx.beginPath(); g.pts.forEach((p,i)=>{ const X=p.top.x*s+tx, Y=p.top.y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); });
+    for(let i=g.pts.length-1;i>=0;i--){ const p=g.pts[i]; ctx.lineTo(p.bot.x*s+tx,p.bot.y*s+ty); } ctx.closePath();
+    ctx.strokeStyle=act?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+    handlePoints(side).forEach(h=>{ const X=h.x*s+tx, Y=h.y*s+ty; ctx.beginPath(); ctx.arc(X,Y,act?7:5.5,0,Math.PI*2);
+      ctx.fillStyle='#fff'; ctx.fill(); ctx.lineWidth=2.2; ctx.strokeStyle=HCOL[h.k]; ctx.stroke(); });
+  });
+}
+function dzResize(){ const cv=$('#dzCanvas'), box=$('#dzStage').getBoundingClientRect(); DZ.dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.max(1,Math.round(box.width*DZ.dpr)); cv.height=Math.max(1,Math.round(box.height*DZ.dpr)); DZ.box={w:box.width,h:box.height}; }
+function dzRender(){
+  const cv=$('#dzCanvas'), ctx=cv.getContext('2d'), {s,tx,ty}=DZ.view, d=DZ.dpr;
+  ctx.setTransform(1,0,0,1,0,0); ctx.filter='none'; ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='#0a0908'; ctx.fillRect(0,0,cv.width,cv.height);
+  if(!DZ.photo.naturalWidth) return;
+  ctx.setTransform(d*s,0,0,d*s,d*tx,d*ty); ctx.imageSmoothingQuality='high'; ctx.drawImage(DZ.photo,0,0);
+  if(!DZ.orig){ paintBrows(ctx,{s:d*s,tx:d*tx,ty:d*ty}); if(DZ.guides) drawHandles(ctx); }
+  else ['right','left'].forEach(side=>{ const g=browGeometry(side); if(g) DZ.geo[side]=g; });
+  dzMeasure();
+}
+function dzExport(){ const cv=document.createElement('canvas'); cv.width=DZ.W; cv.height=DZ.H; const ctx=cv.getContext('2d');
+  ctx.drawImage(DZ.photo,0,0); paintBrows(ctx,{s:1,tx:0,ty:0}); return cv; }
+
+/* the view: fit, zoom to the brows, pinch, wheel */
+function fitAll(){ const b=DZ.box; if(!b||!DZ.W) return; const s=Math.min(b.w/DZ.W,b.h/DZ.H); DZ.view={s, tx:(b.w-DZ.W*s)/2, ty:(b.h-DZ.H*s)/2}; }
+function zoomBrows(){ const b=DZ.box; if(!b) return; const pts=[]; ['right','left'].forEach(k=>{ const br=DZ.brows[k]; if(br) for(const j in br) pts.push(br[j]); });
+  if(!pts.length){ fitAll(); return; }
+  let x0=Math.min(...pts.map(p=>p.x)), x1=Math.max(...pts.map(p=>p.x)), y0=Math.min(...pts.map(p=>p.y)), y1=Math.max(...pts.map(p=>p.y));
+  const padx=(x1-x0)*0.22+20, pady=(x1-x0)*0.32+20; x0-=padx; x1+=padx; y0-=pady; y1+=pady;
+  const s=Math.min(b.w/(x1-x0), b.h/(y1-y0), 6); DZ.view={s, tx:(b.w-(x0+x1)*s)/2, ty:(b.h-(y0+y1)*s)/2}; }
+function zoomAt(c,k){ const v=DZ.view; const s=Math.max(0.03,Math.min(24,v.s*k)); k=s/v.s; DZ.view={s, tx:c.x-(c.x-v.tx)*k, ty:c.y-(c.y-v.ty)*k}; }
+function hitHandle(c){ const {s,tx,ty}=DZ.view; let best=null, bd=18;
+  [DZ.active, DZ.active==='right'?'left':'right'].forEach(side=>handlePoints(side).forEach(h=>{ const d=Math.hypot(h.x*s+tx-c.x, h.y*s+ty-c.y); if(d<bd){ bd=d; best={side,k:h.k}; } }));
+  return best; }
+function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; if(!g) continue;
+    const poly=g.pts.map(q=>q.top).concat(g.pts.slice().reverse().map(q=>q.bot)); let inside=false;
+    for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const a=poly[i], b=poly[j];
+      if((a.y>p.y)!==(b.y>p.y) && p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x) inside=!inside; }
+    if(inside) return side; } return null; }
+(function wireDz(){
+  const st=$('#dzStage'), ptrs=new Map(); let drag=null, pinch=null;
+  const css=e=>{ const r=st.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
+  const toPhoto=e=>{ const c=css(e), {s,tx,ty}=DZ.view; return {x:(c.x-tx)/s, y:(c.y-ty)/s}; };
+  st.addEventListener('pointerdown',e=>{ if(e.button) return; e.preventDefault(); st.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,css(e));
+    if(ptrs.size===2){ drag=null; const [a,b]=[...ptrs.values()]; pinch={d:V.dist(a,b), m:V.mid(a,b), view:{...DZ.view}}; return; }
+    if(ptrs.size>2||!DZ.id) return;
+    const p=toPhoto(e), c=css(e), hit=DZ.guides&&!DZ.orig?hitHandle(c):null;
+    if(hit){ drag={kind:'handle',side:hit.side,k:hit.k,start:p,orig:{...DZ.brows[hit.side][hit.k]}}; DZ.active=hit.side; }
+    else { const side=DZ.orig?null:hitBrow(p);
+      if(side){ drag={kind:'brow',side,start:p,orig:cloneBrow(DZ.brows[side])}; DZ.active=side; }
+      else drag={kind:'pan',start:c,view:{...DZ.view}}; }
+    st.style.cursor=drag.kind==='pan'?'grabbing':'move'; dzActiveLabel(); dzRender(); });
+  st.addEventListener('pointermove',e=>{ if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId,css(e));
+    if(pinch&&ptrs.size===2){ const [a,b]=[...ptrs.values()], d=V.dist(a,b), m=V.mid(a,b);
+      const s=Math.max(0.03,Math.min(24,pinch.view.s*d/Math.max(1,pinch.d))), k=s/pinch.view.s;
+      DZ.view={s, tx:m.x-(pinch.m.x-pinch.view.tx)*k, ty:m.y-(pinch.m.y-pinch.view.ty)*k}; dzRender(); return; }
+    if(!drag) return;
+    if(drag.kind==='pan'){ const c=css(e); DZ.view.tx=drag.view.tx+(c.x-drag.start.x); DZ.view.ty=drag.view.ty+(c.y-drag.start.y); dzRender(); return; }
+    const d=V.sub(toPhoto(e),drag.start);
+    if(drag.kind==='handle') DZ.brows[drag.side][drag.k]=V.add(drag.orig,d);
+    else { const b=DZ.brows[drag.side]; for(const k in drag.orig) b[k]=V.add(drag.orig[k],d); }
+    if(DZ.sym) mirrorBrow(drag.side);
+    dzRender(); dzDirty(); });
+  const up=e=>{ ptrs.delete(e.pointerId); try{ st.releasePointerCapture(e.pointerId); }catch(_){}
+    if(ptrs.size<2) pinch=null; if(!ptrs.size){ drag=null; st.style.cursor=''; } };
+  st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(css(e), Math.exp(-e.deltaY*0.0015)); dzRender(); },{passive:false});
+  addEventListener('resize',()=>{ if($('#dz').hidden) return; dzResize(); dzRender(); });
+  const orig=$('#dzOrig'); const hold=on=>{ DZ.orig=on; orig.classList.toggle('on',on); dzRender(); };
+  orig.addEventListener('pointerdown',e=>{ e.preventDefault(); orig.setPointerCapture(e.pointerId); hold(true); });
+  ['pointerup','pointercancel'].forEach(ev=>orig.addEventListener(ev,()=>hold(false)));
+  document.addEventListener('keydown',e=>{ if($('#dz').hidden||e.repeat) return; const tag=(e.target.tagName||'').toLowerCase();
+    if(e.key===' '&&tag!=='input'&&tag!=='textarea'){ e.preventDefault(); hold(true); } });
+  document.addEventListener('keyup',e=>{ if($('#dz').hidden) return; if(e.key===' ') hold(false); });
+  $('#dzZoomBrow').onclick=()=>{ zoomBrows(); dzRender(); }; $('#dzZoomAll').onclick=()=>{ fitAll(); dzRender(); };
+  $('#dzSym').onclick=()=>{ DZ.sym=!DZ.sym; $('#dzSym').classList.toggle('on',DZ.sym); if(DZ.sym){ mirrorBrow(DZ.active); dzRender(); dzDirty(); } };
+  $('#dzClose').onclick=closeDz;
+  $('#dzClient').addEventListener('input',()=>{ DZ.client=$('#dzClient').value; dzDirty(); });
+  $$('#dzTabs button').forEach(b=>b.onclick=()=>{ $$('#dzTabs button').forEach(x=>x.classList.toggle('on',x===b));
+    $$('.dz-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===b.dataset.t)); });
+  $('#dzCopyRL').onclick=()=>{ mirrorBrow('right'); dzRender(); dzDirty(); }; $('#dzCopyLR').onclick=()=>{ mirrorBrow('left'); dzRender(); dzDirty(); };
+  $('#dzReset').onclick=()=>{ if(!DZ.tex.right) return; DZ.brows=initBrows(); dzRender(); dzDirty(); };
+  $('#dzGuides').onchange=()=>{ DZ.guides=$('#dzGuides').checked; dzRender(); };
+  $('#dzPad').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) nudge(b.dataset.n); });
+  $('#dzIpd').addEventListener('input',()=>{ DZ.ipd=Math.max(50,Math.min(75,+$('#dzIpd').value||62)); dzRender(); dzDirty(); });
+  $('#dzNotes').addEventListener('input',()=>{ DZ.notes=$('#dzNotes').value; dzDirty(); });
+  $('#dzUpload').onclick=()=>$('#dzFile').click();
+  $('#dzFile').addEventListener('change',async()=>{ const files=[...$('#dzFile').files]; $('#dzFile').value=''; if(!files.length) return;
+    let added=[]; for(const f of files){ try{ const b64=await readFile(f); const out=await post('api/templates',{name:f.name.replace(/\.[^.]+$/,''), image:b64, side:$('#dzSide').value});
+        added=added.concat(out.added||[]); }catch(err){ toast(f.name+': '+err.message,'bad'); } }
+    if(added.length){ await loadTemplates(); await setTemplate(added[0].id); if(!DZ.brows.right) DZ.brows=initBrows(); zoomBrows(); dzRender(); dzDirty(); toast(`도안 ${added.length}개를 넣었습니다`,'good'); } });
+  $('#dzSave').onclick=()=>dzSave(false); $('#dzDownload').onclick=dzDownload; $('#dzPrint').onclick=()=>dzSave(true);
+})();
+function nudge(n){ const side=DZ.active, b=DZ.brows[side]; if(!b) return; const mm=pxPerMm(), up=faceUp(), sign=side==='right'?-1:1;
+  const move=(pts,d)=>pts.forEach(k=>{ b[k]=V.add(b[k],d); });
+  const all=['hT','hB','aT','aB','t'], H=V.mid(b.hT,b.hB);
+  const along=V.unit(V.sub(b.t,H));
+  if(n==='up') move(all,V.mul(up,0.5*mm)); if(n==='down') move(all,V.mul(up,-0.5*mm));
+  if(n==='in') move(all,V.mul({x:-sign*mm*0.5,y:0},1)); if(n==='out') move(all,V.mul({x:sign*mm*0.5,y:0},1));
+  if(n==='longer') b.t=V.add(b.t,V.mul(along,mm)); if(n==='shorter') b.t=V.sub(b.t,V.mul(along,mm));
+  if(n==='thicker'){ b.hT=V.add(b.hT,V.mul(up,0.25*mm)); b.hB=V.sub(b.hB,V.mul(up,0.25*mm)); b.aT=V.add(b.aT,V.mul(up,0.25*mm)); b.aB=V.sub(b.aB,V.mul(up,0.25*mm)); }
+  if(n==='thinner'){ b.hT=V.sub(b.hT,V.mul(up,0.25*mm)); b.hB=V.add(b.hB,V.mul(up,0.25*mm)); b.aT=V.sub(b.aT,V.mul(up,0.25*mm)); b.aB=V.add(b.aB,V.mul(up,0.25*mm)); }
+  if(n==='tailup') b.t=V.add(b.t,V.mul(up,0.5*mm)); if(n==='taildown') b.t=V.sub(b.t,V.mul(up,0.5*mm));
+  if(n==='archup') move(['aT','aB'],V.mul(up,0.5*mm)); if(n==='archdown') move(['aT','aB'],V.mul(up,-0.5*mm));
+  if(DZ.sym) mirrorBrow(side); dzRender(); dzDirty(); }
+function dzActiveLabel(){ const l=$('#dzActiveKo'); if(l) l.textContent='· '+(DZ.active==='right'?'오른쪽':'왼쪽')+' 눈썹'; }
+function dzMeasure(){
+  const g=DZ.geo[DZ.active], o=DZ.geo[DZ.active==='right'?'left':'right'], mm=pxPerMm(), up=faceUp(), f=v=>(v/mm).toFixed(1);
+  if(!g){ $('#dzNums').textContent=''; return; }
+  const b=DZ.brows[DZ.active], rows=[['길이', f(V.dist(g.H,g.T))+' mm'], ['아치 두께', f(V.dist(b.aT,b.aB))+' mm'], ['머리 두께', f(V.dist(b.hT,b.hB))+' mm']];
+  const tail=V.dot(V.sub(g.T,g.H),up), arch=V.dot(V.sub(b.aT,b.hT),up);
+  rows.push(['꼬리 높이', (tail>=0?'+':'')+f(tail)+' mm']); rows.push(['아치 높이', (arch>=0?'+':'')+f(arch)+' mm']);
+  if(o) rows.push(['미간 (머리 사이)', f(V.dist(g.H,o.H))+' mm']);
+  rows.push(['아치 위치', Math.round(DZ.tex[DZ.active].uA*100)+'% 지점']);
+  $('#dzNums').textContent=(DZ.active==='right'?'오른쪽':'왼쪽')+' · '+rows.slice(0,4).map(r=>r[0]+' '+r[1]).join(' · ');
+  const dl=$('#dzSpec'); dl.replaceChildren(); rows.forEach(([k,v])=>spec(dl,k,v));
+  if(!DZ.ipdPx) spec(dl,'주의','얼굴을 찾지 못해 치수는 대략값입니다');
+}
+
+/* panel contents */
+function renderTplList(){
+  const box=$('#dzTpls'); box.replaceChildren();
+  if(!DZ.tpls.length){ box.appendChild(el('div','hint','아직 도안이 없습니다. 아래에서 도안을 올리세요.')); return; }
+  DZ.tpls.forEach(t=>{ const c=el('button','dz-tpl'+(t.id===DZ.tplId?' on':'')); c.type='button';
+    const cv=document.createElement('canvas'); cv.width=240; cv.height=68; c.appendChild(cv);
+    loadImg(t.right||t.left).then(im=>{ const x=cv.getContext('2d'); const k=Math.min(220/im.naturalWidth, 60/im.naturalHeight);
+      x.save(); if(!t.right){ x.translate(240,0); x.scale(-1,1); } x.drawImage(im,(240-im.naturalWidth*k)/2,(68-im.naturalHeight*k)/2,im.naturalWidth*k,im.naturalHeight*k); x.restore(); }).catch(()=>{});
+    c.appendChild(el('span','',t.name+(t.side==='pair'?'':' · 한 짝')));
+    const x=el('span','x','×'); x.title='도안 삭제';
+    x.onclick=async e=>{ e.stopPropagation(); if(!confirm(`도안 "${t.name}"을 지울까요?`)) return;
+      try{ await post('api/templates/'+t.id+'/delete'); await loadTemplates(); if(DZ.tplId===t.id) await setTemplate(null); renderTplList(); dzRender(); }catch(err){ toast(err.message,'bad'); } };
+    c.appendChild(x);
+    c.onclick=async()=>{ await setTemplate(t.id); if(!DZ.brows.right) DZ.brows=initBrows(); dzRender(); dzDirty(); };
+    box.appendChild(c); });
+}
+async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templates||[]; }catch(e){ DZ.tpls=[]; } renderTplList(); }
+function renderLookPanel(){
+  const st=$('#dzStages'); st.replaceChildren();
+  STAGES.forEach(([k,ko,op,bl])=>{ const b=el('button','',ko); b.type='button'; b.classList.toggle('on',DZ.look.opacity===op&&DZ.look.blur===bl);
+    b.onclick=()=>{ DZ.look.opacity=op; DZ.look.blur=bl; renderLookPanel(); dzRender(); dzDirty(); }; st.appendChild(b); });
+  const mkSliders=(box,list,after)=>{ box.replaceChildren();
+    list.forEach(([key,ko,lo,hi])=>{ const row=el('label','sl'); row.appendChild(el('span','',ko));
+      const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.value=DZ.look[key]; const out=el('b','',String(DZ.look[key]));
+      r.addEventListener('input',()=>{ DZ.look[key]=+r.value; out.textContent=r.value; if(after||key==='density'||key==='weight') retint(); dzRender(); dzDirty();
+        if(key==='opacity'||key==='blur') $$('#dzStages button').forEach(b=>b.classList.remove('on')); });
+      row.appendChild(r); row.appendChild(out); box.appendChild(row); }); };
+  mkSliders($('#dzLookSliders'),LOOK_SLIDERS); mkSliders($('#dzColorSliders'),COLOR_SLIDERS,retint);
+  const cs=$('#dzColors'); cs.replaceChildren();
+  PIGMENTS.forEach(([k,ko,rgb])=>{ const b=el('button'); b.type='button'; const sw=el('i'); const c=rgb||DZ.hair;
+    sw.style.background=c?`rgb(${c[0]},${c[1]},${c[2]})`:'linear-gradient(135deg,#444,#c9a)'; b.appendChild(sw); b.appendChild(el('span','',ko));
+    b.classList.toggle('on',DZ.look.color===k); if(k==='hair'&&!DZ.hair) b.title='머리카락을 찾지 못해 기본 갈색을 씁니다';
+    b.onclick=()=>{ DZ.look.color=k; retint(); renderLookPanel(); dzRender(); dzDirty(); }; cs.appendChild(b); });
+}
+
+/* open, save, close */
+function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active}; }
+function dzDirty(){ DZ.dirtySince=Date.now(); clearTimeout(DZ.saveTimer);
+  DZ.saveTimer=setTimeout(async()=>{ if(!DZ.id) return; try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client}); }catch(e){} }, 900); }
+async function openDesign(id){
+  const dz=$('#dz'); dz.hidden=false; $('#dzWait').hidden=false;
+  try{
+    const d=await api('api/designs/'+id);
+    DZ.id=id; DZ.W=d.width; DZ.H=d.height; DZ.lm=d.placement?d.placement.landmarks:null; DZ.ipdPx=d.placement?d.placement.ipd_px:0;
+    DZ.client=d.client||''; DZ.saves=d.saves||[]; DZ.lastSave=DZ.saves.length?DZ.saves[DZ.saves.length-1]:null;
+    DZ.look={...LOOK0}; DZ.sym=true; DZ.notes=''; DZ.ipd=62; DZ.tplId=null; DZ.active='right'; DZ.orig=false; DZ.geo={};
+    DZ.anchor=initAnchors(); DZ.brows={};
+    const s=d.state||{};
+    if(s.brows&&s.brows.right&&s.brows.left){ DZ.brows={right:cloneBrow(s.brows.right), left:cloneBrow(s.brows.left)}; }
+    if(s.look) DZ.look={...LOOK0,...s.look}; if(typeof s.sym==='boolean') DZ.sym=s.sym; if(s.ipd) DZ.ipd=+s.ipd; if(s.notes) DZ.notes=s.notes; if(s.tpl) DZ.tplId=s.tpl;
+    $('#dzClient').value=DZ.client; $('#dzNotes').value=DZ.notes; $('#dzIpd').value=DZ.ipd; $('#dzSym').classList.toggle('on',DZ.sym);
+    $('#dzGuides').checked=DZ.guides=true; $('#dzSaveNote').textContent=DZ.saves.length?`저장 ${DZ.saves.length}장 · 마지막 ${fmtTime(DZ.lastSave.created)}`:'';
+    dzResize();
+    await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
+    DZ.hair=sampleHair();
+    await loadTemplates(); await setTemplate(DZ.tplId);
+    if(DZ.tex.right){ const auto=initBrows(); if(!DZ.brows.right||!DZ.brows.left) DZ.brows=auto; }
+    renderLookPanel(); dzActiveLabel(); zoomBrows(); dzRender();
+    if(d.warning) toast(d.warning,'bad');
+    if(!DZ.tpls.length) { $$('#dzTabs button')[0].click(); toast('먼저 도안을 올려 주세요','bad'); }
+  }catch(e){ toast(e.message,'bad'); dz.hidden=true; }
+  $('#dzWait').hidden=true;
+}
+async function closeDz(){ clearTimeout(DZ.saveTimer);
+  if(DZ.id&&DZ.dirtySince){ try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client}); }catch(e){} }
+  $('#dz').hidden=true; DZ.id=null; DZ.dirtySince=0; await refreshGallery(); }
+async function dzSave(thenPrint){
+  if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const note=$('#dzSaveNote'); note.textContent='저장 중…';
+  try{
+    const data=dzExport().toDataURL('image/jpeg',0.93);
+    const tpl=DZ.tpls.find(t=>t.id===DZ.tplId);
+    const out=await post('api/saves',{job:DZ.id, name:DZ.client, image:data, settings:{...DZ.look, tpl:tpl?tpl.name:'', ipd:DZ.ipd, notes:DZ.notes}});
+    if(!DZ.client){ DZ.client=out.name; $('#dzClient').value=out.name; }
+    DZ.lastSave={image:out.url.replace(/^files\/[^/]+\//,''), name:out.name, created:new Date().toISOString()}; DZ.saves.push(DZ.lastSave);
+    note.textContent=`${out.name} (으)로 저장했습니다`; dzDirty();
+    if(thenPrint){ await post('api/jobs',{kind:'sheet', photo_from:{job:DZ.id, file:DZ.lastSave.image}, photo_name:out.name+' 상담 시안', layout:'both', ipd_mm:String(DZ.ipd)});
+      toast('1:1 출력 시트를 만들고 있습니다 · 갤러리에서 확인하세요','good'); }
+    else toast(out.name+' (으)로 갤러리에 저장했습니다','good');
+  }catch(e){ note.textContent=''; toast(e.message,'bad'); }
+}
+function dzDownload(){ if(!DZ.id||!DZ.tex.right) return toast('도안을 먼저 고르세요','bad');
+  const data=dzExport().toDataURL('image/jpeg',0.93), bin=atob(data.slice(data.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([bytes],{type:'image/jpeg'})), a=document.createElement('a');
+  a.href=url; a.download=`${(DZ.client||'상담').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'상담'}_${new Date().toISOString().slice(0,10)}.jpg`;
+  setTimeout(()=>URL.revokeObjectURL(url),4000); document.body.appendChild(a); a.click(); a.remove(); toast('이미지를 내려받았습니다','good'); }
+async function startDesign(body, btn){
+  if(btn){ btn.disabled=true; btn.dataset.busy='1'; const l=$('[data-design-label]'); if(l) l.textContent='얼굴을 찾는 중…'; }
+  try{ const out=await post('api/designs', body); await refreshGallery(); await openDesign(out.id); }
+  catch(e){ toast(e.message,'bad'); }
+  finally{ if(btn){ btn.disabled=false; delete btn.dataset.busy; const l=$('[data-design-label]'); if(l) l.textContent='사진 분석하고 시작'; } }
+}
+$('#fDesign').onsubmit=async e=>{ e.preventDefault(); const form=e.target, msg=$('[data-msg]',form); msg.textContent='';
+  const body={client:form.client.value}; const f=$('input[type=file]',form);
+  try{
+    if(f.files[0]&&f.files[0].size){ body.photo=await readFile(f.files[0]); body.photo_name=f.files[0].name; }
+    else if(form.photo_from_job.value){ body.photo_from={job:form.photo_from_job.value, file:form.photo_from_file.value}; body.photo_name=$('.pt b',form).textContent; }
+    else throw new Error('사진을 고르세요');
+  }catch(err){ msg.textContent=err.message; return; }
+  await startDesign(body, $('button[type=submit]',form)); };
+function renderRecentDesigns(){
+  const box=$('#dzRecent'), list=$('#dzRecentList'); if(!box) return;
+  const seen=new Set(), rows=items.filter(it=>it.kind==='design'&&!seen.has(it.id)&&seen.add(it.id)).slice(0,6);
+  box.hidden=!rows.length; list.replaceChildren();
+  rows.forEach(it=>{ const b=el('button','btn'); b.type='button'; b.style.justifyContent='flex-start'; b.style.height='auto'; b.style.padding='6px 10px';
+    const im=document.createElement('img'); im.src=it.image+'?w=120'; im.alt=''; im.style.cssText='width:34px;height:42px;object-fit:cover;border-radius:6px';
+    b.appendChild(im); b.appendChild(el('span','',(it.client||it.title)+' · '+fmtTime(it.created)));
+    b.onclick=()=>openDesign(it.id); list.appendChild(b); });
+}
+
 /* ── keyboard ────────────────────────────────────────────────────────── */
 document.addEventListener('keydown',e=>{
   if(!$('#lb').hidden){ if(e.key==='Escape') closeLb(); if(e.key==='ArrowLeft') step(-1); if(e.key==='ArrowRight') step(1); return; }
@@ -1262,7 +1870,8 @@ document.addEventListener('keydown',e=>{
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   const tag=(e.target.tagName||'').toLowerCase();
   if(tag==='input'||tag==='textarea'||tag==='select') return;
-  if(e.key==='1') setView('generate'); if(e.key==='2') setView('restyle'); if(e.key==='3') setView('sheet');
+  if(!$('#dz').hidden){ if(e.key==='Escape') closeDz(); return; }
+  if(e.key==='1') setView('design'); if(e.key==='2') setView('generate'); if(e.key==='3') setView('restyle'); if(e.key==='4') setView('sheet');
   if(e.key==='g'||e.key==='ㅎ') setView('gallery');
 });
 

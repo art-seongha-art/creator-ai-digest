@@ -1628,6 +1628,93 @@ class CliTests(unittest.TestCase):
             self.assertTrue((Path(tmp) / "calibration_A4.png").exists())
 
 
+class DesignTests(unittest.TestCase):
+    """The consultation simulator's template library and photo preparation."""
+
+    def test_cut_upload_keeps_a_transparent_brow_as_it_is(self):
+        from browlab import design as D
+
+        im = Image.new("RGBA", (200, 60), (0, 0, 0, 0))
+        px = im.load()
+        for x in range(30, 170):
+            px[x, 25] = (90, 60, 40, 200)
+        pieces = D.cut_upload(im)
+        self.assertEqual(len(pieces), 1)
+        kind, brow, other = pieces[0]
+        self.assertEqual((kind, other), ("single", None))
+        self.assertEqual(brow.mode, "RGBA")
+        self.assertEqual(brow.size, (140 + 8, 1 + 8))                       # its ink plus the 4 px margin
+        r, g, b, a = brow.getpixel((4 + 10, 4))
+        self.assertEqual(((r, g, b), a), (D.TEMPLATE_COLOUR, 200))            # recolourable: only the alpha is kept
+
+    def test_cut_upload_splits_a_drawn_sheet_into_pairs(self):
+        from browlab import design as D
+
+        pieces = D.cut_upload(_brow_sheet(rows=3))
+        self.assertEqual([p[0] for p in pieces], ["pair", "pair", "pair"])
+        for _, right, left in pieces:
+            self.assertTrue(right.width > 100 and left.width > 100)
+            self.assertGreater(right.getchannel("A").getextrema()[1], 150)
+        # one brow drawn on paper is a single template too
+        single = _brow_sheet(rows=1, watermark=False, scrollbar=False, stray=False).crop((90, 150, 380, 330))
+        pieces = D.cut_upload(single)
+        self.assertEqual(len(pieces), 1)
+        self.assertEqual(pieces[0][0], "single")
+        self.assertGreater(pieces[0][1].getchannel("A").getextrema()[1], 150)
+        with self.assertRaises(ValueError):
+            D.cut_upload(Image.new("L", (100, 50), 255))
+
+    def test_template_store_round_trip(self):
+        from browlab import design as D
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = D.TemplateStore(Path(tmp) / "t")
+            self.assertEqual(store.list(), [])
+            rows = store.add("sheet", _brow_sheet(rows=2), "right")
+            self.assertEqual([r["name"] for r in rows], ["sheet 1", "sheet 2"])
+            self.assertTrue(all(r["side"] == "pair" and r["right"] and r["left"] for r in rows))
+            one = Image.new("RGBA", (50, 20), (0, 0, 0, 0)); one.putpixel((10, 10), (0, 0, 0, 255))
+            (row,) = store.add("", one, "left")
+            self.assertEqual((row["name"], row["side"], row["right"]), ("도안", "left", None))
+            self.assertEqual(len(store.list()), 3)
+            self.assertEqual(store.list()[2]["left"], row["left"])
+            name = row["left"].split("/")[-1]
+            self.assertTrue(store.file(name) and store.file(name).is_file())
+            for bad in ("../templates.json", "templates.json", "t_12345678.png.bak", ""):
+                self.assertIsNone(store.file(bad))
+            self.assertEqual(store.rename(row["id"], " 왼쪽 ")["name"], "왼쪽")
+            self.assertIsNone(store.rename("nope", "x"))
+            self.assertTrue(store.remove(row["id"]))
+            self.assertFalse(store.remove(row["id"]))
+            self.assertIsNone(store.file(name))
+            self.assertEqual(len(store.list()), 2)
+            # a second store over the same folder sees the same library
+            self.assertEqual([r["id"] for r in D.TemplateStore(Path(tmp) / "t").list()], [r["id"] for r in rows])
+
+    def test_prepare_photo_uprights_and_bounds(self):
+        from browlab import design as D
+
+        big = Image.new("RGB", (4000, 3000), (200, 170, 150))
+        out = D.prepare_photo(big)
+        self.assertEqual(max(out.size), 3000)
+        self.assertEqual(out.size, (3000, 2250))
+        tall = Image.new("RGB", (300, 400), (1, 2, 3))
+        tall.putpixel((0, 0), (255, 0, 0))
+        exif = tall.getexif(); exif[0x0112] = 6                            # "rotate 90 CW" as phones write it
+        buf = io.BytesIO(); tall.save(buf, "JPEG", exif=exif.tobytes())
+        with Image.open(io.BytesIO(buf.getvalue())) as im:
+            up = D.prepare_photo(im)
+        self.assertEqual(up.size, (400, 300))
+        self.assertEqual(up.mode, "RGB")
+
+    def test_analyse_without_a_face_says_so(self):
+        from browlab import design as D
+
+        payload, warning = D.analyse(Image.new("RGB", (200, 300), (220, 190, 170)))
+        self.assertIsNone(payload)
+        self.assertTrue(warning)
+
+
 class MediapipeTests(unittest.TestCase):
     """Runs only when a real face photo is supplied via BROWLAB_TEST_FACE."""
 
