@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- "홈 화면에 추가" runs the page with no browser chrome at all, which is the only way an
+     iPad gives a full screen no gesture can take back -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BrowLab">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f5f3f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
@@ -373,6 +379,9 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-tabs .fold{flex:0 0 38px;font-size:17px;color:var(--muted)}
 .dz.folded .dz-body{display:none}
 .dz.folded .dz-tabs .fold{transform:rotate(180deg)}
+/* 전체화면: the page's own, so a swipe that cancels the browser's does not undo it */
+.dz.immersive{grid-template-rows:minmax(0,1fr)}
+.dz.immersive .dz-top,.dz.immersive .dz-side{display:none}
 .dz-body{overflow:auto;padding:10px 12px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;min-height:0}
 .dz-tab{display:none;flex-direction:column;gap:10px}.dz-tab.on{display:flex}
 .dz-tab .edit{padding:10px}
@@ -396,6 +405,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-note{font-size:12px;color:var(--muted)}
 .dz-file{display:none}
 @media (min-width:1120px){
+  .dz.immersive{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
   .dz-legend{display:flex}
   .dz-tabs .fold{display:none}
   .dz.folded .dz-body{display:flex}
@@ -748,6 +758,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
       <button class="btn" id="dzZoomBrow" type="button" title="눈썹 부분 확대">눈썹</button>
       <button class="btn" id="dzZoomAll" type="button" title="사진 전체">전체</button>
       <button class="btn" id="dzHeal" type="button" title="잔털·잡티 위를 문지르면 주변 피부로 메웁니다">잔털 지우기</button>
+      <button class="btn" id="dzExit" type="button" title="전체화면 끝내기" hidden>전체화면 끝내기</button>
     </div>
     <div class="dz-heal" id="dzHealBox" hidden>
       <span>지름 <b id="dzHealMm">1.5</b> mm</span>
@@ -1575,6 +1586,7 @@ function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise(
 async function setTemplate(id){
   const row=DZ.tpls.find(t=>t.id===id)||DZ.tpls[0]; if(!row){ DZ.tex={}; return; }
   DZ.tplId=row.id;
+  DZ.shapeCache={}; DZ.layKey=null;
   for(const side of ['right','left']){ const other=side==='right'?'left':'right';
     const url=row[side]||row[other], flip=!row[side];        // one file serves both sides, mirrored
     const img=await loadImg(url); DZ.tex[side]=analyseTemplate(img, flip, side==='right'); }
@@ -1585,23 +1597,37 @@ function pigmentRGB(){
   if(!rgb) rgb=DZ.hair||PIGMENTS[0][2];
   const k=1+o.light/100; return rgb.map((v,i)=>Math.max(0,Math.min(255,Math.round(v*k+(i===0?o.warm*0.55:i===2?-o.warm*0.55:0)))));
 }
-function retint(){ const rgb=pigmentRGB(), o=DZ.look;
-  // 선 굵기: above 5 each stroke grows toward a one-pixel dilation, below 5 it shrinks toward a
-  // one-pixel erosion; 선 진하기: the alpha is raised (>1) or lowered (<1) as if the drawing were
-  // laid on itself that many times. At 5 and 1 the drawing is exactly as drawn.
-  const wgt=Math.max(0,Math.min(10,+o.weight||0)), dens=Math.max(0.2,Math.min(2,+o.density||1));
+// 선 굵기: above 5 each stroke grows toward a one-pixel dilation, below 5 it shrinks toward a
+// one-pixel erosion; 선 진하기: the alpha is raised (>1) or lowered (<1) as if the drawing were
+// laid on itself that many times. At 5 and 1 the drawing is exactly as drawn.
+// The per-pixel work depends only on those two, so it is cached: moving a colour slider (or
+// 강도, or 부드러움) never touches a pixel in JavaScript again.
+function shapeCanvas(side, wgt, dens){
+  const T=DZ.tex[side]; if(!T) return null;
+  const key=side+':'+wgt+':'+dens; DZ.shapeCache=DZ.shapeCache||{};
+  if(DZ.shapeCache[key]) return DZ.shapeCache[key];
+  const W=T.W, H=T.H, a=T.alpha, n=W*H, out=new Float32Array(a);
   const grow=wgt>5?(wgt-5)/5:0, shrink=wgt<5?(5-wgt)/5:0;
-  ['right','left'].forEach(side=>{ const T=DZ.tex[side]; if(!T) return;
+  if(grow||shrink){ for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x; let mx=a[i], mn=a[i];
+      for(let ky=-1;ky<=1;ky++){ const yy=y+ky; if(yy<0||yy>=H) continue; for(let kx=-1;kx<=1;kx++){ const xx=x+kx; if(xx<0||xx>=W) continue;
+        const v=a[yy*W+xx]; if(v>mx) mx=v; if(v<mn) mn=v; } }
+      out[i]=grow? a[i]+grow*(mx-a[i]) : a[i]-shrink*(a[i]-mn); } }
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const c=cv.getContext('2d'), img=c.createImageData(W,H), d=img.data;
+  for(let i=0;i<n;i++){ const v=out[i]; if(v<=0) continue; const al=dens===1?v:1-Math.pow(1-v,dens);
+    d[i*4+3]=Math.round(Math.min(1,al)*255); }                 // black, with the finished alpha
+  c.putImageData(img,0,0);
+  const keys=Object.keys(DZ.shapeCache); if(keys.length>24) delete DZ.shapeCache[keys[0]];
+  return DZ.shapeCache[key]=cv;
+}
+function retint(){ const rgb=pigmentRGB(), o=DZ.look;
+  const wgt=Math.max(0,Math.min(10,+o.weight||0)), dens=Math.max(0.2,Math.min(2,+o.density||1));
+  ['right','left'].forEach(side=>{ const T=DZ.tex[side], shape=shapeCanvas(side,wgt,dens); if(!T||!shape) return;
     const cv=DZ.tint[side]||(DZ.tint[side]=document.createElement('canvas')); cv.width=T.W; cv.height=T.H;
-    const W=T.W, H=T.H, a=T.alpha, n=W*H, out=new Float32Array(a);
-    if(grow||shrink){ for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=y*W+x; let mx=a[i], mn=a[i];
-        for(let ky=-1;ky<=1;ky++){ const yy=y+ky; if(yy<0||yy>=H) continue; for(let kx=-1;kx<=1;kx++){ const xx=x+kx; if(xx<0||xx>=W) continue;
-          const v=a[yy*W+xx]; if(v>mx) mx=v; if(v<mn) mn=v; } }
-        out[i]=grow? a[i]+grow*(mx-a[i]) : a[i]-shrink*(a[i]-mn); } }
-    const img=cv.getContext('2d').createImageData(W,H), d=img.data;
-    for(let i=0;i<n;i++){ const v=out[i]; if(v<=0) continue; const al=dens===1?v:1-Math.pow(1-v,dens);
-      d[i*4]=rgb[0]; d[i*4+1]=rgb[1]; d[i*4+2]=rgb[2]; d[i*4+3]=Math.round(Math.min(1,al)*255); }
-    cv.getContext('2d').putImageData(img,0,0); });
+    const c=cv.getContext('2d'); c.clearRect(0,0,T.W,T.H); c.drawImage(shape,0,0);
+    c.globalCompositeOperation='source-in'; c.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; c.fillRect(0,0,T.W,T.H);
+    c.globalCompositeOperation='source-over'; });
+  DZ.layKey=null;                                              // the painted layer is stale
 }
 function sampleHair(){ // the darker part of the strip above the forehead; nothing there means no hair to match
   const lm=DZ.lm; if(!lm||!DZ.photo.naturalWidth) return null; const ipd=DZ.ipdPx||DZ.W/6;
@@ -1711,20 +1737,26 @@ function drawMesh(ctx, side, g){
 function paintBrows(ctx, view, clipX){
   const geos=['right','left'].map(browGeometry).filter(Boolean); DZ.geo={}; geos.forEach(g=>DZ.geo[g.side]=g);
   if(!geos.length) return;
-  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
-  geos.forEach(g=>g.pts.forEach(p=>[p.top,p.bot].forEach(q=>{ const X=q.x*view.s+view.tx, Y=q.y*view.s+view.ty;
-    if(X<x0) x0=X; if(Y<y0) y0=Y; if(X>x1) x1=X; if(Y>y1) y1=Y; })));
   const blur=DZ.look.blur/100*0.28*pxPerMm()*view.s;          // 부드러움 is in millimetres on the face, not screen pixels
-  const pad=Math.ceil(blur*3+6); x0=Math.floor(x0)-pad; y0=Math.floor(y0)-pad; x1=Math.ceil(x1)+pad; y1=Math.ceil(y1)+pad;
-  const w=x1-x0, h=y1-y0; if(!(w>0&&h>0)||w>8192||h>8192) return;
-  const lay=DZ.lay||(DZ.lay=document.createElement('canvas')); lay.width=w; lay.height=h;
-  const lc=lay.getContext('2d'); lc.imageSmoothingQuality='high'; lc.setTransform(view.s,0,0,view.s,view.tx-x0,view.ty-y0);
-  geos.forEach(g=>drawMesh(lc,g.side,g));
+  // The mesh is 320 clipped affine draws; strength, softness, the compare line and the
+  // before/after tap do not change it, so it is painted once and kept until it really moves.
+  const key=JSON.stringify([DZ.brows, DZ.tplId, view.s, view.tx, view.ty, Math.round(blur*100), DZ.look.color, DZ.look.light, DZ.look.warm, DZ.look.weight, DZ.look.density]);
+  if(DZ.layKey!==key||!DZ.lay){
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+    geos.forEach(g=>g.pts.forEach(p=>[p.top,p.bot].forEach(q=>{ const X=q.x*view.s+view.tx, Y=q.y*view.s+view.ty;
+      if(X<x0) x0=X; if(Y<y0) y0=Y; if(X>x1) x1=X; if(Y>y1) y1=Y; })));
+    const pad=Math.ceil(blur*3+6); x0=Math.floor(x0)-pad; y0=Math.floor(y0)-pad; x1=Math.ceil(x1)+pad; y1=Math.ceil(y1)+pad;
+    const w=x1-x0, h=y1-y0; if(!(w>0&&h>0)||w>8192||h>8192) return;
+    const lay=DZ.lay||(DZ.lay=document.createElement('canvas')); lay.width=w; lay.height=h;
+    const lc=lay.getContext('2d'); lc.imageSmoothingQuality='high'; lc.setTransform(view.s,0,0,view.s,view.tx-x0,view.ty-y0);
+    geos.forEach(g=>drawMesh(lc,g.side,g));
+    DZ.layAt={x:x0,y:y0}; DZ.layKey=key;
+  }
   ctx.save(); ctx.setTransform(1,0,0,1,0,0);
   if(clipX!==undefined){ ctx.beginPath(); ctx.rect(clipX,0,ctx.canvas.width-clipX,ctx.canvas.height); ctx.clip(); }   // 비교: the design only right of the line
   ctx.globalCompositeOperation='multiply'; ctx.globalAlpha=Math.max(0,Math.min(1,DZ.look.opacity/100));
   if(blur>0.15) ctx.filter=`blur(${blur.toFixed(2)}px)`;
-  ctx.drawImage(lay,x0,y0); ctx.restore();
+  ctx.drawImage(DZ.lay,DZ.layAt.x,DZ.layAt.y); ctx.restore();
 }
 function handlePoints(side){ const g=DZ.geo[side], b=DZ.brows[side]; if(!g||!b) return [];
   return ['hT','mT','aT','hB','mB','aB','t'].filter(k=>b[k]).map(k=>({k, x:b[k].x, y:b[k].y})); }
@@ -1805,7 +1837,11 @@ function drawGuideLines(ctx){ // the sheet's design lines: nostril → inner cor
   ctx.restore();
 }
 function dzExport(){ const cv=document.createElement('canvas'); cv.width=DZ.W; cv.height=DZ.H; const ctx=cv.getContext('2d');
-  ctx.drawImage(DZ.base||DZ.photo,0,0); paintBrows(ctx,{s:1,tx:0,ty:0}); return cv; }
+  ctx.drawImage(DZ.base||DZ.photo,0,0);
+  const lay=DZ.lay, at=DZ.layAt, key=DZ.layKey; DZ.lay=null; DZ.layKey=null;   // full size, in its own layer
+  paintBrows(ctx,{s:1,tx:0,ty:0});
+  DZ.lay=lay; DZ.layAt=at; DZ.layKey=key;
+  return cv; }
 
 /* the view: fit, zoom to the brows, pinch, wheel */
 /* 잔털 지우기: a spot-heal brush. Under the brush, pixels darker than the skin around
@@ -1945,6 +1981,9 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   ['pointerup','pointercancel'].forEach(ev=>orig.addEventListener(ev,()=>hold(false)));
   document.addEventListener('keydown',e=>{ if($('#dz').hidden) return; const tag=(e.target.tagName||'').toLowerCase();
     if(tag==='input'||tag==='textarea') return;
+    // this listener was registered first, so stopping it here also stops the page's own
+    // Escape handler further down - otherwise leaving 전체화면 closed the studio as well
+    if(e.key==='Escape'&&$('#dz').classList.contains('immersive')){ e.preventDefault(); e.stopImmediatePropagation(); $('#dzFull').onclick(); return; }
     if(e.key===' '&&!e.repeat){ e.preventDefault(); hold(true); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){ e.preventDefault(); restoreHist(DZ.histAt+(e.shiftKey?1:-1)); return; }
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){ e.preventDefault(); restoreHist(DZ.histAt+1); return; }
@@ -1968,11 +2007,19 @@ function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; 
   // 전체화면: the browser's own full screen where it allows it (desktop, iPad); where it does not
   // (iPhone), the panel folds away so the picture gets the whole screen anyway
   const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
-  $('#dzFull').onclick=async()=>{ const dz=$('#dz');
-    try{ if(fsEl()){ await (document.exitFullscreen||document.webkitExitFullscreen).call(document); return; }
-      const req=dz.requestFullscreen||dz.webkitRequestFullscreen; if(!req) throw new Error('no fullscreen'); await req.call(dz); }
-    catch(_){ dz.classList.toggle('folded'); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); } };
-  ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>{ $('#dzFull').classList.toggle('on',!!fsEl()); requestAnimationFrame(()=>{ dzResize(); dzRender(); }); }));
+  const immersive=on=>{ const dz=$('#dz'); dz.classList.toggle('immersive',on);
+    $('#dzFull').classList.toggle('on',on); $('#dzExit').hidden=!on;
+    requestAnimationFrame(()=>{ dzResize(); dzRender(); }); };
+  DZ.immersive=immersive;
+  $('#dzFull').onclick=async()=>{ const dz=$('#dz'), on=!dz.classList.contains('immersive');
+    immersive(on);                                             // the page's own full screen, first and always
+    try{ if(on){ const req=dz.requestFullscreen||dz.webkitRequestFullscreen; if(req) await req.call(dz); }
+      else if(fsEl()) await (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+    catch(_){}                                                 // the browser's is a bonus; losing it changes nothing
+  };
+  $('#dzExit').onclick=()=>$('#dzFull').onclick();
+  // an iPad leaves the browser's full screen on the smallest swipe: keep ours
+  ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>{ requestAnimationFrame(()=>{ dzResize(); dzRender(); }); }));
   $('#dzClose').onclick=closeDz;
   $('#dzClient').addEventListener('input',()=>{ DZ.client=$('#dzClient').value; dzDirty(); });
   $$('#dzTabs button').forEach(b=>b.onclick=()=>{ $$('#dzTabs button').forEach(x=>x.classList.toggle('on',x===b));
@@ -2051,7 +2098,8 @@ function renderLookPanel(){
   const mkSliders=(box,list,after)=>{ box.replaceChildren();
     list.forEach(([key,ko,lo,hi,step])=>{ const row=el('label','sl'); row.appendChild(el('span','',ko));
       const r=document.createElement('input'); r.type='range'; r.min=lo; r.max=hi; r.step=step||1; r.value=DZ.look[key]; const out=el('b','',String(DZ.look[key]));
-      r.addEventListener('input',()=>{ DZ.look[key]=+r.value; out.textContent=r.value; if(after||key==='density'||key==='weight') retint(); dzRender(); dzDirty();
+      // an iPad fires input far faster than a frame; coalescing keeps the handle under the finger
+      r.addEventListener('input',()=>{ DZ.look[key]=+r.value; out.textContent=r.value; if(after||key==='density'||key==='weight') retint(); dzRenderSoon(); dzDirty();
         if(key==='opacity'||key==='blur') $$('#dzStages button').forEach(b=>b.classList.remove('on')); });
       r.addEventListener('change',pushHist);
       row.appendChild(r); row.appendChild(out); box.appendChild(row); }); };
@@ -2062,6 +2110,9 @@ function renderLookPanel(){
     b.classList.toggle('on',DZ.look.color===k); if(k==='hair'&&!DZ.hair) b.title='머리카락을 찾지 못해 기본 갈색을 씁니다';
     b.onclick=()=>{ DZ.look.color=k; retint(); renderLookPanel(); dzRender(); dzDirty(); pushHist(); }; cs.appendChild(b); });
 }
+
+function immersiveOff(){ const dz=$('#dz'); if(!dz.classList.contains('immersive')) return;
+  dz.classList.remove('immersive'); $('#dzFull').classList.remove('on'); $('#dzExit').hidden=true; }
 
 /* open, save, close */
 function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active, retouch:DZ.retouch}; }
@@ -2082,8 +2133,8 @@ async function openDesign(id){
     if(typeof s.sym==='boolean') DZ.sym=s.sym; if(s.ipd) DZ.ipd=+s.ipd; if(s.notes) DZ.notes=s.notes; if(s.tpl) DZ.tplId=s.tpl;
     $('#dzClient').value=DZ.client; $('#dzNotes').value=DZ.notes; $('#dzIpd').value=DZ.ipd; $('#dzSym').classList.toggle('on',DZ.sym);
     $('#dzGuides').checked=DZ.guides=true; $('#dzPts').classList.add('on'); DZ.wipe={on:false,x:0.5}; $('#dzWipe').classList.remove('on');
-    DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded');
-    DZ.hist=[]; DZ.histAt=-1; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
+    DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded'); immersiveOff();
+    DZ.hist=[]; DZ.histAt=-1; DZ.layKey=null; DZ.shapeCache={}; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
     $('#dzSaveNote').textContent=DZ.saves.length?`저장 ${DZ.saves.length}장 · 마지막 ${fmtTime(DZ.lastSave.created)}`:'';
     dzResize();
     await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
@@ -2173,7 +2224,7 @@ document.addEventListener('keydown',e=>{
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   const tag=(e.target.tagName||'').toLowerCase();
   if(tag==='input'||tag==='textarea'||tag==='select') return;
-  if(!$('#dz').hidden){ if(e.key==='Escape') closeDz(); return; }
+  if(!$('#dz').hidden){ if(e.key==='Escape'&&!$('#dz').classList.contains('immersive')) closeDz(); return; }
   if(e.key==='1') setView('design'); if(e.key==='2') setView('generate'); if(e.key==='3') setView('restyle'); if(e.key==='4') setView('sheet');
   if(e.key==='g'||e.key==='ㅎ') setView('gallery');
 });
