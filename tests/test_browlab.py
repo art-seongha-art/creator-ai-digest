@@ -1664,11 +1664,31 @@ class DesignTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             D.cut_upload(Image.new("L", (100, 50), 255))
 
+    def test_a_new_library_starts_with_the_built_in_pairs(self):
+        from browlab import design as D
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = D.TemplateStore(Path(tmp) / "t")
+            rows = store.list()
+            self.assertEqual([r["name"] for r in rows], [n for n, _ in D.BUILTINS])
+            self.assertTrue(all(r["builtin"] and r["side"] == "pair" for r in rows))
+            for r in rows:
+                for side in ("right", "left"):
+                    with Image.open(store.file(r[side].split("/")[-1])) as im:
+                        self.assertEqual(im.mode, "RGBA")
+                        self.assertGreater(im.getchannel("A").getextrema()[1], 60)      # the lightest built-in pair peaks at 128
+            # deleting one is remembered: a restart does not put it back
+            self.assertTrue(store.remove(rows[0]["id"]))
+            again = D.TemplateStore(Path(tmp) / "t")
+            self.assertEqual([r["name"] for r in again.list()], [n for n, _ in D.BUILTINS][1:])
+
     def test_template_store_round_trip(self):
         from browlab import design as D
 
         with tempfile.TemporaryDirectory() as tmp:
             store = D.TemplateStore(Path(tmp) / "t")
+            for r in store.list():                                          # start from an empty library
+                store.remove(r["id"])
             self.assertEqual(store.list(), [])
             rows = store.add("sheet", _brow_sheet(rows=2), "right")
             self.assertEqual([r["name"] for r in rows], ["sheet 1", "sheet 2"])

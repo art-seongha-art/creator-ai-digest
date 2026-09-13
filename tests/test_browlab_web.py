@@ -463,7 +463,11 @@ class WebServerTest(unittest.TestCase):
         self.assertTrue(pair["right"] and pair["left"])
 
         status, lst, _ = self.call("/api/templates")
-        self.assertEqual([t["id"] for t in lst["templates"]], [single["id"], out["added"][0]["id"], out["added"][1]["id"]])
+        builtin = [t for t in lst["templates"] if t.get("builtin")]
+        self.assertEqual(len(builtin), 5)                                   # the pairs that ship with the app
+        self.assertTrue(all(t["side"] == "pair" and t["right"] and t["left"] for t in builtin))
+        self.assertEqual([t["id"] for t in lst["templates"] if not t.get("builtin")],
+                         [single["id"], out["added"][0]["id"], out["added"][1]["id"]])
         status, raw, headers = self.call("/" + pair["right"], raw=True)
         self.assertEqual((status, headers["Content-Type"]), (200, "image/png"))
         with Image.open(io.BytesIO(raw)) as im:
@@ -475,7 +479,7 @@ class WebServerTest(unittest.TestCase):
         status, _, _ = self.call(f"/api/templates/{single['id']}/delete", {})
         self.assertEqual(status, 200)
         status, lst, _ = self.call("/api/templates")
-        self.assertEqual(len(lst["templates"]), 2)
+        self.assertEqual(len([t for t in lst["templates"] if not t.get("builtin")]), 2)
         status, _, _ = self.call("/" + single["left"], raw=True)
         self.assertEqual(status, 404)                                       # the file went with it
         status, _, _ = self.call(f"/api/templates/{single['id']}/delete", {})

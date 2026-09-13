@@ -354,6 +354,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-legend{position:absolute;right:10px;top:10px;display:flex;gap:9px;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.55);font-size:11px;color:#ddd;pointer-events:none}
 .dz-legend i{display:inline-block;width:9px;height:9px;border-radius:999px;border:2px solid;background:#fff;vertical-align:-1px;margin-right:4px}
 .dz-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:#cdc6bd;font-size:14px;background:rgba(10,9,8,.7)}
+.dz-empty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(88%,420px);padding:14px 18px;border-radius:14px;background:rgba(20,17,15,.88);color:#f4f1ec;font-size:14px;line-height:1.55;text-align:center;pointer-events:none}
 .dz-side{background:var(--panel);color:var(--ink);display:flex;flex-direction:column;max-height:48dvh;border-top:1px solid var(--line);min-height:0}
 .dz-tabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);flex:0 0 auto}
 .dz-tabs button{flex:1;height:36px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
@@ -725,6 +726,7 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
     <div class="dz-nums" id="dzNums"></div>
     <div class="dz-legend" id="dzLegend"><span><i style="border-color:#4fa3ff"></i>윗선</span><span><i style="border-color:#ffb84f"></i>아랫선</span><span><i style="border-color:#e2865f"></i>꼬리</span></div>
     <div class="dz-wait" id="dzWait" hidden><div class="spinner"></div><span>불러오는 중…</span></div>
+    <div class="dz-empty" id="dzEmpty" hidden>도안이 없어 눈썹을 올릴 수 없습니다. 아래 <b>도안</b> 탭에서 도안 PNG 나 도안 시트를 올리세요.</div>
   </div>
   <div class="dz-side">
     <div class="dz-tabs" id="dzTabs">
@@ -1447,6 +1449,13 @@ function frameNormals(pts){ // tangent by central differences on the polyline, n
   const n=pts.length; pts.forEach((p,i)=>{ const a=pts[Math.max(0,i-1)].c, b=pts[Math.min(n-1,i+1)].c;
     const t=V.unit(V.sub(b,a)); p.t=t; p.n={x:t.y,y:-t.x}; }); }
 function cloneBrow(b){ const o={}; for(const k in b) o[k]={x:b[k].x,y:b[k].y}; return o; }
+function cubicFit(us,ys){ // least squares y = a0 + a1 u + a2 u² + a3 u³, so the outline is a curve, not the hairs' silhouette
+  const n=4, A=Array.from({length:n},()=>new Float64Array(n+1));
+  us.forEach((u,i)=>{ const pw=[1,u,u*u,u*u*u]; for(let r=0;r<n;r++){ for(let c=0;c<n;c++) A[r][c]+=pw[r]*pw[c]; A[r][n]+=pw[r]*ys[i]; } });
+  for(let c=0;c<n;c++){ let piv=c; for(let r=c+1;r<n;r++) if(Math.abs(A[r][c])>Math.abs(A[piv][c])) piv=r; [A[c],A[piv]]=[A[piv],A[c]];
+    if(Math.abs(A[c][c])<1e-12) return null;
+    for(let r=0;r<n;r++){ if(r===c) continue; const f=A[r][c]/A[c][c]; for(let k=c;k<=n;k++) A[r][k]-=f*A[c][k]; } }
+  const a=[0,1,2,3].map(r=>A[r][n]/A[r][r]); return u=>a[0]+a[1]*u+a[2]*u*u+a[3]*u*u*u; }
 
 /* the template: spine, thickness profile, where its arch is */
 function analyseTemplate(img, flip, headRight){
@@ -1478,6 +1487,11 @@ function analyseTemplate(img, flip, headRight){
     p.eT=t+2; p.eB=b+2; });
   ['eT','eB'].forEach(key=>{ const v=smp.map(p=>p[key]);        // a gap between two hairs must not pinch the brow
     smp.forEach((p,i)=>{ let m=0; for(let k=-2;k<=2;k++){ const j=i+k; if(j>=0&&j<smp.length) m=Math.max(m,v[j]); } p[key]=Math.max(3,m); }); });
+  // The outline the practitioner sees (and the handles sit on) is a smooth curve fitted
+  // through those extents - a brow shape, not the jagged silhouette of single hairs.
+  // The mesh underneath keeps an envelope that still covers every hair.
+  ['gT','gB'].forEach((key,k)=>{ const src=k?'eB':'eT'; const fit=cubicFit(smp.map(p=>p.u), smp.map(p=>p[src]));
+    smp.forEach(p=>{ p[key]=Math.max(3, fit?fit(p.u):p[src]); p[src]=Math.max(p[src], p[key])+1; }); });
   let uA=0.6, best=Infinity;                                   // the arch: highest point of the upper edge, past the head's fan
   smp.forEach(p=>{ if(p.u<0.3||p.u>0.85) return; const y=p.c.y+p.n.y*p.eT; if(y<best){ best=y; uA=p.u; } });
   // The head handles sit a little in from the tip, where the head has its full height:
@@ -1488,7 +1502,7 @@ function analyseTemplate(img, flip, headRight){
   const S=spineCurve(head, smp[iA].c, tail), tipLen=V.dist(smp[0].c, head), tipFrac=tipLen/(V.dist(head,smp[iA].c)||1);
   // what the drawing does beyond that curve, in chord units, so placing the template only
   // needs the head-to-tail distance on the face
-  smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; });
+  smp.forEach(p=>{ const r=V.sub(p.c, spineAt(S,p.u,uH,uA,tipLen)); p.r={e:V.dot(r,e)/chord, p:V.dot(r,ep)/chord}; p.eT/=chord; p.eB/=chord; p.gT/=chord; p.gB/=chord; });
   return {W,H,cv,smp,uA,uH,iA,iH,chord,flipN,tipFrac};
 }
 function loadImg(url){ return DZ.imgCache[url] || (DZ.imgCache[url]=new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous';
@@ -1541,7 +1555,11 @@ function anchorFromOutline(pts, centreX){ // the brow's head and tail from the d
   let upper=P.slice(0,h), lower=P.slice(h);
   const headFirst=arr=>Math.abs(arr[0].x-centreX)<Math.abs(arr[arr.length-1].x-centreX);
   if(!headFirst(upper)) upper=upper.slice().reverse(); if(!headFirst(lower)) lower=lower.slice().reverse();
-  return {H:V.mid(upper[0],lower[0]), T:V.mid(upper[upper.length-1], lower[lower.length-1])};
+  const H=V.mid(upper[0],lower[0]), T=V.mid(upper[upper.length-1], lower[lower.length-1]);
+  // the detector's tail is where the hair stops; a design usually carries the tail a little
+  // further out - along the eye line, so a brow that slopes down does not droop further
+  const up=faceUp(), out=V.unit({x:-up.y*Math.sign(T.x-H.x), y:up.x*Math.sign(T.x-H.x)});
+  return {H, T:V.add(T, V.mul(out, 0.1*V.dist(H,T)))};
 }
 function initAnchors(){
   const lm=DZ.lm;
@@ -1553,14 +1571,14 @@ function initAnchors(){
   const mk=s=>({H:{x:cx+s*0.28*d,y:cy-0.35*d}, T:{x:cx+s*0.98*d,y:cy-0.36*d}});
   return {right:mk(-1), left:mk(1)};
 }
-function fitTemplate(side){ // the drawing as drawn, scaled and turned so its head and tail meet the anchor's
+function fitTemplate(side){ // the drawing as drawn, scaled and turned so its first hair and its tail meet the anchor's
   const T=DZ.tex[side], a=DZ.anchor&&DZ.anchor[side]; if(!T||!a) return null;
-  const Ht=T.smp[T.iH].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
+  const Ht=T.smp[0].c, Tt=T.smp[T.smp.length-1].c, s=V.dist(a.H,a.T)/(V.dist(Ht,Tt)||1);
   const ang=Math.atan2(a.T.y-a.H.y,a.T.x-a.H.x)-Math.atan2(Tt.y-Ht.y,Tt.x-Ht.x), cs=Math.cos(ang), sn=Math.sin(ang);
   const map=p=>{ const dx=p.x-Ht.x, dy=p.y-Ht.y; return {x:a.H.x+(dx*cs-dy*sn)*s, y:a.H.y+(dx*sn+dy*cs)*s}; };
   const sH=T.smp[T.iH], sA=T.smp[T.iA], ch=T.chord;
-  return {hT:map(V.add(sH.c,V.mul(sH.n,sH.eT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.eB*ch))),
-          aT:map(V.add(sA.c,V.mul(sA.n,sA.eT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.eB*ch))), t:map(Tt)};
+  return {hT:map(V.add(sH.c,V.mul(sH.n,sH.gT*ch))), hB:map(V.sub(sH.c,V.mul(sH.n,sH.gB*ch))),
+          aT:map(V.add(sA.c,V.mul(sA.n,sA.gT*ch))), aB:map(V.sub(sA.c,V.mul(sA.n,sA.gB*ch))), t:map(Tt)};
 }
 function initBrows(){ const out={right:fitTemplate('right'), left:fitTemplate('left')};
   DZ.auto={right:cloneBrow(out.right), left:cloneBrow(out.left)}; return out; }
@@ -1584,13 +1602,14 @@ function browGeometry(side){
   const pts=T.smp.map(p=>{ const q=spineAt(S,p.u,T.uH,T.uA,tipLen); return {u:p.u, c:{x:q.x+(p.r.e*e.x+p.r.p*ep.x)*chord, y:q.y+(p.r.e*e.y+p.r.p*ep.y)*chord}}; });
   frameNormals(pts); if(T.flipN) pts.forEach(p=>{ p.n={x:-p.n.x,y:-p.n.y}; });
   const sH=T.smp[T.iH], sA=T.smp[T.iA];
-  const kTH=V.dist(b.hT,H)/(sH.eT*chord), kBH=V.dist(b.hB,H)/(sH.eB*chord);
-  const kTA=V.dist(b.aT,A)/(sA.eT*chord), kBA=V.dist(b.aB,A)/(sA.eB*chord);
+  const kTH=V.dist(b.hT,H)/(sH.gT*chord), kBH=V.dist(b.hB,H)/(sH.gB*chord);
+  const kTA=V.dist(b.aT,A)/(sA.gT*chord), kBA=V.dist(b.aB,A)/(sA.gB*chord);
   pts.forEach((p,i)=>{ const s=T.smp[i];
     // the tip keeps the head's scale, the tail keeps the arch's; between them it blends
     const f=p.u<=T.uH?0 : p.u>=T.uA?1 : (p.u-T.uH)/(T.uA-T.uH);
     const kT=kTH+(kTA-kTH)*f, kB=kBH+(kBA-kBH)*f;
-    p.top=V.add(p.c, V.mul(p.n, s.eT*chord*kT)); p.bot=V.sub(p.c, V.mul(p.n, s.eB*chord*kB)); });
+    p.top=V.add(p.c, V.mul(p.n, s.eT*chord*kT)); p.bot=V.sub(p.c, V.mul(p.n, s.eB*chord*kB));     // mesh envelope
+    p.gTop=V.add(p.c, V.mul(p.n, s.gT*chord*kT)); p.gBot=V.sub(p.c, V.mul(p.n, s.gB*chord*kB)); });   // outline
   return {side, pts, H, A, T:Tl, iA:T.iA, iH:T.iH, chord, e};
 }
 function drawTri(ctx, tex, s0,s1,s2, d0,d1,d2){
@@ -1629,13 +1648,13 @@ function paintBrows(ctx, view){
   ctx.drawImage(lay,x0,y0); ctx.restore();
 }
 function handlePoints(side){ const g=DZ.geo[side]; if(!g) return [];
-  return [{k:'hT',...g.pts[g.iH].top},{k:'hB',...g.pts[g.iH].bot},{k:'aT',...g.pts[g.iA].top},{k:'aB',...g.pts[g.iA].bot},{k:'t',...g.T}]; }
+  return [{k:'hT',...g.pts[g.iH].gTop},{k:'hB',...g.pts[g.iH].gBot},{k:'aT',...g.pts[g.iA].gTop},{k:'aB',...g.pts[g.iA].gBot},{k:'t',...g.T}]; }
 const HCOL={hT:'#4fa3ff',aT:'#4fa3ff',hB:'#ffb84f',aB:'#ffb84f',t:'#e2865f'};
 function drawHandles(ctx){
   const {s,tx,ty}=DZ.view; ctx.setTransform(DZ.dpr,0,0,DZ.dpr,0,0);
   ['right','left'].forEach(side=>{ const g=DZ.geo[side]; if(!g) return; const act=side===DZ.active;
-    ctx.beginPath(); g.pts.forEach((p,i)=>{ const X=p.top.x*s+tx, Y=p.top.y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); });
-    for(let i=g.pts.length-1;i>=0;i--){ const p=g.pts[i]; ctx.lineTo(p.bot.x*s+tx,p.bot.y*s+ty); } ctx.closePath();
+    ctx.beginPath(); g.pts.forEach((p,i)=>{ const X=p.gTop.x*s+tx, Y=p.gTop.y*s+ty; i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); });
+    for(let i=g.pts.length-1;i>=0;i--){ const p=g.pts[i]; ctx.lineTo(p.gBot.x*s+tx,p.gBot.y*s+ty); } ctx.closePath();
     ctx.strokeStyle=act?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
     handlePoints(side).forEach(h=>{ const X=h.x*s+tx, Y=h.y*s+ty; ctx.beginPath(); ctx.arc(X,Y,act?7:5.5,0,Math.PI*2);
       ctx.fillStyle='#fff'; ctx.fill(); ctx.lineWidth=2.2; ctx.strokeStyle=HCOL[h.k]; ctx.stroke(); });
@@ -1668,7 +1687,7 @@ function hitHandle(c){ const {s,tx,ty}=DZ.view; let best=null, bd=18;
   [DZ.active, DZ.active==='right'?'left':'right'].forEach(side=>handlePoints(side).forEach(h=>{ const d=Math.hypot(h.x*s+tx-c.x, h.y*s+ty-c.y); if(d<bd){ bd=d; best={side,k:h.k}; } }));
   return best; }
 function hitBrow(p){ for(const side of ['right','left']){ const g=DZ.geo[side]; if(!g) continue;
-    const poly=g.pts.map(q=>q.top).concat(g.pts.slice().reverse().map(q=>q.bot)); let inside=false;
+    const poly=g.pts.map(q=>q.gTop).concat(g.pts.slice().reverse().map(q=>q.gBot)); let inside=false;
     for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const a=poly[i], b=poly[j];
       if((a.y>p.y)!==(b.y>p.y) && p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x) inside=!inside; }
     if(inside) return side; } return null; }
@@ -1768,7 +1787,8 @@ function renderTplList(){
     c.onclick=async()=>{ await setTemplate(t.id); if(!DZ.brows.right) DZ.brows=initBrows(); dzRender(); dzDirty(); };
     box.appendChild(c); });
 }
-async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templates||[]; }catch(e){ DZ.tpls=[]; } renderTplList(); }
+async function loadTemplates(){ try{ DZ.tpls=(await api('api/templates')).templates||[]; }catch(e){ DZ.tpls=[]; }
+  $('#dzEmpty').hidden=!!DZ.tpls.length; renderTplList(); }
 function renderLookPanel(){
   const st=$('#dzStages'); st.replaceChildren();
   STAGES.forEach(([k,ko,op,bl])=>{ const b=el('button','',ko); b.type='button'; b.classList.toggle('on',DZ.look.opacity===op&&DZ.look.blur===bl);

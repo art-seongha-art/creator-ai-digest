@@ -26,6 +26,11 @@ SIDES = ("right", "left", "pair")
 TEMPLATE_COLOUR = (60, 48, 40)
 PHOTO_MAX_EDGE = 3000
 _NAME_RE = re.compile(r"^t_[0-9a-f]{8}\.png$")
+# Designs that ship with the app, so the first consultation has brows to show before the
+# practitioner has drawn any: the five pairs cut from the studio's own template sheet.
+BUILTIN_DIR = Path(__file__).with_name("templates")
+BUILTINS = [("스파인 6", "spine6"), ("스파인 3", "spine3"), ("스파인 2.5", "spine2_5"),
+            ("스파인 2 up", "spine2up"), ("스파인 5", "spine5")]
 
 
 def _now() -> str:
@@ -93,6 +98,28 @@ class TemplateStore:
         self.root = root
         self.lock = threading.Lock()
         self.root.mkdir(parents=True, exist_ok=True)
+        if not self.index_path.exists():
+            self._seed()
+
+    def _seed(self) -> None:
+        """A brand-new library starts with the built-in pairs. Deleting one sticks: the
+        index exists from then on, so nothing is put back on the next start."""
+        rows: List[Dict[str, Any]] = []
+        for name, stem in BUILTINS:
+            files = {side: BUILTIN_DIR / f"{stem}_{side}.png" for side in ("right", "left")}
+            if not all(f.is_file() for f in files.values()):
+                continue
+            row: Dict[str, Any] = {"id": secrets.token_hex(4), "name": name, "created": _now(), "side": "pair",
+                                   "builtin": True}
+            for side, src in files.items():
+                with Image.open(src) as im:
+                    im.load()
+                    picture = im.convert("RGBA")
+                row[side] = self._store(picture)
+            row["w"], row["h"] = picture.size
+            rows.append(row)
+        with self.lock:
+            self._write(rows)
 
     @property
     def index_path(self) -> Path:
