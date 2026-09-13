@@ -948,6 +948,14 @@ class JobStore:
         label = _text(name, 60) or f"회원_{index}"
         folder = self.job_dir(job_id) / "saves"
         folder.mkdir(parents=True, exist_ok=True)
+        # every press keeps a new picture, so a second one under the same name is numbered
+        # rather than sitting in the gallery as a second card with an identical label
+        taken = {row["name"] for row in self.saved_edits(job, {f["name"]: f for f in self.list_files(job)})}
+        if label in taken:
+            base, n = label, 2
+            while f"{base} {n}" in taken:
+                n += 1
+            label = f"{base} {n}"
         stem = f"{index:03d}"
         picture.save(folder / f"{stem}.png")
         meta = {"index": index, "name": label, "created": _now(),

@@ -338,9 +338,16 @@ class WebServerTest(unittest.TestCase):
         self.assertEqual(status, 200, out2)
         self.assertEqual(out2["name"], f"회원_{out['index'] + 1}")    # blank names auto-number, and keep counting
 
+        # pressing save again for the same client keeps a second picture under a numbered name
+        status, again, _ = self.call("/api/saves", {"job": job_id, "name": "김하늘", "image": png, "settings": {}})
+        self.assertEqual((status, again["name"]), (200, "김하늘 2"), again)
+        status, third, _ = self.call("/api/saves", {"job": job_id, "name": "김하늘", "image": png, "settings": {}})
+        self.assertEqual(third["name"], "김하늘 3")
+        self.assertNotEqual(third["url"], again["url"])            # a new picture, not an overwrite
+
         status, gal, _ = self.call("/api/gallery")
         saves = [i for i in gal["items"] if i.get("saved")]
-        self.assertEqual({i["label"] for i in saves}, {"김하늘", out2["name"]})
+        self.assertEqual({i["label"] for i in saves}, {"김하늘", "김하늘 2", "김하늘 3", out2["name"]})
         one = next(i for i in saves if i["label"] == "김하늘")
         self.assertEqual(one["kind_ko"], "저장한 보정")
         self.assertEqual(one["edit"], {"overlay": 0.7, "brightness": 6})   # the settings come back

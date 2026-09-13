@@ -405,6 +405,15 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
 .dz-row .btn{height:38px;font-size:13px;padding:0 12px}
 .dz-row .sp{flex:1}
 .dz-note{font-size:12px;color:var(--muted)}
+.dz-auto{font-size:12px;color:var(--muted);padding:8px 10px;border-radius:9px;background:var(--panel-3);line-height:1.5}
+.dz-auto b{color:var(--ink)}
+.dz-auto::after{content:"";font-weight:600}
+.dz-auto[data-state=saving]::after{content:" · 저장 중…"}
+.dz-auto[data-state=saved]::after{content:" · 저장됨";color:var(--ok)}
+.dz-auto[data-state=failed]::after{content:" · 저장 실패 (연결 확인)";color:var(--warn)}
+.dz-shots{display:flex;flex-direction:column;gap:4px}
+.dz-shots span{display:flex;gap:8px;font-size:12px;color:var(--muted)}
+.dz-shots b{font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dz-file{display:none}
 @media (min-width:1120px){
   .dz.immersive{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) 372px}
@@ -822,18 +831,20 @@ pre.log{margin:8px 0 0;background:#14120f;color:#e6e0d7;padding:11px;border-radi
         <dl class="spec" id="dzSpec"></dl>
         <label class="field"><span>동공 간 거리 mm <em class="hint-inline">치수 계산용 · 여 62 / 남 64</em></span><input id="dzIpd" type="number" step="0.5" min="50" max="75" value="62"></label>
         <label class="field"><span>상담 메모</span><textarea id="dzNotes" placeholder="예: 꼬리 3mm 연장 희망, 애쉬 브라운, 2주 뒤 시술"></textarea></label>
+        <div class="dz-auto" id="dzAuto">조절한 내용은 저절로 저장됩니다 · 갤러리의 <b>상담 이어하기</b> 로 이 상태 그대로 열립니다</div>
+        <div class="eyebrow">시안 남기기 <em class="hint-inline">누를 때마다 지금 화면이 한 장으로 갤러리에 쌓입니다</em></div>
         <div class="dz-row">
-          <button class="btn dark" type="button" id="dzSave">갤러리에 저장</button>
+          <button class="btn dark" type="button" id="dzSave">시안 한 장 저장</button>
           <button class="btn" type="button" id="dzDownload">내려받기</button>
           <button class="btn" type="button" id="dzPrint">1:1 출력 시트</button>
         </div>
-        <div class="eyebrow">전후 비교 이미지 <em class="hint-inline">눈썹 부분만 잘라 원본 · 시안을 나란히</em></div>
         <div class="dz-row">
-          <button class="btn" type="button" id="dzCmpSave">비교 이미지 갤러리에 저장</button>
-          <button class="btn" type="button" id="dzCmpDl">비교 이미지 내려받기</button>
+          <button class="btn" type="button" id="dzCmpSave">전후 비교로 한 장</button>
+          <button class="btn" type="button" id="dzCmpDl">전후 비교 내려받기</button>
         </div>
         <div class="msg ok" id="dzSaveNote"></div>
-        <div class="dz-note">갤러리에 저장한 시안은 눌러서 열면 원본과 반씩 비교하거나, 누르고 있는 동안 원본을 볼 수 있습니다.</div>
+        <div class="dz-shots" id="dzShots"></div>
+        <div class="dz-note">시안은 갤러리에서 눌러 원본과 반씩 비교하거나, 누르고 있는 동안 원본을 볼 수 있습니다. 여러 장을 남겨 두고 상담자와 고르면 됩니다.</div>
       </div>
     </div>
   </div>
@@ -2119,8 +2130,17 @@ function immersiveOff(){ const dz=$('#dz'); if(!dz.classList.contains('immersive
 
 /* open, save, close */
 function dzState(){ return {tpl:DZ.tplId, brows:DZ.brows, look:DZ.look, sym:DZ.sym, ipd:DZ.ipd, notes:DZ.notes, active:DZ.active, retouch:DZ.retouch}; }
+function renderShots(){ const box=$('#dzShots'); if(!box) return; box.replaceChildren();
+  if(!DZ.saves.length){ box.appendChild(el('span','','아직 남긴 시안이 없습니다')); return; }
+  DZ.saves.slice(-6).forEach((sv,i,arr)=>{ const row=el('span');
+    row.appendChild(el('b','',(DZ.saves.length-arr.length+i+1)+'. '+(sv.name||'')));
+    row.appendChild(el('i','',fmtTime(sv.created))); box.appendChild(row); }); }
 function dzDirty(){ DZ.dirtySince=Date.now(); clearTimeout(DZ.saveTimer);
-  DZ.saveTimer=setTimeout(async()=>{ if(!DZ.id) return; try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client}); }catch(e){} }, 900); }
+  const auto=$('#dzAuto'); if(auto) auto.dataset.state='saving';
+  DZ.saveTimer=setTimeout(async()=>{ if(!DZ.id) return;
+    try{ await post('api/designs/'+DZ.id,{state:dzState(), client:DZ.client});
+      if(auto) auto.dataset.state='saved';
+    }catch(e){ if(auto) auto.dataset.state='failed'; } }, 900); }
 async function openDesign(id){
   const dz=$('#dz'); dz.hidden=false; $('#dzWait').hidden=false;
   try{
@@ -2138,13 +2158,13 @@ async function openDesign(id){
     $('#dzGuides').checked=DZ.guides=true; $('#dzPts').classList.add('on'); DZ.wipe={on:false,x:0.5}; $('#dzWipe').classList.remove('on');
     DZ.lines=false; $('#dzLines').classList.remove('on'); $('#dzOrig').classList.remove('on'); $('#dz').classList.remove('folded'); immersiveOff();
     DZ.hist=[]; DZ.histAt=-1; DZ.layKey=null; DZ.shapeCache={}; DZ.retouch=Array.isArray(s.retouch)?s.retouch:[]; DZ.base=null; DZ.stroke=null; DZ.cursor=null; if(DZ.setTool) DZ.setTool('move');
-    $('#dzSaveNote').textContent=DZ.saves.length?`저장 ${DZ.saves.length}장 · 마지막 ${fmtTime(DZ.lastSave.created)}`:'';
+    $('#dzSaveNote').textContent=''; $('#dzAuto').dataset.state='saved';
     dzResize();
     await new Promise((res,rej)=>{ DZ.photo.onload=res; DZ.photo.onerror=()=>rej(new Error('사진을 불러오지 못했습니다')); DZ.photo.src=d.photo; });
     DZ.hair=sampleHair(); rebuildBase();
     await loadTemplates(); await setTemplate(DZ.tplId);
     if(DZ.tex.right){ const auto=initBrows(); if(!DZ.brows.right||!DZ.brows.left) DZ.brows=auto; ensureMid('right'); ensureMid('left'); }
-    renderLookPanel(); dzActiveLabel(); zoomBrows(); dzRender(); pushHist();
+    renderLookPanel(); renderShots(); dzActiveLabel(); zoomBrows(); dzRender(); pushHist();
     if(d.warning) toast(d.warning,'bad');
     if(!DZ.tpls.length) { $$('#dzTabs button')[0].click(); toast('먼저 도안을 올려 주세요','bad'); }
   }catch(e){ toast(e.message,'bad'); dz.hidden=true; }
@@ -2162,7 +2182,7 @@ async function dzSave(thenPrint){
     const out=await post('api/saves',{job:DZ.id, name:DZ.client, image:data, settings:{...DZ.look, tpl:tpl?tpl.name:'', ipd:DZ.ipd, notes:DZ.notes}});
     if(!DZ.client){ DZ.client=out.name; $('#dzClient').value=out.name; }
     DZ.lastSave={image:out.url.replace(/^files\/[^/]+\//,''), name:out.name, created:new Date().toISOString()}; DZ.saves.push(DZ.lastSave);
-    note.textContent=`${out.name} (으)로 저장했습니다`; dzDirty();
+    note.textContent=`${out.name} · 시안 ${DZ.saves.length}장`; renderShots(); dzDirty();
     if(thenPrint){ await post('api/jobs',{kind:'sheet', photo_from:{job:DZ.id, file:DZ.lastSave.image}, photo_name:out.name+' 상담 시안', layout:'both', ipd_mm:String(DZ.ipd)});
       toast('1:1 출력 시트를 만들고 있습니다 · 갤러리에서 확인하세요','good'); }
     else toast(out.name+' (으)로 갤러리에 저장했습니다','good');
@@ -2184,7 +2204,8 @@ async function dzCompare(toGallery){ if(!DZ.id||!DZ.tex.right) return toast('도
   const data=compareCanvas().toDataURL('image/jpeg',0.92);
   if(!toGallery){ saveBlob(data, `${(DZ.client||'상담').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'상담'}_전후_${new Date().toISOString().slice(0,10)}.jpg`); return toast('비교 이미지를 내려받았습니다','good'); }
   try{ const out=await post('api/saves',{job:DZ.id, name:(DZ.client||'')&&DZ.client+' 전후', image:data, settings:{...DZ.look, side_by_side:true, notes:DZ.notes}});
-    toast(out.name+' (으)로 갤러리에 저장했습니다','good'); }catch(e){ toast(e.message,'bad'); } }
+    DZ.saves.push({image:out.url.replace(/^files\/[^/]+\//,''), name:out.name, created:new Date().toISOString()});
+    renderShots(); toast(out.name+' (으)로 갤러리에 저장했습니다','good'); }catch(e){ toast(e.message,'bad'); } }
 function saveBlob(dataUrl, filename){ // synchronous, so the click's activation still covers the download
   const bin=atob(dataUrl.slice(dataUrl.indexOf(',')+1)), bytes=new Uint8Array(bin.length);
   for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
